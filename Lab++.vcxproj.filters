@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow">
+      <UniqueIdentifier>{401162db-b5d2-4e34-94e9-e7884272c395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config">
+      <UniqueIdentifier>{0e7e9c72-79c9-44d3-a9af-f98d02c785ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\voltage">
+      <UniqueIdentifier>{0e73881b-8ffc-4646-8874-273784c44434}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\footer">
+      <UniqueIdentifier>{a7eb1433-a62c-4dcb-8e58-7917fb230d1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\open">
+      <UniqueIdentifier>{32ea75c0-5749-4b77-896d-4492df501c85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\play">
+      <UniqueIdentifier>{1e6f73c0-22a4-4d8e-8a7d-9f9fd80b216f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\plot">
+      <UniqueIdentifier>{9950f065-5c4f-4fe6-ae3f-77a8751dcdbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\table">
+      <UniqueIdentifier>{4789c11a-f4c5-4414-92f3-b603e79d79a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement">
+      <UniqueIdentifier>{b3befb68-19ec-4a7c-b11f-368f3d8844c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type">
+      <UniqueIdentifier>{ed3f5ff3-b048-431b-9a8f-7a56c4cb6650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\voltage">
+      <UniqueIdentifier>{caaec548-c2a1-4b07-b767-a711c21163b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\tools">
+      <UniqueIdentifier>{d0067c81-34b9-4be2-8a78-96c16b0095a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\cycle">
+      <UniqueIdentifier>{e67beda2-dbc1-4fb1-a36a-197ff5f5d3be}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cApp.cpp">
+      <Filter>Fichiers sources\MainWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="cMain.cpp">
+      <Filter>Fichiers sources\MainWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="cConfig.cpp">
+      <Filter>Fichiers sources\MainWindow\config</Filter>
+    </ClCompile>
+    <ClCompile Include="cDaqmx.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
+    </ClCompile>
+    <ClCompile Include="cDaqmxScaleDlg.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
+    </ClCompile>
+    <ClCompile Include="cFooter.cpp">
+      <Filter>Fichiers sources\MainWindow\footer</Filter>
+    </ClCompile>
+    <ClCompile Include="cOpen.cpp">
+      <Filter>Fichiers sources\MainWindow\open</Filter>
+    </ClCompile>
+    <ClCompile Include="cPlay.cpp">
+      <Filter>Fichiers sources\MainWindow\play</Filter>
+    </ClCompile>
+    <ClCompile Include="cPlot.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
+    <ClCompile Include="cRender.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
+    <ClCompile Include="cScaleBtn.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
+    <ClCompile Include="cSignalBtn.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
+    <ClCompile Include="xlsx.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
+    <ClCompile Include="cTable.cpp">
+      <Filter>Fichiers sources\MainWindow\table</Filter>
+    </ClCompile>
+    <ClCompile Include="cDaqsim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
+    </ClCompile>
+    <ClCompile Include="cUSB6001.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
+    </ClCompile>
+    <ClCompile Include="cFilter.cpp">
+      <Filter>Fichiers sources\Measurement</Filter>
+    </ClCompile>
+    <ClCompile Include="cMeasurement.cpp">
+      <Filter>Fichiers sources\Measurement</Filter>
+    </ClCompile>
+    <ClCompile Include="cMeasurementControler.cpp">
+      <Filter>Fichiers sources\Measurement</Filter>
+    </ClCompile>
+    <ClCompile Include="cDropper.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cImagePanel.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cInicfg.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cMeasurementmanager.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cObjectmanager.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cSingleton.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cTick.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadBitmapFromRessource.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cCycle.cpp">
+      <Filter>Fichiers sources\cycle</Filter>
+    </ClCompile>
+    <ClCompile Include="cCycleControler.cpp">
+      <Filter>Fichiers sources\cycle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cApp.h">
+      <Filter>Fichiers sources\MainWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="cMain.h">
+      <Filter>Fichiers sources\MainWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="cConfig.h">
+      <Filter>Fichiers sources\MainWindow\config</Filter>
+    </ClInclude>
+    <ClInclude Include="cDaqmx.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
+    </ClInclude>
+    <ClInclude Include="cDaqmxScaleDlg.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
+    </ClInclude>
+    <ClInclude Include="cFooter.h">
+      <Filter>Fichiers sources\MainWindow\footer</Filter>
+    </ClInclude>
+    <ClInclude Include="cOpen.h">
+      <Filter>Fichiers sources\MainWindow\open</Filter>
+    </ClInclude>
+    <ClInclude Include="cPlay.h">
+      <Filter>Fichiers sources\MainWindow\play</Filter>
+    </ClInclude>
+    <ClInclude Include="cPlot.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="cRender.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="cScaleBtn.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="cSignalBtn.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="WinGraph.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="xlsx.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="cTable.h">
+      <Filter>Fichiers sources\MainWindow\table</Filter>
+    </ClInclude>
+    <ClInclude Include="cDaqsim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
+    </ClInclude>
+    <ClInclude Include="cUSB6001.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
+    </ClInclude>
+    <ClInclude Include="cFilter.h">
+      <Filter>Fichiers sources\Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="cMeasurement.h">
+      <Filter>Fichiers sources\Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="cMeasurementControler.h">
+      <Filter>Fichiers sources\Measurement</Filter>
+    </ClInclude>
+    <ClInclude Include="cDropper.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cImagePanel.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cInicfg.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cMeasurementmanager.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cObjectmanager.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cSingleton.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cTick.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadBitmapFromRessource.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="data_types.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="enum.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="cCycle.h">
+      <Filter>Fichiers sources\cycle</Filter>
+    </ClInclude>
+    <ClInclude Include="cCycleControler.h">
+      <Filter>Fichiers sources\cycle</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Lab++.rc">
+      <Filter>Fichiers de ressources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
