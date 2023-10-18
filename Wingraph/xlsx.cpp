@@ -1,4 +1,4 @@
-#include "Xlsx.h"
+/*#include "Xlsx.h"
 
 Excel::_WorksheetPtr pSheet;
 Excel::_ApplicationPtr xl = nullptr;
@@ -267,3 +267,5 @@ bool excel_close(HEXCEL hExcel)
 		return false;
 	}
 }
+
+*/

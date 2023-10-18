@@ -48,6 +48,9 @@
     <Filter Include="Fichiers sources\cycle">
       <UniqueIdentifier>{e67beda2-dbc1-4fb1-a36a-197ff5f5d3be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\pressure">
+      <UniqueIdentifier>{3b103719-5532-4223-bb56-d5601afd674c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp">
@@ -136,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="cCycleControler.cpp">
       <Filter>Fichiers sources\cycle</Filter>
+    </ClCompile>
+    <ClCompile Include="cPressure.cpp">
+      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="cCycleControler.h">
       <Filter>Fichiers sources\cycle</Filter>
+    </ClInclude>
+    <ClInclude Include="cPressure.h">
+      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

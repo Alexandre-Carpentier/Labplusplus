@@ -99,7 +99,7 @@ GLuint  base;                                   // Base Display List For The Fon
 SIZE dispStringWidth;							// The size  in pixel of "-0.000" displayed on screen
 CRITICAL_SECTION cs;							// Sync purpose
 FILE* logfile;									// The ascii log file
-HEXCEL XL;										// The xlsx log file
+//HEXCEL XL;										// The xlsx log file
 INT runonce;									// Used by UpdateBorder
 
 // High precision time measurements
@@ -233,7 +233,7 @@ BOOL StartGraph(HGRAPH hGraph)
 
 	if (pgraph->Logging == LOGGER_XLSX)
 	{
-
+		/*
 		// create unique filename
 
 		char lpDateStr[MAX_PATH] = "";
@@ -250,6 +250,7 @@ BOOL StartGraph(HGRAPH hGraph)
 		// Write header
 		char one_line[64] = "Logger header\tAnalog0\tAnalog1\t";
 		//excel_addline(XL, one_line);
+		*/
 	}
 
 	// Save the start time x=0
@@ -298,13 +299,14 @@ VOID StopGraph(HGRAPH hGraph)
 	}
 	if (pgraph->Logging == LOGGER_XLSX)
 	{
+		/*
 		if (XL)
 		{
 			excel_drawgraph(XL);
 			excel_save(XL, "test_excel.xlsx");
 			excel_close(XL);
 		}
-
+		*/
 	}
 
 	// Update status -> Graph OFF
@@ -1475,12 +1477,14 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 	}
 	if (pgraph->Logging == LOGGER_XLSX)
 	{
+		/*
 		if (XL)
 		{
 			char buffer[260] = "";
 			sprintf_s(buffer, "%lf\t", (double)((finish - start)) / frequency);
 			excel_addline(&XL, buffer);
 		}
+		*/
 	}
 
 	char lpszDataValues[260] = ""; // char values accumulator for XLSX; be carefull max 260 char -> BOF
@@ -1576,10 +1580,12 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 		}
 		if (pgraph->Logging == LOGGER_XLSX)
 		{
+			/*
 			if (XL)
 			{
 				sprintf_s(lpszDataValues, "%lf\t", y[index]);
 			}
+			*/
 		}
 	}
 	if (pgraph->Logging == LOGGER_ASCII)
@@ -1591,11 +1597,13 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 	}
 	if (pgraph->Logging == LOGGER_XLSX)
 	{
+		/*
 		if (XL)
 		{
 			HRESULT hres = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
 			excel_addline(XL, lpszDataValues);
 		}
+		*/
 	}
 
 

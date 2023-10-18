@@ -79,10 +79,10 @@
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\arfc_\source\repos\Lab-\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\arfc_\source\repos\Lab-\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -177,6 +177,7 @@
     <ClCompile Include="cOpen.cpp" />
     <ClCompile Include="cPlay.cpp" />
     <ClCompile Include="cPlot.cpp" />
+    <ClCompile Include="cPressure.cpp" />
     <ClCompile Include="cRender.cpp" />
     <ClCompile Include="cScaleBtn.cpp" />
     <ClCompile Include="cSignalBtn.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="cOpen.h" />
     <ClInclude Include="cPlay.h" />
     <ClInclude Include="cPlot.h" />
+    <ClInclude Include="cPressure.h" />
     <ClInclude Include="cRender.h" />
     <ClInclude Include="cScaleBtn.h" />
     <ClInclude Include="cSignalBtn.h" />

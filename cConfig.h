@@ -16,11 +16,12 @@
 class cPlot;
 class cCycle;
 class cDaqmx;
+class cPressure;
 class cObjectmanager;
 class cMeasurementControler;
 
 /*-----------------Duplication---------------------------------*/
-#include "..\Lab++\Plugin\cProtocol.h"
+#include "Plugin/cProtocol.h"
 enum PLUGIN_ACCESS {
 	READ,
 	WRITE,
@@ -122,6 +123,7 @@ private:
 
 	cPlot* m_plot_ = nullptr;
 	cDaqmx* m_daqmx = nullptr;
+	cPressure* m_pressure = nullptr;
 
 	typedef cDevice* (WINAPI* ATTACH)(wxWindow*);
 	ATTACH Attach;
@@ -148,6 +150,7 @@ public:
 	wxPanel* Getleftpan();
 	wxPanel* Getrightpan();
 	wxBoxSizer* Get_hsizer();
+	cPressure* get_pressuredevice();
 	cDaqmx* get_nidaq();
 
 	void set_graph(cPlot* m_plot);

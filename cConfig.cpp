@@ -9,6 +9,7 @@
 #include "cPlot.h"
 #include "cCycle.h"
 #include "cDaqmx.h"
+#include "cPressure.h"
 #include "cObjectmanager.h"
 #include "cMeasurementControler.h"
 
@@ -152,8 +153,19 @@ cConfig::cConfig(wxWindow* inst)
 	Daqmx_struct.Attach = nullptr;
 	plugin_vec.push_back(Daqmx_struct);
 
+	// Add cPressure to plugin vec
+	m_pressure = new cPressure(book);
+	PLUGIN_DATA Pressure_struct;
+	Pressure_struct.name = L"Pressure controler (Druck Pace 6000).dll";
+	Pressure_struct.panel = m_pressure->get_right_panel();
+	Pressure_struct.hInst = nullptr;
+	Pressure_struct.device = nullptr;
+	Pressure_struct.Attach = nullptr;
+	plugin_vec.push_back(Pressure_struct);
+
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
+	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
 	//book->AddPage(Daqmx_struct.panel, "cDaqmx");
 
 	/////////////////////////////////////////////////////
@@ -192,8 +204,8 @@ cConfig::cConfig(wxWindow* inst)
 	config_tree_ctrl->Bind(wxEVT_LEFT_DOWN, &cConfig::OnClickdrop, this, IDCCONFIGTREE);
 	config_tree_ctrl->SetBackgroundColour(wxColor(210, 210, 212));
 
-	wxTreeItemId config_root = config_tree_ctrl->AddRoot(L"Measurement modules");
-	wxTreeItemId config_voltage_node = config_tree_ctrl->AppendItem(config_root, "Voltage");
+	wxTreeItemId config_root = config_tree_ctrl->AddRoot(L"Plugins");
+	wxTreeItemId config_voltage_node = config_tree_ctrl->AppendItem(config_root, "Measurement modules");
 	//wxTreeItemId config_voltage_item1 = config_tree_ctrl->AppendItem(config_voltage_node, "NI DAQMX (USB6001;cDAQ/9205)");
 
 	// Remove ".dll" in filename and add it to the tree
@@ -365,6 +377,11 @@ wxBoxSizer* cConfig::Get_hsizer()
 cDaqmx* cConfig::get_nidaq()
 {
 	return m_daqmx;
+}
+
+cPressure* cConfig::get_pressuredevice()
+{
+	return m_pressure;
 }
 
 void cConfig::set_graph(cPlot* m_plot)

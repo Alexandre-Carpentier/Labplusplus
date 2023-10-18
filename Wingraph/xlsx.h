@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -40,3 +40,4 @@ bool excel_additem_on_current_line(HEXCEL hExcel, char item[260], int x);
 bool excel_cariage_return(HEXCEL hExcel);
 bool excel_drawgraph(HEXCEL hExcel);
 bool excel_close(HEXCEL hExcel);
+*/

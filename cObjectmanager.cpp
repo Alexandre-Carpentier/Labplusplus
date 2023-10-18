@@ -25,6 +25,11 @@ void cObjectmanager::set_daqmx(cDaqmx* m_daq)
 	m_daq_ = m_daq;
 }
 
+void cObjectmanager::set_pressuredevice(cPressure* m_pressure)
+{
+	m_pressure_ = m_pressure;
+}
+
 void cObjectmanager::set_table(cTable* m_table)
 {
 	m_table_ = m_table;
@@ -58,6 +63,11 @@ cConfig* cObjectmanager::get_config()
 cDaqmx* cObjectmanager::get_daqmx()
 {
 	return m_daq_;
+}
+
+cPressure* cObjectmanager::get_pressuredevice()
+{
+	return m_pressure_;
 }
 
 cTable* cObjectmanager::get_table()
