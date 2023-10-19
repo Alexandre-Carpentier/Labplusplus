@@ -372,72 +372,7 @@ cPressure::cPressure(wxWindow* inst)
 	static_chan_tc_max_range->Show(false);
 	chan_tc_max_range->Show(false);
 
-	////////////////////////////////////////////////////////////
 
-	wxStaticBox* channel_linearize_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Signal template");
-	channel_linearize_group_sizer = new wxStaticBoxSizer(channel_linearize_group, wxVERTICAL);
-
-	////////////////////////////////////////////////////////////
-
-	static_chan_scale = new wxStaticText(channel_linearize_group, IDCSTATICCHANSCALE, L"Linearize:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
-	static_chan_scale->SetFont(static_chan_scale->GetFont().Scale(text_size));
-	//static_chan_scale->SetBackgroundColour(*bgcolor);
-
-	chan_scale = new wxComboBox(channel_linearize_group, IDCCHANSCALE, label.channel_linearize[0].front(), wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.channel_linearize[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
-	chan_scale->SetFont(chan_scale->GetFont().Scale(text_size));
-	chan_scale->SetBackgroundColour(wxColor(250, 250, 250));
-
-	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnDaqScaleSelBtn, this, IDCCHANSCALE);
-	chan_scale->Disable();
-
-	////////////////////////////////////////////////////////////
-
-	static_chan_slope = new wxStaticText(channel_linearize_group, IDCSTATICCHANSLOPE, L"Slope:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
-	static_chan_slope->SetFont(static_chan_slope->GetFont().Scale(text_size));
-	//static_chan_slope->SetBackgroundColour(*bgcolor);
-
-	chan_slope = new wxTextCtrl(channel_linearize_group, IDCCHANSLOPE, label.channel_linearize_slope[0], wxDefaultPosition, inst->FromDIP(text_ctrl_size), TEXT_CTRL_STYLE);
-	chan_slope->SetFont(chan_slope->GetFont().Scale(text_size));
-	chan_slope->SetBackgroundColour(wxColor(250, 250, 250));
-	chan_slope->Enable(false);
-	chan_slope->Disable();
-
-	////////////////////////////////////////////////////////////
-
-	static_chan_shift = new wxStaticText(channel_linearize_group, IDCSTATICCHANSHIFT, L"Shift:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
-	static_chan_shift->SetFont(static_chan_shift->GetFont().Scale(text_size));
-	//static_chan_shift->SetBackgroundColour(*bgcolor);
-
-	chan_shift = new wxTextCtrl(channel_linearize_group, IDCCHANSHIFT, label.channel_linearize_shift[0], wxDefaultPosition, inst->FromDIP(text_ctrl_size), TEXT_CTRL_STYLE);
-	chan_shift->SetFont(chan_shift->GetFont().Scale(text_size));
-	chan_shift->SetBackgroundColour(wxColor(250, 250, 250));
-	chan_shift->Enable(false);
-	chan_shift->Disable();
-
-	////////////////////////////////////////////////////////////
-
-	static_chan_unit = new wxStaticText(channel_linearize_group, IDCSTATICCHANUNIT, L"Unit:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
-	static_chan_unit->SetFont(static_chan_unit->GetFont().Scale(text_size));
-	//static_chan_unit->SetBackgroundColour(*bgcolor);
-
-	chan_unit = new wxTextCtrl(channel_linearize_group, IDCCHANUNIT, label.channel_linearize_unit[0], wxDefaultPosition, inst->FromDIP(text_ctrl_size), TEXT_CTRL_STYLE);
-	chan_unit->SetFont(chan_unit->GetFont().Scale(text_size));
-	chan_unit->SetBackgroundColour(wxColor(250, 250, 250));
-	chan_unit->Enable(false);
-	chan_unit->Disable();
-
-	////////////////////////////////////////////////////////////
-
-	flexchansizer2->Add(static_chan_scale);
-	flexchansizer2->Add(chan_scale);
-	flexchansizer2->Add(static_chan_slope);
-	flexchansizer2->Add(chan_slope);
-	flexchansizer2->Add(static_chan_shift);
-	flexchansizer2->Add(chan_shift);
-	flexchansizer2->Add(static_chan_unit);
-	flexchansizer2->Add(chan_unit);
-
-	channel_linearize_group_sizer->Add(flexchansizer2);
 
 	////////////////////////////////////////////////////////////
 
@@ -1170,7 +1105,7 @@ void cPressure::OnDaqAddrSelBtn(wxCommandEvent& evt)
 	evt.Skip();
 	return;
 }
-
+x
 void cPressure::OnDaqScaleSelBtn(wxCommandEvent& evt)
 {
 	wxString val = chan_scale->GetValue();
