@@ -79,10 +79,10 @@
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\arfc_\source\repos\Lab-\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\arfc_\source\repos\Lab\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Users\arfc_\source\repos\Lab-\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\arfc_\source\repos\Lab\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -175,6 +175,8 @@
     <ClCompile Include="cMeasurementmanager.cpp" />
     <ClCompile Include="cObjectmanager.cpp" />
     <ClCompile Include="cOpen.cpp" />
+    <ClCompile Include="cPacecom.cpp" />
+    <ClCompile Include="cPasesim.cpp" />
     <ClCompile Include="cPlay.cpp" />
     <ClCompile Include="cPlot.cpp" />
     <ClCompile Include="cPressure.cpp" />
@@ -183,6 +185,7 @@
     <ClCompile Include="cSignalBtn.cpp" />
     <ClCompile Include="cSingleton.cpp" />
     <ClCompile Include="cTable.cpp" />
+    <ClCompile Include="cTension.cpp" />
     <ClCompile Include="cTick.cpp" />
     <ClCompile Include="cUSB6001.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
@@ -207,6 +210,8 @@
     <ClInclude Include="cMeasurementmanager.h" />
     <ClInclude Include="cObjectmanager.h" />
     <ClInclude Include="cOpen.h" />
+    <ClInclude Include="cPacecom.h" />
+    <ClInclude Include="cPacesim.h" />
     <ClInclude Include="cPlay.h" />
     <ClInclude Include="cPlot.h" />
     <ClInclude Include="cPressure.h" />
@@ -215,6 +220,7 @@
     <ClInclude Include="cSignalBtn.h" />
     <ClInclude Include="cSingleton.h" />
     <ClInclude Include="cTable.h" />
+    <ClInclude Include="cTension.h" />
     <ClInclude Include="cTick.h" />
     <ClInclude Include="cUSB6001.h" />
     <ClInclude Include="data_types.h" />

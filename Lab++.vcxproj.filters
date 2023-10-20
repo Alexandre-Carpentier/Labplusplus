@@ -51,6 +51,9 @@
     <Filter Include="Fichiers sources\MainWindow\config\pressure">
       <UniqueIdentifier>{3b103719-5532-4223-bb56-d5601afd674c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\pressure">
+      <UniqueIdentifier>{e6a1fb0c-3c7d-4d78-ba0a-f154c94bda15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp">
@@ -142,6 +145,15 @@
     </ClCompile>
     <ClCompile Include="cPressure.cpp">
       <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
+    </ClCompile>
+    <ClCompile Include="cTension.cpp">
+      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
+    </ClCompile>
+    <ClCompile Include="cPasesim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
+    </ClCompile>
+    <ClCompile Include="cPacecom.cpp">
+      <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +256,15 @@
     </ClInclude>
     <ClInclude Include="cPressure.h">
       <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
+    </ClInclude>
+    <ClInclude Include="cTension.h">
+      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
+    </ClInclude>
+    <ClInclude Include="cPacesim.h">
+      <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
+    </ClInclude>
+    <ClInclude Include="cPacecom.h">
+      <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

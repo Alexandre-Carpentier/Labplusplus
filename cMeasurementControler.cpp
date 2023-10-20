@@ -22,6 +22,7 @@ void cMeasurementControler::poll()
 	double Y[80]; memset(Y, 0, sizeof(Y));
 	cTick tick;
 	double time = 0.0;
+
 	//////////////////////////////////////////////////////////////////
 	//
 	// RUNONCE
@@ -84,7 +85,7 @@ void cMeasurementControler::poll()
 	//
 	// LOOP
 	//
-	statusbar->SetLabelText("Reading instruments...");
+	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 	while (1)
 	{
@@ -99,7 +100,7 @@ void cMeasurementControler::poll()
 			{
 				Sleep(4000);
 				if (m_plot_->get_graph_state() == false)
-				{					//std::cout << "bRunning: " << bRunning << "\n";
+				{					
 					std::cout << "cMeasurementcontroler->program break \n";
 					break;
 				}
@@ -111,6 +112,10 @@ void cMeasurementControler::poll()
 				int buffer_index = 0;
 				for (auto meas : meas_pool)
 				{
+					// Set the setpoint
+					meas->set(12.0);
+
+					// Get the read value
 					val = meas->read();
 					for (int c = buffer_index; c < val.buffer_size; c++)
 					{

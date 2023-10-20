@@ -10,6 +10,7 @@
 #include "cCycle.h"
 #include "cDaqmx.h"
 #include "cPressure.h"
+#include "cTension.h"
 #include "cObjectmanager.h"
 #include "cMeasurementControler.h"
 
@@ -101,8 +102,8 @@ cConfig::cConfig(wxWindow* inst)
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 
 	book = new wxSimplebook(config_rightpanel_, wxID_ANY);
-	book->SetEffectsTimeouts(1000, 1000);
-	book->SetEffect(wxSHOW_EFFECT_SLIDE_TO_RIGHT);
+	//book->SetEffectsTimeouts(1000, 1000);
+	//book->SetEffect(wxSHOW_EFFECT_SLIDE_TO_RIGHT);
 	book->SetFitToCurrentPage(true);
 	/*
 	wxSHOW_EFFECT_ROLL_TO_LEFT
@@ -163,10 +164,19 @@ cConfig::cConfig(wxWindow* inst)
 	Pressure_struct.Attach = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
+	// Add cTension to plugin vec
+	m_tension = new cTension(book);
+	PLUGIN_DATA Tension_struct;
+	Tension_struct.name = L"Voltage controler (Keytley 2280S).dll";
+	Tension_struct.panel = m_tension->get_right_panel();
+	Tension_struct.hInst = nullptr;
+	Tension_struct.device = nullptr;
+	Tension_struct.Attach = nullptr;
+	plugin_vec.push_back(Tension_struct);
+
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
-	//book->AddPage(Daqmx_struct.panel, "cDaqmx");
 
 	/////////////////////////////////////////////////////
 	// load and add dll instrument to plugin vec
@@ -177,21 +187,6 @@ cConfig::cConfig(wxWindow* inst)
 	wDir.append(L"\\Plugin");
 	std::cout << "[*] Try to load plugin in folder: " << wDir << "\n";
 	load_plugin(book, wDir);
-
-	/*
-	wxPanel* m_red_panel = new wxPanel(book, wxID_ANY);
-	m_red_panel->SetBackgroundColour(*wxLIGHT_GREY);
-	book->AddPage(m_red_panel, "light grey panel");
-
-	wxPanel* m_green_panel = new wxPanel(book, wxID_ANY);
-	m_green_panel->SetBackgroundColour(*wxGREEN);
-	book->AddPage(m_green_panel, "green panel");
-
-	wxPanel* m_blue_panel = new wxPanel(book, wxID_ANY);
-	m_blue_panel->SetBackgroundColour(*wxBLUE);
-	book->AddPage(m_blue_panel, "blue panel");
-
-	*/
 
 	mainSizer->Add(book, 1, wxEXPAND);
 	config_rightpanel_->SetSizer(mainSizer);
@@ -206,7 +201,6 @@ cConfig::cConfig(wxWindow* inst)
 
 	wxTreeItemId config_root = config_tree_ctrl->AddRoot(L"Plugins");
 	wxTreeItemId config_voltage_node = config_tree_ctrl->AppendItem(config_root, "Measurement modules");
-	//wxTreeItemId config_voltage_item1 = config_tree_ctrl->AppendItem(config_voltage_node, "NI DAQMX (USB6001;cDAQ/9205)");
 
 	// Remove ".dll" in filename and add it to the tree
 	for (auto&& plugin : plugin_vec)
@@ -221,23 +215,6 @@ cConfig::cConfig(wxWindow* inst)
 	wxBoxSizer* config_vtree_sizer_ = new wxBoxSizer(wxVERTICAL);
 	config_vtree_sizer_->Add(config_tree_ctrl, 1, wxALL);
 	config_leftpanel_->SetSizerAndFit(config_vtree_sizer_);
-	/*
-	 //config_panel_sizer = new wxBoxSizer(wxHORIZONTAL);
-	 //config_panel_sizer->Add(config_rightpanel_,1,wxEXPAND);
-
-	 // Extract and add each panel to the simple workbook
-	 wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
-	 for (auto&& plugin : plugin_vec)
-	 {
-		 book->AddPage(plugin.panel, plugin.name.c_str());
-		 v_sizer->Add(plugin.panel, 1, wxEXPAND);
-		 //config_panel_sizer_sub->Add(plugin.panel,1,wxEXPAND);
-		 //plugin.panel->Show(false);
-	 }
-	 book->SetSelection(0);
-
-	 book->SetSizer(v_sizer);
-	 */
 
 	 /////////////////////////////////////////////////////
 	 // Add Dll plugin to the book
@@ -248,7 +225,6 @@ cConfig::cConfig(wxWindow* inst)
 		book->AddPage(plugin.panel, plugin.name.c_str());
 		//plugin.panel->Connect(wxEVT_PAINT, wxPaintEventHandler(cConfig::OnPaint)); // Draw gradiant grey
 	}
-
 
 	config_hsizer_ = new wxBoxSizer(wxHORIZONTAL);
 	config_hsizer_->Add(config_leftpanel_, 0, wxEXPAND);
@@ -329,7 +305,6 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 				// 1 == WRITE
 				// 2 == ALL
 
-
 				PLUGIN_DATA plugin_data;
 				plugin_data.name = plugin_name;
 				plugin_data.panel = plugin_panel;
@@ -337,7 +312,6 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 				plugin_data.hInst = hModule;
 				plugin_data.Attach = Attach;
 				plugin_vec.push_back(plugin_data); // Add struct
-
 			}
 			else
 			{

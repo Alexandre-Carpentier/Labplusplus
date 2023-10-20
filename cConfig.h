@@ -17,6 +17,7 @@ class cPlot;
 class cCycle;
 class cDaqmx;
 class cPressure;
+class cTension;
 class cObjectmanager;
 class cMeasurementControler;
 
@@ -124,18 +125,19 @@ private:
 	cPlot* m_plot_ = nullptr;
 	cDaqmx* m_daqmx = nullptr;
 	cPressure* m_pressure = nullptr;
+	cTension* m_tension = nullptr;
 
 	typedef cDevice* (WINAPI* ATTACH)(wxWindow*);
 	ATTACH Attach;
 
-	typedef struct
+	struct PLUGIN_DATA
 	{
-		std::wstring name;
-		wxPanel* panel;
-		cDevice* device;
-		HINSTANCE hInst;
-		ATTACH Attach;
-	}PLUGIN_DATA, * PPLUGIN_DATA;
+		std::wstring name = L"";
+		wxPanel* panel = nullptr;
+		cDevice* device = nullptr;
+		HINSTANCE hInst = nullptr;
+		ATTACH Attach = nullptr;
+	};
 
 	std::vector<PLUGIN_DATA> plugin_vec;
 

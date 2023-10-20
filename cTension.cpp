@@ -1,4 +1,4 @@
-#include "cPressure.h"
+#include "cTension.h"
 
 #include <wx/wx.h>
 #include <wx/combobox.h>
@@ -12,13 +12,14 @@
 #include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
 #include "cCycle.h"
-#include "cPacesim.h"
+#include "cUSB6001.h"
+#include "cDaqsim.h"
 #include "cPlot.h"
 #include "cImagePanel.h"
 
-cPressure::cPressure(wxWindow* inst)
+cTension::cTension(wxWindow* inst)
 {
-	std::cout << "cPressure ctor...\n";
+	std::cout << "cTension ctor...\n";
 	inst_ = inst;
 
 	////////////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ cPressure::cPressure(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	config_rightpanel_ = new wxPanel(inst, IDC_PRESSURERIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
+	config_rightpanel_ = new wxPanel(inst, IDC_TENSIONRIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
 	config_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165)); // Make inside group box dark grey
 
 	////////////////////////////////////////////////////////////
@@ -50,21 +51,21 @@ cPressure::cPressure(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	wxStaticBox* device_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Pressure controler", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticBox* device_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Tension controler", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
 	device_group_sizer = new wxStaticBoxSizer(device_group, wxVERTICAL);
 
 	////////////////////////////////////////////////////////////
-	wxStaticText* enablepressure = new wxStaticText(device_group, IDCSTATICENABLEDAQ, L"Pace 6000:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
-	enablepressure->SetFont(enablepressure->GetFont().Scale(text_size));
-	enablepressure->SetBackgroundColour(*bgcolor);
-	enablepressure->Hide(); // Just use enabledaq to fill the flex sizer -> hide it after creating
+	wxStaticText* enableTension = new wxStaticText(device_group, IDCSTATICENABLETENSION, L"Keitley 2280S:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	enableTension->SetFont(enableTension->GetFont().Scale(text_size));
+	enableTension->SetBackgroundColour(*bgcolor);
+	enableTension->Hide(); // Just use enabledaq to fill the flex sizer -> hide it after creating
 
 	////////////////////////////////////////////////////////////
 
-	pressure_controler_activate = new wxButton(device_group, IDCPRESSUREACTIVATE, L"OFF", wxDefaultPosition, inst->FromDIP(wxSize(50, 25)), wxSUNKEN_BORDER);
-	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cPressure::OnPressureEnableBtn, this, IDCPRESSUREACTIVATE);
-	pressure_controler_activate->SetFont(pressure_controler_activate->GetFont().Scale(text_size));
-	pressure_controler_activate->SetBackgroundColour(wxColor(250, 120, 120));
+	tension_controler_activate = new wxButton(device_group, IDCTENSIONACTIVATE, L"OFF", wxDefaultPosition, inst->FromDIP(wxSize(50, 25)), wxSUNKEN_BORDER);
+	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cTension::OnTensionEnableBtn, this, IDCTENSIONACTIVATE);
+	tension_controler_activate->SetFont(tension_controler_activate->GetFont().Scale(text_size));
+	tension_controler_activate->SetBackgroundColour(wxColor(250, 120, 120));
 
 	////////////////////////////////////////////////////////////
 
@@ -74,33 +75,33 @@ cPressure::cPressure(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	addr_ctrl = new wxComboBox(device_group, IDCPRESSUREADDR, label.device_name[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
-	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
+	addr_ctrl = new wxComboBox(device_group, IDCTENSIONADDR, label.device_name[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cTension::OnTensionAddrSelBtn, this, IDCTENSIONADDR);
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
 	addr_ctrl->Disable();
-	
-	flexsizer->Add(enablepressure);
-	flexsizer->Add(pressure_controler_activate);
+
+	flexsizer->Add(enableTension);
+	flexsizer->Add(tension_controler_activate);
 	flexsizer->Add(staticaddr);
 	flexsizer->Add(addr_ctrl);
 	device_group_sizer->Add(flexsizer);
 
 	config_rightpanel_->SetSizerAndFit(device_group_sizer);
 
-	wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCPRESSUREACTIVATE);
+	wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCTENSIONACTIVATE);
 	wxPostEvent(inst_, evt);
 }
 
 // Reccord device info selected in GUI field 
 // and save it to an CURRENT_DEVICE_STRUCT witch hold the datas
 // happen each time previous or next is pressed
-void cPressure::save_current_device_config(int channel_index)
+void cTension::save_current_device_config(int channel_index)
 {
 	std::cout << "[*] Saving device GUI field in memory at channel " << channel_index << ".\n";
 
 	// Device enable
 	config.device_enabled = false;
-	if (pressure_controler_activate->GetLabelText().compare("ON") == 0)
+	if (tension_controler_activate->GetLabelText().compare("ON") == 0)
 	{
 		config.device_enabled = true;
 	}
@@ -116,7 +117,7 @@ void cPressure::save_current_device_config(int channel_index)
 // Reccord device info selected in GUI field 
 // and save it to an CURRENT_DEVICE_STRUCT witch hold the datas
 // happen each time previous or next is pressed
-void cPressure::load_current_device_config(int channel_index)
+void cTension::load_current_device_config(int channel_index)
 {
 	std::cout << "[*] Loading device configuration from memory in GUI at channel " << channel_index << ".\n";
 
@@ -134,7 +135,7 @@ void cPressure::load_current_device_config(int channel_index)
 	return;
 }
 
-void cPressure::load_combobox(wxComboBox* combo, wxString str)
+void cTension::load_combobox(wxComboBox* combo, wxString str)
 {
 	wxString wxStr = str;
 	int iTotalItem = combo->GetCount();
@@ -147,7 +148,7 @@ void cPressure::load_combobox(wxComboBox* combo, wxString str)
 	}
 }
 
-void cPressure::load_combobox(wxComboBox* combo, double floating)
+void cTension::load_combobox(wxComboBox* combo, double floating)
 {
 	wxString wxFloating = wxString::Format(wxT("%lf"), floating);
 	int iTotalItem = combo->GetCount();
@@ -160,11 +161,11 @@ void cPressure::load_combobox(wxComboBox* combo, double floating)
 	}
 }
 
-void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
+void cTension::OnTensionEnableBtn(wxCommandEvent& evt)
 {
 	// Enable/disable controls
 	enable_pan = !enable_pan;
-	if (pressure_controler_activate)
+	if (tension_controler_activate)
 	{
 		if (!enable_pan)
 		{
@@ -205,7 +206,6 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 
 			for (auto name : names)
 			{
-
 				first_measurable_device++;
 
 				char product_type[256] = "";
@@ -225,7 +225,7 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			// Channel specific
 
 
-		// List all channels available on each device and concat them 
+		// List all channels available on each device and concat them
 			std::vector<std::string> channels;
 			for (auto name : names)
 			{
@@ -298,7 +298,7 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			// Select the first device measurable
 			// Add it to the measurement manager
 			// by sending an event
-			// This event is responsible to apply in the callback the new policy (daqmx/simulate/...) according to the strategy pattern 
+			// This event is responsible to apply in the callback the new policy (daqmx/simulate/...) according to the strategy pattern
 			if (first_measurable_device < 0)
 			{
 				std::cout << "[!] Warning", L"No module available to take measurement are connected.\n";
@@ -312,42 +312,47 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_COMBOBOX_SELECTED, IDCADDR);
 			wxPostEvent(inst_, evt);
+
+			this->tension_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN
+			this->tension_controler_activate->SetLabel("ON");
+
+			addr_ctrl->Enable(true);
+			checkchan->Enable(true);
 			*/
 
-			this->pressure_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
-			this->pressure_controler_activate->SetLabel("ON");
-
-			addr_ctrl->Enable(true);			
 		}
 		else
 		{
-			this->pressure_controler_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
-			this->pressure_controler_activate->SetLabel("OFF");
+			this->tension_controler_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
+			this->tension_controler_activate->SetLabel("OFF");
 
+			/*
 			addr_ctrl->Enable(false);
+			checkchan->Enable(false);
+			*/
 		}
 	}
 	evt.Skip();
-	
+
 }
 
-void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
+void cTension::OnTensionAddrSelBtn(wxCommandEvent& evt)
 {
 	// Destroy and release previous ressource
 
 	std::cout << "[*] cMeasurementmanager->getInstance()\n";
 	meas_manager = meas_manager->getInstance();
 
-	
+	/*
 	// Destroy item in the list
-	bool isDestroyed = meas_manager->destroy_subsystem(PRESSURECONTROLER_INSTR);
+	bool isDestroyed = meas_manager->destroy_subsystem(DAQ_INSTR);
 	// If item destroyed delete from memory
 	if (isDestroyed)
 	{
-		std::cout << "[*] [delete] m_daq in cPressure.cpp\n";
+		std::cout << "[*] [delete] m_daq in cTension.cpp\n";
 
-		delete m_pressure_;
-		m_pressure_ = nullptr;
+		delete m_daq_;
+		m_daq_ = nullptr;
 	}
 
 	// Read the new sub system name selected
@@ -365,17 +370,17 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 
 	if (current.compare("Simulated") == 0)
 	{
-		if (m_pressure_ == nullptr)
+		if (m_daq_ == nullptr)
 		{
 			std::cout << "[*] [new] Create cDaqsim\n";
-			m_pressure_ = new cPacesim;
-			meas_manager->set_measurement(m_pressure_);
+			m_daq_ = new(cDaqsim);
+			meas_manager->set_measurement(m_daq_);
 		}
 		evt.Skip();
 		return;
 	}
 
-	if (m_pressure_ != nullptr)
+	if (m_daq_ != nullptr)
 	{
 		std::cout << "[!] Failed to load: " << current << "\n";
 		MessageBox(GetFocus(), L"[!] Fail", L"Object already exist", S_OK);
@@ -384,32 +389,32 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 	}
 
 	// Then create appropriate DAQ object
-	std::cout << "[*] [new] Create cPace6000\n";
-	m_pressure_ = new cPacesim;
+	std::cout << "[*] [new] Create cUsb6001\n";
+	m_daq_ = new(cUsb6001);
 
 	// Object failed to create in memory
-	if (m_pressure_ == nullptr)
+	if (m_daq_ == nullptr)
 	{
-		std::cout << "[!] Impossible to load a pressure controler system object\n";
+		std::cout << "[!] Impossible to load a DAQ system object\n";
 		MessageBox(GetFocus(), L"[!] Fail", L"Imposible to create object in memory.\n", S_OK | MB_ICONERROR);
 		evt.Skip();
 		return;
 	}
 
-	meas_manager->set_measurement(m_pressure_);
-	m_pressure_->set_device_addr(current);
-	
+	meas_manager->set_measurement(m_daq_);
+	m_daq_->set_device_addr(current);
+	*/
 	evt.Skip();
 	return;
 }
 
 
-wxPanel* cPressure::get_right_panel()
+wxPanel* cTension::get_right_panel()
 {
 	return config_rightpanel_;
 }
 
-CURRENT_DEVICE_CONFIG_STRUCT cPressure::GetPressureConfigStruct()
+CURRENT_DEVICE_CONFIG_STRUCT cTension::GetTensionConfigStruct()
 {
 	return config;
 }

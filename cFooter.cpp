@@ -9,6 +9,7 @@
 #include "cMeasurementmanager.h"
 #include "cMeasurementControler.h"
 #include "cDaqmx.h"
+#include "cPressure.h"
 #include "cUsb6001.h"
 #include "cScaleBtn.h"
 
@@ -101,11 +102,18 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	}
 	if (m_plot_->get_graph_state() == false)
 	{
-
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		if (daqconfig->m_daq_ == nullptr)
 		{
-			MessageBox(GetFocus(), L"No device loaded", 0, S_OK | MB_ICONERROR);
+			MessageBox(GetFocus(), L"Daqmx not loaded", 0, S_OK | MB_ICONERROR);
+			evt.Skip();
+			return;
+		}
+
+		cPressure* pressureconfig = obj_manager->get_pressuredevice();
+		if (pressureconfig->m_pressure_ == nullptr)
+		{
+			MessageBox(GetFocus(), L"Pressure module not loaded", 0, S_OK | MB_ICONERROR);
 			evt.Skip();
 			return;
 		}
@@ -173,99 +181,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			meas_manager->set_measurement_controler(meas_controler);
 
 
-			// DAQ Configure
-			// Fill the device config struct with user parameters
-			//
-
-			/*
-			DEVICE_CONFIG_STRUCT device_config_struct;
-
-			// Retrieve DAQ addr
-			wxString t = daqconfig->addr_ctrl->GetValue();
-			device_config_struct.device_addr = t.ToStdString();
-
-
-			// Retrieve channel physical addr and name
-			std::vector<std::string> channels_addr;
-			std::vector<std::string> channels_names;
-			//for (int i = 0; i < daqconfig->GetChannelNumber(); i++)
-			//{
-			int i = 0;
-			std::vector <bool> bChannels = daqconfig->GetChannelEnabledVector();
-			for (auto chan : bChannels)
-			{
-				if (chan == true)
-				{
-
-					device_config_struct.channels_addr.push_back(std::string(daqconfig->chan_addr_ctrl->GetValue().mb_str()));
-					device_config_struct.channels_names.push_back(std::string(daqconfig->chan_name->GetValue().mb_str()));
-					m_plot_->set_signal_name(std::string(daqconfig->chan_name->GetValue().mb_str()), i);
-
-					if (device_config_struct.channels_addr.size() == 0)
-					{
-						MessageBox(GetFocus(), L"No DAQ channels selected", L"Error", S_OK | MB_ICONERROR);
-						std::cout << "cycle_controler deleted in Footer.cpp\n";
-						delete cycle_controler;
-						evt.Skip();
-						return;
-					}
-
-					// Retrieve DAQ grounding mode
-					// TODO: use for all channel not one
-					int DAQ_pinmode = DAQmx_Val_RSE;
-					if (daqconfig->mode_ctrl->GetValue().compare("Referenced") == 0)
-					{
-						DAQ_pinmode = DAQmx_Val_RSE;
-					}
-					if (daqconfig->mode_ctrl->GetValue().compare("Differential") == 0)
-					{
-						DAQ_pinmode = DAQmx_Val_Diff;
-					}
-					if (daqconfig->mode_ctrl->GetValue().compare("NRSE") == 0)
-					{
-						DAQ_pinmode = DAQmx_Val_NRSE;
-					}
-					if (daqconfig->mode_ctrl->GetValue().compare("Pseudo Diff") == 0)
-					{
-						DAQ_pinmode = DAQmx_Val_PseudoDiff;
-					}
-					device_config_struct.reference_mode.push_back(DAQ_pinmode);
-
-					// Retrieve min:max range daq capabilities
-					// TODO: use for all channel not one
-					wxString max_str = daqconfig->max_ctrl->GetValue();
-					double max_double = 0.0;
-					max_str.ToCDouble(&max_double);
-					device_config_struct.reference_mode_high.push_back(max_double);
-
-					wxString min_str = daqconfig->min_ctrl->GetValue();
-					double min_double = 0.0;
-					min_str.ToCDouble(&min_double);
-					device_config_struct.reference_mode_low.push_back(min_double);
-
-					// Retrieve scale options
-					wxString scale_strA = daqconfig->chan_slope[i]->GetValue();
-					double A = 0.0;
-					scale_strA.ToCDouble(&A);
-					device_config_struct.scale_mode_A.push_back(A);
-
-					wxString scale_strB = daqconfig->chan_shift[i]->GetValue();
-					double B = 0.0;
-					scale_strB.ToCDouble(&B);
-					device_config_struct.scale_mode_B.push_back(B);
-
-					// Retrieve filtering options
-					// TODO: use for all channel not one
-					device_config_struct.filtering_mode_enable.push_back(true);
-					device_config_struct.filtering_mode.push_back(Filtering);
-
-					// Save current number of channel loaded
-					device_config_struct.chan_number = i;
-					std::cout << "[*] " << i << " Channel configured in daq device.\n";
-				}
-			}
-			*/
-
 			// Save last change in daq gui fields
 
 			size_t channel_index = daqconfig->get_channel_index();
@@ -291,8 +206,12 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			}
 
 			// Launch DAQ System
+			//
+			//
 
 			daqconfig->m_daq_->launch_device(config);
+			pressureconfig->m_pressure_->launch_device(config);
+
 			meas_controler->start();
 			size_t sizesig = meas_manager->get_measurement_total_channel_number();
 			m_plot_->start_graph(Filtering, Rec, sizesig);
@@ -305,6 +224,10 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			daqconfig->channel_group_sizer->GetStaticBox()->Enable(false);
 			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(false);
 			daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(false);
+
+			// Lock pressure controler interface
+			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
+
 		}
 	}
 	else
