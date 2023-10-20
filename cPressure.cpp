@@ -415,7 +415,7 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
-		m_plot->remove_chan_to_gui(max_chan_number+1);
+		m_plot->remove_chan_to_gui(33); // BUG
 	}
 	else
 	{

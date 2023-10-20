@@ -120,6 +120,7 @@ void cMeasurementControler::poll()
 					// Get the read value
 					val = meas->read();
 
+					// Add vector to store points
 					for (int i = 0; i < val.buffer_size; i++)
 					{
 						read_pool.push_back(val.buffer[i]);
