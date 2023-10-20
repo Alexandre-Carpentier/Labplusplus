@@ -4,6 +4,8 @@
 #include <thread>
 #include <Windows.h>
 
+#include <vector>
+
 //#include "cSingleton.h"
 
 class cPlot;

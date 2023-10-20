@@ -60,6 +60,7 @@ public:
 
 	void OnPressureEnableBtn(wxCommandEvent& evt);
 	void OnPressureAddrSelBtn(wxCommandEvent& evt);
+	void EnablePressureChannel(bool isDisplayed);
 
 	void save_current_device_config(int channel_index);
 	void load_current_device_config(int channel_index);

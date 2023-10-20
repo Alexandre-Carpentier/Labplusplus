@@ -318,6 +318,8 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			this->pressure_controler_activate->SetLabel("ON");
 
 			addr_ctrl->Enable(true);			
+
+			EnablePressureChannel(true);
 		}
 		else
 		{
@@ -325,6 +327,8 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			this->pressure_controler_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
+
+			EnablePressureChannel(false);
 		}
 	}
 	evt.Skip();
@@ -401,6 +405,28 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 	
 	evt.Skip();
 	return;
+}
+
+void cPressure::EnablePressureChannel(bool isDisplayed)
+{
+	if (!isDisplayed)
+	{
+		//If cPlot legend active remove it
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->remove_chan_to_gui(max_chan_number+1);
+	}
+	else
+	{
+		//Update cPlot gui with the chan name and color
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+
+		m_plot->init_chan_to_gui("Pace6000", "COM1", "Bar", wxColor(230, 200, 200));
+		//m_plot->add_chan_to_gui("Pressure controler Pace 6000", addr_ctrl->GetLabelText().ToStdString(), "Bar", wxColor(45,30,30), max_chan_number+1);	
+	}
 }
 
 

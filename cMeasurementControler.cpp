@@ -110,6 +110,8 @@ void cMeasurementControler::poll()
 			{
 				tick.start_tick();
 				int buffer_index = 0;
+
+				std::vector<double> read_pool;
 				for (auto meas : meas_pool)
 				{
 					// Set the setpoint
@@ -117,15 +119,30 @@ void cMeasurementControler::poll()
 
 					// Get the read value
 					val = meas->read();
+
+					for (int i = 0; i < val.buffer_size; i++)
+					{
+						read_pool.push_back(val.buffer[i]);
+					}
+					val.buffer_size = 0;
+				}
+
+				m_plot_->graph_addpoint(read_pool.size(), &read_pool.at(0));
+				//memset(Y, 0, sizeof(Y));
+
+					/*
 					for (int c = buffer_index; c < val.buffer_size; c++)
 					{
 						Y[c] = val.buffer[c];
 						buffer_index++;
+						std::cout << "buffer_index" << buffer_index << "\n";
 					}
+					val.buffer_size = 0;
 				}
 
 				m_plot_->graph_addpoint(buffer_index, Y);
 				memset(Y, 0, sizeof(Y));
+				*/
 
 				// Update acquire rate
 				m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));
