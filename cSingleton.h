@@ -20,7 +20,7 @@ public:
         }
         else
         {
-            std::cout << "singleton already created!\n";
+            //std::cout << "singleton already created!\n";
         }
 
         return (static_cast<T*> (_singleton));

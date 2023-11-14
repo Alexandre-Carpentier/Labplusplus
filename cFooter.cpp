@@ -96,6 +96,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	std::cout << "[*] " << measurement_number << " measurements are in pool.\n";
 	if (measurement_number == 0)
 	{
+		wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
+		wxPostEvent(inst_, evt);
 		MessageBox(GetFocus(), L"No active device\ntry to enable one instrument first", L"Error", S_OK | MB_ICONERROR);
 		evt.Skip();
 		return;
@@ -103,25 +105,62 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	if (m_plot_->get_graph_state() == false)
 	{
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
-		if (daqconfig->m_daq_ == nullptr)
+		if (daqconfig->m_daq_ != nullptr)
 		{
-			MessageBox(GetFocus(), L"Daqmx not loaded", 0, S_OK | MB_ICONERROR);
-			evt.Skip();
-			return;
+			// Save last change in daq gui fields
+
+			size_t channel_index = daqconfig->get_channel_index();
+			daqconfig->save_current_device_config(channel_index);
+			daqconfig->save_current_chan_config(channel_index);
+
+			// Retrieve current daq config		
+
+			CURRENT_DEVICE_CONFIG_STRUCT config = daqconfig->GetDaqConfigStruct();
+
+
+			int i = 0;
+			int c = 0;
+			std::vector <bool> bChannels = daqconfig->GetChannelEnabledVector();
+			for (auto chan : bChannels)
+			{
+				if (chan == true)
+				{
+					m_plot_->set_signal_name(config.channel_name.at(c), i);
+					i++;
+				}
+				c++;
+			}
+
+			// Launch DAQ System
+			//
+			//
+
+			daqconfig->m_daq_->launch_device(config);
+
+			// Lock daq interface when running				
+			daqconfig->device_group_sizer->GetStaticBox()->Enable(false);
+			daqconfig->channel_group_sizer->GetStaticBox()->Enable(false);
+			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(false);
+			daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(false);
 		}
 
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
-		if (pressureconfig->m_pressure_ == nullptr)
+		if (pressureconfig->m_pressure_ != nullptr)
 		{
-			MessageBox(GetFocus(), L"Pressure module not loaded", 0, S_OK | MB_ICONERROR);
-			evt.Skip();
-			return;
+			CURRENT_DEVICE_CONFIG_STRUCT config = pressureconfig->GetPressureConfigStruct();
+
+			pressureconfig->m_pressure_->launch_device(config);
+
+			// Lock pressure controler interface
+			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
 		cCycle* m_cycle = nullptr;
 		m_cycle = m_table_->load_cycle();
 		if (m_cycle == nullptr)
 		{
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_EDITBTN);
+			wxPostEvent(inst_, evt);
 			MessageBox(GetFocus(), L"Fill the cycle table please", L"Error", S_OK | MB_ICONERROR);
 		}
 		else
@@ -177,40 +216,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			// MEASUREMENT CONTROLER
 			////////////////////////////////////////////////////////////////////////////////
 			std::cout << "Launching Measurement controler\n";
-			cMeasurementControler* meas_controler = new cMeasurementControler; //////////////////////LEAK/////////////////LEAK///////////////
+			cMeasurementControler* meas_controler = new cMeasurementControler(m_cycle, cycle_controler); //////////////////////LEAK/////////////////LEAK///////////////
 			meas_manager->set_measurement_controler(meas_controler);
-
-
-			// Save last change in daq gui fields
-
-			size_t channel_index = daqconfig->get_channel_index();
-			daqconfig->save_current_device_config(channel_index);
-			daqconfig->save_current_chan_config(channel_index);
-
-			// Retrieve current daq config		
-
-			CURRENT_DEVICE_CONFIG_STRUCT config = daqconfig->GetDaqConfigStruct();
-
-
-			int i = 0;
-			int c = 0;
-			std::vector <bool> bChannels = daqconfig->GetChannelEnabledVector();
-			for (auto chan : bChannels)
-			{
-				if (chan == true)
-				{
-					m_plot_->set_signal_name(config.channel_name.at(c), i);
-					i++;
-				}
-				c++;
-			}
-
-			// Launch DAQ System
-			//
-			//
-
-			daqconfig->m_daq_->launch_device(config);
-			pressureconfig->m_pressure_->launch_device(config);
 
 			meas_controler->start();
 			size_t sizesig = meas_manager->get_measurement_total_channel_number();
@@ -218,15 +225,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 			startbtn->SetBackgroundColour(wxColor(250, 80, 90));
 			startbtn->SetLabelText(L"Stop");
-
-			// Lock daq interface when running				
-			daqconfig->device_group_sizer->GetStaticBox()->Enable(false);
-			daqconfig->channel_group_sizer->GetStaticBox()->Enable(false);
-			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(false);
-			daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(false);
-
-			// Lock pressure controler interface
-			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 
 		}
 	}
@@ -245,18 +243,24 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		startbtn->SetLabelText(L"Start");
 
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
-		if (daqconfig->m_daq_ == nullptr)
+		cPressure* pressureconfig = obj_manager->get_pressuredevice();
+
+		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) )
 		{
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
+			wxPostEvent(inst_, evt);
 			MessageBox(GetFocus(), L"No device loaded", 0, S_OK | MB_ICONERROR);
 			evt.Skip();
 			return;
 		}
-
-		// Unlock daq interface when running
-		daqconfig->device_group_sizer->GetStaticBox()->Enable(true);
-		daqconfig->channel_group_sizer->GetStaticBox()->Enable(true);
-		daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(true);
-		daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(true);
+		else
+		{
+			// Unlock daq interface when running
+			daqconfig->device_group_sizer->GetStaticBox()->Enable(true);
+			daqconfig->channel_group_sizer->GetStaticBox()->Enable(true);
+			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(true);
+			daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(true);
+		}
 
 		meas_manager->stop_all_devices();
 	}

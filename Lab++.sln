@@ -5,9 +5,11 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab++", "Lab++.vcxproj", "{40B18114-476C-4BB6-BC67-5142DC009175}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Wingraph", "Wingraph\Wingraph.vcxproj", "{7F5AF6EF-F74D-4BF4-B68B-24546A62FC9D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinGraph", "Wingraph\Wingraph.vcxproj", "{7F5AF6EF-F74D-4BF4-B68B-24546A62FC9D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Plugin", "Plugin\Plugin.vcxproj", "{AC02B92B-260A-4DCC-8BB0-554CDAC6F67A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LabLauncher", "..\LabLauncher\LabLauncher.vcxproj", "{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,14 @@ Global
 		{AC02B92B-260A-4DCC-8BB0-554CDAC6F67A}.Release|x64.Build.0 = Release|x64
 		{AC02B92B-260A-4DCC-8BB0-554CDAC6F67A}.Release|x86.ActiveCfg = Release|Win32
 		{AC02B92B-260A-4DCC-8BB0-554CDAC6F67A}.Release|x86.Build.0 = Release|Win32
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Debug|x64.ActiveCfg = Debug|x64
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Debug|x64.Build.0 = Debug|x64
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Debug|x86.ActiveCfg = Debug|Win32
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Debug|x86.Build.0 = Debug|Win32
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Release|x64.ActiveCfg = Release|x64
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Release|x64.Build.0 = Release|x64
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Release|x86.ActiveCfg = Release|Win32
+		{8E7F718F-DA11-4FE4-853D-F1CE03E11A69}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

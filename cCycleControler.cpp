@@ -8,36 +8,38 @@
 #include "cCycle.h"
 #include "cTable.h"
 
-void cCycleControler::poll(cCycleControler* self)
+void cCycleControler::poll()
 {
-	std::mutex critical_section;
+	auto st = thread.get_stop_source();
 
-	while (self->bRunning)
+	end = PerformanceCounter();
+
+	while (!st.stop_requested())
 	{
 		m_table_->set_line_highlight(m_cycle_->get_current_step());
 		start = PerformanceCounter();
-		delta = (double)((end - start)) / freq;
-		while (delta < m_cycle_->get_duration() and self->bRunning == true)
+
+		delta = (double)((end - start) / freq);
+		while (delta < (m_cycle_->get_duration()*10) and st.stop_requested() == false)
 		{
 			end = PerformanceCounter();
-			delta = (double)((end - start)) / freq;
+			delta = (double)((end - start) / (freq/10));
 			//Sleep(10);
 		}
+		//std::cout << "tick\n";
+		//std::cout << m_cycle_->get_duration() << "\n";
 
-
-		critical_section.lock();////////////////////////////////////////////////////////////CRITICAL
-		if (self->bRunning == false)
+		if (st.stop_requested())
 		{
-			critical_section.unlock();
 			goto kill;
 		}
 		if (m_cycle_ == nullptr)
 		{
-			critical_section.unlock();
 			goto kill;
 		}
+		critical_section.lock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
 		m_cycle_->next();
-		std::cout << self->bRunning << "\n";
+
 		if (m_cycle_->get_total_step_number() - m_cycle_->get_current_step() == 0)
 		{
 			std::cout << "[*] Cycle controler step end\n";
@@ -54,7 +56,6 @@ void cCycleControler::poll(cCycleControler* self)
 			}
 			if (loopcount <= 0)
 			{
-				critical_section.unlock();/////////////////////////////////////////////////////////CRITICAL
 
 				// Update % in status bar
 				cObjectmanager* object_manager = object_manager->getInstance();
@@ -67,11 +68,12 @@ void cCycleControler::poll(cCycleControler* self)
 				wxPostEvent(inst_, evt);
 
 				MessageBox(GetFocus(), L"End of cycle", L"Success", MB_OK);
+				critical_section.unlock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
 				break;
 			}
 		}
+		critical_section.unlock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
 
-		critical_section.unlock();/////////////////////////////////////////////////////////CRITICAL
 	}
 kill:
 	std::cout << "[*] Cycle controler exitting daemon\n";
@@ -86,15 +88,15 @@ cCycleControler::cCycleControler(cCycle* m_cycle, cTable* m_table, wxWindow* ins
 	m_table_ = m_table;
 	inst_ = inst;
 
-	thread = new std::thread(&cCycleControler::poll, this, this);
-	thread->detach();
+	thread = std::jthread(&cCycleControler::poll, this);
+
 	bRunning = true;
 }
 
 void cCycleControler::stop()
 {
-	bRunning = false; // TODO delay to stop
-	//thread->join();
+	bRunning = false;
+	thread.request_stop();
 	std::cout << "[*] cCycleControler has joined\n";
 }
 
@@ -117,5 +119,10 @@ cCycleControler::~cCycleControler()
 	std::cout << "cCycleControler dtor...\n";
 
 }
-
+/*
+std::mutex cCycleControler::get_mutex_reference()
+{
+	return nullptr;
+}
+*/
 

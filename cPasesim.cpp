@@ -13,7 +13,7 @@ MEAS_TYPE cPacesim::device_type() { return PRESSURECONTROLER_INSTR; };
 
 size_t cPacesim::chan_count()
 {
-    size_t nb_sig = 0;
+    size_t nb_sig = 1;
     return nb_sig;
 }
 
@@ -25,7 +25,7 @@ int cPacesim::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 
 DATAS cPacesim::read()
 {
-    result.buffer[0] = (current_fake_value + rand() % 1);
+    result.buffer[0] = (current_fake_value +  ( (double)(rand() % 30)-15.0)/100.0);
     result.buffer_size = 1;
 
     return result;

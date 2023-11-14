@@ -37,12 +37,17 @@ cPressure::cPressure(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	config_rightpanel_ = new wxPanel(inst, IDC_PRESSURERIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
-	config_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165)); // Make inside group box dark grey
+	::wxInitAllImageHandlers();
+	wxBitmap bmp = wxBitmap("PACEPNG", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
+	pace_img = bmp.ConvertToImage();										// Convert bmp to image to scale purpose
+
+	pace_rightpanel_ = new wxPanel(inst, IDC_PRESSURERIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
+	pace_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165));		// Make inside group box dark grey
+	pace_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cPressure::OnPaint));
 
 	////////////////////////////////////////////////////////////
 
-	wxStaticText* dummy = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxSize(400, 0)));
+	wxStaticText* dummy = new wxStaticText(pace_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxSize(0, 400)));
 
 	////////////////////////////////////////////////////////////
 
@@ -50,7 +55,7 @@ cPressure::cPressure(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	wxStaticBox* device_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Pressure controler", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticBox* device_group = new wxStaticBox(pace_rightpanel_, wxID_ANY, "Pressure controler", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
 	device_group_sizer = new wxStaticBoxSizer(device_group, wxVERTICAL);
 
 	////////////////////////////////////////////////////////////
@@ -85,10 +90,13 @@ cPressure::cPressure(wxWindow* inst)
 	flexsizer->Add(addr_ctrl);
 	device_group_sizer->Add(flexsizer);
 
-	config_rightpanel_->SetSizerAndFit(device_group_sizer);
+	wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
+	v_sizer->Add(dummy); // Space for daq img
+	v_sizer->Add(device_group_sizer, 0, wxALIGN_CENTER, inst->FromDIP(10));
+	pace_rightpanel_->SetSizerAndFit(v_sizer);
 
-	wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCPRESSUREACTIVATE);
-	wxPostEvent(inst_, evt);
+	//wxCommandEvent evt0 = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCPRESSUREACTIVATE);
+	//wxPostEvent(inst_, evt0);
 }
 
 // Reccord device info selected in GUI field 
@@ -166,153 +174,18 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 	enable_pan = !enable_pan;
 	if (pressure_controler_activate)
 	{
-		if (!enable_pan)
+		//If cPlot legend active remove it
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		size_t element_nb = m_plot->get_chan_number_to_gui();
+
+		if (enable_pan)
 		{
-			/*
-			constexpr size_t bufferSize = 1000;
-			char buffer[bufferSize] = {};
-			if (DAQmxGetSysDevNames(buffer, bufferSize) != 0)
-			{
-				MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetSysDevNames() failed to resolve devices.\n", S_OK | MB_ICONERROR);
-				evt.Skip();
-				return;
-			}
-
-			if (strcmp(buffer, "") == 0)
-			{
-				MessageBox(GetFocus(), L"Warning\n\n Connect a DAQ", L"There is no DAQ connected to your computer.", S_OK | MB_ICONINFORMATION);
-			}
-			// Global to device
-
-			std::string s(buffer);
-			std::string delimiter = ",";
-
-			size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-			std::string token;
-			std::vector<std::string> names;
-
-			while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-				token = s.substr(pos_start, pos_end - pos_start);
-				pos_start = pos_end + delim_len;
-				names.push_back(token);
-			}
-
-			names.push_back(s.substr(pos_start));
-
-			addr_ctrl->Clear();
-
-			int first_measurable_device = -1;
-
-			for (auto name : names)
-			{
-
-				first_measurable_device++;
-
-				char product_type[256] = "";
-				if (DAQmxGetDevProductType(name.c_str(), product_type, sizeof(product_type)) != 0)
-				{
-					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevProductType() failed to resolve devices product types.\n", S_OK | MB_ICONERROR);
-					evt.Skip();
-					return;
-				}
-				std::cout << "Dev name: " << name << "\n";
-				std::cout << "product_type: " << product_type << "\n";
-				addr_ctrl->Append(name);
-			}
-			// Add separator
-			addr_ctrl->Append("Simulated");
-
-			// Channel specific
 
 
-		// List all channels available on each device and concat them 
-			std::vector<std::string> channels;
-			for (auto name : names)
-			{
-
-				if (DAQmxGetDevAIPhysicalChans(name.c_str(), buffer, bufferSize) != 0)
-				{
-					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
-					evt.Skip();
-					return;
-				}
-
-				std::string s(buffer);
-				std::string delimiter = ", ";
-				size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-				std::string token;
-
-
-				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-					token = s.substr(pos_start, pos_end - pos_start);
-					pos_start = pos_end + delim_len;
-					channels.push_back(token);
-				}
-
-				channels.push_back(s.substr(pos_start));
-			}
-
-			if (channels.size() == 0)
-			{
-				// create fake simulated channels
-				std::string fake_chan;
-				for (int i = 0; i < 32; i++)
-				{
-					fake_chan = std::format("DevSim/ai{}", i);
-					channels.push_back(fake_chan);
-				}
-
-			}
-
-			//Hide unused channel in the button grid
-			for (int i = channels.size(); i < label.chan_number; i++)
-			{
-				chanbtn[i]->Show(false);
-			}
-
-			// fill analog channel number in list
-			chan_addr_ctrl->Clear();
-			for (auto chan : channels)
-			{
-				chan_addr_ctrl->Append(chan);
-			}
-			chan_addr_ctrl->SetSelection(0);
-
-			// fill analog channel physical name in the config structure
-			for (int i = 0; i < channels.size(); i++)
-			{
-				config.channel_physical_name[i] = channels.at(i);
-			}
-			label.chan_number = channels.size();
-
-
-			// Update channels legend numbers
-			std::cout << "cObjectmanager->getInstance()\n";
-			cObjectmanager* object_manager = object_manager->getInstance();
-			cPlot* m_plot = object_manager->get_plot();
-			m_plot->resize_chan_number_to_gui(channels.size());
-
-
-
-
-			// Select the first device measurable
-			// Add it to the measurement manager
-			// by sending an event
-			// This event is responsible to apply in the callback the new policy (daqmx/simulate/...) according to the strategy pattern 
-			if (first_measurable_device < 0)
-			{
-				std::cout << "[!] Warning", L"No module available to take measurement are connected.\n";
-				addr_ctrl->SetSelection(first_measurable_device + 2); // When failed "Simulated" are at pos 1
-
-			}
-			else
-			{
-				addr_ctrl->SetSelection(first_measurable_device);
-			}
-
-			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_COMBOBOX_SELECTED, IDCADDR);
-			wxPostEvent(inst_, evt);
-			*/
+			// Add a channel for pressure at the end
+			m_plot->resize_chan_number_to_gui(element_nb+1);
 
 			this->pressure_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
 			this->pressure_controler_activate->SetLabel("ON");
@@ -323,6 +196,9 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 		}
 		else
 		{
+
+			m_plot->resize_chan_number_to_gui(element_nb - 1);
+
 			this->pressure_controler_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
 			this->pressure_controler_activate->SetLabel("OFF");
 
@@ -332,7 +208,6 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 		}
 	}
 	evt.Skip();
-	
 }
 
 void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
@@ -371,9 +246,10 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 	{
 		if (m_pressure_ == nullptr)
 		{
-			std::cout << "[*] [new] Create cDaqsim\n";
+			std::cout << "[*] [new] Create cPacesim\n";
 			m_pressure_ = new cPacesim;
 			meas_manager->set_measurement(m_pressure_);
+			m_pressure_->set_device_addr("Simulated");
 		}
 		evt.Skip();
 		return;
@@ -407,6 +283,34 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 	return;
 }
 
+void cPressure::OnPaint(wxPaintEvent& event)
+{
+	// Load bitmap from ressource
+	// consuming a lot of cpu... to fix. But wxImage not accesible from private, public member, so... unbinding here.
+
+	wxBufferedPaintDC dc(this, wxBUFFER_CLIENT_AREA);
+
+	// retrieving different size and proportions
+	wxRect size = pace_rightpanel_->GetRect();
+	size.x = 0;
+	dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
+	wxSize sz = pace_img.GetSize();
+
+	// Scale the image
+	/*
+	double r = size.GetHeight();
+	r = r / 600.0;
+
+	int new_width = sz.GetWidth() * r;
+	pace_img = pace_img.Scale(new_width, sz.GetHeight()*r);
+	*/
+
+	int pos = (size.width / 2) - (sz.x / 2);				// Center
+	dc.DrawBitmap(pace_img, pos, 0, false);					// Draw the final bmp on context
+
+	event.Skip();
+}
+
 void cPressure::EnablePressureChannel(bool isDisplayed)
 {
 	if (!isDisplayed)
@@ -415,7 +319,7 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
-		m_plot->remove_chan_to_gui(33); // BUG
+		m_plot->remove_chan_to_gui(m_plot->gui_get_last_active_channel_number()); // BUG // remove last
 	}
 	else
 	{
@@ -424,15 +328,14 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
 
-		m_plot->init_chan_to_gui("Pace6000", "COM1", "Bar", wxColor(230, 200, 200));
-		//m_plot->add_chan_to_gui("Pressure controler Pace 6000", addr_ctrl->GetLabelText().ToStdString(), "Bar", wxColor(45,30,30), max_chan_number+1);	
+		m_plot->add_chan_to_gui("Pace 6000 simulated", "Simulated", "Bar", wxColor(45, 30, 30), m_plot->gui_get_last_active_channel_number()); // add last
 	}
 }
 
 
 wxPanel* cPressure::get_right_panel()
 {
-	return config_rightpanel_;
+	return pace_rightpanel_;
 }
 
 CURRENT_DEVICE_CONFIG_STRUCT cPressure::GetPressureConfigStruct()

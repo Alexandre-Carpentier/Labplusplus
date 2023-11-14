@@ -79,10 +79,10 @@
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\arfc_\source\repos\Lab\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>C:\Users\arfc_\source\repos\Lab\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>

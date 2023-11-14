@@ -1,10 +1,11 @@
 #pragma once
+/*
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
-
+*/
 #include "resource.h"
 #include <wx/wx.h>
 #include <wx/treectrl.h>
@@ -48,8 +49,8 @@ public:
 
 public:
 
-	enum { DISP_FREQ = 100 };					// ms to draw
-	enum { GRAPH_NBPOINTS = 100000 };				// pts
+	enum { DISP_FREQ = 100 };						// ms to draw
+	enum { GRAPH_NBPOINTS = 1000000 };				// pts
 
 	wxStatusBar* statusBar = nullptr;
 	wxToolBar* toolbar = nullptr;

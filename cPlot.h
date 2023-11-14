@@ -35,7 +35,8 @@ private:
 
 	wxBoxSizer* left_vsizer = nullptr;
 
-	static const int MAX_SIG = 64;
+	const static int MAX_SIG = 64;
+	int CURRENT_SIG;
 	wxBoxSizer* legend_vsizer = nullptr;
 
 	typedef struct
@@ -59,6 +60,8 @@ public:
 	// Channel btn class
 	void init_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color);
 	void resize_chan_number_to_gui(size_t max_item);
+	int gui_get_last_active_channel_number();
+	int get_chan_number_to_gui();
 	void add_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color, size_t position);
 	void draw_chan_to_gui();
 	void remove_chan_to_gui(size_t position);

@@ -39,8 +39,6 @@ public:
 
 	DATAS read() override;
 
-
-
 	void stop_device()override;
 
 

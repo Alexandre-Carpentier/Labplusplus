@@ -105,46 +105,14 @@ cConfig::cConfig(wxWindow* inst)
 	//book->SetEffectsTimeouts(1000, 1000);
 	//book->SetEffect(wxSHOW_EFFECT_SLIDE_TO_RIGHT);
 	book->SetFitToCurrentPage(true);
-	/*
-	wxSHOW_EFFECT_ROLL_TO_LEFT
 
-		Roll window to the left.
-		wxSHOW_EFFECT_ROLL_TO_RIGHT
 
-		Roll window to the right.
-		wxSHOW_EFFECT_ROLL_TO_TOP
+	/////////////////////////////////////////////////////////////
+	//
+	//	create new instrument as plugin here
+	//
 
-		Roll window to the top.
-		wxSHOW_EFFECT_ROLL_TO_BOTTOM
-
-		Roll window to the bottom.
-		wxSHOW_EFFECT_SLIDE_TO_LEFT
-
-		Slide window to the left.
-		wxSHOW_EFFECT_SLIDE_TO_RIGHT
-
-		Slide window to the right.
-		wxSHOW_EFFECT_SLIDE_TO_TOP
-
-		Slide window to the top.
-		wxSHOW_EFFECT_SLIDE_TO_BOTTOM
-
-		Slide window to the bottom.
-		wxSHOW_EFFECT_BLEND
-
-		Fade in or out effect.
-		wxSHOW_EFFECT_EXPAND
-
-		Expanding or collapsing effect.
-		wxSHOW_EFFECT_MAX
-		*/
-
-		/////////////////////////////////////////////////////////////
-		//
-		//	create new instrument as plugin here
-		//
-
-		// Add cDaqmx to plugin vec
+	// Add cDaqmx to plugin vec
 	m_daqmx = new cDaqmx(book);
 	PLUGIN_DATA Daqmx_struct;
 	Daqmx_struct.name = L"NI DAQMX (USB6001;cDAQ/9205).dll";

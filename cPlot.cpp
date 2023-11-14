@@ -27,7 +27,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 
 	legend_vsizer = new wxBoxSizer(wxVERTICAL);
 
-	// Build 32(MAX_SIG) legend signal button and hide
+	// Build 64 (MAX_SIG) legend signal button and hide
 	for (int i = 0; i < MAX_SIG; i++)
 	{
 		chan_info_btn_pool[i] = new wxCustomButton((wxFrame*)plot_legendpanel_, IDCCHANINFO0 + i, "slot free", "DevX/sig0", wxColor(90, 90, 100));
@@ -42,6 +42,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 
 		init_chan_to_gui("slot free", "/addr", "Volt", wxColor(i * 10, 90, 90));
 	}
+	CURRENT_SIG = MAX_SIG; // Save current signal legend button
 
 	plot_legendpanel_->SetSizer(legend_vsizer);
 
@@ -82,9 +83,10 @@ void cPlot::init_chan_to_gui(std::string chan_name, std::string chan_addr, std::
 	draw_chan_to_gui();
 }
 
+// BUGGY BUGGY
 void cPlot::resize_chan_number_to_gui(size_t max_item)
 {
-	if (max_item < MAX_SIG)
+	if (max_item < CURRENT_SIG)
 	{
 		// remove data structure at the end
 		for (int j = chan_legend_struct_list.size(); j > max_item; j--)
@@ -93,20 +95,59 @@ void cPlot::resize_chan_number_to_gui(size_t max_item)
 		}
 		for (int j = legend_vsizer->GetItemCount() - 1; j > max_item; j--)
 		{
-			legend_vsizer->Remove(j);
+			//legend_vsizer->Remove(j);
+			// Hide custom legend in place of removing sizer ?
 		}
+
+		CURRENT_SIG = max_item; // update MAX_SIG
 	}
-	else if (max_item > MAX_SIG)
+	else if (max_item > CURRENT_SIG)
 	{
+		// BUGGY !!!!!!!!!!!!!!!!!!!!
+		// TODO: add new wxCustomButton as the max is 64
+		// TODO: add to sizer the new item
+		
 		// add data structure at the end
-		for (int j = max_item; j < MAX_SIG; j++)
+		for (int j = CURRENT_SIG; j < max_item; j++)
 		{
 			chan_legend_struct_list.push_back({ "slot free", "/addr", "Volt", 0.0, 0.0, 0.0, wxColor(90, 90, 90) });
 		}
 	}
+
 	std::cout << "SetSignalCount is now set to " << chan_legend_struct_list.size() << "\n";
-	SetSignalCount(hGraph, chan_legend_struct_list.size());
+	//SetSignalCount(hGraph, chan_legend_struct_list.size());
 	draw_chan_to_gui();
+}
+
+int cPlot::gui_get_last_active_channel_number()
+{
+	// get total element size
+	size_t index = chan_legend_struct_list.size();
+
+	// point to last element
+	std::list<CHAN_LEGEND_STRUCT>::iterator it;
+	it = chan_legend_struct_list.end();// after last element do not dereference it (std::list::end)
+	it--;
+
+	//dec
+	while (index > 0)
+	{
+
+		if (it->channel_legend_name.compare("slot free") != 0)
+		{
+			return index;
+		}
+		it--;
+		index--;
+	}
+	return index;
+}
+
+int cPlot::get_chan_number_to_gui()
+{
+
+	std::cout << "Get gui channel number " << chan_legend_struct_list.size() << "\n";
+	return chan_legend_struct_list.size();
 }
 
 void cPlot::add_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color, size_t position)
@@ -126,7 +167,7 @@ void cPlot::add_chan_to_gui(std::string chan_name, std::string chan_addr, std::s
 	// Replace data structure
 	*it = { chan_name,  chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color };
 	//std::cout << "RGB:" << (int)chan_color.Red() << " " << (int)chan_color.Green() << " " << (int)chan_color.Blue() << "\n";
-	//std::cout << "at position: " << position << "\n";
+	std::cout << "at position: " << position << "\n";
 
 	draw_chan_to_gui();
 }

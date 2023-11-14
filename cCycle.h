@@ -205,7 +205,7 @@ public:
 	void previous() { pcycle->current_step--; }
 	void next() { pcycle->current_step++; }
 
-	double get_pressure() { return pcycle->step_table[pcycle->current_step]->pressure; }
+	double get_pressure() {return pcycle->step_table[pcycle->current_step]->pressure; }
 	double get_pressure(const int index) { return pcycle->step_table[index]->pressure; }
 	double get_voltage() { return pcycle->step_table[pcycle->current_step]->voltage; }
 	double get_voltage(const int index) { return pcycle->step_table[index]->voltage; }

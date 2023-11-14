@@ -5,6 +5,8 @@
 #include <thread>
 #include <Windows.h>
 
+#include "cCycle.h"
+#include "cCycleControler.h"
 #include "cPlot.h"
 #include "cFooter.h"
 #include "cObjectmanager.h"
@@ -15,6 +17,9 @@
 
 void cMeasurementControler::poll()
 {
+	std::cout << "cMeasurementcontroler->get_stop_token...\n";
+	auto st = measurement_controler_thread.get_stop_token();
+
 	meas_pool = meas_manager->get_measurement_pool();
 	std::cout << "cMeasurementcontroler->polling...\n";
 
@@ -31,7 +36,7 @@ void cMeasurementControler::poll()
 	wxStatusBar* statusbar = object_manager->get_status_bar();
 	statusbar->SetLabelText("Begin reading instrument values...");
 
-	if (bRunning)
+	if (!st.stop_requested())
 	{
 		wxString frequency = m_footer_->freq->GetValue();
 		frequency.ToCDouble(&freq_s_);
@@ -51,6 +56,13 @@ void cMeasurementControler::poll()
 
 		for (auto meas : meas_pool)
 		{
+			// Write data to instrument (controler)
+			if (m_cycle_ != nullptr)
+			{		
+				meas->set(0.0);
+			}		
+
+			// Read data from instrument
 			val = meas->read();
 			for (int c = buffer_index; c < val.buffer_size; c++)
 			{
@@ -87,11 +99,12 @@ void cMeasurementControler::poll()
 	//
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
+
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
 
-		if (bRunning)
+		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();
 			frequency.ToCDouble(&freq_s_);
@@ -111,13 +124,55 @@ void cMeasurementControler::poll()
 				tick.start_tick();
 				int buffer_index = 0;
 
+				
 				std::vector<double> read_pool;
 				for (auto meas : meas_pool)
 				{
-					// Set the setpoint
-					meas->set(12.0);
 
-					// Get the read value
+					// Write data to instrument (controler)
+					if (m_cycle_ != nullptr)
+					{				
+						double value = 0.0;
+						MEAS_TYPE type = meas->device_type();
+						
+						switch (type)
+						{
+						case MEAS_TYPE::PRESSURECONTROLER_INSTR:
+						{
+							static double old_pressure=0.0;
+							m_cyclecontroler_->critical_section.lock(); ////////////////////////////////CRITICAL_SECTION///////////
+							value = m_cycle_->get_pressure();
+							m_cyclecontroler_->critical_section.unlock(); ////////////////////////////////CRITICAL_SECTION///////////
+							if(old_pressure == value)
+							{			
+								goto read;
+							}
+							old_pressure = value; // save old value
+							break;
+						}
+						/*
+						case MEAS_TYPE::DAQ_INSTR:
+						{
+							static double old_daq = 0.0;
+							value = m_cycle_->get_voltage();
+							if (old_daq == value)
+							{		
+								goto read;
+							}
+							old_daq = value; // save old value
+							break;
+						}
+						*/
+						//... add other controler here
+						default:
+							value = 0.0;
+							goto read;
+						}
+						meas->set(value);
+					}
+					
+read:
+					// Read data from instrument
 					val = meas->read();
 
 					// Add vector to store points
@@ -171,7 +226,10 @@ void cMeasurementControler::start()
 
 	//control_thread.detach();
 	bRunning = true;
-	cMeasurementControler::control_thread = std::thread(&cMeasurementControler::poll, this);
+	//cMeasurementControler::control_thread = std::thread(&cMeasurementControler::poll, this);
+
+	measurement_controler_thread = std::jthread(&cMeasurementControler::poll, this);
+	
 
 }
 
@@ -179,7 +237,8 @@ void cMeasurementControler::stop()
 {
 	bRunning = false;
 	std::cout << "cMeasurementcontroler->stoping...\n";
-	control_thread.join();
+	measurement_controler_thread.request_stop();
+	//control_thread.join();
 	std::cout << "cMeasurementcontroler has joined...\n";
 }
 

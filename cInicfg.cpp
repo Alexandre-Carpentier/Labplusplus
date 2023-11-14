@@ -48,17 +48,17 @@ void cInicfg::load_table(void)
 		index = "force"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 5, str); }
 		index = "htriger"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
-		index = "ltriger"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 1, str); }
-		index = "jumpto"; index.append(wxString::Format("%i", i));
+		index = "ltriger"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 2, str); }
-		index = "jumpcount"; index.append(wxString::Format("%i", i));
+		index = "jumpto"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 3, str); }
-		index = "frontshape"; index.append(wxString::Format("%i", i));
+		index = "jumpcount"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 4, str); }
-		index = "duration"; index.append(wxString::Format("%i", i));
+		index = "frontshape"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 5, str); }
+		index = "duration"; index.append(wxString::Format("%i", i));
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 6, str); }
 	}
 	cfg->DeleteAll();
 	delete cfg;
@@ -85,12 +85,12 @@ void cInicfg::save_table(void)
 		double temperature = wxAtof(m_table->grid->GetCellValue(i, 3));
 		double position = wxAtof(m_table->grid->GetCellValue(i, 4));
 		double force = wxAtof(m_table->grid->GetCellValue(i, 5));
-		double htriger = wxAtof(m_table->grid->GetCellValue(i, 0));
-		double ltriger = wxAtof(m_table->grid->GetCellValue(i, 1));
-		int jumpto = wxAtoi(m_table->grid->GetCellValue(i, 2));
-		int jumpcount = wxAtoi(m_table->grid->GetCellValue(i, 3));
-		int frontshape = wxAtoi(m_table->grid->GetCellValue(i, 4));
-		double duration = wxAtof(m_table->grid->GetCellValue(i, 5));
+		double htriger = wxAtof(m_table->grid->GetCellValue(i, 1));
+		double ltriger = wxAtof(m_table->grid->GetCellValue(i, 2));
+		int jumpto = wxAtoi(m_table->grid->GetCellValue(i, 3));
+		int jumpcount = wxAtoi(m_table->grid->GetCellValue(i, 4));
+		int frontshape = wxAtoi(m_table->grid->GetCellValue(i, 5));
+		double duration = wxAtof(m_table->grid->GetCellValue(i, 6));
 
 		// Save in : // C:\Users\The Hive\AppData\Roaming
 

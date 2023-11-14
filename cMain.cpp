@@ -12,15 +12,14 @@
 #include"cInicfg.h"
 #include "LoadBitmapFromRessource.h"
 
-
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
-EVT_TOOL(10001, cMain::openButtonClicked)
-EVT_TOOL(10002, cMain::saveButtonClicked)
-EVT_TOOL(10003, cMain::settingsButtonClicked)
-EVT_TOOL(10004, cMain::editButtonClicked)
-EVT_TOOL(10005, cMain::playButtonClicked)
-EVT_TOOL(10006, cMain::plotButtonClicked)
-EVT_TOOL(10007, cMain::exitButtonClicked)
+EVT_TOOL(IDTOOL_OPENBTN, cMain::openButtonClicked)
+EVT_TOOL(IDTOOL_SAVEBTN, cMain::saveButtonClicked)
+EVT_TOOL(IDTOOL_SETTINGS, cMain::settingsButtonClicked)
+EVT_TOOL(IDTOOL_EDITBTN, cMain::editButtonClicked)
+EVT_TOOL(IDTOOL_PLAYBTN, cMain::playButtonClicked)
+EVT_TOOL(IDTOOL_PLOT, cMain::plotButtonClicked)
+EVT_TOOL(IDTOOL_EXIT, cMain::exitButtonClicked)
 
 EVT_PAINT(cMain::Paintevt)
 EVT_SIZE(cMain::Sizeevt)
@@ -28,15 +27,6 @@ EVT_SIZING(cMain::Moveevt)
 EVT_MAXIMIZE(cMain::Maximizeevt)
 wxEND_EVENT_TABLE()
 
-enum STATUS {
-	OPEN = 10001,
-	SAVE,
-	CONF,
-	EDIT,
-	PLAY,
-	PLOT,
-	EXIT
-};
 
 cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1200, 600))
 {
@@ -81,26 +71,24 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	//wxBitmap open(wxT("Open.bmp"), wxBITMAP_TYPE_BMP);
 	//wxBitmap save(wxT("Save.bmp"), wxBITMAP_TYPE_BMP);
 	//wxBitmap settings(wxT("Settings.bmp"), wxBITMAP_TYPE_BMP);
-	wxBitmap settings("BMP0", wxBITMAP_TYPE_BMP_RESOURCE);
+	wxBitmap settings("BMP0", wxBITMAP_TYPE_PNG_RESOURCE);
 	//wxBitmap edit(wxT("Pixel editor.bmp"), wxBITMAP_TYPE_BMP);	
-	wxBitmap edit("BMP1", wxBITMAP_TYPE_BMP_RESOURCE);
+	wxBitmap edit("BMP1", wxBITMAP_TYPE_PNG_RESOURCE);
 	//wxBitmap plot(wxT("Chart xy.bmp"), wxBITMAP_TYPE_BMP);
-	wxBitmap plot("BMP2", wxBITMAP_TYPE_BMP_RESOURCE);
+	wxBitmap plot("BMP2", wxBITMAP_TYPE_PNG_RESOURCE);
 	//wxBitmap play(wxT("Play.bmp"), wxBITMAP_TYPE_BMP);
 	//wxBitmap exit(wxT("Exit.bmp"), wxBITMAP_TYPE_BMP);
-	wxBitmap exit("BMP3", wxBITMAP_TYPE_BMP_RESOURCE);
+	wxBitmap exit("BMP3", wxBITMAP_TYPE_PNG_RESOURCE);
 
 	wxToolBar* toolbar = CreateToolBar();
-	//toolbar->AddTool(STATUS::OPEN, wxT("Open"), open);
-	//toolbar->AddTool(STATUS::SAVE, wxT("Save"), save);
-
-
-
-	toolbar->AddTool(STATUS::CONF, wxT("Conf"), settings);
-	toolbar->AddTool(STATUS::EDIT, wxT("Edit"), edit);
-	toolbar->AddTool(STATUS::PLOT, wxT("Plot"), plot);
-	//toolbar->AddTool(STATUS::PLAY, wxT("Play"), play);
-	toolbar->AddTool(STATUS::EXIT, wxT("Exit"), exit);
+	//toolbar->AddTool(IDTOOL_OPENBTN, wxT("Open"), open);
+	//toolbar->AddTool(IDTOOL_SAVEBTN, wxT("Save"), save);
+	toolbar->AddTool(IDTOOL_SETTINGS, wxT("Conf"), settings);
+	toolbar->AddTool(IDTOOL_EDITBTN, wxT("Edit"), edit);
+	toolbar->AddTool(IDTOOL_PLOT, wxT("Plot"), plot);
+	//toolbar->AddTool(IDTOOL_PLAYBTN, wxT("Play"), play);
+	toolbar->AddTool(IDTOOL_EXIT, wxT("Exit"), exit);
+	toolbar->SetToolBitmapSize(this->FromDIP(wxSize(64, 64)));
 	toolbar->SetBackgroundColour(*wxWHITE);
 	toolbar->Realize();
 
@@ -395,7 +383,7 @@ void cMain::Paintevt(wxPaintEvent& evt)
 
 void cMain::Sizeevt(wxSizeEvent& evt)
 {
-	this->Refresh();//////////////////////////////////////remove graph lag
+	this->Refresh();//////////////////////////////////////remove graph lag but degrade picture displayed in setting
 	evt.Skip();
 }
 

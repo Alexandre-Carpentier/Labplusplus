@@ -129,22 +129,25 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	}
 	////////////////////////////////////////////////////////////
 
-	config_rightpanel_ = new wxPanel(inst, IDC_DAQRIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
-	config_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165)); // Make inside group box dark grey
-	config_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cDaqmx::OnPaint));
 
-	////////////////////////////////////////////////////////////
-
-	//wxInitAllImageHandlers();
+		//wxInitAllImageHandlers();
 	//image.LoadFile(wxT("multi_function_daq_img600x300.png"), wxBITMAP_TYPE_PNG);
 	//image.LoadFile(wxT("IDB_PNG2"), wxBITMAP_TYPE_ANY);
 
 	::wxInitAllImageHandlers();
-	wxBitmap bmp("DAQPNG", wxBITMAP_TYPE_PNG_RESOURCE);
-	image = bmp.ConvertToImage();
+	wxBitmap bmp = wxBitmap("DAQPNG", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
+	temp_img = bmp.ConvertToImage();										// Convert bmp to image to scale purpose
 
-	//wxBitmap imagebmp("IDB_PNG2", wxBITMAP_TYPE_PNG_RESOURCE);
-	//image = imagebmp.ConvertToImage();
+
+	config_rightpanel_ = new wxPanel(inst, IDC_DAQRIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
+	config_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165));		// Make inside group box dark grey
+
+	config_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cDaqmx::OnPaint));
+	//inst->Connect(wxEVT_SIZING, wxSizeEventHandler(cDaqmx::OnPaint));
+
+	////////////////////////////////////////////////////////////
+
+
 
 	wxStaticText* dummy = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxSize(400, 0)));
 
@@ -154,14 +157,14 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	wxStaticBox* device_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "NiDAQmx Hardware", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticBox* device_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Hardware", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
 	device_group_sizer = new wxStaticBoxSizer(device_group, wxVERTICAL);
 
 	////////////////////////////////////////////////////////////
-	wxStaticText* enabledaq = new wxStaticText(device_group, IDCSTATICENABLEDAQ, L"NI DAQmx:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
-	enabledaq->SetFont(enabledaq->GetFont().Scale(text_size));
-	enabledaq->SetBackgroundColour(*bgcolor);
-	enabledaq->Hide(); // Just use enabledaq to fill the flex sizer -> hide it after creating
+	//wxStaticText* enabledaq = new wxStaticText(device_group, IDCSTATICENABLEDAQ, L"_Hollow_:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	//enabledaq->SetFont(enabledaq->GetFont().Scale(text_size));
+	//enabledaq->SetBackgroundColour(*bgcolor);
+	//enabledaq->Hide(); // Just use enabledaq to fill the flex sizer -> hide it after creating
 
 	////////////////////////////////////////////////////////////
 
@@ -172,8 +175,8 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	wxStaticText* staticaddr = new wxStaticText(device_group, IDCSTATICADDR, L"Device list:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
-	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
+	//wxStaticText* staticaddr = new wxStaticText(device_group, IDCSTATICADDR, L"Device list:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	//staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
 	//staticaddr->SetBackgroundColour(*bgcolor);
 
 	////////////////////////////////////////////////////////////
@@ -184,20 +187,26 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	addr_ctrl->Disable();
 
 	flexsizer->Add(daq_activate);
-	flexsizer->Add(enabledaq);
-	flexsizer->Add(staticaddr);
+	//flexsizer->Add(enabledaq);
+	//flexsizer->Add(staticaddr);
 	flexsizer->Add(addr_ctrl);
 	device_group_sizer->Add(flexsizer);
 
 	wxBoxSizer* btn_hsizer = new wxBoxSizer(wxHORIZONTAL);
-	wxButton* previous_chan = new wxButton(config_rightpanel_, IDCPREVIOUS, "Previous", wxDefaultPosition, inst->FromDIP(wxSize(100, 30)), wxRAISED_BORDER);
-	previous_chan->SetFont(previous_chan->GetFont().Scale(text_size + 0.5f));
-	previous_chan->SetBackgroundColour(wxColor(250, 248, 240));
-	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cDaqmx::OnPreviousCliqued, this, IDCPREVIOUS);
 
-	wxButton* next_chan = new wxButton(config_rightpanel_, IDCNEXT, "Next", wxDefaultPosition, inst->FromDIP(wxSize(100, 30)), wxSUNKEN_BORDER);
-	next_chan->SetFont(next_chan->GetFont().Scale(text_size + 0.5f));
-	next_chan->SetBackgroundColour(wxColor(250, 248, 240));
+	wxSize picture_size = inst->FromDIP(wxSize(32, 32));
+	wxImage prev_img = wxBitmap("BMP4", wxBITMAP_TYPE_PNG_RESOURCE).ConvertToImage();
+	wxButton* previous_chan = new wxBitmapButton(config_rightpanel_, IDCPREVIOUS, wxBitmap(prev_img.Scale(picture_size.GetWidth(), picture_size.GetHeight())), wxDefaultPosition, inst->FromDIP(wxSize(48, 48)), wxBORDER_SIMPLE);
+	//wxButton* previous_chan = new wxButton(config_rightpanel_, IDCPREVIOUS, "Previous", wxDefaultPosition, inst->FromDIP(wxSize(100, 30)), wxBORDER_SUNKEN);
+	//previous_chan->SetFont(previous_chan->GetFont().Scale(text_size + 0.5f));
+	//previous_chan->SetBackgroundColour(wxColor(250, 248, 240));
+	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cDaqmx::OnPreviousCliqued, this, IDCPREVIOUS);
+	
+	wxImage next_img = wxBitmap("BMP5", wxBITMAP_TYPE_PNG_RESOURCE).ConvertToImage();
+	wxButton* next_chan = new wxBitmapButton(config_rightpanel_, IDCNEXT, wxBitmap(next_img.Scale(picture_size.GetWidth(), picture_size.GetHeight())), wxDefaultPosition, inst->FromDIP(wxSize(48, 48)), wxBORDER_SIMPLE);
+	//wxButton* next_chan = new wxButton(config_rightpanel_, IDCNEXT, "Next", wxDefaultPosition, inst->FromDIP(wxSize(100, 30)), wxSUNKEN_BORDER);
+	//next_chan->SetFont(next_chan->GetFont().Scale(text_size + 0.5f));
+	//next_chan->SetBackgroundColour(wxColor(250, 248, 240));
 	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cDaqmx::OnNextCliqued, this, IDCNEXT);
 
 	btn_hsizer->Add(previous_chan, 0, wxALL | wxEXPAND, inst->FromDIP(5));
@@ -249,10 +258,10 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	channel_group_sizer = new wxStaticBoxSizer(channel_group, wxVERTICAL);
 	////////////////////////////////////////////////////////////
 
-	staticenablechan = new wxStaticText(channel_group, IDCENABLECHAN, L"Active:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	staticenablechan = new wxStaticText(channel_group, IDCENABLECHAN, L"_Hollow_:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	staticenablechan->SetFont(staticenablechan->GetFont().Scale(text_size));
 	staticenablechan->Hide(); // Just use as dummy for flexsizer spacing, hide it after creation
-	//staticenablechan->SetBackgroundColour(*bgcolor);
+
 
 	checkchan = new wxButton(channel_group, IDCCHECKCHAN, L"", wxDefaultPosition, inst->FromDIP(wxSize(50, 25)), wxSUNKEN_BORDER);
 	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cDaqmx::OnDaqChanEnableBtn, this, IDCCHECKCHAN);
@@ -273,11 +282,11 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	chan_name->Disable();
 	////////////////////////////////////////////////////////////
 
-	staticchan = new wxStaticText(channel_group, IDCSTATICCHAN, L"Physical channel:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	staticchan = new wxStaticText(channel_group, IDCSTATICCHAN, L"Physical chan:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	staticchan->SetFont(staticchan->GetFont().Scale(text_size));
 	//staticchan->SetBackgroundColour(*bgcolor);
 
-	chan_addr_ctrl = new wxComboBox(channel_group, IDCCHANADDR, label.channel_physical_name[0].front(), wxDefaultPosition, inst->FromDIP(wxSize(150, 20)), label.channel_physical_name[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
+	chan_addr_ctrl = new wxComboBox(channel_group, IDCCHANADDR, label.channel_physical_name[0].front(), wxDefaultPosition, inst->FromDIP(static_ctrl_size), label.channel_physical_name[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
 	inst_->Bind(wxEVT_TEXT, &cDaqmx::OnDaqChanPhysicalAddressNameModified, this, IDCCHANADDR);
 	chan_addr_ctrl->SetFont(chan_addr_ctrl->GetFont().Scale(text_size));
 	chan_addr_ctrl->Disable();
@@ -287,13 +296,13 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	statictype->SetFont(statictype->GetFont().Scale(text_size));
 	//statictype->SetBackgroundColour(*bgcolor);
 
-	meas_type_ctrl = new wxComboBox(channel_group, IDCCHANTYPE, label.channel_type[0].front(), wxDefaultPosition, inst->FromDIP(wxSize(150, 20)), label.channel_type[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
+	meas_type_ctrl = new wxComboBox(channel_group, IDCCHANTYPE, label.channel_type[0].front(), wxDefaultPosition, inst->FromDIP(static_ctrl_size), label.channel_type[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
 	inst_->Bind(wxEVT_TEXT, &cDaqmx::OnDaqChanTypeModified, this, IDCCHANTYPE);
 	meas_type_ctrl->SetFont(meas_type_ctrl->GetFont().Scale(text_size));
 	meas_type_ctrl->Disable();
 	////////////////////////////////////////////////////////////
 
-	static_chan_max_input_range = new wxStaticText(channel_group, IDCSTATICMAX, L"Max input voltage:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	static_chan_max_input_range = new wxStaticText(channel_group, IDCSTATICMAX, L"Max. input:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	static_chan_max_input_range->SetFont(static_chan_max_input_range->GetFont().Scale(text_size));
 	//static_chan_max_input_range->SetBackgroundColour(*bgcolor);
 
@@ -302,7 +311,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	chan_max_input_range->Disable();
 	////////////////////////////////////////////////////////////
 
-	static_chan_min_input_range = new wxStaticText(channel_group, IDCSTATICMIN, L"Min input voltage:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	static_chan_min_input_range = new wxStaticText(channel_group, IDCSTATICMIN, L"Min. input:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	static_chan_min_input_range->SetFont(static_chan_min_input_range->GetFont().Scale(text_size));
 	//static_chan_min_input_range->SetBackgroundColour(*bgcolor);
 
@@ -331,7 +340,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	static_chan_tc_min_range = new wxStaticText(channel_group, IDCSTATICTCMIN, L"Min temperature °C:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	static_chan_tc_min_range = new wxStaticText(channel_group, IDCSTATICTCMIN, L"Min. temp. °C:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	static_chan_tc_min_range->SetFont(static_chan_tc_min_range->GetFont().Scale(text_size));
 	//static_chan_tc_min_range->SetBackgroundColour(*bgcolor);
 
@@ -341,7 +350,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	static_chan_tc_max_range = new wxStaticText(channel_group, IDCSTATICTCMAX, L"Max temperature °C:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	static_chan_tc_max_range = new wxStaticText(channel_group, IDCSTATICTCMAX, L"Max. temp. °C:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	static_chan_tc_max_range->SetFont(static_chan_tc_max_range->GetFont().Scale(text_size));
 	//static_chan_tc_max_range->SetBackgroundColour(*bgcolor);
 
@@ -351,14 +360,14 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	flexchansizer1->Add(checkchan);
-	flexchansizer1->Add(staticenablechan);
-	flexchansizer1->Add(static_chan_name);
-	flexchansizer1->Add(chan_name);
-	flexchansizer1->Add(staticchan);
-	flexchansizer1->Add(chan_addr_ctrl);
-	flexchansizer1->Add(statictype);
-	flexchansizer1->Add(meas_type_ctrl);
+	flexchansizer1->Add(checkchan, 0);
+	flexchansizer1->Add(staticenablechan, 0);
+	flexchansizer1->Add(static_chan_name, 0);
+	flexchansizer1->Add(chan_name, 0);
+	flexchansizer1->Add(staticchan, 0);
+	flexchansizer1->Add(chan_addr_ctrl, 0);
+	flexchansizer1->Add(statictype, 0);
+	flexchansizer1->Add(meas_type_ctrl, 0);
 
 
 	flexchansizer1->Add(static_chan_max_input_range);
@@ -396,7 +405,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	static_chan_scale->SetFont(static_chan_scale->GetFont().Scale(text_size));
 	//static_chan_scale->SetBackgroundColour(*bgcolor);
 
-	chan_scale = new wxComboBox(channel_linearize_group, IDCCHANSCALE, label.channel_linearize[0].front(), wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.channel_linearize[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
+	chan_scale = new wxComboBox(channel_linearize_group, IDCCHANSCALE, label.channel_linearize[0].front(), wxDefaultPosition, inst->FromDIP(text_ctrl_size), label.channel_linearize[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
 	chan_scale->SetFont(chan_scale->GetFont().Scale(text_size));
 	chan_scale->SetBackgroundColour(wxColor(250, 250, 250));
 
@@ -519,7 +528,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	wxBoxSizer* upper_sizer = new wxBoxSizer(wxHORIZONTAL); // device + dummy
 	wxBoxSizer* grid_hsizer = new wxBoxSizer(wxHORIZONTAL); // channels
 
-	upper_sizer->Add(device_group_sizer, 0, wxALIGN_CENTER_VERTICAL | wxALL, inst->FromDIP(50)); // Device
+	//upper_sizer->Add(device_group_sizer, 0, wxALIGN_CENTER_VERTICAL | wxALL, inst->FromDIP(50)); // Device
 	upper_sizer->Add(dummy, 1, wxRIGHT, 400); // dummy
 
 	chan_vsizer = new wxBoxSizer(wxVERTICAL);
@@ -528,16 +537,16 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	grid_vsizer->Add(upper_sizer/*dummy*/, 1, wxALIGN_CENTER, inst->FromDIP(10)); // Space for daq img
 	grid_vsizer->Add(grid_hsizer, 1, wxALL | wxALIGN_CENTER, inst->FromDIP(10));
 
-	//grid_hsizer->Add(device_group_sizer/*flexsizer*/, 0, wxALIGN_CENTER, 10);
-	grid_hsizer->Add(chan_vsizer, 1, wxALIGN_CENTER);
+	grid_hsizer->Add(chan_vsizer, 0, wxALIGN_CENTER);
 
 	chan_vsizer->Add(btn_hsizer, 0, wxEXPAND);
 	chan_vsizer->Add(chan_grid, 0);
-	chan_vsizer->Add(chan_hsizer, 0);
-
-	chan_hsizer->Add(channel_group_sizer/*flexchansizer1*/, 0, wxALL | wxEXPAND, inst->FromDIP(10));
-	chan_hsizer->Add(channel_linearize_group_sizer/*flexchansizer2*/, 0, wxALL | wxEXPAND, inst->FromDIP(10));
-	chan_hsizer->Add(channel_signal_group_sizer/*flexchansizer3*/, 0, wxALL | wxEXPAND, inst->FromDIP(10));
+	chan_vsizer->Add(chan_hsizer, 0, wxEXPAND);
+	
+	chan_hsizer->Add(device_group_sizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));
+	chan_hsizer->Add(channel_group_sizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));
+	chan_hsizer->Add(channel_linearize_group_sizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));
+	chan_hsizer->Add(channel_signal_group_sizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));
 
 	config_rightpanel_->SetSizerAndFit(grid_vsizer);
 
@@ -549,17 +558,28 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 void cDaqmx::OnPaint(wxPaintEvent& event)
 {
+	// Load bitmap from ressource
+	// consuming a lot of cpu... to fix. But wxImage not accesible from private, public member, so... unbinding here.
+
 	wxBufferedPaintDC dc(this, wxBUFFER_CLIENT_AREA);
 
-
+	// retrieving different size and proportions
 	wxRect size = config_rightpanel_->GetRect();
-
 	size.x = 0;
 	dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
+	wxSize sz = temp_img.GetSize();
 
-	wxSize sz = image.GetSize();
-	int pos = (size.width / 2) - (sz.x / 2);
-	dc.DrawBitmap(image, pos + 120, 0, false);
+	// Scale the image
+	/*
+	double r = size.GetHeight();
+	r = r / 600.0;
+
+	int new_width = sz.GetWidth() * r;
+	temp_img = temp_img.Scale(new_width, sz.GetHeight()*r);
+	*/
+
+	int pos = (size.width / 2) - (sz.x / 2);				// Center
+	dc.DrawBitmap(temp_img, pos, 0, false);					// Draw the final bmp on context
 
 	event.Skip();
 }

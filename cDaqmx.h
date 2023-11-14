@@ -7,6 +7,7 @@
 #include <wx/fileconf.h>
 #include "data_types.h"
 
+static wxImage temp_img;
 
 class cMeasurementmanager;
 class cCycle;
@@ -16,18 +17,16 @@ class cMeasurement;
 class cPlot;
 class cImagePanel;
 
-static wxImage image;
-
 static wxPanel* config_rightpanel_ = nullptr;
 static wxTreeCtrl* config_tree_ctrl = nullptr;
 
 class cDaqmx : public wxFrame
 {
 private:
+	
 	cImagePanel* InstrImg = nullptr;
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
-
 public:
 	// Signal color map
 	float COLORS[32][3] =
@@ -168,9 +167,9 @@ public:
 	// Style
 	const float text_size = 1;
 	const int STATIC_CTRL_STYLE = wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL;
-	const wxSize static_ctrl_size = wxSize(120, 20);
+	const wxSize static_ctrl_size = wxSize(80, 20);
 	const int TEXT_CTRL_STYLE = wxSUNKEN_BORDER;
-	const wxSize text_ctrl_size = wxSize(120, 24);
+	const wxSize text_ctrl_size = wxSize(100, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
 	cDaqmx(wxWindow* inst);

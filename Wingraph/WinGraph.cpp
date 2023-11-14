@@ -86,7 +86,7 @@ typedef struct {
 	BOOL bDisplayCursor;						// Logging active
 	double ymin_fix;							// Fix the Y min val
 	double ymax_fix;							// Fix the Y max val
-	int scale_factor;						// Fix the X scale factor (zoom)
+	int scale_factor;							// Fix the X scale factor (zoom)
 	double xwindow_fix;							// Fix the time windows val
 	DATA* signal[];								// ! (flexible array member) Array of pointers for every signal to be store by the struct - Must be last member of the struct
 }GRAPHSTRUCT, * PGRAPHSTRUCT;					// Declaration of the struct. To be cast from HGRAPH api
@@ -751,7 +751,7 @@ VOID SetSignalColor(HGRAPH hGraph, INT R, INT G, INT B, INT iSignalNumber)
 		return;
 	}
 
-	printf("[*] a new signal color is assigned: RGBf (%i %i %i) at position: %i\n", R, G, B, iSignalNumber);
+	//printf("[*] a new signal color is assigned: RGBf (%i %i %i) at position: %i\n", R, G, B, iSignalNumber);
 	DATA* signal = (DATA*)pgraph->signal[iSignalNumber];
 	if (NULL == signal)
 	{
@@ -769,7 +769,7 @@ VOID SetSignalColor(HGRAPH hGraph, INT R, INT G, INT B, INT iSignalNumber)
 	for (int i = 0; i < pgraph->signalcount; i++)
 	{
 		signal = (DATA*)pgraph->signal[i];
-		printf("[WINGRAPH]%i %s (%i %i %i)\n", i, signal->signame, (int)(signal->color[0] * 255.0f), (int)(signal->color[1] * 255.0f), (int)(signal->color[2] * 255.0f));
+		//printf("[WINGRAPH]%i %s (%i %i %i)\n", i, signal->signame, (int)(signal->color[0] * 255.0f), (int)(signal->color[1] * 255.0f), (int)(signal->color[2] * 255.0f));
 	}
 }
 
@@ -1784,7 +1784,7 @@ BOOL Render(HGRAPH hGraph)
 						dy = SnapPlot->Ymax + dy;
 						DrawString(normal_pos_x + 0.05, normal_pos_y - 0.05, dtos(value, sizeof(value), dy));
 
-						printf("x=%lf	y=%lf	xnorm=%lf	ynorm=%lf\n", normal_pos_x, normal_pos_y, normal_pos_x_shifted, normal_pos_y_shifted);
+						//printf("x=%lf	y=%lf	xnorm=%lf	ynorm=%lf\n", normal_pos_x, normal_pos_y, normal_pos_x_shifted, normal_pos_y_shifted);
 
 						// Display lines indicator
 
@@ -1873,7 +1873,7 @@ VOID InitGL(HGRAPH hGraph, int Width, int Height)		// Called after the main wind
 	//glEnable(GL_BLEND);
 	glDepthMask(false);
 
-	if (!BuildMyFont(hGraph, (char*)"Verdana", 12))		// Build The Font BuildMyFont(HGRAPH hGraph, char* FontName, int Fontsize)
+	if (!BuildMyFont(hGraph, (char*)"Verdana", 14))		// Build The Font BuildMyFont(HGRAPH hGraph, char* FontName, int Fontsize)
 	{
 		// error on creating the Font
 	}
@@ -2026,7 +2026,6 @@ BOOL FindGlobalMaxScale(HGRAPH hGraph, double& Xmin, double& Xmax, double& Ymin,
 		Ymin = pgraph->signal[first_sig]->Ymin;										// save first value
 		Ymax = pgraph->signal[first_sig]->Ymax;										// save first value
 
-
 		for (int index = first_sig + 1; index < pgraph->signalcount; index++)			// Iterate every signals
 		{
 			if (pgraph->signal[index]->show == true)						// Update limit only if signal displayed
@@ -2117,10 +2116,14 @@ VOID DrawWave(HGRAPH hGraph)
 
 			int first_point = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / GetZoomFactor(hGraph));	// first_point [0-cur_nbpoints]
 			if (first_point < 0)
+			{
 				first_point = 0;
-
+			}
+				
 			for (int i = first_point; i < pgraph->cur_nbpoints; i++)	// Handle zoom here
 			{
+				//printf("\n [!] X%i = %lf \n", i, TakeFiniteNumber(pDATA->Xnorm[i]));
+
 				// prevent NAN
 
 				if (pDATA->Xnorm[i] != pDATA->Xnorm[i] || pDATA->Ynorm[i] != pDATA->Ynorm[i])
@@ -2329,7 +2332,7 @@ VOID normalize_data(HGRAPH hGraph, double Xmin, double Xmax, double Ymin, double
 		{
 			int min_point = 0;
 			int zoom = GetZoomFactor(hGraph);
-			if (zoom > 0)
+			if (zoom > 1)
 			{
 				min_point = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / zoom);
 			}
@@ -2346,6 +2349,8 @@ VOID normalize_data(HGRAPH hGraph, double Xmin, double Xmax, double Ymin, double
 
 				pgraph->signal[index]->Xnorm[x] = (pgraph->signal[index]->X[x] - Xmin) / (Xmax - Xmin);
 				pgraph->signal[index]->Ynorm[x] = (pgraph->signal[index]->Y[x] - Ymin) / (Ymax - Ymin);
+
+				//printf("\n [!] X%i = %lf \n", x, TakeFiniteNumber(pgraph->signal[index]->Xnorm[x]));
 
 				// prevent Nan numbers in normalized buffer
 
@@ -2395,15 +2400,8 @@ VOID UpdateBorder(HGRAPH hGraph)
 	//fprintf("\rAnalizedPts%i xmax%i ymin%i ymax%i", AnalizedPts, xmaxpos, yminpos, ymaxpos);
 	if (yminpos < 0 || ymaxpos < 0 || yminpos > pgraph->cur_nbpoints / 20 || ymaxpos > pgraph->cur_nbpoints / 20)
 	{
-		int zoom = GetZoomFactor(hGraph);
-		if (zoom > 0)
-		{
-			int low = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / zoom);
-			//printf("\r\nlower point analysed: %i", low);
-			AnalizedPts = low;
-		}
-		else
-			AnalizedPts = 0;
+		// Get scale factor position
+		AnalizedPts = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / GetZoomFactor(hGraph));		
 
 		//AnalizedPts = 0;
 		for (int index = 0; index <= pgraph->signalcount - 1; index++)
@@ -2433,7 +2431,7 @@ VOID UpdateBorder(HGRAPH hGraph)
 
 	/// ////////////////////////////////////////////
 
-	if (0 == pgraph->cur_nbpoints)
+	if (pgraph->cur_nbpoints == 0 )
 	{
 		for (int index = 0; index <= pgraph->signalcount - 1; index++)
 		{
@@ -2445,7 +2443,7 @@ VOID UpdateBorder(HGRAPH hGraph)
 		return;
 	}
 
-	if (1 == pgraph->cur_nbpoints)
+	if (pgraph->cur_nbpoints == 1 )
 	{
 		for (int index = 0; index <= pgraph->signalcount - 1; index++)
 		{
@@ -2460,7 +2458,7 @@ VOID UpdateBorder(HGRAPH hGraph)
 		}
 	}
 
-	if (1 < pgraph->cur_nbpoints)
+	if (pgraph->cur_nbpoints > 1)
 	{
 		for (int index = 0; index <= pgraph->signalcount - 1; index++)
 		{
@@ -2472,9 +2470,22 @@ VOID UpdateBorder(HGRAPH hGraph)
 
 			for (CurrentPoint; CurrentPoint < pgraph->cur_nbpoints; CurrentPoint++)
 			{
-				pgraph->signal[index]->Xmin = TakeFiniteNumber(pgraph->signal[index]->X[AnalizedPts]);
-				//pgraph->signal[index]->Xmin = TakeFiniteNumber(pgraph->signal[index]->X[0]);
+				////////////////////////////////////////////
+				int zoom = GetZoomFactor(hGraph);
+				if (zoom > 1)
+				{
+					zoom  = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / zoom);
+		
+				}
+				else
+				{
+					zoom = 0;
+				}
 
+				pgraph->signal[index]->Xmin = TakeFiniteNumber(pgraph->signal[index]->X[zoom]);
+				//pgraph->signal[index]->Xmin = TakeFiniteNumber(pgraph->signal[index]->X[0]);
+				
+				////////////////////////////////////////////
 				if (TakeFiniteNumber(pgraph->signal[index]->X[CurrentPoint]) > pgraph->signal[index]->Xmax)
 				{
 					pgraph->signal[index]->Xmax = TakeFiniteNumber(pgraph->signal[index]->X[CurrentPoint]);

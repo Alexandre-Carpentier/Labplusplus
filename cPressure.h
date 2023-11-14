@@ -9,6 +9,7 @@
 #include <wx/fileconf.h>
 #include "data_types.h"
 
+static wxImage pace_img;
 
 class cMeasurementmanager;
 class cCycle;
@@ -18,13 +19,13 @@ class cMeasurement;
 class cPlot;
 class cImagePanel;
 
-
-
+static wxPanel* pace_rightpanel_ = nullptr;
 
 class cPressure : public wxFrame
 {
 private:
-	wxPanel* config_rightpanel_ = nullptr;
+	
+	
 
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
@@ -60,6 +61,7 @@ public:
 
 	void OnPressureEnableBtn(wxCommandEvent& evt);
 	void OnPressureAddrSelBtn(wxCommandEvent& evt);
+	void OnPaint(wxPaintEvent& event);
 	void EnablePressureChannel(bool isDisplayed);
 
 	void save_current_device_config(int channel_index);
