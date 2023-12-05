@@ -46,6 +46,7 @@ public:
     void set_average(double val);
     void set_max(double val);
     void set_color(wxColor color);
+    void set_visible(bool isDisplayed);
 
     wxString get_name();
     wxString get_address();

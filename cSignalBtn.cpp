@@ -148,6 +148,11 @@ void wxCustomButton::set_color(wxColor color)
     this->color_ = color;
 }
 
+void wxCustomButton::set_visible(bool isDisplayed)
+{
+    show->SetValue(isDisplayed);
+}
+
 wxString wxCustomButton::get_name()
 {
     return this->name_;

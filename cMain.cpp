@@ -34,7 +34,13 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	//_crtBreakAlloc = 248;	
 #endif
 
-	//__asm {nop};
+	/////////////////////////////////////////////////////////////
+	//
+	//	Launch the device monitor tool
+	//
+
+	devmon = std::make_unique<cDeviceMonitor>();
+	devmon->Notify();
 
 	std::cout << "Current scale factor: " << this->GetDPIScaleFactor() << "\n";
 	////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +94,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	toolbar->AddTool(IDTOOL_PLOT, wxT("Plot"), plot);
 	//toolbar->AddTool(IDTOOL_PLAYBTN, wxT("Play"), play);
 	toolbar->AddTool(IDTOOL_EXIT, wxT("Exit"), exit);
-	toolbar->SetToolBitmapSize(this->FromDIP(wxSize(64, 64)));
+	toolbar->SetToolBitmapSize(this->FromDIP(wxSize(32, 32)));
 	toolbar->SetBackgroundColour(*wxWHITE);
 	toolbar->Realize();
 

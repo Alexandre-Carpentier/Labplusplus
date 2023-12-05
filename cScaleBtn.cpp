@@ -92,6 +92,18 @@ void wxScaleButton::render(wxDC& dc)
 
 }
 
+void wxScaleButton::slider_reset()
+{
+    set_scale_factor(1);
+    std::cout << "Zoom: " << 1 << "\n";
+    wxString scaletxt = wxString::Format(wxT("Scale factor: x%i "), 1);;
+    staticscale->SetLabelText(scaletxt);
+    
+    slider->SetValue(1);
+
+    this->Layout();
+}
+
 void wxScaleButton::set_scale_factor(int factor)
 {
     std::cout << "cObjectmanager->getInstance()\n";

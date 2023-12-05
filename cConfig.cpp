@@ -1,10 +1,8 @@
 
 #include "cConfig.h"
 
-
 #include "enum.h"
 #include <thread>
-
 
 #include "cPlot.h"
 #include "cCycle.h"
@@ -16,7 +14,7 @@
 
 
 
-/*-----------------Duplication---------------------------------*/
+/*---------------- - Duplication-------------------------------- -
 void cDevice::DisplayConfiguration()
 {
 	std::cout << "[*] Communication are configurated with: " << this->protocol->get_type() << "\n";
@@ -80,7 +78,7 @@ void cDevice::OnPaint()
 {
 	return;
 }
-/*-----------------Duplication---------------------------------*/
+-----------------Duplication---------------------------------*/
 
 cConfig::cConfig(wxWindow* inst)
 {
@@ -118,8 +116,8 @@ cConfig::cConfig(wxWindow* inst)
 	Daqmx_struct.name = L"NI DAQMX (USB6001;cDAQ/9205).dll";
 	Daqmx_struct.panel = m_daqmx->get_right_panel();
 	Daqmx_struct.hInst = nullptr;
-	Daqmx_struct.device = nullptr;
-	Daqmx_struct.Attach = nullptr;
+	//Daqmx_struct.device = nullptr;
+	//Daqmx_struct.Attach = nullptr;
 	plugin_vec.push_back(Daqmx_struct);
 
 	// Add cPressure to plugin vec
@@ -128,8 +126,8 @@ cConfig::cConfig(wxWindow* inst)
 	Pressure_struct.name = L"Pressure controler (Druck Pace 6000).dll";
 	Pressure_struct.panel = m_pressure->get_right_panel();
 	Pressure_struct.hInst = nullptr;
-	Pressure_struct.device = nullptr;
-	Pressure_struct.Attach = nullptr;
+	//Pressure_struct.device = nullptr;
+	//Pressure_struct.Attach = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
 	// Add cTension to plugin vec
@@ -138,8 +136,8 @@ cConfig::cConfig(wxWindow* inst)
 	Tension_struct.name = L"Voltage controler (Keytley 2280S).dll";
 	Tension_struct.panel = m_tension->get_right_panel();
 	Tension_struct.hInst = nullptr;
-	Tension_struct.device = nullptr;
-	Tension_struct.Attach = nullptr;
+	//Tension_struct.device = nullptr;
+	//Tension_struct.Attach = nullptr;
 	plugin_vec.push_back(Tension_struct);
 
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
@@ -246,26 +244,26 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 
 			HINSTANCE hModule = nullptr;
 			std::cout << "[*] Found plugin module to load: " << dllfilepath << "\n";
-			hModule = LoadLibrary(dllfilepath.c_str());
+			//hModule = LoadLibrary(dllfilepath.c_str());
 			if (hModule)
 			{
-				std::cout << "[*] Loading...\n";
-				Attach = nullptr;
-				Attach = (ATTACH)GetProcAddress(hModule, "Attach");
-				if (!Attach)
-				{
-					std::cout << "[!] Failed to load module with GetProcAddress(). \n";
-					FreeLibrary(hModule);
-					break;
-				}
-				std::cout << "[*] Loading success. \n";
+				//std::cout << "[*] Loading...\n";
+				//Attach = nullptr;
+				//Attach = (ATTACH)GetProcAddress(hModule, "Attach");
+				//if (!Attach)
+				//{
+				//	std::cout << "[!] Failed to load module with GetProcAddress(). \n";
+				//	FreeLibrary(hModule);
+				//	break;
+				//}
+				//std::cout << "[*] Loading success. \n";
 
 				// Populate vector of PLUGIN_DATA
-				std::wstring plugin_name = ffd.cFileName;
+				//std::wstring plugin_name = ffd.cFileName;
 
 				// Attach the plugin DLL to the core system here
-				cDevice* dev = Attach(parent);
-				wxPanel* plugin_panel = dev->panel;
+				//cDevice* dev = Attach(parent);
+				//wxPanel* plugin_panel = dev->panel;
 
 				// If new device is a writer: 
 				// add a new column in cTable with expected name and unit
@@ -273,13 +271,13 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 				// 1 == WRITE
 				// 2 == ALL
 
-				PLUGIN_DATA plugin_data;
-				plugin_data.name = plugin_name;
-				plugin_data.panel = plugin_panel;
-				plugin_data.device = dev;
-				plugin_data.hInst = hModule;
-				plugin_data.Attach = Attach;
-				plugin_vec.push_back(plugin_data); // Add struct
+				//PLUGIN_DATA plugin_data;
+				//plugin_data.name = plugin_name;
+				//plugin_data.panel = plugin_panel;
+				//plugin_data.device = dev;
+				//plugin_data.hInst = hModule;
+				//plugin_data.Attach = Attach;
+				//plugin_vec.push_back(plugin_data); // Add struct
 			}
 			else
 			{

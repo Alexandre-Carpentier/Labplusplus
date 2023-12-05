@@ -4,6 +4,7 @@
 #include <wx/combobox.h>
 #include <wx/dcbuffer.h>
 #include <format>
+#include <locale>
 
 #include "enum.h"
 
@@ -12,9 +13,14 @@
 #include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
 #include "cCycle.h"
-#include "cPacesim.h"
 #include "cPlot.h"
 #include "cImagePanel.h"
+
+#include "cDeviceMonitor.h"
+#include "cPacesim.h"
+#include "cPacecom.h"
+
+
 
 cPressure::cPressure(wxWindow* inst)
 {
@@ -24,9 +30,7 @@ cPressure::cPressure(wxWindow* inst)
 	////////////////////////////////////////////////////////////
 	// Load default labels in memory
 	////////////////////////////////////////////////////////////
-	label.device_enabled = false;
-	label.device_name.push_back("COM1");
-	label.device_name.push_back("COM2");
+	label.device_enabled = false;	
 	label.device_name.push_back("Simulated");
 
 	////////////////////////////////////////////////////////////
@@ -36,6 +40,8 @@ cPressure::cPressure(wxWindow* inst)
 	config.device_name = wxT("Simulated");
 
 	////////////////////////////////////////////////////////////
+
+
 
 	::wxInitAllImageHandlers();
 	wxBitmap bmp = wxBitmap("PACEPNG", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
@@ -82,7 +88,9 @@ cPressure::cPressure(wxWindow* inst)
 	addr_ctrl = new wxComboBox(device_group, IDCPRESSUREADDR, label.device_name[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
 	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
+	RefreshPort();
 	addr_ctrl->Disable();
+	
 	
 	flexsizer->Add(enablepressure);
 	flexsizer->Add(pressure_controler_activate);
@@ -97,6 +105,34 @@ cPressure::cPressure(wxWindow* inst)
 
 	//wxCommandEvent evt0 = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCPRESSUREACTIVATE);
 	//wxPostEvent(inst_, evt0);
+}
+
+cPressure::~cPressure()
+{
+	if (m_pressure_ != nullptr)
+	{
+		delete m_pressure_;
+	}
+}
+
+void cPressure::RefreshPort()
+{
+	std::wcout << L"[*] Refresh port called\n";
+
+	cDeviceMonitor* devmon = devmon->getInstance();
+	std::vector<cDev> dev_list = devmon->get_device_vec();
+	addr_ctrl->Clear();
+
+	for (auto& dev : dev_list)
+	{
+		//std::wstring wname = dev.get_name();
+		//if (wname.compare(L"Unknown") != 0)
+		//{
+			addr_ctrl->Append(dev.get_addr());		
+			//}
+	}
+	addr_ctrl->Append("Simulated");
+	addr_ctrl->SetSelection(0);
 }
 
 // Reccord device info selected in GUI field 
@@ -182,7 +218,10 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 
 		if (enable_pan)
 		{
+			RefreshPort();
 
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_COMBOBOX_SELECTED, IDCPRESSUREADDR);
+			wxPostEvent(inst_, evt);
 
 			// Add a channel for pressure at the end
 			m_plot->resize_chan_number_to_gui(element_nb+1);
@@ -193,6 +232,8 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			addr_ctrl->Enable(true);			
 
 			EnablePressureChannel(true);
+			
+
 		}
 		else
 		{
@@ -263,9 +304,9 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 		return;
 	}
 
-	// Then create appropriate DAQ object
-	std::cout << "[*] [new] Create cPace6000\n";
-	m_pressure_ = new cPacesim;
+	// Then create appropriate pressure object
+	std::cout << "[*] [new] Create cPacecom\n";
+	m_pressure_ = new cPacecom;
 
 	// Object failed to create in memory
 	if (m_pressure_ == nullptr)

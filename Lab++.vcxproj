@@ -79,10 +79,12 @@
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x64\Debug;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\IVI Foundation\VISA\Win64\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Release;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files\IVI Foundation\VISA\Win64\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -100,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -115,7 +117,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -130,7 +132,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -145,7 +147,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -158,12 +160,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp" />
+    <ClCompile Include="cCom.cpp" />
     <ClCompile Include="cConfig.cpp" />
     <ClCompile Include="cCycle.cpp" />
     <ClCompile Include="cCycleControler.cpp" />
     <ClCompile Include="cDaqmx.cpp" />
     <ClCompile Include="cDaqmxScaleDlg.cpp" />
     <ClCompile Include="cDaqsim.cpp" />
+    <ClCompile Include="cDeviceMonitor.cpp" />
     <ClCompile Include="cDropper.cpp" />
     <ClCompile Include="cFilter.cpp" />
     <ClCompile Include="cFooter.cpp" />
@@ -180,25 +184,32 @@
     <ClCompile Include="cPlay.cpp" />
     <ClCompile Include="cPlot.cpp" />
     <ClCompile Include="cPressure.cpp" />
+    <ClCompile Include="cProtocol.cpp" />
+    <ClCompile Include="cProtocolFactory.cpp" />
     <ClCompile Include="cRender.cpp" />
     <ClCompile Include="cScaleBtn.cpp" />
+    <ClCompile Include="cSerial.cpp" />
     <ClCompile Include="cSignalBtn.cpp" />
     <ClCompile Include="cSingleton.cpp" />
     <ClCompile Include="cTable.cpp" />
+    <ClCompile Include="cTcp.cpp" />
     <ClCompile Include="cTension.cpp" />
     <ClCompile Include="cTick.cpp" />
     <ClCompile Include="cUSB6001.cpp" />
+    <ClCompile Include="cVisa.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
     <ClCompile Include="xlsx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h" />
+    <ClInclude Include="cCom.h" />
     <ClInclude Include="cConfig.h" />
     <ClInclude Include="cCycle.h" />
     <ClInclude Include="cCycleControler.h" />
     <ClInclude Include="cDaqmx.h" />
     <ClInclude Include="cDaqmxScaleDlg.h" />
     <ClInclude Include="cDaqsim.h" />
+    <ClInclude Include="cDeviceMonitor.h" />
     <ClInclude Include="cDropper.h" />
     <ClInclude Include="cFilter.h" />
     <ClInclude Include="cFooter.h" />
@@ -215,14 +226,19 @@
     <ClInclude Include="cPlay.h" />
     <ClInclude Include="cPlot.h" />
     <ClInclude Include="cPressure.h" />
+    <ClInclude Include="cProtocol.h" />
+    <ClInclude Include="cProtocolFactory.h" />
     <ClInclude Include="cRender.h" />
     <ClInclude Include="cScaleBtn.h" />
+    <ClInclude Include="cSerial.h" />
     <ClInclude Include="cSignalBtn.h" />
     <ClInclude Include="cSingleton.h" />
     <ClInclude Include="cTable.h" />
+    <ClInclude Include="cTcp.h" />
     <ClInclude Include="cTension.h" />
     <ClInclude Include="cTick.h" />
     <ClInclude Include="cUSB6001.h" />
+    <ClInclude Include="cVisa.h" />
     <ClInclude Include="data_types.h" />
     <ClInclude Include="enum.h" />
     <ClInclude Include="LoadBitmapFromRessource.h" />

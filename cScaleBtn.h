@@ -21,7 +21,7 @@ class wxScaleButton : public wxWindow
 public:
     wxScaleButton(wxFrame* parent, wxWindowID id);
 
-
+    void slider_reset();
     void set_scale_factor(int factor);
 
     int get_scale_factor();

@@ -52,7 +52,7 @@ cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_conf
 	inst->Bind(wxEVT_COMMAND_COMBOBOX_CLOSEUP, &cFooter::filterButtonClicked, this, IDC_FILTERCOMBO);
 	combo1->Hide();
 
-	wxScaleButton* scale_btn = new wxScaleButton((wxFrame*)inst_, wxID_ANY);
+	scale_btn = new wxScaleButton((wxFrame*)inst_, wxID_ANY);
 
 	wxStaticText* staticrectxt = new wxStaticText(inst_, IDC_RECTXT, L"Rec:", wxDefaultPosition, inst->FromDIP(wxSize(70, 25)), wxTE_CENTER);
 	staticrectxt->SetBackgroundColour(wxColor(240, 245, 250));
@@ -91,6 +91,14 @@ wxBoxSizer* cFooter::GetSizer()
 
 void cFooter::startButtonClicked(wxCommandEvent& evt)
 {
+		// reset zoom slider to x1
+
+	scale_btn->slider_reset();
+
+		// show every signals
+
+	m_plot_->show_all_signals(true);
+
 
 	size_t measurement_number = meas_manager->get_measurement_pool_size();
 	std::cout << "[*] " << measurement_number << " measurements are in pool.\n";
@@ -135,7 +143,11 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			//
 			//
 
-			daqconfig->m_daq_->launch_device(config);
+			if (daqconfig->m_daq_->launch_device(config) < 0)
+			{
+				evt.Skip();
+				return;
+			}
 
 			// Lock daq interface when running				
 			daqconfig->device_group_sizer->GetStaticBox()->Enable(false);
@@ -149,7 +161,11 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		{
 			CURRENT_DEVICE_CONFIG_STRUCT config = pressureconfig->GetPressureConfigStruct();
 
-			pressureconfig->m_pressure_->launch_device(config);
+			if(pressureconfig->m_pressure_->launch_device(config)<0)
+			{
+				evt.Skip();
+				return;
+			}
 
 			// Lock pressure controler interface
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
@@ -213,6 +229,12 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			}
 
 			////////////////////////////////////////////////////////////////////////////////
+			// STOP CONTINUOUSLY LOOKING UP FOR DEVICE
+			////////////////////////////////////////////////////////////////////////////////
+			cDeviceMonitor* devmon = devmon->getInstance();
+			devmon->lookup_stop();
+
+			////////////////////////////////////////////////////////////////////////////////
 			// MEASUREMENT CONTROLER
 			////////////////////////////////////////////////////////////////////////////////
 			std::cout << "Launching Measurement controler\n";
@@ -225,7 +247,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 			startbtn->SetBackgroundColour(wxColor(250, 80, 90));
 			startbtn->SetLabelText(L"Stop");
-
 		}
 	}
 	else
@@ -260,9 +281,18 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			daqconfig->channel_group_sizer->GetStaticBox()->Enable(true);
 			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(true);
 			daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(true);
+
+			// Unlock pressure controler interface
+			pressureconfig->device_group_sizer->GetStaticBox()->Enable(true);
 		}
 
 		meas_manager->stop_all_devices();
+
+		////////////////////////////////////////////////////////////////////////////////
+		// START CONTINUOUSLY LOOKING UP FOR DEVICE
+		////////////////////////////////////////////////////////////////////////////////
+		cDeviceMonitor* devmon = devmon->getInstance();
+		devmon->lookup_start();
 	}
 
 	evt.Skip();

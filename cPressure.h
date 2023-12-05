@@ -58,6 +58,9 @@ public:
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
 	cPressure(wxWindow* inst);
+	~cPressure();
+
+	void RefreshPort();
 
 	void OnPressureEnableBtn(wxCommandEvent& evt);
 	void OnPressureAddrSelBtn(wxCommandEvent& evt);

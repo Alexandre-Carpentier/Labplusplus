@@ -9,6 +9,10 @@
 #include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
 
+
+
+
+
 cPlot::cPlot(wxWindow* inst, int nbPoints)
 {
 	inst_ = inst;
@@ -78,7 +82,7 @@ cPlot::~cPlot()
 void cPlot::init_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color)
 {
 	// Insert data structure at the end
-	chan_legend_struct_list.push_back({ chan_name, chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color });
+	chan_legend_struct_list.push_back({chan_name, chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color });
 
 	draw_chan_to_gui();
 }
@@ -122,7 +126,7 @@ void cPlot::resize_chan_number_to_gui(size_t max_item)
 int cPlot::gui_get_last_active_channel_number()
 {
 	// get total element size
-	size_t index = chan_legend_struct_list.size();
+	size_t index = chan_legend_struct_list.size()-1;
 
 	// point to last element
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
@@ -229,11 +233,16 @@ void cPlot::draw_chan_to_gui()
 	}
 
 	plot_leftpanel_->SetSizerAndFit(left_vsizer);
-	//inst_->Refresh();
 }
 
 void cPlot::remove_chan_to_gui(size_t position)
 {
+	if (position > chan_legend_struct_list.size())
+	{
+		std::cout << "[!] Fatal error in cPlot::remove_chan_to_gui(size_t position)\n";
+		return;
+	}
+
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_legend_struct_list.begin();
 
@@ -441,6 +450,15 @@ void cPlot::set_autoscale(bool enable)
 void cPlot::set_zoom(int factor)
 {
 	SetZoomFactor(hGraph, factor);
+}
+
+void cPlot::show_all_signals(bool isDisplayed)
+{
+	int i = 1;
+	for (auto &item: chan_info_btn_pool )
+	{
+		item->set_visible(true);
+	}
 }
 
 int cPlot::get_zoom()

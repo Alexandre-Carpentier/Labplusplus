@@ -54,6 +54,21 @@
     <Filter Include="Fichiers sources\Measurement\Type\pressure">
       <UniqueIdentifier>{e6a1fb0c-3c7d-4d78-ba0a-f154c94bda15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol">
+      <UniqueIdentifier>{c0c35bd7-2436-47a5-ab13-fb0ecdfbccf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol\VISA">
+      <UniqueIdentifier>{96ddcd1b-995d-4a5d-9444-39bb2b0620f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol\VISA\Derived">
+      <UniqueIdentifier>{e53440b3-bd52-48b3-acf8-7adfd440a1c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol\RS232">
+      <UniqueIdentifier>{eacb1972-3055-4e50-8dd1-d9a737c18872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol\TCPIP">
+      <UniqueIdentifier>{6a4be1ee-b26b-40d8-a104-ea51c8548a73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp">
@@ -154,6 +169,27 @@
     </ClCompile>
     <ClCompile Include="cPacecom.cpp">
       <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
+    </ClCompile>
+    <ClCompile Include="cProtocolFactory.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="cProtocol.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="cVisa.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA</Filter>
+    </ClCompile>
+    <ClCompile Include="cSerial.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
+    </ClCompile>
+    <ClCompile Include="cTcp.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
+    </ClCompile>
+    <ClCompile Include="cCom.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol\RS232</Filter>
+    </ClCompile>
+    <ClCompile Include="cDeviceMonitor.cpp">
+      <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +301,27 @@
     </ClInclude>
     <ClInclude Include="cPacecom.h">
       <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
+    </ClInclude>
+    <ClInclude Include="cProtocolFactory.h">
+      <Filter>Fichiers sources\Measurement\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="cProtocol.h">
+      <Filter>Fichiers sources\Measurement\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="cVisa.h">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA</Filter>
+    </ClInclude>
+    <ClInclude Include="cSerial.h">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
+    </ClInclude>
+    <ClInclude Include="cTcp.h">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
+    </ClInclude>
+    <ClInclude Include="cCom.h">
+      <Filter>Fichiers sources\Measurement\Protocol\RS232</Filter>
+    </ClInclude>
+    <ClInclude Include="cDeviceMonitor.h">
+      <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

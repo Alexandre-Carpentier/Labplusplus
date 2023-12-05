@@ -637,7 +637,7 @@ void cDaqmx::OnNextCliqued(wxCommandEvent& evt)
 	show_next_channel();
 	// Display the current selected channel measure type
 	reload_current_channel_type();
-	//inst_->Layout();
+
 	evt.Skip();
 }
 
@@ -1468,6 +1468,7 @@ void cDaqmx::OnDaqChanNameModified(wxCommandEvent& evt)
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* object_manager = object_manager->getInstance();
 	cPlot* m_plot = object_manager->get_plot();
+	std::cout << chan_name->GetLabelText().ToStdString() << "\n";
 
 	m_plot->update_chan_name_to_gui(chan_name->GetValue().ToStdString(), label.channel_index);
 }
@@ -1539,7 +1540,7 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 
 	if (!bFound)
 	{
-		MessageBox(0, L"Be carefull your DAQ system desn't support this type.", L"DAQmxGetDevAISupportedMeasTypes Warnings", 0);
+		MessageBox(0, L"Be carefull your DAQ system doesn't support this type.", L"DAQmxGetDevAISupportedMeasTypes Warnings", 0);
 	}
 
 
@@ -1548,7 +1549,9 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	cPlot* m_plot = object_manager->get_plot();
 	m_plot->update_chan_physical_unit_to_gui("°C", label.channel_index); // If temperature measurement update unit in channel listed in graph
 
-	inst_->Layout();
+	//inst_->Layout();
+	//Refresh();
+	channel_group_sizer->Layout();
 }
 
 void cDaqmx::OnDaqChanEnableBtn(wxCommandEvent& evt)
@@ -1756,7 +1759,10 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
-		wxString chan_name_str = chan_name->GetValue();
+
+		//wxString chan_name_str = chan_name->GetValue();
+		wxString chan_name_str = config.channel_name[label.channel_index];
+		
 		wxString chan_physical_name = chan_addr_ctrl->GetValue();
 		wxString chan_physical_unit = meas_type_ctrl->GetValue();
 		m_plot->add_chan_to_gui(chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255), label.channel_index);
@@ -1820,7 +1826,6 @@ void cDaqmx::reload_current_channel_type()
 	{
 		show_tc_param(false);
 		show_voltage_param(true);
-
 		break;
 	}
 	case 1:
@@ -1839,6 +1844,8 @@ void cDaqmx::reload_current_channel_type()
 		show_tc_param(false);
 		show_voltage_param(true);
 	}
+
+	inst_->Layout();
 	return;
 }
 

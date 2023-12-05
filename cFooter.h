@@ -5,7 +5,9 @@
 #include <vector>
 #include <Windows.h>
 #include <string>
+
 #include "data_types.h"
+#include "cDeviceMonitor.h"
 
 class cPlot;
 class cConfig;
@@ -14,6 +16,7 @@ class cCycle;
 class cCycleControler;
 class cObjectmanager;
 class cMeasurementmanager;
+class wxScaleButton;
 
 class cFooter
 {
@@ -27,6 +30,7 @@ public:
 	wxPanel* footerpanel = nullptr;
 	wxBoxSizer* hfootersizer = nullptr;
 	wxButton* startbtn = nullptr;
+	wxScaleButton* scale_btn = nullptr;
 	wxStaticText* staticratetxt = nullptr;
 	wxTextCtrl* ratetxt = nullptr;
 

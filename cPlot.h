@@ -17,9 +17,39 @@ static HGRAPH hGraph;
 class cMeasurementControler;
 class cObjectmanager;
 class cMeasurementmanager;
+
+
 #include "cSignalBtn.h"
+#include "cMeasurement.h"
 
+typedef struct
+{
+	MEAS_TYPE type;
+	std::string  channel_legend_name;
+	std::string  channel_legend_addr;
+	std::string  channel_legend_unit;
+	double channel_legend_min_value;
+	double channel_legend_average_value;
+	double channel_legend_max_value;
+	wxColor channel_legend_color;
+}CHAN_LEGEND_STRUCT, * PCHAN_LEGEND_STRUCT;
 
+class cSignalTable
+{
+	cSignalTable(){
+		// allocate all slot
+		// register slot range / register slot
+		// add sigs / add sig
+	};
+
+	bool slot_register_range(int pos, int length, MEAS_TYPE type);
+	bool slot_register(int pos, MEAS_TYPE type);
+
+	bool sig_add(int pos);
+	bool sig_add_multiple(int pos, int count);
+
+	~cSignalTable(){};
+};
 
 class cPlot
 {
@@ -35,20 +65,9 @@ private:
 
 	wxBoxSizer* left_vsizer = nullptr;
 
-	const static int MAX_SIG = 64;
+	const static int MAX_SIG = 128;
 	int CURRENT_SIG;
 	wxBoxSizer* legend_vsizer = nullptr;
-
-	typedef struct
-	{
-		std::string  channel_legend_name;
-		std::string  channel_legend_addr;
-		std::string  channel_legend_unit;
-		double channel_legend_min_value;
-		double channel_legend_average_value;
-		double channel_legend_max_value;
-		wxColor channel_legend_color;
-	}CHAN_LEGEND_STRUCT, * PCHAN_LEGEND_STRUCT;
 
 	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list;
 	wxCustomButton* chan_info_btn_pool[MAX_SIG];
@@ -79,6 +98,7 @@ public:
 	int get_graph_signal_count();
 	void set_graph_filter(FILTER_M FilteringType);
 	void set_signal_name(std::string signame, int position);  // change the signal name in the WinGraph module
+	void show_all_signals(bool isDisplayed);
 	void start_graph(FILTER_M FilteringType, LOGGER_M ReccordingType, int SignalNumber);
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);

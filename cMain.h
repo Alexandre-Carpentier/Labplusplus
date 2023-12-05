@@ -14,6 +14,8 @@
 #include <vector>
 #include <memory>
 
+#include "cDeviceMonitor.h"
+
 #pragma comment (lib, "WinGraph.lib")
 
 #pragma comment (lib, "Advapi32.lib")
@@ -51,6 +53,8 @@ public:
 
 	enum { DISP_FREQ = 100 };						// ms to draw
 	enum { GRAPH_NBPOINTS = 1000000 };				// pts
+
+	std::unique_ptr<cDeviceMonitor> devmon;
 
 	wxStatusBar* statusBar = nullptr;
 	wxToolBar* toolbar = nullptr;

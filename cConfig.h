@@ -1,7 +1,7 @@
 #pragma once
 
-#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+//#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+//#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
 #include <wx/dcbuffer.h>
 #include <wx/wx.h>
@@ -21,7 +21,8 @@ class cTension;
 class cObjectmanager;
 class cMeasurementControler;
 
-/*-----------------Duplication---------------------------------*/
+/*
+//-----------------Duplication---------------------------------
 #include "Plugin/cProtocol.h"
 enum PLUGIN_ACCESS {
 	READ,
@@ -107,8 +108,8 @@ private:
 	// When controls are drawn on plugin book
 	void OnPaint();
 };
-/*-----------------Duplication---------------------------------*/
-
+//-----------------Duplication---------------------------------
+*/
 class cConfig : public wxFrame
 {
 private:
@@ -127,16 +128,16 @@ private:
 	cPressure* m_pressure = nullptr;
 	cTension* m_tension = nullptr;
 
-	typedef cDevice* (WINAPI* ATTACH)(wxWindow*);
-	ATTACH Attach;
+	//typedef cDevice* (WINAPI* ATTACH)(wxWindow*);
+	//ATTACH Attach;
 
 	struct PLUGIN_DATA
 	{
 		std::wstring name = L"";
 		wxPanel* panel = nullptr;
-		cDevice* device = nullptr;
+		//cDevice* device = nullptr;
 		HINSTANCE hInst = nullptr;
-		ATTACH Attach = nullptr;
+		//ATTACH Attach = nullptr;
 	};
 
 	std::vector<PLUGIN_DATA> plugin_vec;
