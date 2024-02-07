@@ -77,7 +77,6 @@ public:
 
 private:
 	
-
 	size_t sig_count_ = 0;
 	std::list<CHAN_LEGEND_STRUCT> chan_list;
 };
