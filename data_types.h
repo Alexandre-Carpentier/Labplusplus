@@ -68,3 +68,25 @@ typedef struct {
 	std::string channel_trigger[max_chan_number];								// trigger
 	wxString channel_trigger_threshold[max_chan_number];						// threshold
 }CURRENT_DEVICE_CONFIG_STRUCT;
+
+
+enum MEAS_TYPE
+{
+	VOID_INSTR = 0,
+	SUPER_INSTR,
+	DAQ_INSTR,
+	PRESSURECONTROLER_INSTR,
+	VACUUMSENSOR_INSTR,
+};
+
+typedef struct
+{
+	MEAS_TYPE type;
+	std::string  channel_legend_name;
+	std::string  channel_legend_addr;
+	std::string  channel_legend_unit;
+	double channel_legend_min_value;
+	double channel_legend_average_value;
+	double channel_legend_max_value;
+	wxColor channel_legend_color;
+}CHAN_LEGEND_STRUCT, * PCHAN_LEGEND_STRUCT;

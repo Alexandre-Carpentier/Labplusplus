@@ -31,12 +31,9 @@ int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
     device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
 
     err = device->init();
-    /*if (err.err_code < 0)
-    {
-        std::wcout << err.err_msg;
-        MessageBox(0, err.err_msg.c_str(), L"", S_OK);
-        return -1;
-    }*/
+
+    // Here configure PACE6000 specifics
+
 
     // Reset the device
 

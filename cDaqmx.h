@@ -5,17 +5,25 @@
 #include <wx/treectrl.h>
 #include <string>
 #include <wx/fileconf.h>
+
+#include "enum.h"
+
+#include "cMeasurementControler.h"
+#include "cMeasurement.h"
+#include "cObjectmanager.h"
+#include "cMeasurementmanager.h"
+#include "cCycle.h"
+#include "cUSB6001.h"
+#include "cDaqsim.h"
+#include "cPlot.h"
+#include "cDaqmxScaleDlg.h"
+#include "cImagePanel.h"
 #include "data_types.h"
+#include "cSignalTable.h"
 
 static wxImage temp_img;
 
-class cMeasurementmanager;
-class cCycle;
-class cUsb6001;
-class cDaqsim;
-class cMeasurement;
-class cPlot;
-class cImagePanel;
+
 
 static wxPanel* config_rightpanel_ = nullptr;
 static wxTreeCtrl* config_tree_ctrl = nullptr;

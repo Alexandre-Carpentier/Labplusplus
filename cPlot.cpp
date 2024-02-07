@@ -10,9 +10,6 @@
 #include "cMeasurementmanager.h"
 
 
-
-
-
 cPlot::cPlot(wxWindow* inst, int nbPoints)
 {
 	inst_ = inst;
@@ -35,7 +32,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 	for (int i = 0; i < MAX_SIG; i++)
 	{
 		chan_info_btn_pool[i] = new wxCustomButton((wxFrame*)plot_legendpanel_, IDCCHANINFO0 + i, "slot free", "DevX/sig0", wxColor(90, 90, 100));
-		legend_vsizer->Add(chan_info_btn_pool[i]);
+		legend_vsizer->Add(chan_info_btn_pool[i], 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND, 3);
 		chan_info_btn_pool[i]->Hide();
 		// 
 		// 
@@ -44,7 +41,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 		//legend_vsizer->Add(chan_info_btn_pool[i], 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND, 3);
 		//chan_info_btn_pool[i]->Hide();
 
-		init_chan_to_gui("slot free", "/addr", "Volt", wxColor(i * 10, 90, 90));
+		//init_chan_to_gui("slot free", "/addr", "Volt", wxColor(i * 10, 90, 90));
 	}
 	CURRENT_SIG = MAX_SIG; // Save current signal legend button
 
@@ -79,10 +76,11 @@ cPlot::~cPlot()
 	}
 }
 
+/*
 void cPlot::init_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color)
 {
 	// Insert data structure at the end
-	chan_legend_struct_list.push_back({chan_name, chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color });
+	chan_legend_struct_listg.push_back({chan_name, chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color });
 
 	draw_chan_to_gui();
 }
@@ -256,6 +254,80 @@ void cPlot::remove_chan_to_gui(size_t position)
 
 	draw_chan_to_gui();
 }
+*/
+
+void cPlot::update_gui()
+{
+	cSignalTable* sigt = sigt->getInstance();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+
+	std::list<CHAN_LEGEND_STRUCT>::iterator it;
+	it = chan_legend_struct_list.begin();
+
+	// Hide every signals
+	for (int i = 0; i < CURRENT_SIG; i++)
+	{
+		chan_info_btn_pool[i]->Hide();
+	}
+	
+	// update Wingraph internal struct
+	
+	if (hGraph != nullptr)
+	{
+		// update signal total number	
+		int sig_count = 0;
+		for (auto chan : chan_legend_struct_list)
+		{
+			if (chan.channel_legend_name.compare("slot free") != 0)
+			{
+				sig_count++;
+			}
+		}
+		SetSignalCount(hGraph, sig_count);
+
+		// set every valid signal in Wingraph + display in plot gui
+		int k = 0;
+		for (auto chan : chan_legend_struct_list)
+		{
+			if (chan.channel_legend_name.compare("slot free") != 0)
+			{
+				if (chan.type != MEAS_TYPE::VOID_INSTR)
+				{
+					SetSignalLabel(hGraph, chan.channel_legend_name.c_str(), k);
+					SetSignalColor(hGraph, (int)chan.channel_legend_color.Red(), (int)chan.channel_legend_color.Green(), (int)chan.channel_legend_color.Blue(), k);
+				
+					chan_info_btn_pool[k]->set_name(chan.channel_legend_name);
+					chan_info_btn_pool[k]->set_address(chan.channel_legend_addr);
+					chan_info_btn_pool[k]->set_unit(chan.channel_legend_unit);
+					chan_info_btn_pool[k]->set_color(chan.channel_legend_color);
+
+					chan_info_btn_pool[k]->Show();
+					k++;
+				}
+			}
+		}
+	}
+	/*
+	// Display every active signals in plot windows
+	it = chan_legend_struct_list.begin();
+
+	int current_pos = 0;
+	while (it->type != MEAS_TYPE::VOID_INSTR)
+	{
+		if (it->channel_legend_name.compare("slot free") != 0)
+		{
+			chan_info_btn_pool[current_pos]->set_name(it->channel_legend_name);
+			chan_info_btn_pool[current_pos]->set_address(it->channel_legend_addr);
+			chan_info_btn_pool[current_pos]->set_unit(it->channel_legend_unit);
+			chan_info_btn_pool[current_pos]->set_color(it->channel_legend_color);
+
+			chan_info_btn_pool[current_pos]->Show();		
+		}
+		current_pos++;
+		it++;
+	}
+	*/
+}
 
 void cPlot::update_chan_name_to_gui(std::string name, size_t position)
 {
@@ -274,19 +346,23 @@ void cPlot::update_chan_physical_unit_to_gui(std::string unit, size_t position)
 
 void cPlot::update_chan_statistic_labels()
 {
+	cSignalTable* sigt = sigt->getInstance();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_legend_struct_list.begin();
+
+	// BUG index different de i et decalle 
 	int index = 0;
 	for (int i = 0; i < chan_legend_struct_list.size(); i++)
 	{
 		if (it->channel_legend_name.compare("slot free") != 0)
 		{
-			chan_info_btn_pool[i]->set_min(get_signal_min_value(index));
-			chan_info_btn_pool[i]->set_average(get_signal_average_value(index));
-			chan_info_btn_pool[i]->set_max(get_signal_max_value(index));
+			chan_info_btn_pool[index]->set_min(get_signal_min_value(index));
+			chan_info_btn_pool[index]->set_average(get_signal_average_value(index));
+			chan_info_btn_pool[index]->set_max(get_signal_max_value(index));
 			index++;
 		}
-
 		it++;
 	}
 }
@@ -302,12 +378,33 @@ int cPlot::GuiPositionToWingraphPosition(wxWindowID id)
 		return -1;
 	}
 
+	cSignalTable* sigt = sigt->getInstance();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+
+	int struct_pos = 0;
+	for (auto&& chan : chan_legend_struct_list)
+	{
+		if (chan.type != MEAS_TYPE::VOID_INSTR)
+		{
+			if (chan.channel_legend_name.compare("slot free") != 0)
+			{
+				std::string target_name = chan_info_btn_pool[signal_position]->get_name().ToStdString();
+				if (target_name.compare(chan.channel_legend_name) == 0)
+				{
+					return struct_pos;
+				}
+				struct_pos++;
+			}
+		}
+	}
+	return -1;
+	/*
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_legend_struct_list.begin();
 
 	// Iterate until and count valid signal
 	int j = 0;
-	for (int i = 0; i < signal_position; i++)
+	for (int i = 0; i <= signal_position; i++)
 	{
 		if (it->channel_legend_name.compare("slot free") != 0)
 		{
@@ -316,6 +413,7 @@ int cPlot::GuiPositionToWingraphPosition(wxWindowID id)
 		it++; // inc iterator until the position 
 	}
 	return j;
+	*/
 }
 
 void cPlot::update_chan_color(wxColor col, wxWindowID id)
@@ -323,7 +421,6 @@ void cPlot::update_chan_color(wxColor col, wxWindowID id)
 	int index = GuiPositionToWingraphPosition(id);
 	SetSignalColor(hGraph, col.Red(), col.Green(), col.Blue(), index);
 }
-
 
 void cPlot::reset_chan_statistic_labels(wxWindowID id)
 {
@@ -380,6 +477,7 @@ void cPlot::set_graph_filter(FILTER_M isFiltering)
 void cPlot::set_signal_name(std::string signame, int position)
 {
 	SetSignalLabel(hGraph, signame.c_str(), position);
+
 }
 
 void cPlot::start_graph(FILTER_M FilteringType, LOGGER_M ReccordingType, int SignalNumber)

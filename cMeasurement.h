@@ -10,15 +10,6 @@
 #include "data_types.h"
 
 
-enum MEAS_TYPE
-{
-	VOID_INSTR = 0,
-	SUPER_INSTR,
-	DAQ_INSTR,
-	PRESSURECONTROLER_INSTR,
-	VACUUMSENSOR_INSTR,
-};
-
 #define MAX_CHAN 64
 
 struct DATAS

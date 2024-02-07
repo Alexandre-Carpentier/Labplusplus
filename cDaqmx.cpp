@@ -5,18 +5,16 @@
 #include <wx/dcbuffer.h>
 #include <format>
 
-#include "enum.h"
 
-#include "cMeasurementControler.h"
-#include "cMeasurement.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
-#include "cCycle.h"
-#include "cUSB6001.h"
-#include "cDaqsim.h"
-#include "cPlot.h"
-#include "cDaqmxScaleDlg.h"
-#include "cImagePanel.h"
+
+class cMeasurementmanager;
+class cCycle;
+class cUsb6001;
+class cDaqsim;
+class cMeasurement;
+class cPlot;
+class cImagePanel;
+class cSignalTable;
 
 cDaqmx::cDaqmx(wxWindow* inst)
 {
@@ -105,7 +103,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 		config.channel_physical_name[i] = "/ai" + std::to_string(i);
 
-		config.channel_type[i] = "Voltage";
+		config.channel_type[i] = "Volt";
 
 		config.channel_max[i] = "10";
 
@@ -127,6 +125,14 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 		config.channel_trigger_threshold[i] = "0";
 	}
+
+	// Register appropriate slots in cSignalTable
+	
+	cSignalTable* sigt = sigt->getInstance();
+	if (!sigt->slot_register_range(max_chan_number, MEAS_TYPE::DAQ_INSTR))
+	{
+		MessageBox(nullptr, L"Critical error in cSignalTable, cannot register signal range.", L"[!] Critical failure.", S_OK);
+	}
 	////////////////////////////////////////////////////////////
 
 
@@ -146,7 +152,6 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	//inst->Connect(wxEVT_SIZING, wxSizeEventHandler(cDaqmx::OnPaint));
 
 	////////////////////////////////////////////////////////////
-
 
 
 	wxStaticText* dummy = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxSize(400, 0)));
@@ -628,7 +633,7 @@ void cDaqmx::show_next_channel()
 		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120)); // dark
 
 		// If channel disabled gray it out
-		EnableChannelItems(label.channel_enabled.at(label.channel_index));
+		// EnableChannelItems(label.channel_enabled.at(label.channel_index));
 	}
 }
 
@@ -665,7 +670,7 @@ void cDaqmx::show_previous_channel()
 		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120)); // dark
 
 		// If channel disabled gray it out
-		EnableChannelItems(label.channel_enabled.at(label.channel_index));
+		// EnableChannelItems(label.channel_enabled.at(label.channel_index));
 	}
 }
 
@@ -1114,15 +1119,19 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			}
 			label.chan_number = channels.size();
 
-
+			/*
 			// Update channels legend numbers
 			std::cout << "cObjectmanager->getInstance()\n";
 			cObjectmanager* object_manager = object_manager->getInstance();
 			cPlot* m_plot = object_manager->get_plot();
 			m_plot->resize_chan_number_to_gui(channels.size());
-
-
-
+			*/
+			std::cout << "cSignalTable->getInstance()\n";
+			cSignalTable* sigt = sigt->getInstance();
+			if (!sigt->slot_register_range(channels.size(), MEAS_TYPE::DAQ_INSTR))
+			{
+				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
+			}
 
 			// Select the first device measurable
 			// Add it to the measurement manager
@@ -1724,11 +1733,26 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		checkchan->SetBackgroundColour(wxColor(250, 120, 120)); // RED
 		checkchan->SetLabel("OFF");
 
+		/*
 		//If cPlot legend active remove it
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
 		m_plot->remove_chan_to_gui(label.channel_index);
+		*/
+
+		std::cout << "cSignalTable->getInstance()\n";
+		cSignalTable* sigt = sigt->getInstance();
+		if (!sigt->sig_remove(MEAS_TYPE::DAQ_INSTR, label.channel_index))
+		{
+			MessageBox(nullptr, L"Critical error at sig_remove in cSignalTable, cannot delete the signal.", L"[!] Critical failure.", S_OK);
+		}
+
+		// Update signals in GUI
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->update_gui();
 
 		// Disallow editing
 		chan_name->Enable(false);
@@ -1755,17 +1779,32 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
 		this->checkchan->SetLabel("ON");
 
+		/*
 		//Update cPlot gui with the chan name and color
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
+		*/
 
 		//wxString chan_name_str = chan_name->GetValue();
 		wxString chan_name_str = config.channel_name[label.channel_index];
 		
 		wxString chan_physical_name = chan_addr_ctrl->GetValue();
 		wxString chan_physical_unit = meas_type_ctrl->GetValue();
-		m_plot->add_chan_to_gui(chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255), label.channel_index);
+
+		//m_plot->add_chan_to_gui(chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255), label.channel_index);
+		std::cout << "cSignalTable->getInstance()\n";
+		cSignalTable* sigt = sigt->getInstance();
+		if (!sigt->sig_add(label.channel_index, MEAS_TYPE::DAQ_INSTR, chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255)))
+		{
+			MessageBox(nullptr, L"Critical error at sig_add in cSignalTable, cannot add the signal.", L"[!] Critical failure.", S_OK);
+		}
+
+		// Update signals in GUI
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->update_gui();
 
 		// Allow editing
 		chan_name->Enable(true);

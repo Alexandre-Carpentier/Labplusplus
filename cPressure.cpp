@@ -39,6 +39,15 @@ cPressure::cPressure(wxWindow* inst)
 	config.device_enabled = false;
 	config.device_name = wxT("Simulated");
 
+	// Register pressure signal to signal table
+
+	std::cout << "cSignalTable->getInstance()\n";
+	cSignalTable* sigt = sigt->getInstance();
+	if (!sigt->slot_register(MEAS_TYPE::PRESSURECONTROLER_INSTR))
+	{
+		MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
+	}
+
 	////////////////////////////////////////////////////////////
 
 
@@ -210,11 +219,14 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 	enable_pan = !enable_pan;
 	if (pressure_controler_activate)
 	{
+		/*
 		//If cPlot legend active remove it
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
 		size_t element_nb = m_plot->get_chan_number_to_gui();
+		*/
+
 
 		if (enable_pan)
 		{
@@ -224,7 +236,9 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			wxPostEvent(inst_, evt);
 
 			// Add a channel for pressure at the end
-			m_plot->resize_chan_number_to_gui(element_nb+1);
+			//m_plot->resize_chan_number_to_gui(element_nb+1);
+
+
 
 			this->pressure_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
 			this->pressure_controler_activate->SetLabel("ON");
@@ -238,7 +252,7 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 		else
 		{
 
-			m_plot->resize_chan_number_to_gui(element_nb - 1);
+			//m_plot->resize_chan_number_to_gui(element_nb - 1);
 
 			this->pressure_controler_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
 			this->pressure_controler_activate->SetLabel("OFF");
@@ -356,20 +370,49 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 {
 	if (!isDisplayed)
 	{
+		/*
 		//If cPlot legend active remove it
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
 		m_plot->remove_chan_to_gui(m_plot->gui_get_last_active_channel_number()); // BUG // remove last
+		*/
+
+		std::cout << "cSignalTable->getInstance()\n";
+		cSignalTable* sigt = sigt->getInstance();
+		if (!sigt->sig_remove(MEAS_TYPE::PRESSURECONTROLER_INSTR, 0))
+		{
+			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
+		}
+
+		// Update signals in GUI
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->update_gui();
 	}
 	else
 	{
+		/*
 		//Update cPlot gui with the chan name and color
 		std::cout << "cObjectmanager->getInstance()\n";
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
-
 		m_plot->add_chan_to_gui("Pace 6000 simulated", "Simulated", "Bar", wxColor(45, 30, 30), m_plot->gui_get_last_active_channel_number()); // add last
+		*/
+
+		std::cout << "cSignalTable->getInstance()\n";
+		cSignalTable* sigt = sigt->getInstance();
+		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURECONTROLER_INSTR, "Pace 6000 simulated", "Simulated", "Bar", wxColor(45, 30, 30)))
+		{
+			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
+		}
+
+		// Update signals in GUI
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->update_gui();
 	}
 }
 

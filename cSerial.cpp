@@ -53,6 +53,10 @@ err_struct cSerial::init()
 		return { std::wstring(L"[!] viOpen() failled."), -2 };
 	}
 
+	// Clear line
+	status = viClear(ressource_manager);
+
+
 	// For Serial and TCP/IP socket connections enable the read Termination Character, or read's will timeout
 	ViChar fullAddress[100] = "";
 	viGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
@@ -61,18 +65,51 @@ err_struct cSerial::init()
 		return { std::wstring(L"[!] viGetAttribute() failled. It is not a ASRL device"), -3 };
 	}
 
-	viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE);
+	// Set timeout value to 5s
+	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 5000);
+
+	/*
+#define VI_ATTR_ASRL_BAUD                     (0x3FFF0021UL)
+#define VI_ATTR_ASRL_DATA_BITS                (0x3FFF0022UL)
+#define VI_ATTR_ASRL_PARITY                   (0x3FFF0023UL)
+#define VI_ATTR_ASRL_STOP_BITS                (0x3FFF0024UL)
+#define VI_ATTR_ASRL_FLOW_CNTRL               (0x3FFF0025UL)
+#define VI_ATTR_ASRL_AVAIL_NUM                (0x3FFF00ACUL
+#define VI_ATTR_ASRL_CTS_STATE                (0x3FFF00AEUL)
+#define VI_ATTR_ASRL_DCD_STATE                (0x3FFF00AFUL)
+#define VI_ATTR_ASRL_DSR_STATE                (0x3FFF00B1UL)
+#define VI_ATTR_ASRL_DTR_STATE                (0x3FFF00B2UL)
+#define VI_ATTR_ASRL_END_IN                   (0x3FFF00B3UL)
+#define VI_ATTR_ASRL_END_OUT                  (0x3FFF00B4UL)
+#define VI_ATTR_ASRL_REPLACE_CHAR             (0x3FFF00BEUL)
+#define VI_ATTR_ASRL_RI_STATE                 (0x3FFF00BFUL)
+#define VI_ATTR_ASRL_RTS_STATE                (0x3FFF00C0UL)
+#define VI_ATTR_ASRL_XON_CHAR                 (0x3FFF00C1UL)
+#define VI_ATTR_ASRL_XOFF_CHAR                (0x3FFF00C2UL)
+viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE); ?
+	*/
+
+	//viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE);
+
+	viSetAttribute(device_, VI_ATTR_ASRL_END_IN, VI_TRUE);
+	viSetAttribute(device_, VI_ATTR_ASRL_END_OUT, VI_TRUE);
+	
+
 	// If you've setup the serial port settings in Connection Expert, you can remove this section. 
 	// Otherwise, set your connection parameters
 	viSetAttribute(device_, VI_ATTR_ASRL_BAUD, 9600);
-	viSetAttribute(device_, VI_ATTR_ASRL_DATA_BITS, 8);
-	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0x0A);
-	viSetAttribute(device_, VI_ATTR_ASRL_PARITY, VI_ASRL_PAR_NONE);
 	viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
-	viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_XON_XOFF);
+	viSetAttribute(device_, VI_ATTR_ASRL_PARITY, VI_ASRL_PAR_NONE);
+	viSetAttribute(device_, VI_ATTR_ASRL_DATA_BITS, 8);
+	viSetAttribute(device_, VI_ATTR_ASRL_STOP_BITS, VI_ASRL_STOP_ONE);
+	
 
-	// Set timeout value to 5s
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 5000);
+	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0x0D); // CR=0x0D LF=0x0A
+	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
+	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_XON_XOFF);
+
+	viFlush(device_, 0xC0);
+	viSetBuf(device_, 0x30, 4096);
 
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;

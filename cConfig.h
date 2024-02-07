@@ -13,13 +13,15 @@
 #include <codecvt>
 #include <map>
 
-class cPlot;
-class cCycle;
-class cDaqmx;
-class cPressure;
-class cTension;
-class cObjectmanager;
-class cMeasurementControler;
+#include "cPlot.h"
+#include "cCycle.h"
+#include "cDaqmx.h"
+#include "cPressure.h"
+#include "cTension.h"
+#include "cObjectmanager.h"
+#include "cMeasurementControler.h"
+
+
 
 /*
 //-----------------Duplication---------------------------------

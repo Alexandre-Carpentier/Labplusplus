@@ -190,6 +190,7 @@
     <ClCompile Include="cScaleBtn.cpp" />
     <ClCompile Include="cSerial.cpp" />
     <ClCompile Include="cSignalBtn.cpp" />
+    <ClCompile Include="cSignalTable.cpp" />
     <ClCompile Include="cSingleton.cpp" />
     <ClCompile Include="cTable.cpp" />
     <ClCompile Include="cTcp.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="cScaleBtn.h" />
     <ClInclude Include="cSerial.h" />
     <ClInclude Include="cSignalBtn.h" />
+    <ClInclude Include="cSignalTable.h" />
     <ClInclude Include="cSingleton.h" />
     <ClInclude Include="cTable.h" />
     <ClInclude Include="cTcp.h" />

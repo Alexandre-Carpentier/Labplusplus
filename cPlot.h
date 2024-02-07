@@ -9,8 +9,7 @@
 #include <Windows.h>
 #include <process.h>
 #include "WinGraph.h"
-
-
+#include "cSignalTable.h"
 
 static HGRAPH hGraph;
 
@@ -18,61 +17,8 @@ class cMeasurementControler;
 class cObjectmanager;
 class cMeasurementmanager;
 
-
 #include "cSignalBtn.h"
 #include "cMeasurement.h"
-
-typedef struct
-{
-	MEAS_TYPE type;
-	std::string  channel_legend_name;
-	std::string  channel_legend_addr;
-	std::string  channel_legend_unit;
-	double channel_legend_min_value;
-	double channel_legend_average_value;
-	double channel_legend_max_value;
-	wxColor channel_legend_color;
-}CHAN_LEGEND_STRUCT, * PCHAN_LEGEND_STRUCT;
-
-bool is_a_number(size_t numb)
-{
-	if (numb != numb)
-	{
-		std::cout << "[*] Nan\n";
-		return false;
-	}
-	return true;
-}
-
-class cSignalTable
-{
-public:
-	cSignalTable(size_t sig_count){
-		if (!is_a_number)
-		{
-			std::cout << "[*] Exiting cSignalTable Constructor\n\n";
-			return;
-		}
-		// allocate all slot
-		for (size_t i = 0; i < sig_count; i++)
-		{
-			chan_list.push_back({ MEAS_TYPE::VOID_INSTR, "slot free", "/voidaddr", "MyUnit", 0.0, 0.0, 0.0, wxColor(90, 90, 90) });
-			sig_count_++;
-		}	
-	};
-	// register slot range / register slot
-	bool slot_register_range(int length, MEAS_TYPE type);
-	bool slot_register(MEAS_TYPE type);
-	// add sig
-	bool sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color);
-	bool sig_remove(MEAS_TYPE type, size_t pos);
-
-	virtual ~cSignalTable(){};
-
-private:
-	size_t sig_count_ = 0;
-	std::list<CHAN_LEGEND_STRUCT> chan_list;
-};
 
 class cPlot
 {
@@ -88,25 +34,27 @@ private:
 
 	wxBoxSizer* left_vsizer = nullptr;
 
-	const static int MAX_SIG = 128;
+	const static int MAX_SIG = 64; // Must add new IDCCHANINFO0+i in enum.h
 	int CURRENT_SIG;
 	wxBoxSizer* legend_vsizer = nullptr;
 
-	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list;
+	//std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list;
 	wxCustomButton* chan_info_btn_pool[MAX_SIG];
 
 public:
 	cPlot(wxWindow* inst, int nbPoints);
 	~cPlot();
 
+	void update_gui();
+
 	// Channel btn class
-	void init_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color);
-	void resize_chan_number_to_gui(size_t max_item);
-	int gui_get_last_active_channel_number();
-	int get_chan_number_to_gui();
-	void add_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color, size_t position);
-	void draw_chan_to_gui();
-	void remove_chan_to_gui(size_t position);
+	//void init_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color);
+	//void resize_chan_number_to_gui(size_t max_item);
+	//int gui_get_last_active_channel_number();
+	//int get_chan_number_to_gui();
+	//void add_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color, size_t position);
+	//void draw_chan_to_gui();
+	//void remove_chan_to_gui(size_t position);
 	void update_chan_name_to_gui(std::string name, size_t position); // change the signal name in the channel btn class
 	void update_chan_physical_name_to_gui(std::string name, size_t position); // change the signal physical name in the channel btn class
 	void update_chan_physical_unit_to_gui(std::string unit, size_t position); // change the signal physical unit in the channel btn class

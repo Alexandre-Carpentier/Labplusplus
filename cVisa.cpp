@@ -31,6 +31,7 @@ err_struct cVisa::init()
 		{
 			return { std::wstring(L"[!] viOpen() failed."), -1 };
 		}
+
 		std::string utf8_str = instr; // load value into a standard string
 		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
 		device_name_ = converter.from_bytes(utf8_str);
