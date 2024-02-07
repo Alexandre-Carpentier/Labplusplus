@@ -34,21 +34,44 @@ typedef struct
 	wxColor channel_legend_color;
 }CHAN_LEGEND_STRUCT, * PCHAN_LEGEND_STRUCT;
 
+bool is_a_number(size_t numb)
+{
+	if (numb != numb)
+	{
+		std::cout << "[*] Nan\n";
+		return false;
+	}
+	return true;
+}
+
 class cSignalTable
 {
-	cSignalTable(){
+public:
+	cSignalTable(size_t sig_count){
+		if (!is_a_number)
+		{
+			std::cout << "[*] Exiting cSignalTable Constructor\n\n";
+			return;
+		}
 		// allocate all slot
-		// register slot range / register slot
-		// add sigs / add sig
+		for (size_t i = 0; i < sig_count; i++)
+		{
+			chan_list.push_back({ MEAS_TYPE::VOID_INSTR, "slot free", "/voidaddr", "MyUnit", 0.0, 0.0, 0.0, wxColor(90, 90, 90) });
+			sig_count_++;
+		}	
 	};
+	// register slot range / register slot
+	bool slot_register_range(int length, MEAS_TYPE type);
+	bool slot_register(MEAS_TYPE type);
+	// add sig
+	bool sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color);
+	bool sig_remove(MEAS_TYPE type, size_t pos);
 
-	bool slot_register_range(int pos, int length, MEAS_TYPE type);
-	bool slot_register(int pos, MEAS_TYPE type);
+	virtual ~cSignalTable(){};
 
-	bool sig_add(int pos);
-	bool sig_add_multiple(int pos, int count);
-
-	~cSignalTable(){};
+private:
+	size_t sig_count_ = 0;
+	std::list<CHAN_LEGEND_STRUCT> chan_list;
 };
 
 class cPlot
