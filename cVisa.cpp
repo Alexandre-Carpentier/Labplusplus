@@ -27,7 +27,7 @@ err_struct cVisa::init()
 		ViPUInt32 count = 0;
 
 		char* instr = nullptr;
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, "?::*INSTR", list, count, instr))
+		if (VI_SUCCESS != viFindRsrc(ressource_manager, (char*)"?::*INSTR", list, count, instr))
 		{
 			return { std::wstring(L"[!] viOpen() failed."), -1 };
 		}
@@ -37,7 +37,7 @@ err_struct cVisa::init()
 		device_name_ = converter.from_bytes(utf8_str);
 	}
 
-	status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
+	status = viOpen(ressource_manager, (ViRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failed."), -2 };
@@ -60,7 +60,7 @@ err_struct cVisa::write(std::wstring scpi)
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
 	std::string utf8_str = converter.to_bytes(utf16_str);
 
-	viPrintf(device_, utf8_str.c_str());
+	viPrintf(device_, (char *)utf8_str.c_str());
 
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;

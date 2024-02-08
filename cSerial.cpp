@@ -24,7 +24,7 @@ err_struct cSerial::init()
 		ViPFindList list = 0;
 		ViPUInt32 count = 0;
 		ViChar instrument_name[260] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, "ASRL*?::*INSTR", list, count, instrument_name))
+		if (VI_SUCCESS != viFindRsrc(ressource_manager, (char*)"ASRL*?::*INSTR", list, count, instrument_name))
 		{
 			return { std::wstring(L"[!] viFindRsrc() failled."), -1 };
 		}
@@ -46,7 +46,7 @@ err_struct cSerial::init()
 
 	//status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
 
-	status = viOpen(ressource_manager, (ViConstRsrc)"ASRL20::INSTR", VI_NULL, 0, &device_);
+	status = viOpen(ressource_manager, (ViRsrc)"ASRL8::INSTR", VI_NULL, 0, &device_);
 	//status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
@@ -54,7 +54,7 @@ err_struct cSerial::init()
 	}
 
 	// Clear line
-	status = viClear(ressource_manager);
+	//status = viClear(ressource_manager); // except!
 
 
 	// For Serial and TCP/IP socket connections enable the read Termination Character, or read's will timeout
@@ -98,7 +98,8 @@ viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE); ?
 	// If you've setup the serial port settings in Connection Expert, you can remove this section. 
 	// Otherwise, set your connection parameters
 	viSetAttribute(device_, VI_ATTR_ASRL_BAUD, 9600);
-	viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
+	viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_XON_XOFF);
+	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
 	viSetAttribute(device_, VI_ATTR_ASRL_PARITY, VI_ASRL_PAR_NONE);
 	viSetAttribute(device_, VI_ATTR_ASRL_DATA_BITS, 8);
 	viSetAttribute(device_, VI_ATTR_ASRL_STOP_BITS, VI_ASRL_STOP_ONE);

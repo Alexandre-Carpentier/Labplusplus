@@ -64,19 +64,18 @@ void cPacecom::acquire()
     {
         if (setpoint != setpoint_saved)
         {
+            std::cout << "[*] New set point: " << setpoint <<"\n";
             std::wstring cmd;
-            std::wstring msg;
-
             cmd = std::format(L"SOUR:PRES {}\n", setpoint);
             device->write(cmd); // Set to value
-
-            device->read(msg);
-            //readpoint = std::stof(msg);
-            readpoint = setpoint;
-
-            setpoint_saved = setpoint;
-            Sleep(5000);
+            setpoint_saved = setpoint;         
         }
+        std::wstring msg;
+        device->read(msg);
+        std::cout << msg << "\n";
+        //readpoint = std::stof(msg);
+        readpoint = setpoint;
+        Sleep(2000);
     }
 }
 

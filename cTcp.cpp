@@ -24,7 +24,7 @@ err_struct cTcp::init()
 		ViPFindList list = 0;
 		ViPUInt32 count = 0;
 		ViChar instrument_name[260] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, "TCPIP*?::*INSTR", list, count, instrument_name))
+		if (VI_SUCCESS != viFindRsrc(ressource_manager, (char*)"TCPIP*?::*INSTR", list, count, instrument_name))
 		{
 			return { std::wstring(L"[!] viOpen() failled."), -1 };
 		}
@@ -34,7 +34,7 @@ err_struct cTcp::init()
 		device_name_ = converter.from_bytes(utf8_str);
 	}
 
-	status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
+	status = viOpen(ressource_manager, (ViRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failled."), -2 };
