@@ -26,17 +26,6 @@ std::vector<int> get_rs232port_list()
 
 void cDeviceMonitor::Notify()
 {
-	dev_list.clear();
-	std::wstring comaddrbase = L"\\\\.\\COM8";
-	cDev dev;
-	dev.set_addr(comaddrbase);
-
-	dev.set_type(L"VISASERIAL");
-	dev.set_name(comaddrbase);
-	dev_list.push_back(dev);
-
-	
-	/*
 	// Com lookup
 	dev_list.clear();
 	std::vector<int> com = get_rs232port_list();
@@ -55,7 +44,7 @@ void cDeviceMonitor::Notify()
 		std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::SERIAL, comaddr.c_str());
 
 		std::wstring instr_name = L"";
-		device->write(L"*IDN?\n");
+		device->write(L"*IDN?\r");
 		device->read(instr_name);
 
 		cDev dev;	
@@ -68,13 +57,12 @@ void cDeviceMonitor::Notify()
 		}
 		else
 		{
-			dev.set_type(L"SERIAL");
+			dev.set_type(L"RS232");
 			dev.set_name(L"Unknown");		
 		}
 		std::cout << "[*] Found: " << dev.get_type() << " " << dev.get_name() << " at COM" << item << "\n";
 		dev_list.push_back(dev);
 	}
-	*/
 }
 
 std::vector<cDev> cDeviceMonitor::get_device_vec()

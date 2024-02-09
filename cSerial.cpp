@@ -18,7 +18,7 @@ err_struct cSerial::init()
 {
 	std::wcout << L"[*] cSerial init() called\n";
 
-	if (device_name_.compare(L"magic") == 0)
+	if (device_name_.compare(L"magic") == 0) // if magic used. No address is specified. Searching for the first one available
 	{
 		//TCPIP0::169.254.254.001::inst0::INSTR
 		ViPFindList list = 0;
@@ -29,7 +29,7 @@ err_struct cSerial::init()
 			return { std::wstring(L"[!] viFindRsrc() failled."), -1 };
 		}
 
-		// Convert tu utf16 wide char (wchar_t)
+		// Convert to utf16 wide char (wchar_t)
 		std::string str_utf8 = instrument_name;
 		std::wstring_convert< std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
 		device_name_ = converter.from_bytes(str_utf8);
@@ -46,16 +46,14 @@ err_struct cSerial::init()
 
 	//status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
 
-	status = viOpen(ressource_manager, (ViRsrc)"ASRL8::INSTR", VI_NULL, 0, &device_);
-	//status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NULL, 0, &device_);
+	status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failled."), -2 };
 	}
 
 	// Clear line
-	//status = viClear(ressource_manager); // except!
-
+	status = viClear(device_);
 
 	// For Serial and TCP/IP socket connections enable the read Termination Character, or read's will timeout
 	ViChar fullAddress[100] = "";
@@ -65,8 +63,8 @@ err_struct cSerial::init()
 		return { std::wstring(L"[!] viGetAttribute() failled. It is not a ASRL device"), -3 };
 	}
 
-	// Set timeout value to 5s
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 5000);
+	// Set timeout value to x s
+	//status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 500);
 
 	/*
 #define VI_ATTR_ASRL_BAUD                     (0x3FFF0021UL)
@@ -86,10 +84,12 @@ err_struct cSerial::init()
 #define VI_ATTR_ASRL_RTS_STATE                (0x3FFF00C0UL)
 #define VI_ATTR_ASRL_XON_CHAR                 (0x3FFF00C1UL)
 #define VI_ATTR_ASRL_XOFF_CHAR                (0x3FFF00C2UL)
-viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE); ?
 	*/
 
-	//viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE);
+	viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_FALSE);
+
+	viSetAttribute(device_, VI_ATTR_SEND_END_EN, VI_TRUE);
+	viSetAttribute(device_, VI_ATTR_SUPPRESS_END_EN, VI_FALSE);
 
 	viSetAttribute(device_, VI_ATTR_ASRL_END_IN, VI_TRUE);
 	viSetAttribute(device_, VI_ATTR_ASRL_END_OUT, VI_TRUE);
@@ -98,16 +98,18 @@ viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE); ?
 	// If you've setup the serial port settings in Connection Expert, you can remove this section. 
 	// Otherwise, set your connection parameters
 	viSetAttribute(device_, VI_ATTR_ASRL_BAUD, 9600);
-	viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_XON_XOFF);
-	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
+	
+	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_NONE);
+	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_XON_XOFF);
+	viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
+
 	viSetAttribute(device_, VI_ATTR_ASRL_PARITY, VI_ASRL_PAR_NONE);
 	viSetAttribute(device_, VI_ATTR_ASRL_DATA_BITS, 8);
 	viSetAttribute(device_, VI_ATTR_ASRL_STOP_BITS, VI_ASRL_STOP_ONE);
 	
 
-	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0x0D); // CR=0x0D LF=0x0A
-	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
-	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_XON_XOFF);
+	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0xD); // CR=0x0D LF=0x0A
+	viSetAttribute(device_, VI_ATTR_IO_PROT, VI_PROT_4882_STRS);
 
 	viFlush(device_, 0xC0);
 	viSetBuf(device_, 0x30, 4096);

@@ -1128,6 +1128,11 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			*/
 			std::cout << "cSignalTable->getInstance()\n";
 			cSignalTable* sigt = sigt->getInstance();
+
+			// Remove old range
+			sigt->slot_remove_range(MEAS_TYPE::DAQ_INSTR);
+
+			// Add a new range
 			if (!sigt->slot_register_range(channels.size(), MEAS_TYPE::DAQ_INSTR))
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);

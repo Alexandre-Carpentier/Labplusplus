@@ -37,23 +37,66 @@ bool cSignalTable::slot_register_range(int length, MEAS_TYPE type)
 			std::cout << "[!] Error at slot_register_range() max signal is reached\n";
 			return false;
 		}
-		counter++;
+		if (it->type == type) // count only 
+		{
+			counter++;
+		}
+
 		it++;
 	}
 
 	if ((counter + length) > sig_count_)
 	{
 		std::cout << "[!] Error at slot_register_range() can't allocate more than max signal available \"" << sig_count_ << "\".\n";
-		return false;
+		length = sig_count_;
 	}
 
 	// Reserve sig space here
+	for (auto& chan : chan_list)
+	{
+		if (chan.type == MEAS_TYPE::VOID_INSTR)
+		{
+			if (length > 0)
+			{
+				chan.type = type;
+				chan.channel_legend_addr = std::string("slot free");
+				chan.channel_legend_addr = "/addr";
+				chan.channel_legend_unit = "Volt";
+				chan.channel_legend_color = wxColor(90, 90, 90);
+				chan.channel_legend_max_value = 0.0;
+				chan.channel_legend_min_value = 0.0;
+				chan.channel_legend_average_value = 0.0;
+				length--;
+			}
+		}
+	}
+	/*
 	for (int i = 0; i < length; i++)
 	{
 		*it = { type, std::string("slot free"), "/addr", "Volt", 0.0, 0.0, 0.0, wxColor(90, 90, 90) };
 		it++;
 	}
+	*/
+	return true;
+}
 
+bool cSignalTable::slot_remove_range(MEAS_TYPE type)
+{
+	
+	for (auto& chan : chan_list)
+	{
+		if (chan.type == type)
+		{
+			chan.type = MEAS_TYPE::VOID_INSTR;
+			chan.channel_legend_addr = std::string("slot free");
+			chan.channel_legend_addr = "/addr";
+			chan.channel_legend_unit = "Volt";
+			chan.channel_legend_color = wxColor(90, 90, 90);
+			chan.channel_legend_max_value = 0.0;
+			chan.channel_legend_min_value = 0.0;
+			chan.channel_legend_average_value = 0.0;
+		}
+	}
 	return true;
 }
 

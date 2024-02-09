@@ -278,20 +278,23 @@ void cPlot::update_gui()
 		int sig_count = 0;
 		for (auto chan : chan_legend_struct_list)
 		{
-			if (chan.channel_legend_name.compare("slot free") != 0)
+			if (chan.type != MEAS_TYPE::VOID_INSTR)
 			{
-				sig_count++;
+				if (chan.channel_legend_name.compare("slot free") != 0)
+				{
+					sig_count++;
+				}
 			}
 		}
 		SetSignalCount(hGraph, sig_count);
 
-		// set every valid signal in Wingraph + display in plot gui
+		// set every valid signal in Wingraph + display in cPlot gui
 		int k = 0;
 		for (auto chan : chan_legend_struct_list)
 		{
-			if (chan.channel_legend_name.compare("slot free") != 0)
+			if (chan.type != MEAS_TYPE::VOID_INSTR)
 			{
-				if (chan.type != MEAS_TYPE::VOID_INSTR)
+				if (chan.channel_legend_name.compare("slot free") != 0)
 				{
 					SetSignalLabel(hGraph, chan.channel_legend_name.c_str(), k);
 					SetSignalColor(hGraph, (int)chan.channel_legend_color.Red(), (int)chan.channel_legend_color.Green(), (int)chan.channel_legend_color.Blue(), k);
@@ -356,14 +359,17 @@ void cPlot::update_chan_statistic_labels()
 	int index = 0;
 	for (int i = 0; i < chan_legend_struct_list.size(); i++)
 	{
-		if (it->channel_legend_name.compare("slot free") != 0)
+		if (it->type != MEAS_TYPE::VOID_INSTR)
 		{
-			chan_info_btn_pool[index]->set_min(get_signal_min_value(index));
-			chan_info_btn_pool[index]->set_average(get_signal_average_value(index));
-			chan_info_btn_pool[index]->set_max(get_signal_max_value(index));
-			index++;
+			if (it->channel_legend_name.compare("slot free") != 0)
+			{
+				chan_info_btn_pool[index]->set_min(get_signal_min_value(index));
+				chan_info_btn_pool[index]->set_average(get_signal_average_value(index));
+				chan_info_btn_pool[index]->set_max(get_signal_max_value(index));
+				index++;
+			}
+			it++;
 		}
-		it++;
 	}
 }
 

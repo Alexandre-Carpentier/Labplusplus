@@ -66,6 +66,7 @@ public:
 
 	// register slot range / register slot
 	bool slot_register_range(int length, MEAS_TYPE type);
+	bool slot_remove_range(MEAS_TYPE type);
 	bool slot_register(MEAS_TYPE type);
 	
 	// add sig

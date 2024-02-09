@@ -32,15 +32,11 @@ int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 
     err = device->init();
 
-    // Here configure PACE6000 specifics
-
 
     // Reset the device
-
     device->write(L"*RST\n");
 
     // init PACE6000 specific command
-
     device->write(L"SOUR:PRES 0\n"); // Set to 1 bar
 
     device->write(L":UNIT BAR\n");
@@ -50,8 +46,8 @@ int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
     readpoint = 0.0;
     setpoint = 0.0;
 
+    // acquizition loop
     acquireloop = std::jthread(&cPacecom::acquire, this);
-
 
     return 0;
 }
@@ -66,16 +62,39 @@ void cPacecom::acquire()
         {
             std::cout << "[*] New set point: " << setpoint <<"\n";
             std::wstring cmd;
-            cmd = std::format(L"SOUR:PRES {}\n", setpoint);
+            cmd = std::format(L"SOUR:PRES {}\r", setpoint);
             device->write(cmd); // Set to value
-            setpoint_saved = setpoint;         
+            setpoint_saved = setpoint;  
         }
+
         std::wstring msg;
+        device->write(L":SENS?\r"); // Set to value
         device->read(msg);
-        std::cout << msg << "\n";
-        //readpoint = std::stof(msg);
+        //:SENS:PRES - 0.0002771\r
+
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
+        std::string msg_utf8 = converter.to_bytes(msg);
+
+        char temp_buff[512] = "";
+
+        strncpy(temp_buff, msg_utf8.c_str(), msg_utf8.size());
+
+        int pos = 10;
+        int i = 0;
+        while (temp_buff[pos + i] != '\r')
+        {
+            temp_buff[i] = temp_buff[pos + i];
+            i++;
+        }
+        temp_buff[i] = '\0';
+
+        readpoint = atof(temp_buff);
+        std::cout << "read pressure: " << readpoint << " bar\n";
+        //readpoint = std::stof(msg);   
+
+        std::cout << "setpoint " << setpoint << "setpoint_saved " << setpoint_saved << "\n";
         readpoint = setpoint;
-        Sleep(2000);
+        Sleep(100);
     }
 }
 
@@ -94,6 +113,12 @@ void cPacecom::set(double value)
 
 void cPacecom::stop_device() { 
     std::cout << "cPacesim->stoping...\n"; acquireloop.request_stop();
+
+    device->write(L"SOUR:PRES 0\n"); // Set to value
+    Sleep(3000);
+    device->write(L":OUTP 0\n"); // Set to value
+    device->write(L"LOC\n"); // Set to value
+    device->close();
 }
 
 cPacecom::~cPacecom() { std::cout << "cPacesim dtor...\n"; };

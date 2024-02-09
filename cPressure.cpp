@@ -322,7 +322,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 	std::cout << "[*] [new] Create cPacecom\n";
 	m_pressure_ = new cPacecom;
 
-	// Object failed to create in memory
+	// Object failed to be created in memory
 	if (m_pressure_ == nullptr)
 	{
 		std::cout << "[!] Impossible to load a pressure controler system object\n";
@@ -400,10 +400,11 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		cPlot* m_plot = object_manager->get_plot();
 		m_plot->add_chan_to_gui("Pace 6000 simulated", "Simulated", "Bar", wxColor(45, 30, 30), m_plot->gui_get_last_active_channel_number()); // add last
 		*/
-
+		
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURECONTROLER_INSTR, "Pace 6000 simulated", "Simulated", "Bar", wxColor(45, 30, 30)))
+
+		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURECONTROLER_INSTR, "Pace 6000", addr_ctrl->GetLabelText().ToStdString(), "Bar", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
 		}
