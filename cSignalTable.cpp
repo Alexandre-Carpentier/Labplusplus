@@ -102,6 +102,26 @@ bool cSignalTable::slot_remove_range(MEAS_TYPE type)
 
 bool cSignalTable::slot_register(MEAS_TYPE type)
 {
+	for (auto& chan : chan_list)
+	{
+		if (chan.type == MEAS_TYPE::VOID_INSTR)
+		{
+			// register the new signal
+			chan.type = type;
+			chan.channel_legend_addr = std::string("slot free");
+			chan.channel_legend_addr = "/addr";
+			chan.channel_legend_unit = "Volt";
+			chan.channel_legend_color = wxColor(90, 90, 90);
+			chan.channel_legend_max_value = 0.0;
+			chan.channel_legend_min_value = 0.0;
+			chan.channel_legend_average_value = 0.0;		
+			return true;
+		}
+	}
+	return false;
+
+	///////////////////////////////////////////////////////////////////
+	/*
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_list.begin();
 
@@ -120,6 +140,30 @@ bool cSignalTable::slot_register(MEAS_TYPE type)
 	// Reserve sig space here
 	it->type = type;
 
+	return true;
+	*/
+}
+
+bool cSignalTable::slot_remove(MEAS_TYPE type, size_t pos)
+{
+	int currentpos = 0;
+	for (auto& chan : chan_list)
+	{
+		if (chan.type == type)
+		{
+			if (currentpos = pos)
+			{
+				chan.type = MEAS_TYPE::VOID_INSTR;
+				chan.channel_legend_addr = std::string("slot free");
+				chan.channel_legend_addr = "/addr";
+				chan.channel_legend_unit = "Volt";
+				chan.channel_legend_color = wxColor(90, 90, 90);
+				chan.channel_legend_max_value = 0.0;
+				chan.channel_legend_min_value = 0.0;
+				chan.channel_legend_average_value = 0.0;
+			}
+		}
+	}
 	return true;
 }
 

@@ -159,6 +159,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
 		if (pressureconfig->m_pressure_ != nullptr)
 		{
+			pressureconfig->save_current_device_config(0);
 			CURRENT_DEVICE_CONFIG_STRUCT config = pressureconfig->GetPressureConfigStruct();
 
 			if(pressureconfig->m_pressure_->launch_device(config)<0)

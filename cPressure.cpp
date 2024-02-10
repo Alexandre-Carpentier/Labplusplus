@@ -39,15 +39,6 @@ cPressure::cPressure(wxWindow* inst)
 	config.device_enabled = false;
 	config.device_name = wxT("Simulated");
 
-	// Register pressure signal to signal table
-
-	std::cout << "cSignalTable->getInstance()\n";
-	cSignalTable* sigt = sigt->getInstance();
-	if (!sigt->slot_register(MEAS_TYPE::PRESSURECONTROLER_INSTR))
-	{
-		MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
-	}
-
 	////////////////////////////////////////////////////////////
 
 
@@ -238,7 +229,15 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			// Add a channel for pressure at the end
 			//m_plot->resize_chan_number_to_gui(element_nb+1);
 
+			cSignalTable* sigt = sigt->getInstance();
+			// Remove old range
+			sigt->slot_remove_range(MEAS_TYPE::PRESSURECONTROLER_INSTR);
 
+			// Add a new range
+			if (!sigt->slot_register(MEAS_TYPE::PRESSURECONTROLER_INSTR))
+			{
+				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
+			}
 
 			this->pressure_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
 			this->pressure_controler_activate->SetLabel("ON");
@@ -403,8 +402,8 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
-
-		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURECONTROLER_INSTR, "Pace 6000", addr_ctrl->GetLabelText().ToStdString(), "Bar", wxColor(45, 30, 30)))
+		std::string instr_name = addr_ctrl->GetValue().ToStdString();
+		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURECONTROLER_INSTR, "Pace 6000", instr_name, "Bar", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
 		}

@@ -37,12 +37,12 @@ cTable::cTable(wxWindow* inst)
 	//grid->SetColLabelValue(3, "Temperature (°C)");
 	//grid->SetColLabelValue(4, "Position (m)");
 	//grid->SetColLabelValue(5, "Force set (N)");
-	grid->SetColLabelValue(1, "Triger H (V)");
-	grid->SetColLabelValue(2, "Triger L (V)");
-	grid->SetColLabelValue(3, "Jump to (i)");
-	grid->SetColLabelValue(4, "Jump count (n)");
-	grid->SetColLabelValue(5, "Front");
-	grid->SetColLabelValue(6, "Duration (s)");
+	//grid->SetColLabelValue(1, "Triger H (V)");
+	//grid->SetColLabelValue(2, "Triger L (V)");
+	grid->SetColLabelValue(1, "Jump to (i)");
+	grid->SetColLabelValue(2, "Jump count (n)");
+	//grid->SetColLabelValue(5, "Front");
+	grid->SetColLabelValue(3, "Duration (s)");
 
 	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 50);
 	wxStaticText* staticloop = new wxStaticText(table_rightpanel_, IDCSTATICLOOP, L"Total iteration:");
@@ -117,17 +117,17 @@ cCycle* cTable::load_cycle()
 	for (int i = 0; i < j; i++)
 	{
 		double pressure = wxAtof(grid->GetCellValue(i, 0));
-		double voltage = wxAtof(grid->GetCellValue(i, 1));
-		double flow = wxAtof(grid->GetCellValue(i, 2));
-		double temperature = wxAtof(grid->GetCellValue(i, 3));
-		double position = wxAtof(grid->GetCellValue(i, 4));
-		double force = wxAtof(grid->GetCellValue(i, 5));
-		double htriger = wxAtof(grid->GetCellValue(i, 1));
-		double ltriger = wxAtof(grid->GetCellValue(i, 2));
-		int jumpto = wxAtoi(grid->GetCellValue(i, 3));
-		int jumpcount = wxAtoi(grid->GetCellValue(i, 4));
-		int frontshape = wxAtoi(grid->GetCellValue(i, 5));
-		double duration = wxAtof(grid->GetCellValue(i, 6));
+		double voltage = wxAtof(grid->GetCellValue(i, 0));
+		double flow = wxAtof(grid->GetCellValue(i, 0));
+		double temperature = wxAtof(grid->GetCellValue(i, 0));
+		double position = wxAtof(grid->GetCellValue(i, 0));
+		double force = wxAtof(grid->GetCellValue(i, 0));
+		double htriger = wxAtof(grid->GetCellValue(i, 0));
+		double ltriger = wxAtof(grid->GetCellValue(i, 0));
+		int jumpto = wxAtoi(grid->GetCellValue(i, 1));
+		int jumpcount = wxAtoi(grid->GetCellValue(i, 2));
+		int frontshape = wxAtoi(grid->GetCellValue(i, 0));
+		double duration = wxAtof(grid->GetCellValue(i, 3));
 
 		m_cycle->add_step_back(pressure,
 			voltage,

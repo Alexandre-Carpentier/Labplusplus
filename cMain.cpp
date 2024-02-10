@@ -62,6 +62,8 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 		menu->Append(wxID_ANY, "&Cycle configuration\t2")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::plotButtonClicked, this,
 		menu->Append(wxID_ANY, "&Graph window\t3")->GetId());
+	this->Bind(wxEVT_MENU, &cMain::MeasurementFolderButtonClicked, this,
+		menu->Append(wxID_ANY, "&Open measurement folder\t4")->GetId());
 	menu->AppendSeparator();
 	this->Bind(wxEVT_MENU, &cMain::exitButtonClicked, this,
 		menu->Append(wxID_ANY, "&Exit\tESC")->GetId());
@@ -411,4 +413,14 @@ wxPanel cMain::Getplotleftpanel(wxPanel* plot_leftpanel_)
 	return plot_leftpanel;
 }
 
+void cMain::MeasurementFolderButtonClicked(wxCommandEvent& evt)
+{
+	// Open current application directory
+	wchar_t current_dir[MAX_PATH];
+	memset(current_dir, 0, sizeof(current_dir));
+	DWORD length = sizeof(current_dir) / 4; // TODO: change /4 hardcoded value to prevent the BOF
+	GetCurrentDirectory(length, current_dir);
+	ShellExecute(NULL, L"explore", current_dir, NULL, NULL, SW_SHOWNORMAL);
+	evt.Skip();
+}
 

@@ -74,7 +74,7 @@ public:
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);
 
-	double get_signal_min_value(int SignalNumber);
+	double get_signal_min_value(MEAS_TYPE type, int SignalNumber);
 	double get_signal_average_value(int SignalNumber);
 	double get_signal_max_value(int SignalNumber);
 	void set_signal_visible(bool bShow, int SignalNumber);

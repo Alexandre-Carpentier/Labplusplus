@@ -126,13 +126,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		config.channel_trigger_threshold[i] = "0";
 	}
 
-	// Register appropriate slots in cSignalTable
-	
-	cSignalTable* sigt = sigt->getInstance();
-	if (!sigt->slot_register_range(max_chan_number, MEAS_TYPE::DAQ_INSTR))
-	{
-		MessageBox(nullptr, L"Critical error in cSignalTable, cannot register signal range.", L"[!] Critical failure.", S_OK);
-	}
+
 	////////////////////////////////////////////////////////////
 
 

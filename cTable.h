@@ -22,7 +22,7 @@ private:
 	wxPanel* table_leftpanel_ = nullptr;
 	wxPanel* table_rightpanel_ = nullptr;
 	wxBoxSizer* table_hsizer_ = nullptr;
-	const int COL_NB = 7;
+	const int COL_NB = 4;
 	const int LINE_NB = 200;
 
 	cDurationStatisticCtrl* stat = nullptr;

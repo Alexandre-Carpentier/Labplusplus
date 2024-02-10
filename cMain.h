@@ -113,6 +113,7 @@ public:
 	void Maximizeevt(wxMaximizeEvent& evt);
 
 	wxPanel Getplotleftpanel(wxPanel* plot_leftpanel_);
+	void MeasurementFolderButtonClicked(wxCommandEvent& evt);
 
 };
 

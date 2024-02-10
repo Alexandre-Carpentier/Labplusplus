@@ -64,26 +64,19 @@ err_struct cSerial::init()
 	}
 
 	// Set timeout value to x s
-	//status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 500);
+	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 100);
 
 	/*
-#define VI_ATTR_ASRL_BAUD                     (0x3FFF0021UL)
-#define VI_ATTR_ASRL_DATA_BITS                (0x3FFF0022UL)
-#define VI_ATTR_ASRL_PARITY                   (0x3FFF0023UL)
-#define VI_ATTR_ASRL_STOP_BITS                (0x3FFF0024UL)
-#define VI_ATTR_ASRL_FLOW_CNTRL               (0x3FFF0025UL)
-#define VI_ATTR_ASRL_AVAIL_NUM                (0x3FFF00ACUL
-#define VI_ATTR_ASRL_CTS_STATE                (0x3FFF00AEUL)
-#define VI_ATTR_ASRL_DCD_STATE                (0x3FFF00AFUL)
-#define VI_ATTR_ASRL_DSR_STATE                (0x3FFF00B1UL)
-#define VI_ATTR_ASRL_DTR_STATE                (0x3FFF00B2UL)
-#define VI_ATTR_ASRL_END_IN                   (0x3FFF00B3UL)
-#define VI_ATTR_ASRL_END_OUT                  (0x3FFF00B4UL)
-#define VI_ATTR_ASRL_REPLACE_CHAR             (0x3FFF00BEUL)
-#define VI_ATTR_ASRL_RI_STATE                 (0x3FFF00BFUL)
-#define VI_ATTR_ASRL_RTS_STATE                (0x3FFF00C0UL)
-#define VI_ATTR_ASRL_XON_CHAR                 (0x3FFF00C1UL)
-#define VI_ATTR_ASRL_XOFF_CHAR                (0x3FFF00C2UL)
+	#define VI_ATTR_ASRL_AVAIL_NUM                (0x3FFF00ACUL
+	#define VI_ATTR_ASRL_CTS_STATE                (0x3FFF00AEUL)
+	#define VI_ATTR_ASRL_DCD_STATE                (0x3FFF00AFUL)
+	#define VI_ATTR_ASRL_DSR_STATE                (0x3FFF00B1UL)
+	#define VI_ATTR_ASRL_DTR_STATE                (0x3FFF00B2UL)
+	#define VI_ATTR_ASRL_REPLACE_CHAR             (0x3FFF00BEUL)
+	#define VI_ATTR_ASRL_RI_STATE                 (0x3FFF00BFUL)
+	#define VI_ATTR_ASRL_RTS_STATE                (0x3FFF00C0UL)
+	#define VI_ATTR_ASRL_XON_CHAR                 (0x3FFF00C1UL)
+	#define VI_ATTR_ASRL_XOFF_CHAR                (0x3FFF00C2UL)
 	*/
 
 	viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_FALSE);

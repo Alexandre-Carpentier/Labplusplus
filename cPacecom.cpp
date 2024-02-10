@@ -27,11 +27,11 @@ int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
     // Create the proper implementation of cProtocol with a factory method
     //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISATCP, L"TCPIP0::169.254.254.001::inst0::INSTR");
     //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISASERIAL, L"\\\\.\\COM20");
-
-    device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
+    
+    //device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
+    device = factory.make(PROTOCOLENUM::VISASERIAL, config_struct_.device_name.ToStdWstring());
 
     err = device->init();
-
 
     // Reset the device
     device->write(L"*RST\n");
@@ -70,28 +70,43 @@ void cPacecom::acquire()
         std::wstring msg;
         device->write(L":SENS?\r"); // Set to value
         device->read(msg);
-        //:SENS:PRES - 0.0002771\r
 
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
-        std::string msg_utf8 = converter.to_bytes(msg);
-
-        char temp_buff[512] = "";
-
-        strncpy(temp_buff, msg_utf8.c_str(), msg_utf8.size());
-
-        int pos = 10;
-        int i = 0;
-        while (temp_buff[pos + i] != '\r')
+        // Valid reading?
+        // ex ":SENS:PRES - 0.0002771\r"
+        if (msg.compare(0, wcslen(L":SENS:PRES"), L":SENS:PRES") == 0)
         {
-            temp_buff[i] = temp_buff[pos + i];
-            i++;
+            // extract floating point
+
+            // C style
+            //std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
+            //std::string msg_utf8 = converter.to_bytes(msg);
+            //char temp_buff[512] = "";
+            //strncpy(temp_buff, msg_utf8.c_str(), msg_utf8.size());
+            //int pos = 10;
+            //int i = 0;
+            //while (temp_buff[pos + i] != '\r')
+            //{
+            //    temp_buff[i] = temp_buff[pos + i];
+            //    i++;
+            //}
+            //temp_buff[i] = '\0';
+            //readpoint = atof(temp_buff);
+            // C style end
+
+            // C++ style
+            std::wstring wValue = msg.substr(wcslen(L":SENS:PRES"));
+            readpoint = std::stof(wValue);
+            // C++ style end
+            
+            std::cout << "read pressure: " << readpoint << " bar\n";
+            Sleep(100);
+
+            // skip end loop
+            continue; 
         }
-        temp_buff[i] = '\0';
-
-        readpoint = atof(temp_buff);
-        std::cout << "read pressure: " << readpoint << " bar\n";
-        //readpoint = std::stof(msg);   
-
+       
+        // if reading issue -> assuming readpoint is the setpoint
+        
         std::cout << "setpoint " << setpoint << "setpoint_saved " << setpoint_saved << "\n";
         readpoint = setpoint;
         Sleep(100);

@@ -363,7 +363,7 @@ void cPlot::update_chan_statistic_labels()
 		{
 			if (it->channel_legend_name.compare("slot free") != 0)
 			{
-				chan_info_btn_pool[index]->set_min(get_signal_min_value(index));
+				chan_info_btn_pool[index]->set_min(get_signal_min_value(it->type, index));
 				chan_info_btn_pool[index]->set_average(get_signal_average_value(index));
 				chan_info_btn_pool[index]->set_max(get_signal_max_value(index));
 				index++;
@@ -525,8 +525,15 @@ void cPlot::graph_addpoint(const int signb, double val[])
 	AddPoints(hGraph, val, signb);
 }
 
-double cPlot::get_signal_min_value(int SignalNumber)
+double cPlot::get_signal_min_value(MEAS_TYPE type, int SignalNumber)
 {
+	cSignalTable* sigt = sigt->getInstance();
+	std::list<CHAN_LEGEND_STRUCT> list = sigt->get_signal_table();
+
+	for (auto& chan : list)
+	{
+
+	}
 	return GetSignalMinValue(hGraph, SignalNumber);
 }
 

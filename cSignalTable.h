@@ -67,7 +67,9 @@ public:
 	// register slot range / register slot
 	bool slot_register_range(int length, MEAS_TYPE type);
 	bool slot_remove_range(MEAS_TYPE type);
+
 	bool slot_register(MEAS_TYPE type);
+	bool slot_remove(MEAS_TYPE type, size_t pos);
 	
 	// add sig
 	bool sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color);

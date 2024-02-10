@@ -22,6 +22,49 @@ void cMeasurementControler::poll()
 
 	meas_pool = meas_manager->get_measurement_pool();
 	std::cout << "cMeasurementcontroler->polling...\n";
+	/*
+	// Rearange the meas_pool to display signal at the right place
+	// First class in order the MEAS_TYPE in the sigtable (1)
+	// Then put the measurement in the same order in a temporary list (2)
+	// Swap the list (3)
+	// so measurement will be displayed in the same order
+
+	// (1)
+	cSignalTable* sigt = sigt->getInstance();
+	std::list<CHAN_LEGEND_STRUCT> list = sigt->get_signal_table();
+
+	int meas_count = 0;
+
+	std::vector<int> order;
+	for (auto& chan : list)
+	{
+		if (chan.type != MEAS_TYPE::VOID_INSTR)
+		{
+			order.push_back(chan.type);
+			meas_count++;
+		}
+	}
+
+	// (2)
+	std::vector<cMeasurement*> temp_pool;
+	int i = 0;
+	for (auto& meas : meas_pool)
+	{
+		if (meas_count > 0)
+		{
+			if (meas->device_type() == order.at(i))
+			{
+				temp_pool.push_back(meas);
+				i++;
+				meas_count--;
+			}
+		}
+	}
+
+	// (3)
+	meas_pool.clear();
+	meas_pool = temp_pool;
+	*/
 
 	DATAS val;
 	double Y[80]; memset(Y, 0, sizeof(Y));
