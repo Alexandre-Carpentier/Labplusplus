@@ -4,6 +4,10 @@
 #include <iostream>
 #define WIN32_LEAN_AND_MEAN
 #define WXUSINGDLL
+#pragma comment (lib, "comctl32.lib")
+#pragma comment(lib, "comctl32")
+#pragma comment(lib, "Rpcrt4")
+
 //#include <winsock2.h>
 #include <Windows.h>
 #include <wx/wx.h>

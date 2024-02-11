@@ -10,7 +10,7 @@
 // CLOSE = 0
 // 
 // 
-class cProtocol {
+class plug_cProtocol {
 public:
     virtual std::string get_type() = 0;
     virtual bool open(std::string addr) = 0;
@@ -27,7 +27,7 @@ public:
 // CLOSE 
 // 
 // 
-class cCom : public cProtocol
+class plug_cCom : public plug_cProtocol
 {
     std::string get_type()override { return std::string("COM port"); };
     bool open(std::string addr) override;
@@ -44,7 +44,7 @@ class cCom : public cProtocol
 // CLOSE 
 // 
 // 
-class cTcp : public cProtocol
+class plug_cTcp : public plug_cProtocol
 {
     std::string get_type()override { return std::string("TCP port"); };
     bool open(std::string addr) override;
@@ -61,7 +61,7 @@ class cTcp : public cProtocol
 // CLOSE 
 // 
 // 
-class cUsb : public cProtocol
+class plug_cUsb : public plug_cProtocol
 {
     std::string get_type()override { return std::string("USB port"); };
     bool open(std::string addr) override;
@@ -78,7 +78,7 @@ class cUsb : public cProtocol
 // CLOSE 
 // 
 // 
-class cDaq : public cProtocol
+class plug_cDaq : public plug_cProtocol
 {
     std::string get_type()override { return std::string("DAQMX linked"); };
     bool open(std::string addr) override;
@@ -95,7 +95,7 @@ class cDaq : public cProtocol
 // CLOSE 
 // 
 // 
-class cVisa : public cProtocol
+class plug_cVisa : public plug_cProtocol
 {
     std::string get_type()override { return std::string("VISA linked"); };
     bool open(std::string addr) override;

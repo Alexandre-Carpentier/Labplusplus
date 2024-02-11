@@ -8,19 +8,19 @@
 // CLOSE 
 // 
 // 
-bool cCom::open(std::string addr)
+bool plug_cCom::open(std::string addr)
 {
     return true;
 }
-bool cCom::send(std::string cmd)
+bool plug_cCom::send(std::string cmd)
 {
     return true;
 }
-bool cCom::recv(std::string& response)
+bool plug_cCom::recv(std::string& response)
 {
     return true;
 }
-void cCom::close()
+void plug_cCom::close()
 {
     return;
 }
@@ -33,19 +33,19 @@ void cCom::close()
 // CLOSE 
 // 
 // 
-bool cTcp::open(std::string addr)
+bool plug_cTcp::open(std::string addr)
 {
     return true;
 }
-bool cTcp::send(std::string cmd)
+bool plug_cTcp::send(std::string cmd)
 {
     return true;
 }
-bool cTcp::recv(std::string& response)
+bool plug_cTcp::recv(std::string& response)
 {
     return true;
 }
-void cTcp::close()
+void plug_cTcp::close()
 {
     return;
 }
@@ -58,19 +58,19 @@ void cTcp::close()
 // CLOSE 
 // 
 // 
-bool cUsb::open(std::string addr)
+bool plug_cUsb::open(std::string addr)
 {
     return true;
 }
-bool cUsb::send(std::string cmd)
+bool plug_cUsb::send(std::string cmd)
 {
     return true;
 }
-bool cUsb::recv(std::string& response)
+bool plug_cUsb::recv(std::string& response)
 {
     return true;
 }
-void cUsb::close()
+void plug_cUsb::close()
 {
     return;
 }
@@ -83,19 +83,19 @@ void cUsb::close()
 // CLOSE 
 // 
 // 
-bool cDaq::open(std::string addr)
+bool plug_cDaq::open(std::string addr)
 {
     return true;
 }
-bool cDaq::send(std::string cmd)
+bool plug_cDaq::send(std::string cmd)
 {
     return true;
 }
-bool cDaq::recv(std::string& response)
+bool plug_cDaq::recv(std::string& response)
 {
     return true;
 }
-void cDaq::close()
+void plug_cDaq::close()
 {
     return;
 }
@@ -108,19 +108,19 @@ void cDaq::close()
 // CLOSE 
 // 
 // 
-bool cVisa::open(std::string addr)
+bool plug_cVisa::open(std::string addr)
 {
     return true;
 }
-bool cVisa::send(std::string cmd)
+bool plug_cVisa::send(std::string cmd)
 {
     return true;
 }
-bool cVisa::recv(std::string& response)
+bool plug_cVisa::recv(std::string& response)
 {
     return true;
 }
-void cVisa::close()
+void plug_cVisa::close()
 {
     return;
 }

@@ -172,6 +172,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
+		// retieve the cycle and save it in memory
+
 		cCycle* m_cycle = nullptr;
 		m_cycle = m_table_->load_cycle();
 		if (m_cycle == nullptr)
@@ -254,6 +256,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	{
 		m_plot_->stop_graph();
 		cycle_controler->stop();
+		Sleep(500);
 		std::cout << "cycle_controler deleted in Footer.cpp\n";
 		delete cycle_controler;
 		cycle_controler = nullptr;

@@ -38,27 +38,27 @@ void cInicfg::load_table(void)
 		index = "pressure"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "voltage"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 1, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "flow"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 2, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "temperature"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 3, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "position"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 4, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "force"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 5, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "htriger"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 1, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "ltriger"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 2, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "jumpto"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 3, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 1, str); }
 		index = "jumpcount"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 4, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 2, str); }
 		index = "frontshape"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 5, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "duration"; index.append(wxString::Format("%i", i));
-		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 6, str); }
+		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 3, str); }
 	}
 	cfg->DeleteAll();
 	delete cfg;
@@ -80,17 +80,17 @@ void cInicfg::save_table(void)
 	for (int i = 0; i < j; i++)
 	{
 		double pressure = wxAtof(m_table->grid->GetCellValue(i, 0));
-		double voltage = wxAtof(m_table->grid->GetCellValue(i, 1));
-		double flow = wxAtof(m_table->grid->GetCellValue(i, 2));
-		double temperature = wxAtof(m_table->grid->GetCellValue(i, 3));
-		double position = wxAtof(m_table->grid->GetCellValue(i, 4));
-		double force = wxAtof(m_table->grid->GetCellValue(i, 5));
-		double htriger = wxAtof(m_table->grid->GetCellValue(i, 1));
-		double ltriger = wxAtof(m_table->grid->GetCellValue(i, 2));
-		int jumpto = wxAtoi(m_table->grid->GetCellValue(i, 3));
-		int jumpcount = wxAtoi(m_table->grid->GetCellValue(i, 4));
-		int frontshape = wxAtoi(m_table->grid->GetCellValue(i, 5));
-		double duration = wxAtof(m_table->grid->GetCellValue(i, 6));
+		double voltage = wxAtof(m_table->grid->GetCellValue(i, 0));
+		double flow = wxAtof(m_table->grid->GetCellValue(i, 0));
+		double temperature = wxAtof(m_table->grid->GetCellValue(i, 0));
+		double position = wxAtof(m_table->grid->GetCellValue(i, 0));
+		double force = wxAtof(m_table->grid->GetCellValue(i, 0));
+		double htriger = wxAtof(m_table->grid->GetCellValue(i, 0));
+		double ltriger = wxAtof(m_table->grid->GetCellValue(i, 0));
+		int jumpto = wxAtoi(m_table->grid->GetCellValue(i, 1));
+		int jumpcount = wxAtoi(m_table->grid->GetCellValue(i, 2));
+		int frontshape = wxAtoi(m_table->grid->GetCellValue(i, 0));
+		double duration = wxAtof(m_table->grid->GetCellValue(i, 3));
 
 		// Save in : // C:\Users\The Hive\AppData\Roaming
 

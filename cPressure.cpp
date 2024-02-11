@@ -230,6 +230,7 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			//m_plot->resize_chan_number_to_gui(element_nb+1);
 
 			cSignalTable* sigt = sigt->getInstance();
+
 			// Remove old range
 			sigt->slot_remove_range(MEAS_TYPE::PRESSURECONTROLER_INSTR);
 
@@ -245,8 +246,6 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			addr_ctrl->Enable(true);			
 
 			EnablePressureChannel(true);
-			
-
 		}
 		else
 		{

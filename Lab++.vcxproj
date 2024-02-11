@@ -79,7 +79,7 @@
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>x64\Debug;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;$(LibraryPath)</LibraryPath>
+    <LibraryPath>x64\Debug;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;G:\CODE\VS_PROJET\Lab++\ADDON</LibraryPath>
     <IncludePath>C:\Program Files\IVI Foundation\VISA\Win64\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -199,6 +199,7 @@
     <ClCompile Include="cUSB6001.cpp" />
     <ClCompile Include="cVisa.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
+    <ClCompile Include="Plugin\cDevice.cpp" />
     <ClCompile Include="xlsx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -244,6 +245,7 @@
     <ClInclude Include="data_types.h" />
     <ClInclude Include="enum.h" />
     <ClInclude Include="LoadBitmapFromRessource.h" />
+    <ClInclude Include="Plugin\cDevice.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="WinGraph.h" />
     <ClInclude Include="xlsx.h" />

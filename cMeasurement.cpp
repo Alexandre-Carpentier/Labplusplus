@@ -25,9 +25,14 @@ void cMeasurement::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_
 	return;
 }
 
-void cMeasurement::set_device_addr(std::string name)
+void cMeasurement::set_device_name(std::string name)
 {
 	config_struct_.device_name = name;
+}
+
+void cMeasurement::set_device_addr(std::string addr)
+{
+	config_struct_.device_addr = addr;
 }
 
 void cMeasurement::stop_device() {};

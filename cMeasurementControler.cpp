@@ -15,6 +15,23 @@
 #include "cMeasurement.h"
 #include "cTick.h"
 
+double get_instr_setpoint(cMeasurement *meas, std::vector<STEPSTRUCT> step_table)
+{
+	double val=0.0;
+	std::string dev_name = meas->device_name();
+	for (auto& step : step_table)
+	{
+		for (auto& controler : step.controler_vec)
+		{
+			if (controler.first.find(dev_name) == 0)
+			{
+				val = controler.second;
+			}
+		}
+	}
+	return val;
+}
+
 void cMeasurementControler::poll()
 {
 	std::cout << "cMeasurementcontroler->get_stop_token...\n";
@@ -177,14 +194,14 @@ void cMeasurementControler::poll()
 					{				
 						double value = 0.0;
 						MEAS_TYPE type = meas->device_type();
-						
+		
 						switch (type)
 						{
 						case MEAS_TYPE::PRESSURECONTROLER_INSTR:
 						{
 							static double old_pressure=0.0;
 							m_cyclecontroler_->critical_section.lock(); ////////////////////////////////CRITICAL_SECTION///////////
-							value = m_cycle_->get_pressure();
+							value = get_instr_setpoint(meas, m_cycle_->pcycle->step_table);
 							m_cyclecontroler_->critical_section.unlock(); ////////////////////////////////CRITICAL_SECTION///////////
 							if(old_pressure == value)
 							{			

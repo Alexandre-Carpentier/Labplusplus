@@ -24,9 +24,6 @@ static wxPanel* pace_rightpanel_ = nullptr;
 class cPressure : public wxFrame
 {
 private:
-	
-	
-
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
 
@@ -42,7 +39,6 @@ public:
 	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
 	cMeasurement* m_pressure_ = nullptr; // daq measurement gui
-
 
 	bool enable_pan = false;
 	wxButton* pressure_controler_activate;

@@ -11,7 +11,7 @@ cPacecom::cPacecom()
     result.buffer_size = 1;
 };
 
-std::string cPacecom::device_name() { return std::string("PACECOM"); }
+std::string cPacecom::device_name() { return config_struct_.device_name.ToStdString(); }
 MEAS_TYPE cPacecom::device_type() { return PRESSURECONTROLER_INSTR; };
 
 size_t cPacecom::chan_count()
@@ -126,7 +126,17 @@ void cPacecom::set(double value)
     setpoint = value;
 }
 
-void cPacecom::stop_device() { 
+void cPacecom::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+{
+    config_struct_ = config_struct;
+}
+
+void cPacecom::set_device_name(std::string name)
+{
+    config_struct_.device_name = name;
+}
+
+void cPacecom::stop_device() {
     std::cout << "cPacesim->stoping...\n"; acquireloop.request_stop();
 
     device->write(L"SOUR:PRES 0\n"); // Set to value

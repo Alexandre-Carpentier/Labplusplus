@@ -65,7 +65,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
     {
         //std::cout << "[*] Dll process attach...\n";
         // Issue when loading the DLL, must set the instance with Windows
-        // wxSetInstance((HINSTANCE)hModule);
+         wxSetInstance((HINSTANCE)hModule);
        // int argc = 0;
         //char** argv = NULL;
        // wxEntryStart(argc, argv);
@@ -79,7 +79,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
         break;
 
     case DLL_PROCESS_DETACH:
-        //wxEntryCleanup();
+        wxEntryCleanup();
         break;
     }
     return TRUE;
@@ -98,6 +98,7 @@ cDevice* Attach(wxWindow* inst)
 
     std::cout << "[*] Plugin builder started...\n";
     // Build a protocol object containing specific concrete code for communicate with the device
+    // 
     // Set protocol to COM
     builder->ProduceProtocol(SCPIMODE::COM);
 

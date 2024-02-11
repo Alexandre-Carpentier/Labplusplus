@@ -113,7 +113,7 @@ cConfig::cConfig(wxWindow* inst)
 	// Add cDaqmx to plugin vec
 	m_daqmx = new cDaqmx(book);
 	PLUGIN_DATA Daqmx_struct;
-	Daqmx_struct.name = L"NI DAQMX (USB6001;cDAQ/9205).dll";
+	Daqmx_struct.name = L"USB-DAQ-6001.dll";
 	Daqmx_struct.panel = m_daqmx->get_right_panel();
 	Daqmx_struct.hInst = nullptr;
 	//Daqmx_struct.device = nullptr;
@@ -123,21 +123,21 @@ cConfig::cConfig(wxWindow* inst)
 	// Add cPressure to plugin vec
 	m_pressure = new cPressure(book);
 	PLUGIN_DATA Pressure_struct;
-	Pressure_struct.name = L"Pressure controler (Druck Pace 6000).dll";
+	Pressure_struct.name = L"Pace 6000.dll";
 	Pressure_struct.panel = m_pressure->get_right_panel();
 	Pressure_struct.hInst = nullptr;
-	//Pressure_struct.device = nullptr;
-	//Pressure_struct.Attach = nullptr;
+	Pressure_struct.device = nullptr;
+	Pressure_struct.Attach = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
 	// Add cTension to plugin vec
 	m_tension = new cTension(book);
 	PLUGIN_DATA Tension_struct;
-	Tension_struct.name = L"Voltage controler (Keytley 2280S).dll";
+	Tension_struct.name = L"Keitley 2280S.dll";
 	Tension_struct.panel = m_tension->get_right_panel();
 	Tension_struct.hInst = nullptr;
-	//Tension_struct.device = nullptr;
-	//Tension_struct.Attach = nullptr;
+	Tension_struct.device = nullptr;
+	Tension_struct.Attach = nullptr;
 	plugin_vec.push_back(Tension_struct);
 
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
@@ -150,7 +150,7 @@ cConfig::cConfig(wxWindow* inst)
 	DWORD dwLength = GetCurrentDirectory(MAX_PATH, lpszDir);
 	std::wstring wDir;
 	wDir.append(lpszDir);
-	wDir.append(L"\\Plugin");
+	wDir.append(L"\\ADDON");
 	std::cout << "[*] Try to load plugin in folder: " << wDir << "\n";
 	load_plugin(book, wDir);
 
@@ -244,26 +244,27 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 
 			HINSTANCE hModule = nullptr;
 			std::cout << "[*] Found plugin module to load: " << dllfilepath << "\n";
-			//hModule = LoadLibrary(dllfilepath.c_str());
+			hModule = LoadLibrary(dllfilepath.c_str());
 			if (hModule)
 			{
-				//std::cout << "[*] Loading...\n";
-				//Attach = nullptr;
-				//Attach = (ATTACH)GetProcAddress(hModule, "Attach");
-				//if (!Attach)
-				//{
-				//	std::cout << "[!] Failed to load module with GetProcAddress(). \n";
-				//	FreeLibrary(hModule);
-				//	break;
-				//}
-				//std::cout << "[*] Loading success. \n";
+				std::cout << "[*] Loading...\n";
+				Attach = nullptr;
+				Attach = (ATTACH)GetProcAddress(hModule, "Attach");
+				if (!Attach)
+				{
+					std::cout << "[!] Failed to load module with GetProcAddress(). \n";
+					FreeLibrary(hModule);
+					continue;
+					//break;
+				}
+				std::cout << "[*] Loading success. \n";
 
 				// Populate vector of PLUGIN_DATA
-				//std::wstring plugin_name = ffd.cFileName;
+				std::wstring plugin_name = ffd.cFileName;
 
 				// Attach the plugin DLL to the core system here
-				//cDevice* dev = Attach(parent);
-				//wxPanel* plugin_panel = dev->panel;
+				cDevice* dev = Attach(parent);
+				wxPanel* plugin_panel = dev->panel;
 
 				// If new device is a writer: 
 				// add a new column in cTable with expected name and unit
@@ -271,13 +272,13 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 				// 1 == WRITE
 				// 2 == ALL
 
-				//PLUGIN_DATA plugin_data;
-				//plugin_data.name = plugin_name;
-				//plugin_data.panel = plugin_panel;
-				//plugin_data.device = dev;
-				//plugin_data.hInst = hModule;
-				//plugin_data.Attach = Attach;
-				//plugin_vec.push_back(plugin_data); // Add struct
+				PLUGIN_DATA plugin_data;
+				plugin_data.name = plugin_name;
+				plugin_data.panel = plugin_panel;
+				plugin_data.device = dev;
+				plugin_data.hInst = hModule;
+				plugin_data.Attach = Attach;
+				plugin_vec.push_back(plugin_data); // Add struct
 			}
 			else
 			{
@@ -317,6 +318,39 @@ wxBoxSizer* cConfig::Get_hsizer()
 cDaqmx* cConfig::get_nidaq()
 {
 	return m_daqmx;
+}
+
+std::vector<cDevice*> cConfig::get_device_vec()
+{
+	std::vector<cDevice*> vec;
+	for (auto& plugin : plugin_vec)
+	{
+		if (plugin.device)
+			vec.push_back(plugin.device);
+	}
+	return vec;
+}
+
+std::vector<std::string> cConfig::get_plugin_name_vec()
+{
+	std::vector<std::string> vec;
+	for (auto& plugin : plugin_vec)
+	{
+		if (plugin.device)
+			vec.push_back(plugin.device->get_plugin_name());
+	}
+	return vec;
+}
+
+std::vector<std::string> cConfig::get_plugin_unit_vec()
+{
+	std::vector<std::string> vec;
+	for (auto& plugin : plugin_vec)
+	{
+		if(plugin.device)
+			vec.push_back(plugin.device->plugin_unit());
+	}
+	return vec;
 }
 
 cPressure* cConfig::get_pressuredevice()

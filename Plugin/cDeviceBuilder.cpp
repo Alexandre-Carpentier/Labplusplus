@@ -2,102 +2,29 @@
 
 #pragma comment (lib, "Kernel32.lib")
 
-//////////////////////////////////////////////////////////////
-// COMPONENT TO BE BUILD
-// -----------------------------------------------------------
-// PROTOCOL
-// iMG
-// PANEL COMPONENT WITH DIFFERENT CONTROLS
-// DEFINE DIFFERENT CALLBACK TO LINK CONTROLS AND FUNCTIONS
-// INIT SEQ
-// CLOSING SEQ
 
-
-void cDevice::DisplayConfiguration()
-{
-    std::cout << "[*] Communication are configurated with: " << this->protocol->get_type() << "\n";
-    return;
-}
-
-void cDevice::set_device_name(std::string name)
-{
-    device_name = name;
-}
-
-void cDevice::scpi_open(std::string addr)
-{
-    std::cout << "[*] SCPI open called.\n";
-    this->protocol->open(addr);
-    return;
-}
-
-void cDevice::scpi_write(std::string command)
-{
-    std::cout << "[*] SCPI write called.\n";
-    this->protocol->send(command);
-    return;
-}
-
-std::string cDevice::scpi_read()
-{
-    std::string response;
-    this->protocol->recv(response);
-    std::cout << "[*] SCPI read recv: " << response << "\n";
-    return response;
-}
-
-void cDevice::scpi_close()
-{
-    std::cout << "[*] SCPI close called.\n";
-    return;
-}
-
-std::string cDevice::get_device_name()
-{
-    return device_name;
-}
-
-int cDevice::get_device_access_type()
-{
-    return static_cast<int>(plugin_access_type);
-}
-
-std::string cDevice::get_plugin_name()
-{
-    return plugin_control_name;
-}
-
-std::string cDevice::plugin_unit()
-{
-    return plugin_control_unit;
-}
-
-void cDevice::OnPaint()
-{
-    return;
-}
 
 void DeviceBuilder1::ProduceProtocol(SCPIMODE mode) const
 {
     if (mode == SCPIMODE::COM)
     {
-        this->product->protocol = std::make_unique <cCom>();
+        this->product->protocol = std::make_unique <plug_cCom>();
     }
     if (mode == SCPIMODE::TCP)
     {
-        this->product->protocol = std::make_unique <cTcp>();
+        this->product->protocol = std::make_unique <plug_cTcp>();
     }
     if (mode == SCPIMODE::USB)
     {
-        this->product->protocol = std::make_unique <cUsb>();
+        this->product->protocol = std::make_unique <plug_cUsb>();
     }
     if (mode == SCPIMODE::DAQMX)
     {
-        this->product->protocol = std::make_unique <cDaq>();
+        this->product->protocol = std::make_unique <plug_cDaq>();
     }
     if (mode == SCPIMODE::VISA)
     {
-        this->product->protocol = std::make_unique <cVisa>();
+        this->product->protocol = std::make_unique <plug_cVisa>();
     }
 }
 
@@ -105,7 +32,7 @@ void DeviceBuilder1::ProducePanel(wxWindow* inst) const
 {
     this->product->panel = new wxScrolled <wxPanel>(inst, wxID_ANY, wxDefaultPosition, inst->FromDIP(wxSize(400, 600)));
     this->product->panel->FitInside();
-    this->product->panel->SetScrollRate(0, 10);
+    this->product->panel->SetScrollRate(0, 40);
     this->product->header_v_sizer = new wxBoxSizer(wxVERTICAL);
     this->product->header_h_sizer = new wxBoxSizer(wxHORIZONTAL);
     this->product->grid_sizer = new wxFlexGridSizer(30, 2, 10, inst->FromDIP(50));
@@ -145,17 +72,17 @@ void DeviceBuilder1::ProduceImage(wxWindow* inst) const
     szFileName[len - 4] = '\0'; // Cut filepath without .dll (4*wchar_t)
     //wprintf(L"Filename: %s\n", szFileName);
 
-    std::wstring img_file = L"plugin\\";
+    std::wstring img_file = L"ADDON\\";
     img_file.append(szFileName);
     img_file.append(L".png");
 
     wxInitAllImageHandlers();
 
-    this->product->instr_img = new wxStaticBitmap(this->product->panel, wxID_ANY, wxBitmap(img_file.c_str(), wxBITMAP_TYPE_PNG), inst->FromDIP(wxPoint(50, 20)), inst->FromDIP(wxSize(500, 300)));
-    this->product->header = new wxStaticText(this->product->panel, wxID_ANY, szFileName, wxDefaultPosition, inst->FromDIP(wxSize(300, 200)), wxNO_BORDER);
-    this->product->header->SetFont(this->product->header->GetFont().Scale(inst->FromDIP(4)));
+    this->product->instr_img = new wxStaticBitmap(this->product->panel, wxID_ANY, wxBitmap(img_file.c_str(), wxBITMAP_TYPE_PNG), inst->FromDIP(wxPoint(50, 20)), inst->FromDIP(wxSize(740, 420)));
+    //this->product->header = new wxStaticText(this->product->panel, wxID_ANY, szFileName, wxDefaultPosition, inst->FromDIP(wxSize(300, 200)), wxNO_BORDER);
+    //this->product->header->SetFont(this->product->header->GetFont().Scale(inst->FromDIP(4)));
     this->product->header_h_sizer->Add(this->product->instr_img, 0, wxEXPAND, inst->FromDIP(20));
-    this->product->header_h_sizer->Add(this->product->header, 0, wxALL, inst->FromDIP(20));
+   // this->product->header_h_sizer->Add(this->product->header, 0, wxALL, inst->FromDIP(20));
 }
 
 void DeviceBuilder1::AddPanelCtrl(CONTROLTYPE type, int length, int height, std::string label)const
@@ -172,7 +99,7 @@ void DeviceBuilder1::AddPanelCtrl(CONTROLTYPE type, int length, int height, std:
     }
     if (type == CONTROLTYPE::TXTFIELD)
     {
-        ctrl = new wxTextCtrl(this->product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxSUNKEN_BORDER);
+        ctrl = new wxTextCtrl(this->product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxTE_MULTILINE | wxTE_RICH | wxHSCROLL | wxSUNKEN_BORDER);
     }
     if (type == CONTROLTYPE::SPINBUT)
     {

@@ -164,7 +164,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// EDIT WND
 	////////////////////////////////////////////////////////////////////////////////
-	m_table = new cTable(this);
+	m_table = new cTable(this, m_config);
 	manager->set_table(m_table);
 	table_leftpanel = m_table->Getleftpan();
 	table_rightpanel = m_table->Getrightpan();

@@ -26,8 +26,6 @@ void cCycleControler::poll()
 			delta = (double)((end - start) / (freq/10));
 			//Sleep(10);
 		}
-		//std::cout << "tick\n";
-		//std::cout << m_cycle_->get_duration() << "\n";
 
 		if (st.stop_requested())
 		{
@@ -40,7 +38,9 @@ void cCycleControler::poll()
 		critical_section.lock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
 		m_cycle_->next();
 
-		if (m_cycle_->get_total_step_number() - m_cycle_->get_current_step() == 0)
+		int total = m_cycle_->get_total_step_number();
+		int current = m_cycle_->get_current_step();
+		if (total - current == 0)
 		{
 			std::cout << "[*] Cycle controler step end\n";
 			m_table_->set_lines_white();
@@ -62,18 +62,17 @@ void cCycleControler::poll()
 				wxStatusBar* statusbar = object_manager->get_status_bar();
 				wxString statusstr = wxString::Format("100 %% performed...");
 				statusbar->SetLabelText(statusstr);
+				critical_section.unlock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
 
-				// Send click on STOP btn
+				// Send virtual click on STOP btn
 				wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDC_STARTBTN);
 				wxPostEvent(inst_, evt);
 
 				MessageBox(GetFocus(), L"End of cycle", L"Success", MB_OK);
-				critical_section.unlock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
 				break;
 			}
 		}
 		critical_section.unlock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
-
 	}
 kill:
 	std::cout << "[*] Cycle controler exitting daemon\n";

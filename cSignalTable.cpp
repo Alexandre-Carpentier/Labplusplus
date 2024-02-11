@@ -171,7 +171,7 @@ bool cSignalTable::sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, st
 {
 	for (auto&& chan : chan_list)
 	{
-		std::cout << chan.type << "\n";
+		//std::cout << chan.type << "\n";
 	}
 
 	std::list< CHAN_LEGEND_STRUCT>::iterator it;

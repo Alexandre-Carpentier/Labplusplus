@@ -44,6 +44,9 @@
     <ClCompile Include="cBtn.cpp">
       <Filter>Fichiers sources\Widget</Filter>
     </ClCompile>
+    <ClCompile Include="cDevice.cpp">
+      <Filter>Fichiers sources\DeviceBuilder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cProtocol.h">
@@ -63,6 +66,9 @@
     </ClInclude>
     <ClInclude Include="cBtn.h">
       <Filter>Fichiers sources\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="cDevice.h">
+      <Filter>Fichiers sources\DeviceBuilder</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

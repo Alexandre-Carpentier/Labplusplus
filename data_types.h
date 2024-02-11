@@ -43,6 +43,7 @@ typedef struct {
 	// General config
 	bool device_enabled;
 	wxString  device_name;
+	wxString  device_addr;
 	// Channels config
 
 	int chan_number;// = max_chan_number;										// flex sizer 1

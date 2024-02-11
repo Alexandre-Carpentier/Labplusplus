@@ -194,6 +194,9 @@
     <ClCompile Include="cSignalTable.cpp">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
+    <ClCompile Include="Plugin\cDevice.cpp">
+      <Filter>Fichiers sources\MainWindow\config</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -328,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="cSignalTable.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="Plugin\cDevice.h">
+      <Filter>Fichiers sources\MainWindow\config</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,8 @@
 #include <memory>
 #include "cObjectmanager.h"
 
+#include "cConfig.h"
+
 class cPlot;
 class cCycle;
 class cTick;
@@ -22,16 +24,19 @@ private:
 	wxPanel* table_leftpanel_ = nullptr;
 	wxPanel* table_rightpanel_ = nullptr;
 	wxBoxSizer* table_hsizer_ = nullptr;
-	const int COL_NB = 4;
+	const int COL_NB = 4; // Whitout plugin 
 	const int LINE_NB = 200;
+	size_t pugin_number = 0;
 
 	cDurationStatisticCtrl* stat = nullptr;
 	cCycle* m_cycle = nullptr;
 
+	cConfig* m_config_ = nullptr;
+
 	wxTextCtrl* loop = nullptr;
 
 public:
-	cTable(wxWindow* inst);
+	cTable(wxWindow* inst, cConfig* m_config);
 
 	~cTable();
 

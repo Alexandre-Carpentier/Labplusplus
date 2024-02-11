@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 
+/*
 typedef struct {
 	double pressure;
 	double voltage;
@@ -17,6 +18,14 @@ typedef struct {
 	double duration;
 
 }STEPSTRUCT, * PSTEPSTRUCT;
+*/
+
+typedef struct {
+	std::vector<std::pair<std::string,double>> controler_vec; // an agregation of instrument name and setpoints
+	int jumpto;
+	int jumpcount;
+	double duration;
+}STEPSTRUCT, * PSTEPSTRUCT;
 
 class cCycle
 {
@@ -24,7 +33,7 @@ class cCycle
 		int current_step;
 		int total_step;
 		int total_loop;
-		std::vector<PSTEPSTRUCT> step_table;
+		std::vector<STEPSTRUCT> step_table;
 
 	}CYCLESTRUCT, * PCYCLESTRUCT;
 
@@ -73,17 +82,12 @@ public:
 		}
 	}
 
-	void add_step_back(double pressure,
-		double voltage,
-		double flow,
-		double temperature,
-		double position,
-		double force,
-		double htriger,
-		double ltriger,
+	/*
+	void add_step_back(
+		std::pair<std::string, double> instruction,
+
 		int jumpto,
 		int jumpcount,
-		int frontshape,
 		double duration
 	)
 	{
@@ -99,38 +103,21 @@ public:
 		{
 			return;
 		}
-		std::cout << "pressure: " << pressure;
-		std::cout << "voltage: " << voltage;
-		std::cout << "flow: " << flow;
-		std::cout << "temperature: " << temperature;
-		std::cout << "position: " << position;
-		std::cout << "force: " << force;
-		std::cout << "htriger: " << htriger;
-		std::cout << "ltriger: " << ltriger;
+
 		std::cout << "jumpto: " << jumpto;
 		std::cout << "jumpcount: " << jumpcount;
-		std::cout << "frontshape: " << frontshape;
 		std::cout << "duration: " << duration;
 		std::cout << "\n";
 
-		p_items->pressure = pressure;
-		p_items->voltage = voltage;
-		p_items->flow = flow;
-		p_items->temperature = temperature;
-		p_items->position = position;
-		p_items->force = force;
-		p_items->htriger = htriger;
-		p_items->ltriger = ltriger;
 		p_items->jumpto = jumpto;
 		p_items->jumpcount = jumpcount;
-		p_items->frontshape = frontshape;
 		p_items->duration = duration;
 
 		pcycle->step_table.push_back(p_items);
 		pcycle->total_step++;
 		return;
 	}
-
+	*/
 	int get_current_loop()
 	{
 		if (pcycle != nullptr)
@@ -193,8 +180,8 @@ public:
 
 		for (int x = 0; x < pcycle->step_table.size(); x++)
 		{
-			delete pcycle->step_table.at(x);
-			pcycle->step_table.at(x) = nullptr;
+			//delete pcycle->step_table.at(x);
+			//pcycle->step_table.at(x) = nullptr;
 		}
 		pcycle->step_table.clear(); // Delete raw pointers before clearing vector to prevent memory leaks
 		pcycle->current_step = 0;
@@ -203,56 +190,24 @@ public:
 
 public:
 	void previous() { pcycle->current_step--; }
-	void next() { pcycle->current_step++; }
+	void next() { 
+		pcycle->current_step++; 
+	}
 
-	double get_pressure() {return pcycle->step_table[pcycle->current_step]->pressure; }
-	double get_pressure(const int index) { return pcycle->step_table[index]->pressure; }
-	double get_voltage() { return pcycle->step_table[pcycle->current_step]->voltage; }
-	double get_voltage(const int index) { return pcycle->step_table[index]->voltage; }
-	double get_flow() { return pcycle->step_table[pcycle->current_step]->flow; }
-	double get_flow(const int index) { return pcycle->step_table[index]->flow; }
-	double get_temperature() { return pcycle->step_table[pcycle->current_step]->temperature; }
-	double get_temperature(const int index) { return pcycle->step_table[index]->temperature; }
-	double get_position() { return pcycle->step_table[pcycle->current_step]->position; }
-	double get_position(const int index) { return pcycle->step_table[index]->position; }
-	double get_force() { return pcycle->step_table[pcycle->current_step]->force; }
-	double get_force(const int index) { return pcycle->step_table[index]->force; }
-	double get_htriger() { return pcycle->step_table[pcycle->current_step]->htriger; }
-	double get_htriger(const int index) { return pcycle->step_table[index]->htriger; }
-	double get_ltriger() { return pcycle->step_table[pcycle->current_step]->ltriger; }
-	double get_ltriger(const int index) { return pcycle->step_table[index]->ltriger; }
-	int get_jumpto() { return pcycle->step_table[pcycle->current_step]->jumpto; }
-	int get_jumpto(const int index) { return pcycle->step_table[index]->jumpto; }
-	int get_jumpcount() { return pcycle->step_table[pcycle->current_step]->jumpcount; }
-	int get_jumpcount(const int index) { return pcycle->step_table[index]->jumpcount; }
-	int get_frontshape() { return pcycle->step_table[pcycle->current_step]->frontshape; }
-	int get_frontshape(const int index) { return pcycle->step_table[index]->frontshape; }
-	double get_duration() { return pcycle->step_table[pcycle->current_step]->duration; }
-	double get_duration(const int index) { return pcycle->step_table[index]->duration; }
+	int get_jumpto() { return pcycle->step_table.at(pcycle->current_step).jumpto; }
+	int get_jumpto(const int index) { return pcycle->step_table.at(index).jumpto; }
+	int get_jumpcount() { return pcycle->step_table.at(pcycle->current_step).jumpcount; }
+	int get_jumpcount(const int index) { return pcycle->step_table.at(index).jumpcount; }
 
-	void set_pressure(const double p) { pcycle->step_table[pcycle->current_step]->pressure = p; }
-	void set_pressure(const double p, const int index) { pcycle->step_table[index]->pressure = p; }
-	void set_voltage(const double v) { pcycle->step_table[pcycle->current_step]->voltage = v; }
-	void set_voltage(const double v, const int index) { pcycle->step_table[index]->voltage = v; }
-	void set_flow(const double f) { pcycle->step_table[pcycle->current_step]->flow = f; }
-	void set_flow(const double f, const int index) { pcycle->step_table[index]->flow = f; }
-	void set_temperature(const double t) { pcycle->step_table[pcycle->current_step]->temperature = t; }
-	void set_temperature(const double t, const int index) { pcycle->step_table[index]->temperature = t; }
-	void set_position(const double pos) { pcycle->step_table[pcycle->current_step]->position = pos; }
-	void set_position(const double pos, const int index) { pcycle->step_table[index]->position = pos; }
-	void set_force(const double force) { pcycle->step_table[pcycle->current_step]->force = force; }
-	void set_force(const double force, const int index) { pcycle->step_table[index]->force = force; }
-	void set_htriger(const double ht) { pcycle->step_table[pcycle->current_step]->htriger = ht; }
-	void set_htriger(const double ht, const int index) { pcycle->step_table[index]->htriger = ht; }
-	void set_ltriger(const double lt) { pcycle->step_table[pcycle->current_step]->ltriger = lt; }
-	void set_ltriger(const double lt, const int index) { pcycle->step_table[index]->ltriger = lt; }
-	void set_jumpto(const int jt) { pcycle->step_table[pcycle->current_step]->jumpto; }
-	void set_jumpto(const int jt, const int index) { pcycle->step_table[index]->jumpto; }
-	void set_jumpcount(const int jc) { pcycle->step_table[pcycle->current_step]->jumpcount; }
-	void set_jumpcount(const int jc, const int index) { pcycle->step_table[index]->jumpcount; }
-	void set_frontshape(const int fs) { pcycle->step_table[pcycle->current_step]->frontshape; }
-	void set_frontshape(const int fs, const int index) { pcycle->step_table[index]->frontshape; }
-	void set_duration(const double d) { pcycle->step_table[pcycle->current_step]->duration; }
-	void set_duration(const double d, const int index) { pcycle->step_table[index]->duration; }
+	double get_duration() { return pcycle->step_table.at(pcycle->current_step).duration; }
+	double get_duration(const int index) { return pcycle->step_table.at(index).duration; }
+
+	void set_jumpto(const int jt) { pcycle->step_table.at(pcycle->current_step).jumpto = jt; }
+	void set_jumpto(const int jt, const int index) { pcycle->step_table.at(index).jumpto = jt; }
+	void set_jumpcount(const int jc) { pcycle->step_table.at(pcycle->current_step).jumpcount = jc; }
+	void set_jumpcount(const int jc, const int index) { pcycle->step_table.at(index).jumpcount = jc; }
+
+	void set_duration(const double d) { pcycle->step_table.at(pcycle->current_step).duration = d; }
+	void set_duration(const double d, const int index) { pcycle->step_table.at(index).duration = d; }
 };
 

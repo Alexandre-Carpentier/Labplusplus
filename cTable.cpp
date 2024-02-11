@@ -1,14 +1,19 @@
 #include "cTable.h"
 
 #include"cPlot.h"
+
 #include "cCycle.h"
 #include "cTick.h"
 #include <format>
 
-cTable::cTable(wxWindow* inst)
+class cConfig;
+class cDevice;
+
+cTable::cTable(wxWindow* inst, cConfig* m_config)
 {
 	std::cout << "cTable ctor...\n";
 	inst_ = inst;
+	m_config_ = m_config;
 	table_leftpanel_ = new wxPanel(inst, IDCTABLEPANELLEFT, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
 	table_leftpanel_->SetBackgroundColour(wxColor(240, 240, 240));
 
@@ -22,16 +27,33 @@ cTable::cTable(wxWindow* inst)
 	table_rightpanel_ = new wxPanel(inst, IDCTABLEPANELRIGHT, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
 	table_rightpanel_->SetBackgroundColour(wxColor(240, 240, 240));
 
+	// Retrieve ADDON information
+	std::vector<std::string>name_vec = m_config_->get_plugin_name_vec();
+	std::vector<std::string>unit_vec = m_config_->get_plugin_unit_vec();
+
+	pugin_number = unit_vec.size();
+	
+
 	// Create a wxGrid object
 	grid = new wxGrid(table_rightpanel_, IDCTABLEGRID, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
 
-	grid->CreateGrid(LINE_NB, COL_NB);
+	grid->CreateGrid(LINE_NB, COL_NB + pugin_number);
 	grid->SetDefaultRowSize(40, false);
 	grid->SetDefaultCellOverflow(false);
 	grid->SetDefaultCellFont(grid->GetFont().Scale(1));
 	grid->SetDefaultCellAlignment(wxALIGN_CENTRE, wxALIGN_CENTRE);
 
-	grid->SetColLabelValue(0, "Pressure (bar)");
+	int pos = 0;
+	grid->SetColLabelValue(pos, "Pressure (bar)");
+
+	int j = 0;
+	for (auto& unit : unit_vec)
+	{
+		pos++;
+		std::string name = name_vec.at(j); j++;
+		grid->SetColLabelValue(pos, name + std::string("(") + std::string(unit) + std::string(")"));
+	}
+
 	//grid->SetColLabelValue(1, "Voltage (V)");
 	//grid->SetColLabelValue(2, "Flow (SCCM)");
 	//grid->SetColLabelValue(3, "Temperature (°C)");
@@ -39,10 +61,11 @@ cTable::cTable(wxWindow* inst)
 	//grid->SetColLabelValue(5, "Force set (N)");
 	//grid->SetColLabelValue(1, "Triger H (V)");
 	//grid->SetColLabelValue(2, "Triger L (V)");
-	grid->SetColLabelValue(1, "Jump to (i)");
-	grid->SetColLabelValue(2, "Jump count (n)");
+
+	grid->SetColLabelValue(++pos, "Jump to (i)");
+	grid->SetColLabelValue(++pos, "Jump count (n)");
 	//grid->SetColLabelValue(5, "Front");
-	grid->SetColLabelValue(3, "Duration (s)");
+	grid->SetColLabelValue(++pos, "Duration (s)");
 
 	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 50);
 	wxStaticText* staticloop = new wxStaticText(table_rightpanel_, IDCSTATICLOOP, L"Total iteration:");
@@ -103,6 +126,10 @@ cCycle* cTable::load_cycle()
 		return nullptr;
 
 	std::cout << "new cCycle()\n";
+	if(m_cycle != nullptr)
+	{
+		m_cycle = nullptr;
+	}
 	m_cycle = nullptr;
 	m_cycle = new cCycle();
 	m_cycle->create_cycle();
@@ -114,6 +141,67 @@ cCycle* cTable::load_cycle()
 
 	m_cycle->set_current_loop(iloopnumber);
 
+	// For each table line
+	for (int row = 0; row < j; row++)
+	{
+		// Inc step number in struct
+		m_cycle->pcycle->total_step++;
+
+		// Fill the step struc for each line
+		STEPSTRUCT step;
+		step.duration = 0.0;
+		step.jumpcount = 0.0;
+		step.jumpto = 0.0;
+		step.controler_vec.clear();
+
+		// For each table collumn
+		int col_numb = 0;
+		col_numb = grid->GetNumberCols();
+		for (int col = 0; col < col_numb; col++)
+		{
+			// populate the std::pair with col name and col value
+			// put all std::pair in a vector
+			std::string name = grid->GetColLabelValue(col).ToStdString();
+			double value = wxAtof(grid->GetCellValue(row, col));		
+			step.controler_vec.push_back( std::make_pair(name, value) );
+			
+		}
+		// Add step to the std::vector
+		m_cycle->pcycle->step_table.push_back(step);
+
+		// extract table information (duration, jump to, ...)
+		// to fill extra field needed
+	}
+
+	int index = 0;
+	for (auto& item : m_cycle->pcycle->step_table)
+	{
+		for (auto& controler : item.controler_vec)
+		{
+			if (controler.first.compare(std::string("Duration (s)")) == 0)
+			{
+				item.duration = controler.second;
+			}
+			if (controler.first.compare("Jump to (i)") == 0)
+			{
+				item.jumpto = controler.second;
+			}
+			if (controler.first.compare("Jump count (n)") == 0)
+			{
+				item.jumpcount = controler.second;
+			}
+			index++;
+		}
+		// Sanity check
+		if (item.duration == 0.0)
+		{
+			MessageBox(GetFocus(), L"Step duration is too small", L"Be carefull", S_OK);
+			delete m_cycle;
+			return nullptr;
+		}
+	}
+
+	/*
 	for (int i = 0; i < j; i++)
 	{
 		double pressure = wxAtof(grid->GetCellValue(i, 0));
@@ -142,19 +230,16 @@ cCycle* cTable::load_cycle()
 			frontshape,
 			duration
 		);
-
-
 	}
+	*/
 
 	stat->start(m_cycle, this);
-
-
 	return m_cycle;
 }
 
 void cTable::set_line_highlight(const int line)
 {
-	for (int i = 0; i < COL_NB; i++)
+	for (int i = 0; i < COL_NB + pugin_number; i++)
 	{
 		grid->SetCellBackgroundColour(line - 1, i, *wxWHITE);
 		grid->SetCellBackgroundColour(line, i, *wxLIGHT_GREY);
@@ -167,7 +252,7 @@ void cTable::set_lines_white()
 {
 	for (int line = 0; line < m_cycle->get_total_step_number(); line++)
 	{
-		for (int i = 0; i < COL_NB; i++)
+		for (int i = 0; i < COL_NB + pugin_number; i++)
 		{
 			grid->SetCellBackgroundColour(line, i, *wxWHITE);
 			grid->Refresh();
@@ -191,7 +276,7 @@ int cTable::get_last_active_line()
 bool cTable::IsActiveLine(const int line)
 {
 	double cell = 0;
-	cell = wxAtof(grid->GetCellValue(line, COL_NB - 1));
+	cell = wxAtof(grid->GetCellValue(line, COL_NB + pugin_number - 1));
 	if (cell > 0.0)
 		return true;
 	else
@@ -201,9 +286,9 @@ bool cTable::IsActiveLine(const int line)
 void cTable::GridResize(wxGrid* grid)
 {
 	wxSize size = inst_->FromDIP(grid->GetSize());
-	for (int i = 0; i < COL_NB; i++)
+	for (int i = 0; i < COL_NB + pugin_number; i++)
 	{
-		grid->SetColSize(i, ((size.x - size.x / COL_NB) / COL_NB));
+		grid->SetColSize(i, ((size.x - size.x / (COL_NB + pugin_number)) / (COL_NB + pugin_number)));
 	}
 }
 
