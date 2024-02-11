@@ -152,7 +152,8 @@ void cPressure::save_current_device_config(int channel_index)
 	// Device name
 	//int iSelection = addr_ctrl->GetCurrentSelection();
 	//config.device_name = label.device_name[iSelection];
-	config.device_name = addr_ctrl->GetValue();
+	config.device_name = "Pace 6000";
+	config.device_addr = addr_ctrl->GetValue();
 
 	return;
 }
@@ -303,6 +304,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 			m_pressure_ = new cPacesim;
 			meas_manager->set_measurement(m_pressure_);
 			m_pressure_->set_device_addr("Simulated");
+			m_pressure_->set_device_name("Pace 6000");
 		}
 		evt.Skip();
 		return;
@@ -331,6 +333,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 
 	meas_manager->set_measurement(m_pressure_);
 	m_pressure_->set_device_addr(current);
+	m_pressure_->set_device_name("Pace 6000");
 	
 	evt.Skip();
 	return;

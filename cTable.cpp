@@ -44,7 +44,7 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	grid->SetDefaultCellAlignment(wxALIGN_CENTRE, wxALIGN_CENTRE);
 
 	int pos = 0;
-	grid->SetColLabelValue(pos, "Pressure (bar)");
+	grid->SetColLabelValue(pos, "Pace 6000 (bar)");
 
 	int j = 0;
 	for (auto& unit : unit_vec)

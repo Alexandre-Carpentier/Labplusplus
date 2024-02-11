@@ -11,7 +11,10 @@ cPacecom::cPacecom()
     result.buffer_size = 1;
 };
 
-std::string cPacecom::device_name() { return config_struct_.device_name.ToStdString(); }
+std::string cPacecom::device_name() { 
+    return config_struct_.device_name.ToStdString(); 
+}
+
 MEAS_TYPE cPacecom::device_type() { return PRESSURECONTROLER_INSTR; };
 
 size_t cPacecom::chan_count()

@@ -8,7 +8,10 @@ cDaqsim::cDaqsim()
     result.buffer_size = 1;
 };
 
-std::string cDaqsim::device_name() { return std::string("DAQSIM"); }
+std::string cDaqsim::device_name() { 
+    return config_struct_.device_name.ToStdString(); 
+}
+
 MEAS_TYPE cDaqsim::device_type() { return DAQ_INSTR; };
 size_t cDaqsim::chan_count()
 {

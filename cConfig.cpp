@@ -122,6 +122,10 @@ cConfig::cConfig(wxWindow* inst)
 
 	// Add cPressure to plugin vec
 	m_pressure = new cPressure(book);
+
+	//cDevice pressure_dev;
+	//pressure_dev.set_device_name("Pace 6000");
+
 	PLUGIN_DATA Pressure_struct;
 	Pressure_struct.name = L"Pace 6000.dll";
 	Pressure_struct.panel = m_pressure->get_right_panel();

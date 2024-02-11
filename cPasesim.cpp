@@ -8,7 +8,10 @@ cPacesim::cPacesim()
     result.buffer_size = 1;
 };
 
-std::string cPacesim::device_name() { return std::string("PACE 6000"); }
+std::string cPacesim::device_name() { 
+    return config_struct_.device_name.ToStdString();
+}
+
 MEAS_TYPE cPacesim::device_type() { return PRESSURECONTROLER_INSTR; };
 
 size_t cPacesim::chan_count()
