@@ -79,8 +79,8 @@
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>x64\Debug;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;G:\CODE\VS_PROJET\Lab++\ADDON</LibraryPath>
-    <IncludePath>C:\Program Files\IVI Foundation\VISA\Win64\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>x64\Debug;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;G:\CODE\VS_PROJET\Lab++\ADDON;G:\CODE\VS_PROJET\Lab++\LUA_LIB_542</LibraryPath>
+    <IncludePath>C:\Program Files\IVI Foundation\VISA\Win64\Include;G:\CODE\VS_PROJET\Lab++\LUA_LIB_542\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Release;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;$(LibraryPath)</LibraryPath>

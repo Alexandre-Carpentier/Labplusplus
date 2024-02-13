@@ -76,6 +76,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>G:\CODE\VS_PROJET\Lab++\ADDON\</OutDir>
+    <IncludePath>G:\CODE\VS_PROJET\Lab++\LUA_LIB_542\include;$(IncludePath)</IncludePath>
+    <LibraryPath>G:\CODE\VS_PROJET\Lab++\LUA_LIB_542;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)ADDON</OutDir>
