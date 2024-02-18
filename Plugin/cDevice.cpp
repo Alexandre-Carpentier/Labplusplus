@@ -65,7 +65,7 @@ std::string cDevice::get_plugin_name()
     return plugin_control_name;
 }
 
-std::string cDevice::plugin_unit()
+std::string cDevice::get_plugin_unit()
 {
     return plugin_control_unit;
 }

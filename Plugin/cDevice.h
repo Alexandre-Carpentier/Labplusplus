@@ -53,6 +53,11 @@ public:
     // attribute a name to the device
     void set_device_name(std::string name);
 
+    void set_lua_state_ptr(void* inst)
+    {
+        lua_state_ptr = inst;
+    }
+
     // SCPI interface
     void scpi_open(std::string addr);
     void scpi_write(std::string command);
@@ -61,16 +66,15 @@ public:
 
     // attribute a name to the device
     std::string get_device_name();
-public:
+
     // Get device type (reader / writter/ all)
-public:
+
     int get_device_access_type();
     // Get control name (access ALL only)
-public:
+
     std::string get_plugin_name();
     // Get control unit (access ALL only)
-public:
-    std::string plugin_unit();
+    std::string get_plugin_unit();
     // 
     // Get current measured value
     // Set current instrument set point
@@ -78,6 +82,10 @@ public:
     // Start plugin acquizition function
     // Stop plugin acquizition function
 
+    void* get_lua_state_ptr()
+    {
+        return lua_state_ptr;
+    }
 
 private:
     // Define if the plugin can be set, can be read, or both
@@ -87,6 +95,9 @@ private:
     PLUGIN_ACCESS plugin_access_type = READ;
     std::string plugin_control_name = "Voltage";
     std::string plugin_control_unit = "Volt";
+
+    // Store the lua instance here
+    void* lua_state_ptr = nullptr; 
 
     // Define the plugin device name used to display
     std::string device_name = "2280S";

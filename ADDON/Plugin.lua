@@ -58,3 +58,7 @@ end
 function lua_init()
 
 end
+
+function lua_close()
+	print("@LUA close called")
+end

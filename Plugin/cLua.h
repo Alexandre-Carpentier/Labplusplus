@@ -53,30 +53,8 @@ static void registerObj(lua_State* L)
 
 static int lua_CreateBuilder(lua_State* L)
 {
-	std::cout << "[*] lua_CreateObject\n";
-	/*
-	// Get object name from lua
-	std::string obj_str = lua_tostring(L, 1);
-	OBJTYPE type = OBJTYPE::OSCOPE;
-
-	// Get object protocol from lua
-	std::string protocol_str = lua_tostring(L, 1);
-	SCPIMODE protocol = SCPIMODE::COM;
-
-	// Build desired object
-	if (obj_str.compare("oscope") == 0)
-	{
-		type = OBJTYPE::OSCOPE;
-
-		if (protocol_str.compare("visa") == 0)
-		{
-			protocol = SCPIMODE::COM;
-		}
-	}
-	*/
-
+	std::cout << "[*] lua_CreateBuilder\n";
 	*reinterpret_cast<DeviceBuilder1**>(lua_newuserdata(L, sizeof(DeviceBuilder1*))) = new DeviceBuilder1();
-	// save object created 
 	luaL_setmetatable(L, "builder");
 
 	return 1;
@@ -118,7 +96,6 @@ static int luaProduceProtocol(lua_State* L)
 
 static int luaProducePanel(lua_State* L) 
 {
-	lua_display_stack(L);
 	wxWindow* wxInst = (wxWindow*) lua_touserdata(L, -1);
 	(*reinterpret_cast<DeviceBuilder1**>(luaL_checkudata(L, 1, "builder")))->ProducePanel(wxInst);
 	return 1;
@@ -126,7 +103,6 @@ static int luaProducePanel(lua_State* L)
 
 static int luaProduceImage(lua_State* L) 
 {
-	lua_display_stack(L);
 	wxWindow* wxInst = (wxWindow*)lua_touserdata(L, -1);
 	(*reinterpret_cast<DeviceBuilder1**>(luaL_checkudata(L, 1, "builder")))->ProduceImage(wxInst);
 	return 1;
@@ -134,7 +110,7 @@ static int luaProduceImage(lua_State* L)
 
 static int luaAddPanelCtrl(lua_State* L) 
 {
-	lua_display_stack(L);
+	//lua_display_stack(L);
 	CONTROLTYPE type = (CONTROLTYPE) lua_tointeger(L, 2);
 	int length = lua_tointeger(L, 3);
 	int height = lua_tointeger(L, 4);

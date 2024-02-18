@@ -146,10 +146,8 @@ cDevice* lua_start_vm(void* wxInst)
 		std::cout << "[LUA] Running lua_entrypoint...\n";
 		lua_getglobal(L, "lua_entrypoint");
 		if (lua_isfunction(L, -1))
-		{
-				
+		{			
 				// Call entrypoint with wxInstance arg
-
 			lua_pushlightuserdata(L, wxInst); // push pointer to lua
 			lua_pcall(L, /*1 arg*/1, /*1 return*/1, 0);
 
@@ -160,6 +158,7 @@ cDevice* lua_start_vm(void* wxInst)
 
 				builder = (DeviceBuilder1*) lua_touserdata(L, -1);
 				dev = builder->GetProduct();
+				dev->set_lua_state_ptr(L);
 
 				// Size properly items inside the sizer
 				dev->header_v_sizer->Add(dev->header_h_sizer); // Header
@@ -180,6 +179,21 @@ cDevice* lua_start_vm(void* wxInst)
 			CheckLua(L, lua_pcall(L, 1, 1, 0));
 		}
 	}
-	lua_close(L); // do not forget to free memory
+
 	return dev;
+}
+
+
+bool lua_stop_vm(cDevice* dev)
+{
+	lua_State* L = static_cast<lua_State *> (dev->get_lua_state_ptr());
+
+	lua_getglobal(L, "lua_close");
+	if (lua_isfunction(L, -1))
+	{
+		CheckLua(L, lua_pcall(L, 0, 0, 0));
+		//lua_close(L); // do not forget to free memory
+		return true;
+	}
+	return false;
 }
