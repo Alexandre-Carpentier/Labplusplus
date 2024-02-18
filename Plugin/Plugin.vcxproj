@@ -175,6 +175,9 @@
     <ClInclude Include="cProtocol.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ADDON\Plugin.lua" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

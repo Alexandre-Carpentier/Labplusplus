@@ -32,7 +32,7 @@ class cDevice
 {
 public:
     // cProtocol abstract COM,USB,TCP,DAQMX,VISA protocol
-    std::unique_ptr<plug_cProtocol> protocol;
+    plug_cProtocol* protocol;
 
     // Raw ptr of the right panel to load inside main application
     wxScrolled <wxPanel>* panel = nullptr;

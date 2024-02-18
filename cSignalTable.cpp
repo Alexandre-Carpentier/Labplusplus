@@ -210,10 +210,46 @@ bool cSignalTable::sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, st
 
 bool cSignalTable::sig_remove(MEAS_TYPE type, size_t pos)
 {
+	
+		// iterate until type is found
+
+	size_t counter = 0;
+	size_t item = 0;
+
+	for (auto& chan : chan_list)
+	{
+		if (chan.type != type) // Count dead signals
+		{
+			if (counter == sig_count_)
+			{
+				std::cout << "[!] Error at slot_register_range() max signal is reached\"" << sig_count_ << "\".\n";
+				return false;
+			}
+			counter++;
+		}
+		if (chan.type == type) // Signal type found
+		{
+			if (item == pos)
+			{
+				chan.channel_legend_name = "slot free";
+				break;
+			}
+			if (counter == sig_count_)
+			{
+				std::cout << "[!] Error at slot_register_range() max signal is reached\"" << sig_count_ << "\".\n";
+				return false;
+			}
+			item++;
+		}
+	}
+
+	/*
+	
+	size_t counter = 0;
 	std::list< CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_list.begin();
 
-	size_t counter = 0;
+	
 	while (it->type != type)
 	{
 		if (counter == sig_count_)
@@ -224,7 +260,7 @@ bool cSignalTable::sig_remove(MEAS_TYPE type, size_t pos)
 		counter++;
 		it++;
 	}
-
+	
 	size_t item = 0;
 	while (it->type == type)
 	{
@@ -241,11 +277,38 @@ bool cSignalTable::sig_remove(MEAS_TYPE type, size_t pos)
 		item++;
 		it++;
 	}
+
+	*/
 	return true;
 }
 
 bool cSignalTable::sig_read(MEAS_TYPE type, size_t pos, CHAN_LEGEND_STRUCT &read_value)
 {
+	size_t counter = 0;
+	size_t item = 0;
+
+	for (auto& chan : chan_list)
+	{
+		if (chan.type != type)
+		{
+			if (counter == sig_count_)
+			{
+				std::cout << "[!] Error at slot_register_range() max signal is reached\"" << sig_count_ << "\".\n";
+				return false;
+			}
+			counter++;
+		}
+		if(chan.type == type)
+		{
+			if (counter == sig_count_)
+			{
+				std::cout << "[!] Error at slot_register_range() max signal is reached\"" << sig_count_ << "\".\n";
+				return false;
+			}
+			item++;
+		}
+	}
+	/*
 	std::list< CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_list.begin();
 
@@ -277,5 +340,6 @@ bool cSignalTable::sig_read(MEAS_TYPE type, size_t pos, CHAN_LEGEND_STRUCT &read
 		item++;
 		it++;
 	}
+	*/
 	return true;
 }

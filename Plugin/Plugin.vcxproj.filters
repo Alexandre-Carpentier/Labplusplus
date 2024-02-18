@@ -71,4 +71,9 @@
       <Filter>Fichiers sources\DeviceBuilder</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ADDON\Plugin.lua">
+      <Filter>Fichiers sources\Lua</Filter>
+    </None>
+  </ItemGroup>
 </Project>

@@ -42,7 +42,7 @@ public:
 class DeviceBuilder1 : public Builder {
 private:
 
-    std::unique_ptr <cDevice> product;
+    cDevice* product;
 
     /**
      * A fresh builder instance should contain a blank product object, which is
@@ -59,7 +59,7 @@ public:
     }
 
     void Reset() {
-        this->product = std::make_unique<cDevice>();
+        this->product = new cDevice;
     }
 
     // build selected protocol
@@ -102,14 +102,20 @@ public:
       * memory leaks
       */
 
-    std::unique_ptr<cDevice> GetProduct()
+    void* GetObject()
     {
         // Scale controls on the panel before returning the full object
         //product->right_panel->SetSizerAndFit(product->grid_sizer);
 
-        std::unique_ptr <cDevice> result = std::move(product);
-        this->Reset();
-        return result;
+        return this;
+    }
+
+    cDevice* GetProduct()
+    {
+        // Scale controls on the panel before returning the full object
+        //product->right_panel->SetSizerAndFit(product->grid_sizer);
+
+        return this->product;
     }
 };
 #endif

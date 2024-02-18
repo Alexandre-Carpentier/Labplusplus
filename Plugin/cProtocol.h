@@ -80,7 +80,7 @@ class plug_cUsb : public plug_cProtocol
 // 
 class plug_cDaq : public plug_cProtocol
 {
-    std::string get_type()override { return std::string("DAQMX linked"); };
+    std::string get_type()override { return std::string("DAQMX"); };
     bool open(std::string addr) override;
     bool send(std::string cmd) override;
     bool recv(std::string& response) override;
@@ -97,7 +97,7 @@ class plug_cDaq : public plug_cProtocol
 // 
 class plug_cVisa : public plug_cProtocol
 {
-    std::string get_type()override { return std::string("VISA linked"); };
+    std::string get_type()override { return std::string("VISA"); };
     bool open(std::string addr) override;
     bool send(std::string cmd) override;
     bool recv(std::string& response) override;

@@ -8,23 +8,23 @@ void DeviceBuilder1::ProduceProtocol(SCPIMODE mode) const
 {
     if (mode == SCPIMODE::COM)
     {
-        this->product->protocol = std::make_unique <plug_cCom>();
+        this->product->protocol = new plug_cCom;
     }
     if (mode == SCPIMODE::TCP)
     {
-        this->product->protocol = std::make_unique <plug_cTcp>();
+        this->product->protocol = new plug_cTcp;
     }
     if (mode == SCPIMODE::USB)
     {
-        this->product->protocol = std::make_unique <plug_cUsb>();
+        this->product->protocol = new plug_cUsb;
     }
     if (mode == SCPIMODE::DAQMX)
     {
-        this->product->protocol = std::make_unique <plug_cDaq>();
+        this->product->protocol = new plug_cDaq;
     }
     if (mode == SCPIMODE::VISA)
     {
-        this->product->protocol = std::make_unique <plug_cVisa>();
+        this->product->protocol = new plug_cVisa;
     }
 }
 

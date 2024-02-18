@@ -1,8 +1,6 @@
 #include <wx/wx.h>
 
-
 #include "cIniCfg.h"
-
 
 #include <Windows.h>
 
@@ -33,9 +31,15 @@ void cInicfg::load_table(void)
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
 	cfg->SetPath(wxT("TABLE"));
 
-	for (int i = 0; i < MAX_TABLE_LINE; i++)
+	for (int row = 0; row < MAX_TABLE_LINE; row++)
 	{
-		index = "pressure"; index.append(wxString::Format("%i", i));
+		int col_count = m_table->grid->GetNumberCols();
+		for (int col = 0; col < col_count; col++)
+		{
+			index = wxString::Format("row%icol%i", row, col);
+			if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(row, col, str); }
+		}
+		/*index = "pressure"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "voltage"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
@@ -59,8 +63,9 @@ void cInicfg::load_table(void)
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
 		index = "duration"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 3, str); }
+		*/
 	}
-	cfg->DeleteAll();
+	//cfg->DeleteAll();
 	delete cfg;
 }
 
@@ -69,7 +74,7 @@ void cInicfg::save_table(void)
 	std::cout << "[*] cInicfg:save_table start...\n";
 	cObjectmanager* obj_manager = obj_manager->getInstance();
 	cTable* m_table = obj_manager->get_table();
-	int j = m_table->get_last_active_line();
+	int row_count = m_table->get_last_active_line();
 
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
 	cfg->SetPath(wxT("TABLE"));
@@ -77,8 +82,16 @@ void cInicfg::save_table(void)
 	//cfg->DeleteAll();
 
 	wxString str;
-	for (int i = 0; i < j; i++)
+	for (int row = 0; row < row_count; row++)
 	{
+		int col_count = m_table->grid->GetNumberCols();
+		for (int col = 0; col < col_count; col++)
+		{
+			
+			str = wxString::Format("row%icol%i", row, col);
+			cfg->Write(str, std::stof(m_table->grid->GetCellValue(row, col).ToStdString()));
+		}
+		/*
 		double pressure = wxAtof(m_table->grid->GetCellValue(i, 0));
 		double voltage = wxAtof(m_table->grid->GetCellValue(i, 0));
 		double flow = wxAtof(m_table->grid->GetCellValue(i, 0));
@@ -118,6 +131,7 @@ void cInicfg::save_table(void)
 		cfg->Write(str, frontshape);
 		str = "duration"; str.append(wxString::Format("%i", i));
 		cfg->Write(str, duration);
+		*/
 	}
 	delete cfg;
 }
