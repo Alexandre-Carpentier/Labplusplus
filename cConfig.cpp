@@ -268,8 +268,13 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 
 				// Attach the plugin DLL to the core system here
 				cDevice* dev = Attach(parent);
-				wxPanel* plugin_panel = dev->panel;
 
+				wxPanel* plugin_panel = nullptr;
+				if (dev != nullptr)
+				{
+					plugin_panel = dev->panel;
+				}
+				
 				// If new device is a writer: 
 				// add a new column in cTable with expected name and unit
 				// 0 == READ
@@ -352,7 +357,7 @@ std::vector<std::string> cConfig::get_plugin_unit_vec()
 	for (auto& plugin : plugin_vec)
 	{
 		if(plugin.device)
-			vec.push_back(plugin.device->plugin_unit());
+			vec.push_back(plugin.device->get_plugin_unit());
 	}
 	return vec;
 }

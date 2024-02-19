@@ -1,4 +1,6 @@
 #include "cLoader.h"
+#include "cLua.h"
+
 /*
 #ifndef _DEBUG
 class cMain :public wxFrame
@@ -88,6 +90,13 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 
 cDevice* Attach(wxWindow* inst)
 {
+    // Load LUA
+    cDevice *dev = lua_start_vm(inst);
+    return dev;
+}
+
+cDevice* Attach_(wxWindow* inst)
+{  
     // Define the object builder first
     // All differents creationnal choice are inside builder
     // it provide an interface to get the final object
@@ -130,7 +139,7 @@ cDevice* Attach(wxWindow* inst)
     builder->AddPanelCtrl(CONTROLTYPE::TXTFIELD, 400, 200, "*RST\\n");
 
     // Get the final product to return to the main application
-    dev = builder->GetProduct();
+    //dev = builder->GetProduct();
 
     // Size properly items inside the sizer
     dev->header_v_sizer->Add(dev->header_h_sizer); // Header
