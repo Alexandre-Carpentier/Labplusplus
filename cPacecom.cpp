@@ -26,16 +26,25 @@ size_t cPacecom::chan_count()
 int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 {
     config_struct_ = config_struct;
+    readpoint = 0.0;
+    setpoint = 0.0;
 
     // Create the proper implementation of cProtocol with a factory method
     //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISATCP, L"TCPIP0::169.254.254.001::inst0::INSTR");
     //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISASERIAL, L"\\\\.\\COM20");
     
-    //device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
-    device = factory.make(PROTOCOLENUM::VISASERIAL, config_struct_.device_name.ToStdWstring());
+    device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
+    //device = factory.make(PROTOCOLENUM::VISASERIAL, config_struct_.device_addr.ToStdWstring());
+
+    // TODO: test device not null
 
     err = device->init();
 
+    if (err.err_code != 0)
+    {
+        MessageBox(GetFocus(), L"Failed to launch cPacecom at init()", L"FAIL", S_OK);
+        return -1;
+    }
     // Reset the device
     device->write(L"*RST\n");
 
@@ -45,9 +54,6 @@ int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
     device->write(L":UNIT BAR\n");
     device->write(L":SOUR:SLEW:MODE max\n");
     device->write(L":OUTP 1\n");
-
-    readpoint = 0.0;
-    setpoint = 0.0;
 
     // acquizition loop
     acquireloop = std::jthread(&cPacecom::acquire, this);

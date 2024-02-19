@@ -46,6 +46,17 @@ err_struct cSerial::init()
 
 	//status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
 
+	// build VISA ressource ADDR \\.\COM34
+	int ret = device_name_.compare(0, 7, L"\\\\.\\COM");
+	if ( ret == 0)
+	{
+		// TCPIP0::169.254.254.001::inst0::INSTR
+		// \\\\.\\COM20
+		// ASRL*::INSTR
+
+		device_name_ = L"ASRL*::INSTR";
+	}
+
 	status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{

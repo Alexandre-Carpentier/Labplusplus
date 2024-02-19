@@ -22,7 +22,7 @@
 #include "cMeasurementControler.h"
 
 //#pragma comment (lib, "Plugin.lib")
-#include "..\Lab++\Plugin\cDevice.h"
+#include "..\Lab\Plugin\cDevice.h"
 
 
 class cConfig : public wxFrame
