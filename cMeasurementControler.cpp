@@ -203,9 +203,8 @@ void cMeasurementControler::poll()
 		
 						switch (type)
 						{
-						case MEAS_TYPE::PRESSURECONTROLER_INSTR:
-						{
-							
+						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
+						{					
 							static double old_pressure=0.0;
 							m_cyclecontroler_->critical_section.lock(); ////////////////////////////////CRITICAL_SECTION///////////
 							value = get_instr_setpoint(meas, m_cycle_->pcycle->step_table, m_cycle_->get_current_step());

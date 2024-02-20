@@ -12,7 +12,7 @@ std::string cPacesim::device_name() {
     return config_struct_.device_name.ToStdString();
 }
 
-MEAS_TYPE cPacesim::device_type() { return PRESSURECONTROLER_INSTR; };
+MEAS_TYPE cPacesim::device_type() { return PRESSURE_CONTROLER_INSTR; };
 
 size_t cPacesim::chan_count()
 {

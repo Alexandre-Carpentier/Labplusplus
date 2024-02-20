@@ -51,7 +51,7 @@ public:
     void DisplayConfiguration();
 
     // attribute a name to the device
-    void set_device_name(std::string name);
+
 
     void set_lua_state_ptr(void* inst)
     {
@@ -64,17 +64,17 @@ public:
     std::string scpi_read();
     void scpi_close();
 
-    // attribute a name to the device
+
     std::string get_device_name();
+    int get_access_type();
+    std::string get_measurement_name();
+    std::string get_measurement_unit();
 
-    // Get device type (reader / writter/ all)
+    void set_device_name(std::string name);
+    void set_access_type(int type);
+    void set_measurement_name(std::string meas_name);
+    void set_measurement_unit(std::string meas_unit);
 
-    int get_device_access_type();
-    // Get control name (access ALL only)
-
-    std::string get_plugin_name();
-    // Get control unit (access ALL only)
-    std::string get_plugin_unit();
     // 
     // Get current measured value
     // Set current instrument set point
@@ -88,19 +88,14 @@ public:
     }
 
 private:
-    // Define if the plugin can be set, can be read, or both
-    // If writable, plugin must provide a unit to control in cTable.
-    // This property must be accessible when launched
-
+    // Plugin information
+    std::string device_name = "2280S";
     PLUGIN_ACCESS plugin_access_type = READ;
-    std::string plugin_control_name = "Voltage";
-    std::string plugin_control_unit = "Volt";
+    std::string plugin_measurement_name = "Voltage";
+    std::string plugin_measurement_unit = "Volt";
 
     // Store the lua instance here
     void* lua_state_ptr = nullptr; 
-
-    // Define the plugin device name used to display
-    std::string device_name = "2280S";
 
     // When controls are drawn on plugin book
     void OnPaint();

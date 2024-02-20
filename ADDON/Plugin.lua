@@ -10,7 +10,7 @@ function lua_entrypoint(wxInst)
 	builder1 = builder()
 
 	-- ProduceProtocol(SCPIMODE)
-	-- 	Determine the protocol to use to link instrument. This this the
+	-- 	Determine the protocol to use to link instrument. This is the
 	--  different implementation available here. COM is full compatible
 	--  RS232 driver implemented in the low level. TCP provide standard socket send/recv
 	--  communication. USB is using VISA from the IVI foundation and support National Instrument.
@@ -40,10 +40,10 @@ function lua_entrypoint(wxInst)
 	-- 	arg2: length
 	-- 	arg3: height
 	-- 	arg4: name of the control	
-	builder1:AddPanelCtrl(1, 400, 30, "initialisation de l'alimentation")
-	builder1:AddPanelCtrl(2, 200, 200, "*RST\\nOUTP:1\\n")
+	builder1:AddPanelCtrl(1, 400, 30, "initialisation alimentation")
+	builder1:AddPanelCtrl(2, 200, 100, "*RST\\nOUTP:1\\n")
 	builder1:AddPanelCtrl(1, 400, 30, "commande de lecture de l'appareil")
-	builder1:AddPanelCtrl(2, 200, 200, "SOUR1:SENS?\n")
+	builder1:AddPanelCtrl(2, 200, 100, "SOUR1:SENS?\n")
 	builder1:AddPanelCtrl(1, 400, 30, "commande de consigne")
 	builder1:AddPanelCtrl(2, 200, 200, "SOUR1:SET 10\n")
 	builder1:AddPanelCtrl(1, 400, 30, "sequence de nettoyage")

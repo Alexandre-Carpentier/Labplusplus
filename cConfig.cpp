@@ -346,7 +346,7 @@ std::vector<std::string> cConfig::get_plugin_name_vec()
 	for (auto& plugin : plugin_vec)
 	{
 		if (plugin.device)
-			vec.push_back(plugin.device->get_plugin_name());
+			vec.push_back(plugin.device->get_device_name());
 	}
 	return vec;
 }
@@ -357,7 +357,7 @@ std::vector<std::string> cConfig::get_plugin_unit_vec()
 	for (auto& plugin : plugin_vec)
 	{
 		if(plugin.device)
-			vec.push_back(plugin.device->get_plugin_unit());
+			vec.push_back(plugin.device->get_measurement_unit());
 	}
 	return vec;
 }

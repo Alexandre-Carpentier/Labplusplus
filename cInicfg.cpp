@@ -89,7 +89,12 @@ void cInicfg::save_table(void)
 		{
 			
 			str = wxString::Format("row%icol%i", row, col);
-			cfg->Write(str, std::stof(m_table->grid->GetCellValue(row, col).ToStdString()));
+			//crash
+			std::string value = m_table->grid->GetCellValue(row, col).ToStdString();
+			if (value.size() > 0)
+			{
+				cfg->Write(str, std::stof(value));
+			}		
 		}
 		/*
 		double pressure = wxAtof(m_table->grid->GetCellValue(i, 0));

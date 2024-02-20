@@ -233,10 +233,10 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			cSignalTable* sigt = sigt->getInstance();
 
 			// Remove old range
-			sigt->slot_remove_range(MEAS_TYPE::PRESSURECONTROLER_INSTR);
+			sigt->slot_remove_range(MEAS_TYPE::PRESSURE_CONTROLER_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register(MEAS_TYPE::PRESSURECONTROLER_INSTR))
+			if (!sigt->slot_register(MEAS_TYPE::PRESSURE_CONTROLER_INSTR))
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -273,7 +273,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 
 	
 	// Destroy item in the list
-	bool isDestroyed = meas_manager->destroy_subsystem(PRESSURECONTROLER_INSTR);
+	bool isDestroyed = meas_manager->destroy_subsystem(PRESSURE_CONTROLER_INSTR);
 	// If item destroyed delete from memory
 	if (isDestroyed)
 	{
@@ -381,7 +381,7 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_remove(MEAS_TYPE::PRESSURECONTROLER_INSTR, 0))
+		if (!sigt->sig_remove(MEAS_TYPE::PRESSURE_CONTROLER_INSTR, 0))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -405,7 +405,7 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURECONTROLER_INSTR, "Pace 6000", instr_name, "Bar", wxColor(45, 30, 30)))
+		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURE_CONTROLER_INSTR, "Pace 6000", instr_name, "Bar", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
 		}

@@ -57,7 +57,8 @@ err_struct cSerial::init()
 		device_name_ = L"ASRL*::INSTR";
 	}
 
-	status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
+	//status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
+	status = viOpen(ressource_manager, (ViRsrc)"ASRL4::INSTR", VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failled."), -2 };

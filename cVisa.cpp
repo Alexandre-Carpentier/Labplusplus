@@ -101,14 +101,37 @@ err_struct cVisa::write(std::wstring scpi)
 err_struct cVisa::read(std::wstring& scpi)
 {
 
-	char msg[100];
+	char msg[100]= "";
 	ViUInt32 iRead = 0;
-	ViStatus res = viRead(device_, (ViBuf)msg, sizeof(msg), &iRead);
+	ViStatus res = viRead(device_, (ViBuf)msg, sizeof(msg)-1, &iRead);
 	msg[iRead] = '\0';
+
+	printf("viRead:");
+	printf(msg);
+	printf("\n");
 
 	// TODO: check this part
 	if (res != VI_SUCCESS)
 	{
+
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
+		scpi = converter.from_bytes(msg);
+
+
+		char err_msg[100] = "";
+		res = viStatusDesc(device_, res, err_msg);
+		if (res == VI_SUCCESS)
+		{
+			printf("viRead error description: ");
+			printf(err_msg);
+			printf("\n");
+		}
+		last_error.err_msg = L"viRead error\n";
+		last_error.err_code = -2;
+
+		std::wcout << last_error.err_msg;
+		return last_error;
+		/*
 		char err_msg[100] = "";
 		res = viStatusDesc(device_, res, err_msg);
 		if (res == VI_SUCCESS)
@@ -122,8 +145,10 @@ err_struct cVisa::read(std::wstring& scpi)
 			{
 				utf8_str = "viStatusDesc error";
 			}
+
+			//todo: check this part
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
-			last_error.err_msg = converter.from_bytes(utf8_str);
+			last_error.err_msg = L"Error at Visa read!\n"; //converter.from_bytes(utf8_str);
 			last_error.err_code = -2;
 
 			// If characters present in the buffer
@@ -144,6 +169,7 @@ err_struct cVisa::read(std::wstring& scpi)
 			std::wcout << last_error.err_msg;
 			return last_error;
 		}
+		*/
 	}
 	else
 	{
@@ -155,6 +181,9 @@ err_struct cVisa::read(std::wstring& scpi)
 		// If characters present in the buffer
 		if (iRead > 0)
 		{
+			//wchar_t* wide = nullptr;
+			
+
 			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
 			scpi = converter.from_bytes(msg);
 		}

@@ -15,7 +15,7 @@ std::string cPacecom::device_name() {
     return config_struct_.device_name.ToStdString(); 
 }
 
-MEAS_TYPE cPacecom::device_type() { return PRESSURECONTROLER_INSTR; };
+MEAS_TYPE cPacecom::device_type() { return PRESSURE_CONTROLER_INSTR; };
 
 size_t cPacecom::chan_count()
 {
@@ -71,13 +71,14 @@ void cPacecom::acquire()
         {
             std::cout << "[*] New set point: " << setpoint <<"\n";
             std::wstring cmd;
-            cmd = std::format(L"SOUR:PRES {}\r", setpoint);
+            cmd = std::format(L"SOUR:PRES {}\r\n", setpoint);
             device->write(cmd); // Set to value
+            //device->write(L"SOUR:PRES 0\r\n");
             setpoint_saved = setpoint;  
         }
 
         std::wstring msg;
-        device->write(L":SENS?\r"); // Set to value
+        device->write(L":SENS?\r\n"); // Set to value
         device->read(msg);
 
         // Valid reading?
@@ -107,7 +108,7 @@ void cPacecom::acquire()
             readpoint = std::stof(wValue);
             // C++ style end
             
-            std::cout << "read pressure: " << readpoint << " bar\n";
+            std::cout << "[*] read pressure: " << readpoint << " bar\n";
             Sleep(100);
 
             // skip end loop
@@ -148,10 +149,10 @@ void cPacecom::set_device_name(std::string name)
 void cPacecom::stop_device() {
     std::cout << "cPacesim->stoping...\n"; acquireloop.request_stop();
 
-    device->write(L"SOUR:PRES 0\n"); // Set to value
+    device->write(L"SOUR:PRES 0\r\n"); // Set to value
     Sleep(3000);
-    device->write(L":OUTP 0\n"); // Set to value
-    device->write(L"LOC\n"); // Set to value
+    device->write(L":OUTP 0\r\n"); // Set to value
+    device->write(L"LOC\r\n"); // Set to value
     device->close();
 }
 

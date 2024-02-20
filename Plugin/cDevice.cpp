@@ -22,6 +22,21 @@ void cDevice::set_device_name(std::string name)
     device_name = name;
 }
 
+void cDevice::set_access_type(int type)
+{
+    this->plugin_access_type = (PLUGIN_ACCESS) type;
+}
+
+void cDevice::set_measurement_name(std::string meas_name)
+{
+    this->plugin_measurement_name = meas_name;
+}
+
+void cDevice::set_measurement_unit(std::string meas_unit)
+{
+    this->plugin_measurement_unit = meas_unit;
+}
+
 void cDevice::scpi_open(std::string addr)
 {
     std::cout << "[*] SCPI open called.\n";
@@ -55,19 +70,19 @@ std::string cDevice::get_device_name()
     return device_name;
 }
 
-int cDevice::get_device_access_type()
+int cDevice::get_access_type()
 {
     return static_cast<int>(plugin_access_type);
 }
 
-std::string cDevice::get_plugin_name()
+std::string cDevice::get_measurement_name()
 {
-    return plugin_control_name;
+    return plugin_measurement_name;
 }
 
-std::string cDevice::get_plugin_unit()
+std::string cDevice::get_measurement_unit()
 {
-    return plugin_control_unit;
+    return plugin_measurement_unit;
 }
 
 void cDevice::OnPaint()
