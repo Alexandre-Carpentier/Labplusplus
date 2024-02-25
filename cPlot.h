@@ -4,6 +4,9 @@
 #include <wx/treectrl.h>
 #include <wx/grid.h>
 
+#include <wx/bannerwindow.h>
+
+
 #include <list>
 #include <vector>
 #include <Windows.h>
@@ -55,7 +58,7 @@ public:
 	//void add_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color, size_t position);
 	//void draw_chan_to_gui();
 	//void remove_chan_to_gui(size_t position);
-	void update_chan_name_to_gui(std::string name, size_t position); // change the signal name in the channel btn class
+	void update_chan_name_to_gui(MEAS_TYPE type, std::string name, size_t position); // change the signal name in the channel btn class
 	void update_chan_physical_name_to_gui(std::string name, size_t position); // change the signal physical name in the channel btn class
 	void update_chan_physical_unit_to_gui(std::string unit, size_t position); // change the signal physical unit in the channel btn class
 	void update_chan_statistic_labels();

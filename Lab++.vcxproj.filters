@@ -98,7 +98,7 @@
     <ClCompile Include="cPlot.cpp">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
-    <ClCompile Include="cRender.cpp">
+    <ClCompile Include="cGraphrender.cpp">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
     <ClCompile Include="cScaleBtn.cpp">
@@ -197,6 +197,12 @@
     <ClCompile Include="Plugin\cDevice.cpp">
       <Filter>Fichiers sources\MainWindow\config</Filter>
     </ClCompile>
+    <ClCompile Include="encoding.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cStatrender.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -226,7 +232,7 @@
     <ClInclude Include="cPlot.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
-    <ClInclude Include="cRender.h">
+    <ClInclude Include="cGraphrender.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
     <ClInclude Include="cScaleBtn.h">
@@ -334,6 +340,12 @@
     </ClInclude>
     <ClInclude Include="Plugin\cDevice.h">
       <Filter>Fichiers sources\MainWindow\config</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cStatrender.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

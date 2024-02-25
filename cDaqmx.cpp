@@ -130,7 +130,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	////////////////////////////////////////////////////////////
 
 
-		//wxInitAllImageHandlers();
+	//wxInitAllImageHandlers();
 	//image.LoadFile(wxT("multi_function_daq_img600x300.png"), wxBITMAP_TYPE_PNG);
 	//image.LoadFile(wxT("IDB_PNG2"), wxBITMAP_TYPE_ANY);
 
@@ -195,14 +195,16 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	wxSize picture_size = inst->FromDIP(wxSize(32, 32));
 	wxImage prev_img = wxBitmap("BMP4", wxBITMAP_TYPE_PNG_RESOURCE).ConvertToImage();
-	wxButton* previous_chan = new wxBitmapButton(config_rightpanel_, IDCPREVIOUS, wxBitmap(prev_img.Scale(picture_size.GetWidth(), picture_size.GetHeight())), wxDefaultPosition, inst->FromDIP(wxSize(48, 48)), wxBORDER_SIMPLE);
+	previous_chan = new wxBitmapButton(config_rightpanel_, IDCPREVIOUS, wxBitmap(prev_img.Scale(picture_size.GetWidth(), picture_size.GetHeight())), wxDefaultPosition, inst->FromDIP(wxSize(48, 48)), wxBORDER_SIMPLE);
+	previous_chan->Enable(false);
 	//wxButton* previous_chan = new wxButton(config_rightpanel_, IDCPREVIOUS, "Previous", wxDefaultPosition, inst->FromDIP(wxSize(100, 30)), wxBORDER_SUNKEN);
 	//previous_chan->SetFont(previous_chan->GetFont().Scale(text_size + 0.5f));
 	//previous_chan->SetBackgroundColour(wxColor(250, 248, 240));
 	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cDaqmx::OnPreviousCliqued, this, IDCPREVIOUS);
 	
 	wxImage next_img = wxBitmap("BMP5", wxBITMAP_TYPE_PNG_RESOURCE).ConvertToImage();
-	wxButton* next_chan = new wxBitmapButton(config_rightpanel_, IDCNEXT, wxBitmap(next_img.Scale(picture_size.GetWidth(), picture_size.GetHeight())), wxDefaultPosition, inst->FromDIP(wxSize(48, 48)), wxBORDER_SIMPLE);
+	next_chan = new wxBitmapButton(config_rightpanel_, IDCNEXT, wxBitmap(next_img.Scale(picture_size.GetWidth(), picture_size.GetHeight())), wxDefaultPosition, inst->FromDIP(wxSize(48, 48)), wxBORDER_SIMPLE);
+	next_chan->Enable(false);
 	//wxButton* next_chan = new wxButton(config_rightpanel_, IDCNEXT, "Next", wxDefaultPosition, inst->FromDIP(wxSize(100, 30)), wxSUNKEN_BORDER);
 	//next_chan->SetFont(next_chan->GetFont().Scale(text_size + 0.5f));
 	//next_chan->SetBackgroundColour(wxColor(250, 248, 240));
@@ -213,16 +215,27 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	// Draw btn with channel numbers 0 1 2 3 4 5 ...
 
-	wxGridSizer* chan_grid = new  wxGridSizer(max_chan_number, 0, 0);
+	chan_grid = new  wxGridSizer(max_chan_number, 0, 0);
 	for (int i = 0; i < max_chan_number; i++)
 	{
 		std::string ind; ind.append(std::to_string(i));
-		chanbtn[i] = new wxButton(config_rightpanel_, IDCCHANBTN0 + i, ind, wxDefaultPosition, inst->FromDIP(wxSize(18, 18)), wxSUNKEN_BORDER);
+		chanbtn[i] = new wxButton(config_rightpanel_, IDCCHANBTN0 + i, ind, wxDefaultPosition, inst->FromDIP(wxSize(18, 18)), wxBORDER_SUNKEN);
 		inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cDaqmx::OnChannelBtnNumberCliqued, this, IDCCHANBTN0 + i);
 		chanbtn[i]->SetFont(chanbtn[i]->GetFont().Scale(0.7f));
+		chanbtn[i]->Enable(false);
 		chan_grid->Add(chanbtn[i]);
 	}
-	chanbtn[0]->SetBackgroundColour(wxColor(120, 140, 120));
+	//chanbtn[0]->SetForegroundColour(wxColor(120, 140, 120));
+
+	// To remove native grey border arround btn at initialization
+	int i = max_chan_number;
+	for (auto& ch : chanbtn)
+	{
+		--i;
+		wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCCHANBTN0 + i);
+		wxPostEvent(inst_, evt);
+
+	}
 
 	//////////////////////////////////////////////////////////////////
 	// DAQ chan settings
@@ -553,8 +566,6 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	wxPostEvent(inst_, evt);
 }
 
-
-
 void cDaqmx::OnPaint(wxPaintEvent& event)
 {
 	// Load bitmap from ressource
@@ -618,6 +629,9 @@ void cDaqmx::show_next_channel()
 		load_current_device_config(label.channel_index);
 		load_current_chan_config(label.channel_index);
 
+		bool state = label.channel_enabled[label.channel_index];
+		EnableChannelItems(state);
+
 		// Mark button with color
 		if (label.channel_enabled[label.channel_index - 1] == true)
 			chanbtn[label.channel_index - 1]->SetBackgroundColour(wxColor(160, 250, 160)); // green
@@ -654,6 +668,9 @@ void cDaqmx::show_previous_channel()
 		// Load next channel
 		load_current_device_config(label.channel_index);
 		load_current_chan_config(label.channel_index);
+
+		bool state = label.channel_enabled[label.channel_index];
+		EnableChannelItems(state);
 
 		// Mark button with color
 		if (label.channel_enabled[label.channel_index + 1] == true)
@@ -744,7 +761,7 @@ void cDaqmx::save_current_chan_config(int channel_index)
 	}
 
 	// Channel name
-	config.channel_name[channel_index] = chan_name->GetValue();
+	//config.channel_name[channel_index] = chan_name->GetValue();
 
 	// Channel physical name
 	int iSelection = chan_addr_ctrl->GetCurrentSelection();
@@ -1155,7 +1172,13 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 			addr_ctrl->Enable(true);
 			checkchan->Enable(true);
-
+			
+			previous_chan->Enable(true);
+			next_chan->Enable(true);
+			for (auto& chan : chanbtn)
+			{
+				chan->Enable(true);
+			}
 		}
 		else
 		{
@@ -1164,6 +1187,13 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 			addr_ctrl->Enable(false);
 			checkchan->Enable(false);
+
+			previous_chan->Enable(false);
+			next_chan->Enable(false);
+			for (auto& chan : chanbtn)
+			{
+				chan->Enable(false);
+			}
 		}
 	}
 	evt.Skip();
@@ -1473,12 +1503,19 @@ void cDaqmx::DaqChanAllOn(bool enable)
 
 void cDaqmx::OnDaqChanNameModified(wxCommandEvent& evt)
 {
-	std::cout << "cObjectmanager->getInstance()\n";
-	cObjectmanager* object_manager = object_manager->getInstance();
-	cPlot* m_plot = object_manager->get_plot();
-	std::cout << chan_name->GetLabelText().ToStdString() << "\n";
+	// Filter click from previous and next
+	if (evt.GetId() == IDCCHANNAME)
+	{
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		std::cout << chan_name->GetValue().ToStdString() << "\n";
 
-	m_plot->update_chan_name_to_gui(chan_name->GetValue().ToStdString(), label.channel_index);
+		m_plot->update_chan_name_to_gui(MEAS_TYPE::DAQ_INSTR, chan_name->GetValue().ToStdString(), label.channel_index);
+		config.channel_name[label.channel_index] = chan_name->GetValue().ToStdString();
+	}
+
+	evt.Skip();
 }
 
 void cDaqmx::OnDaqChanPhysicalAddressNameModified(wxCommandEvent& evt)
@@ -1567,7 +1604,11 @@ void cDaqmx::OnDaqChanEnableBtn(wxCommandEvent& evt)
 	// Enable/disable controls
 	label.channel_enabled[label.channel_index] = !label.channel_enabled[label.channel_index];
 
-	EnableChannelItems(label.channel_enabled.at(label.channel_index));
+	bool state = label.channel_enabled.at(label.channel_index);
+	SwitchChannelON(state);
+	UpdateChannelSig(state);
+	EnableChannelItems(state);
+	SwitchChannelColor(state);
 	/*
 	if (!label.channel_enabled[label.channel_index])
 	{
@@ -1725,21 +1766,24 @@ bool cDaqmx::isDeviceMeasurable(std::string dev_name)
 	return true;
 }
 
-void cDaqmx::EnableChannelItems(bool isDisplayed)
+void cDaqmx::SwitchChannelON(bool isDisplayed)
 {
 	if (!isDisplayed)
 	{
 		checkchan->SetBackgroundColour(wxColor(250, 120, 120)); // RED
 		checkchan->SetLabel("OFF");
+	}
+	else
+	{
+		this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
+		this->checkchan->SetLabel("ON");
+	}
+}
 
-		/*
-		//If cPlot legend active remove it
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		m_plot->remove_chan_to_gui(label.channel_index);
-		*/
-
+void cDaqmx::UpdateChannelSig(bool isDisplayed)
+{
+	if (!isDisplayed)
+	{
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
 		if (!sigt->sig_remove(MEAS_TYPE::DAQ_INSTR, label.channel_index))
@@ -1752,7 +1796,60 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
 		m_plot->update_gui();
+	}
+	else
+	{
+		//wxString chan_name_str = config.channel_name[label.channel_index];
+		wxString chan_name_str = chan_name->GetValue();
 
+		wxString chan_physical_name = chan_addr_ctrl->GetValue();
+		wxString chan_physical_unit = meas_type_ctrl->GetValue();
+
+		//m_plot->add_chan_to_gui(chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255), label.channel_index);
+		std::cout << "cSignalTable->getInstance()\n";
+		cSignalTable* sigt = sigt->getInstance();
+		if (!sigt->sig_add(label.channel_index, MEAS_TYPE::DAQ_INSTR, chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255)))
+		{
+			MessageBox(nullptr, L"Critical error at sig_add in cSignalTable, cannot add the signal.", L"[!] Critical failure.", S_OK);
+		}
+
+		// Update signals in GUI
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->update_gui();
+	}
+}
+
+void cDaqmx::EnableChannelItems(bool isDisplayed)
+{
+	if (!isDisplayed)
+	{
+		//checkchan->SetBackgroundColour(wxColor(250, 120, 120)); // RED
+		//checkchan->SetLabel("OFF");
+
+		/*
+		//If cPlot legend active remove it
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->remove_chan_to_gui(label.channel_index);
+		*/
+
+		/*
+		std::cout << "cSignalTable->getInstance()\n";
+		cSignalTable* sigt = sigt->getInstance();
+		if (!sigt->sig_remove(MEAS_TYPE::DAQ_INSTR, label.channel_index))
+		{
+			MessageBox(nullptr, L"Critical error at sig_remove in cSignalTable, cannot delete the signal.", L"[!] Critical failure.", S_OK);
+		}
+
+		// Update signals in GUI
+		std::cout << "cObjectmanager->getInstance()\n";
+		cObjectmanager* object_manager = object_manager->getInstance();
+		cPlot* m_plot = object_manager->get_plot();
+		m_plot->update_gui();
+		*/
 		// Disallow editing
 		chan_name->Enable(false);
 		chan_addr_ctrl->Enable(false);
@@ -1770,13 +1867,13 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		chan_trigger_threshold->Enable(false);
 
 		// Mark button grid item as dark
-		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120));
+		//chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120));
 
 	}
 	else
 	{
-		this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
-		this->checkchan->SetLabel("ON");
+		//this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
+		//this->checkchan->SetLabel("ON");
 
 		/*
 		//Update cPlot gui with the chan name and color
@@ -1785,6 +1882,7 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		cPlot* m_plot = object_manager->get_plot();
 		*/
 
+		/*
 		//wxString chan_name_str = chan_name->GetValue();
 		wxString chan_name_str = config.channel_name[label.channel_index];
 		
@@ -1804,7 +1902,7 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		cObjectmanager* object_manager = object_manager->getInstance();
 		cPlot* m_plot = object_manager->get_plot();
 		m_plot->update_gui();
-
+		*/
 		// Allow editing
 		chan_name->Enable(true);
 		chan_addr_ctrl->Enable(true);
@@ -1831,8 +1929,22 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		}
 
 		// Mark button grid item as green
-		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(160, 250, 160));
+		//chanbtn[label.channel_index]->SetBackgroundColour(wxColor(160, 250, 160));
 
+	}
+}
+
+void cDaqmx::SwitchChannelColor(bool isDisplayed)
+{
+	if (!isDisplayed)
+	{
+		// Mark button grid item as dark
+		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120));
+	}
+	else
+	{
+		// Mark button grid item as green
+		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(160, 250, 160));
 	}
 }
 

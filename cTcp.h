@@ -6,6 +6,8 @@
 #include <iostream>
 #include <locale>
 #include <codecvt>
+
+#include "encoding.h"
 #include "cVisa.h" 
 
 // A Tcp class is a Visa protocol

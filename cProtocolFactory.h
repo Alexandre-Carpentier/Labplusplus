@@ -8,7 +8,7 @@
 #include "cCom.h"
 #include <string>
 
-enum PROTOCOLENUM { SERIAL, USB, TCP, VISASERIAL, VISATCP };
+enum PROTOCOLENUM { COM, USB, TCP, VISASERIAL, VISATCP };
 
 class cProtocolFactory
 {

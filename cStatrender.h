@@ -8,18 +8,21 @@
 class cPlot;
 class cFooter;
 
-class cRender : public wxTimer
+class cStatrender : public wxTimer
 {
 public:
 
 	cPlot* m_plot_ = nullptr;
 	cFooter* m_footer_ = nullptr;
 
-	cRender(cPlot* m_plot, const short disp_freq);
+	cStatrender(cPlot* m_plot, const short disp_freq);
 
 	void add_freq_footer(cFooter* m_footer);
 
+
 	void Notify();
+
+
 
 };
 

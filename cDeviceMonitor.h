@@ -11,7 +11,7 @@
 #include "cSerial.h"
 #include "cProtocolFactory.h"
 
-const int refresh_rate = 5000;
+const int refresh_rate = 20000;
 
 class cDev
 {
@@ -35,7 +35,7 @@ class cDeviceMonitor : public wxTimer, public cSingleton<cDeviceMonitor>
 public:
 	cDeviceMonitor()
 	{
-		wxTimer::Start(refresh_rate);
+		Start(refresh_rate);
 	}
 
 	void Notify();

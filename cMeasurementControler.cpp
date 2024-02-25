@@ -207,7 +207,13 @@ void cMeasurementControler::poll()
 						{					
 							static double old_pressure=0.0;
 							m_cyclecontroler_->critical_section.lock(); ////////////////////////////////CRITICAL_SECTION///////////
-							value = get_instr_setpoint(meas, m_cycle_->pcycle->step_table, m_cycle_->get_current_step());
+							auto cycle = m_cycle_->get_cycle();
+							if (cycle)
+							{
+								value = get_instr_setpoint(meas, cycle->step_table, m_cycle_->get_current_step());
+							}
+							
+							//value = get_instr_setpoint(meas, m_cycle_->pcycle->step_table, m_cycle_->get_current_step());
 							m_cyclecontroler_->critical_section.unlock(); ////////////////////////////////CRITICAL_SECTION///////////
 							if(old_pressure == value)
 							{			

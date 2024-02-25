@@ -18,10 +18,10 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 	std::cout << "cMeasurementmanager->getInstance()\n";
 	meas_manager = meas_manager->getInstance();
 
-	plot_leftpanel_ = new wxPanel(inst, 11014, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
+	plot_leftpanel_ = new wxPanel(inst, PLOTLEFTPANEL, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
 	plot_leftpanel_->SetBackgroundColour(wxColor(220, 220, 225));
 
-	wxScrolled<wxPanel>* plot_legendpanel_ = new wxScrolled<wxPanel>(plot_leftpanel_, 11014, wxDefaultPosition, inst->FromDIP(wxSize(300, 400)));
+	wxScrolled<wxPanel>* plot_legendpanel_ = new wxScrolled<wxPanel>(plot_leftpanel_, PLOTLENGENDPANEL, wxDefaultPosition, inst->FromDIP(wxSize(300, 400)));
 	plot_legendpanel_->SetBackgroundColour(wxColor(90, 90, 93));
 	plot_legendpanel_->SetScrollRate(0, 10);
 	//plot_legendpanel_->SetScrollbar(wxVERTICAL, 0, 5, 50);
@@ -52,14 +52,24 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 
 	plot_leftpanel_->SetSizerAndFit(left_vsizer);
 
-	plot_rightpanel_ = new wxPanel(inst, 11015, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
-	plot_rightpanel_->SetBackgroundColour(wxColor(00, 60, 60));
+	plot_rightpanel_ = new wxPanel(inst, PLOTRIGHTPANEL, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
+	//plot_rightpanel_->SetBackgroundColour(wxColor(00, 60, 60));
+	plot_rightpanel_->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_DESKTOP));
 
-	wxRect r = /*inst_*/ plot_rightpanel_->GetClientRect();
+	/*
+	wxRect r = plot_rightpanel_->GetClientRect();
 	RECT rect;
 	rect.left = r.GetLeft(); rect.right = r.GetRight(); rect.top = r.GetTop(); rect.bottom = r.GetBottom();
-
 	hGraph = CreateGraph(plot_rightpanel_->GetHWND(), rect, 63, nbPoints);	// Max signal = 64
+	
+	*/
+
+	wxWindow* wxGraph = new wxWindow(plot_rightpanel_, PLOTWINDOW, wxDefaultPosition, wxSize(300, 300), wxSUNKEN_BORDER| wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN);
+	wxRect r = wxGraph->GetClientRect();
+	RECT rect;
+	rect.left = r.GetLeft(); rect.right = r.GetRight(); rect.top = r.GetTop(); rect.bottom = r.GetBottom();
+	hGraph = CreateGraph(wxGraph->GetHWND(), rect, 63, nbPoints);	// Max signal = 64
+
 
 	plot_hsizer_ = new wxBoxSizer(wxHORIZONTAL);
 	plot_hsizer_->Add(plot_leftpanel_, 0, wxEXPAND);
@@ -276,7 +286,7 @@ void cPlot::update_gui()
 	{
 		// update signal total number	
 		int sig_count = 0;
-		for (auto chan : chan_legend_struct_list)
+		for (auto &chan : chan_legend_struct_list)
 		{
 			if (chan.type != MEAS_TYPE::VOID_INSTR)
 			{
@@ -290,7 +300,7 @@ void cPlot::update_gui()
 
 		// set every valid signal in Wingraph + display in cPlot gui
 		int k = 0;
-		for (auto chan : chan_legend_struct_list)
+		for (auto &chan : chan_legend_struct_list)
 		{
 			if (chan.type != MEAS_TYPE::VOID_INSTR)
 			{
@@ -299,12 +309,14 @@ void cPlot::update_gui()
 					SetSignalLabel(hGraph, chan.channel_legend_name.c_str(), k);
 					SetSignalColor(hGraph, (int)chan.channel_legend_color.Red(), (int)chan.channel_legend_color.Green(), (int)chan.channel_legend_color.Blue(), k);
 				
+					
 					chan_info_btn_pool[k]->set_name(chan.channel_legend_name);
 					chan_info_btn_pool[k]->set_address(chan.channel_legend_addr);
 					chan_info_btn_pool[k]->set_unit(chan.channel_legend_unit);
 					chan_info_btn_pool[k]->set_color(chan.channel_legend_color);
 
 					chan_info_btn_pool[k]->Show();
+					std::cout << "update gui->name: " << chan.channel_legend_name << "\n";
 					k++;
 				}
 			}
@@ -332,8 +344,39 @@ void cPlot::update_gui()
 	*/
 }
 
-void cPlot::update_chan_name_to_gui(std::string name, size_t position)
+void cPlot::update_chan_name_to_gui(MEAS_TYPE type, std::string name, size_t position)
 {
+	// Update the sigtable
+	//
+
+	// Open
+	cSignalTable* sigt = sigt->getInstance();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+
+	// iterate until finding item
+	int pos = 0;
+	for (auto &chan : chan_legend_struct_list)
+	{
+		
+		if (chan.type == type)
+		{
+			if (pos == position)
+			{
+				if (chan.channel_legend_name.compare("slot free") != 0)
+				{
+					// update
+					chan.channel_legend_name = name;
+					std::cout << "update_chan_name_to_gui->name: " << chan.channel_legend_name << "\n";
+					sigt->set_signal_table(chan_legend_struct_list);
+					break;
+				}
+			}
+			pos++;
+
+		}
+	}
+	update_gui();
+
 	chan_info_btn_pool[position]->set_name(name);
 }
 
@@ -581,10 +624,10 @@ void cPlot::SizeGraph()
 {
 	if (inst_ != nullptr)
 	{
+		//wxRect r = plot_rightpanel_->GetClientSize();
 		wxRect r = plot_rightpanel_->GetClientRect();
 		ReshapeGraph(hGraph, r.GetLeft(), r.GetTop(), r.GetRight(), r.GetBottom());
 	}
-
 }
 
 void cPlot::RenderGraph()

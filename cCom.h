@@ -5,6 +5,7 @@
 #include <codecvt>
 #include <iostream>
 #include <vector>
+#include <cassert>
 #include "cProtocol.h"
 
 // A Com class is a protocol

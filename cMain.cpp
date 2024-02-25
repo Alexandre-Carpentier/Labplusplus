@@ -1,17 +1,5 @@
 #include "cMain.h"
 
-#include"cOpen.h"
-#include"cPlay.h"
-#include"cPlot.h"
-#include"cFooter.h"
-#include"cRender.h"
-#include"cTable.h"
-#include"cCycleControler.h"
-#include"cConfig.h"
-#include"cObjectmanager.h"
-#include"cInicfg.h"
-#include "LoadBitmapFromRessource.h"
-
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 EVT_TOOL(IDTOOL_OPENBTN, cMain::openButtonClicked)
 EVT_TOOL(IDTOOL_SAVEBTN, cMain::saveButtonClicked)
@@ -33,6 +21,15 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 #ifdef _DEBUG
 	//_crtBreakAlloc = 248;	
 #endif
+
+	/////////////////////////////////////////////////////////////
+	//
+	//	Called when close button is pressed
+	//
+
+	Bind(wxEVT_CLOSE_WINDOW, &cMain::OnCloseWindow, this);
+
+
 
 	/////////////////////////////////////////////////////////////
 	//
@@ -96,7 +93,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	toolbar->AddTool(IDTOOL_PLOT, wxT("Plot"), plot);
 	//toolbar->AddTool(IDTOOL_PLAYBTN, wxT("Play"), play);
 	toolbar->AddTool(IDTOOL_EXIT, wxT("Exit"), exit);
-	toolbar->SetToolBitmapSize(this->FromDIP(wxSize(32, 32)));
+	toolbar->SetToolBitmapSize(this->FromDIP(wxSize(64, 64)));
 	toolbar->SetBackgroundColour(*wxWHITE);
 	toolbar->Realize();
 
@@ -191,7 +188,8 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	plot_hsizer->Show(false);
 
 	main_vsizer->Add(plot_hsizer, 1, wxEXPAND);
-	m_render = new cRender(m_plot, DISP_FREQ);
+	m_graphrender = new cGraphrender(m_plot, DISP_FREQ);
+	m_statrender = new cStatrender(m_plot, 1000);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// PLAY WND
@@ -217,7 +215,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	wxBoxSizer* hfootersier = m_footer->GetSizer();
 
 	main_vsizer->Add(hfootersier, 0, wxEXPAND);
-	m_render->add_freq_footer(m_footer);
+	m_graphrender->add_freq_footer(m_footer);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// INI CONFIG LOADER
@@ -238,6 +236,11 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	//this->SetClientSize(this->FromDIP(wxSize(400, 300)));
 }
 
+void cMain::OnCloseWindow(wxCloseEvent& event)
+{
+	Destroy();
+}
+
 cMain::~cMain()
 {
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_render, m_footer deleted in cMain.cpp\n";
@@ -245,7 +248,8 @@ cMain::~cMain()
 	delete m_table;
 	delete m_config;
 	delete m_plot;
-	delete m_render;
+	delete m_graphrender;
+	delete m_statrender;
 	delete m_footer;
 
 #ifdef _DEBUG
@@ -365,16 +369,23 @@ void cMain::exitButtonClicked(wxCommandEvent& evt)
 	if (iResult == IDYES)
 	{
 		// TODO: Check if measurements are running and close it properly
-		// TODO: Save current table config
+		// TODO: Save current table config	
 
+		// Send click on STOP btn
+		bool on = m_plot->get_graph_state();
+		if (on)
+		{
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDC_STARTBTN);
+			wxPostEvent(this, evt);
+		}
+		m_graphrender->Stop();
+		m_statrender->Stop();
 		cMain::Close();
-		m_render->Stop();
 	}
 	else
 	{
 
 	}
-	evt.Skip();
 }
 
 void cMain::Paintevt(wxPaintEvent& evt)
@@ -383,15 +394,21 @@ void cMain::Paintevt(wxPaintEvent& evt)
 	{
 		m_table->GridResize(m_table->grid);
 	}
-
-	//this->config_rightpanel->Refresh();
+	if (m_graphrender)
+	{
+		m_graphrender->QuickNotify(); // Redraw graph
+	}
 	//this->Refresh();
 	evt.Skip();
 }
 
 void cMain::Sizeevt(wxSizeEvent& evt)
 {
-	this->Refresh();//////////////////////////////////////remove graph lag but degrade picture displayed in setting
+	if (m_graphrender)
+	{
+		m_graphrender->Notify(); // Redraw graph
+	}
+	this->Refresh();//////////////////////////////////////remove this line -> graph lag disapear but degrade picture displayed in setting	
 	evt.Skip();
 }
 
@@ -422,5 +439,10 @@ void cMain::MeasurementFolderButtonClicked(wxCommandEvent& evt)
 	GetCurrentDirectory(length, current_dir);
 	ShellExecute(NULL, L"explore", current_dir, NULL, NULL, SW_SHOWNORMAL);
 	evt.Skip();
+}
+
+void cMain::StopDiscoverDeviceTimer()
+{
+	devmon->lookup_stop();
 }
 

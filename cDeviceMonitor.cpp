@@ -35,17 +35,19 @@ void cDeviceMonitor::Notify()
 
 	for (auto& item : com)
 	{
-		std::cout << item << "\n";
+		//std::cout << item << "\n";
 
 		comaddr = comaddrbase;
 		comaddr.append(std::to_wstring(item));
 
 		// Create the proper implementation of cProtocol with a factory method
-		std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::SERIAL, comaddr.c_str());
+		std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISASERIAL, comaddr.c_str());
 
 		std::wstring instr_name = L"";
+		device->init();
 		device->write(L"*IDN?\r");
 		device->read(instr_name);
+		device->close();
 
 		cDev dev;	
 		dev.set_addr(comaddr);	
@@ -72,10 +74,15 @@ std::vector<cDev> cDeviceMonitor::get_device_vec()
 
 void cDeviceMonitor::lookup_stop()
 {
-	wxTimer::Stop();
+	bool run = this->IsRunning();
+	if (run)
+	{
+		Stop();
+	}
+	this->kill();
 }
 
 void cDeviceMonitor::lookup_start()
 {
-	wxTimer::Start();
+	Start();
 }

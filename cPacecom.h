@@ -2,11 +2,14 @@
 #include <winsock2.h> 
 #include <vector>
 #include <format>
+#include <cassert>
 
 #include "cVisa.h"
 #include "cTcp.h"
 #include "cSerial.h"
 #include "cProtocolFactory.h"
+
+#include "encoding.h"
 
 class cTick;
 class cMeasurement;
@@ -22,7 +25,6 @@ private:
 	cProtocolFactory factory;
 	std::unique_ptr<cProtocol> device;
 	err_struct err;
-
 
 	std::jthread acquireloop;
 public:
