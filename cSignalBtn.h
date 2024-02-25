@@ -34,7 +34,7 @@ class wxCustomButton : public wxWindow
     wxColor color_;
 
     static const int buttonWidth = 300;
-    static const int buttonHeight = 100;
+    static const int buttonHeight = 65;
 
 public:
     wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wxString address, wxColor color);

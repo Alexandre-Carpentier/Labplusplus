@@ -32,14 +32,14 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     wxButton* sinebtn = new wxButton(this, wxID_ANY, "", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxNO_BORDER);
     sinebtn->SetBitmap(wxBitmap(wxT("SINUSPNG"), wxBITMAP_TYPE_PNG_RESOURCE));
 
-    txt = new wxStaticText(this, wxID_ANY, name, wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
+    txt = new wxStaticText(this, wxID_ANY, name, wxDefaultPosition, this->FromDIP(wxSize(50, 20)), wxTE_CENTRE | wxNO_BORDER);
     wxFont font = txt->GetFont();
     font.SetPointSize(10);
     font.SetWeight(wxFONTWEIGHT_BOLD);
     txt->SetFont(font);
 
     picker = new wxColourPickerCtrl(this, IDCPICKER, *wxLIGHT_GREY, wxDefaultPosition,
-        this->FromDIP(wxSize(50, 15)), wxCLRP_DEFAULT_STYLE,
+        this->FromDIP(wxSize(50, 10)), wxCLRP_DEFAULT_STYLE,
         wxDefaultValidator,
         wxString(""));
 
@@ -79,9 +79,9 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
 
 
     wxBoxSizer* h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
-    min = new wxStaticText(this, wxID_ANY, "Min: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxNO_BORDER);
-    avg = new wxStaticText(this, wxID_ANY, "Average: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxNO_BORDER);
-    max = new wxStaticText(this, wxID_ANY, "Max: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxNO_BORDER);
+    min = new wxStaticText(this, wxID_ANY, "Min: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
+    avg = new wxStaticText(this, wxID_ANY, "Average: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
+    max = new wxStaticText(this, wxID_ANY, "Max: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
     reset = new wxButton(this, IDCRESET_STAT, "", wxPoint(0, 0), this->FromDIP(wxSize(10, 10)), wxNO_BORDER);
     reset->SetBitmap(wxBitmap(wxT("BACKARROWPNG"), wxBITMAP_TYPE_PNG_RESOURCE));
     this->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &wxCustomButton::reset_stat, this, IDCRESET_STAT);
