@@ -1,17 +1,6 @@
 #include "cFooter.h"
 
-#include "cPlot.h"
-#include "cConfig.h"
-#include "cTable.h"
-#include "cCycle.h"
-#include "cCycleControler.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
-#include "cMeasurementControler.h"
-#include "cDaqmx.h"
-#include "cPressure.h"
-#include "cUsb6001.h"
-#include "cScaleBtn.h"
+class cMain;
 
 cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config)
 {
@@ -68,7 +57,7 @@ cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_conf
 	wxStaticText* staticfreqtxt = new wxStaticText(inst_, IDC_FREQTXT, L"freq (ms):", wxDefaultPosition, inst->FromDIP(wxSize(60, 25)), wxTE_CENTER);
 	staticfreqtxt->SetBackgroundColour(wxColor(240, 245, 250));
 
-	freq = new wxTextCtrl(inst_, IDC_FREQTEXTCTRL, L"100", wxDefaultPosition, inst->FromDIP(wxSize(30, 25)));
+	freq = new wxTextCtrl(inst_, IDC_FREQTEXTCTRL, L"500", wxDefaultPosition, inst->FromDIP(wxSize(30, 25)));
 	freq->SetBackgroundColour(wxColor(255, 255, 255));
 	inst->Bind(wxEVT_COMMAND_TEXT_UPDATED, &cFooter::freqButtonClicked, this, IDC_FREQTEXTCTRL);
 
@@ -149,7 +138,13 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				return;
 			}
 
-			// Lock daq interface when running				
+			// Lock daq interface when running	
+			daqconfig->previous_chan->Enable(false);
+			daqconfig->next_chan->Enable(false);
+			for (auto& ch_btn : daqconfig->chanbtn)
+			{
+				ch_btn->Enable(false);
+			}	
 			daqconfig->device_group_sizer->GetStaticBox()->Enable(false);
 			daqconfig->channel_group_sizer->GetStaticBox()->Enable(false);
 			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(false);
@@ -234,8 +229,12 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			////////////////////////////////////////////////////////////////////////////////
 			// STOP CONTINUOUSLY LOOKING UP FOR DEVICE
 			////////////////////////////////////////////////////////////////////////////////
-			cDeviceMonitor* devmon = devmon->getInstance();
-			devmon->lookup_stop();
+			//cDeviceMonitor* devmon = devmon->getInstance();
+			//devmon->lookup_stop();
+			cMain* m_main = nullptr;
+			m_main = dynamic_cast<cMain*>(inst_);
+			if(m_main)
+				m_main->StopDiscoverDeviceTimer();
 
 			////////////////////////////////////////////////////////////////////////////////
 			// MEASUREMENT CONTROLER
@@ -280,7 +279,13 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 		else
 		{
-			// Unlock daq interface when running
+			// Unlock daq interface when not running 
+			daqconfig->previous_chan->Enable(true);
+			daqconfig->next_chan->Enable(true);
+			for (auto& ch_btn : daqconfig->chanbtn)
+			{
+				ch_btn->Enable(true);
+			}
 			daqconfig->device_group_sizer->GetStaticBox()->Enable(true);
 			daqconfig->channel_group_sizer->GetStaticBox()->Enable(true);
 			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(true);

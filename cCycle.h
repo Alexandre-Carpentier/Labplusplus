@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <cassert>
 
 /*
 typedef struct {
@@ -76,10 +77,13 @@ public:
 
 	PCYCLESTRUCT get_cycle()
 	{
+		assert(pcycle != nullptr);
+
 		if (pcycle != nullptr)
 		{
 			return pcycle;
 		}
+		return nullptr;
 	}
 
 	/*

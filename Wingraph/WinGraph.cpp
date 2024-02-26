@@ -444,6 +444,8 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 	{
 		if (NULL == (pgraph->signal[i] = (DATA*)malloc(sizeof(DATA))))
 		{
+			free(pgraph);
+			//todo: free signal already created
 			LeaveCriticalSection(&cs);
 			printf("[!] malloc failed to build signals buffer in CreateGraph()\n");
 			return NULL;
@@ -453,6 +455,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 		if (NULL == (pDATA->X = (double*)malloc(sizeof(double) * BufferSize)))
 		{
+			free(pgraph);
 			LeaveCriticalSection(&cs);
 			printf("[!] malloc failed to build signals buffer in CreateGraph()\n");
 			return NULL;
@@ -460,6 +463,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 		if (NULL == (pDATA->Y = (double*)malloc(sizeof(double) * BufferSize)))
 		{
+			free(pgraph);
 			LeaveCriticalSection(&cs);
 			printf("[!] malloc failed to build signals buffer in CreateGraph()\n");
 			return NULL;
@@ -467,6 +471,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 		if (NULL == (pDATA->Xnorm = (double*)malloc(sizeof(double) * BufferSize)))
 		{
+			free(pgraph);
 			LeaveCriticalSection(&cs);
 			printf("[!] malloc failed to build signals buffer in CreateGraph()\n");
 			return NULL;
@@ -474,6 +479,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 		if (NULL == (pDATA->Ynorm = (double*)malloc(sizeof(double) * BufferSize)))
 		{
+			free(pgraph);
 			LeaveCriticalSection(&cs);
 			printf("[!] malloc failed to build signals buffer in CreateGraph()\n");
 			return NULL;
@@ -516,6 +522,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 	SnapPlot = NULL;
 	if (NULL == (SnapPlot = (DATA*)malloc(sizeof(DATA))))
 	{
+		free(pgraph);
 		LeaveCriticalSection(&cs);
 		printf("[!] malloc failed to build temp signals buffer in CreateGraph()\n");
 		return NULL;
@@ -523,6 +530,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 	if (NULL == (SnapPlot->X = (double*)malloc(sizeof(double) * BufferSize)))
 	{
+		free(pgraph);
 		LeaveCriticalSection(&cs);
 		printf("[!] malloc failed to build temp signals buffer in CreateGraph()\n");
 		return NULL;
@@ -530,6 +538,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 	if (NULL == (SnapPlot->Y = (double*)malloc(sizeof(double) * BufferSize)))
 	{
+		free(pgraph);
 		LeaveCriticalSection(&cs);
 		printf("[!] malloc failed to build temp signals buffer in CreateGraph()\n");
 		return NULL;
@@ -537,6 +546,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 	if (NULL == (SnapPlot->Xnorm = (double*)malloc(sizeof(double) * BufferSize)))
 	{
+		free(pgraph);
 		LeaveCriticalSection(&cs);
 		printf("[!] malloc failed to build temp signals buffer in CreateGraph()\n");
 		return NULL;
@@ -544,6 +554,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 
 	if (NULL == (SnapPlot->Ynorm = (double*)malloc(sizeof(double) * BufferSize)))
 	{
+		free(pgraph);
 		LeaveCriticalSection(&cs);
 		printf("[!] malloc failed to build temp signals buffer in CreateGraph()\n");
 		return NULL;
@@ -555,12 +566,11 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 	memset(SnapPlot->Ynorm, 0, sizeof(double) * BufferSize);
 
 	pgraph->hParentWnd = hWnd;
-
+	/////////////////////////////////////////////
+	pgraph->hGraphWnd = hWnd;
+	/*
 	// Graph created in a "Static" control windows class named ""
 	// When redrawn the control will be painted with the graph in place of
-
-	//printf("[*] CreateGraph() of position l:%i t:%i r:%i b:%i \n", GraphArea.left, GraphArea.top, GraphArea.right, GraphArea.bottom );
-
 	pgraph->hGraphWnd = CreateWindow(
 		"Static",													// Predefined class; Unicode assumed 
 		"",															// The text will be erased by OpenGL
@@ -575,7 +585,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 		NULL);														// No parameters
 
 	// Sanity check
-
+	*/
 	if (NULL == pgraph->hGraphWnd)
 	{
 		printf("[!] CreateWindow() failed in CreateGraph()\n");
@@ -1414,19 +1424,18 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 	}
 
 	DATA* pDATA = NULL;
+	/*
 	if (cs.DebugInfo == NULL)
 	{
 		printf("[!] Error at AddPoints() critical section not available\n");
 		return;
 	}
-
-	EnterCriticalSection(&cs);
+	*/
 
 	// Sanity check
 
 	if (FALSE == pgraph->bRunning)
 	{
-		LeaveCriticalSection(&cs);
 		printf("[!] Error at AddPoints() graph not strated\n");
 		return;
 	}
@@ -1435,10 +1444,11 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 	if (pgraph->signalcount != PointsCount)
 	{
-		LeaveCriticalSection(&cs);
 		printf("[!] Error at AddPoints() signalcount not egual to y length\n");
 		return;
 	}
+
+	EnterCriticalSection(&cs);
 
 	// If the maximum points are reached 
 	// in the buffer, shift left the array and
@@ -1457,6 +1467,7 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 		}
 		pgraph->cur_nbpoints--;																				// Update the current point number
 	}
+	LeaveCriticalSection(&cs);
 
 	// Save the actual timestamp
 
@@ -1489,6 +1500,7 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 	char lpszDataValues[260] = ""; // char values accumulator for XLSX; be carefull max 260 char -> BOF
 
+	EnterCriticalSection(&cs);
 	for (int index = 0; index < pgraph->signalcount; index++)
 	{
 		pDATA = pgraph->signal[index];
@@ -1673,7 +1685,7 @@ BOOL Render(HGRAPH hGraph)
 
 	// Set the correct perspective.
 
-//gluOrtho2D(-0.08, 1.04, 0 - 0.08, 1 + 0.02);
+	//gluOrtho2D(-0.08, 1.04, 0 - 0.08, 1 + 0.02);
 
 	const float orthoLeft = -0.08f; const float orthoRight = 1.04f;
 	const float orthoBottom = -0.08f; const float orthoTop = 1.02f;
@@ -1691,7 +1703,7 @@ BOOL Render(HGRAPH hGraph)
 
 	// Clear Color and Depth Buffers
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	// Draw graph frame and grid
 

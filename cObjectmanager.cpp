@@ -5,7 +5,7 @@
 
 #include "cPlot.h"
 #include "cFooter.h"
-#include "cRender.h"
+#include "cGraphrender.h"
 #include "cTable.h"
 #include "cConfig.h"
 #include "cMeasurementControler.h"

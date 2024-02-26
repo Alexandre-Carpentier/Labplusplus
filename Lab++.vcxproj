@@ -186,7 +186,7 @@
     <ClCompile Include="cPressure.cpp" />
     <ClCompile Include="cProtocol.cpp" />
     <ClCompile Include="cProtocolFactory.cpp" />
-    <ClCompile Include="cRender.cpp" />
+    <ClCompile Include="cGraphrender.cpp" />
     <ClCompile Include="cScaleBtn.cpp" />
     <ClCompile Include="cSerial.cpp" />
     <ClCompile Include="cSignalBtn.cpp" />
@@ -198,8 +198,10 @@
     <ClCompile Include="cTick.cpp" />
     <ClCompile Include="cUSB6001.cpp" />
     <ClCompile Include="cVisa.cpp" />
+    <ClCompile Include="encoding.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
     <ClCompile Include="Plugin\cDevice.cpp" />
+    <ClCompile Include="cStatrender.cpp" />
     <ClCompile Include="xlsx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -230,12 +232,13 @@
     <ClInclude Include="cPressure.h" />
     <ClInclude Include="cProtocol.h" />
     <ClInclude Include="cProtocolFactory.h" />
-    <ClInclude Include="cRender.h" />
+    <ClInclude Include="cGraphrender.h" />
     <ClInclude Include="cScaleBtn.h" />
     <ClInclude Include="cSerial.h" />
     <ClInclude Include="cSignalBtn.h" />
     <ClInclude Include="cSignalTable.h" />
     <ClInclude Include="cSingleton.h" />
+    <ClInclude Include="cStatrender.h" />
     <ClInclude Include="cTable.h" />
     <ClInclude Include="cTcp.h" />
     <ClInclude Include="cTension.h" />
@@ -243,6 +246,7 @@
     <ClInclude Include="cUSB6001.h" />
     <ClInclude Include="cVisa.h" />
     <ClInclude Include="data_types.h" />
+    <ClInclude Include="encoding.h" />
     <ClInclude Include="enum.h" />
     <ClInclude Include="LoadBitmapFromRessource.h" />
     <ClInclude Include="Plugin\cDevice.h" />

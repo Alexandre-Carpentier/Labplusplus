@@ -6,9 +6,23 @@
 #include <Windows.h>
 #include <string>
 
-#include "data_types.h"
-#include "cDeviceMonitor.h"
+#include "cPlot.h"
+#include "cConfig.h"
+#include "cTable.h"
+#include "cCycle.h"
+#include "cCycleControler.h"
+#include "cObjectmanager.h"
+#include "cMeasurementmanager.h"
+#include "cMeasurementControler.h"
+#include "cDaqmx.h"
+#include "cPressure.h"
+#include "cUsb6001.h"
+#include "cScaleBtn.h"
 
+#include "data_types.h"
+#include "cMain.h"
+#include "cDeviceMonitor.h"
+/*
 class cPlot;
 class cConfig;
 class cTable;
@@ -17,6 +31,7 @@ class cCycleControler;
 class cObjectmanager;
 class cMeasurementmanager;
 class wxScaleButton;
+*/
 
 class cFooter
 {

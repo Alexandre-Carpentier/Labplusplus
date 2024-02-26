@@ -11,34 +11,41 @@ cTcp::cTcp(std::wstring addr)
 	:cVisa()
 {
 	std::wcout << L"[*] cSerial constructor called\n";
+	assert(addr.size() > 0);
 	device_name_ = addr;
 }
 
 err_struct cTcp::init()
 {
 	std::wcout << L"[*] cSerial init() called\n";
+	assert(ressource_manager>0);
 
 	if (device_name_.compare(L"magic") == 0)
 	{
 		//TCPIP0::169.254.254.001::inst0::INSTR
 		ViPFindList list = 0;
 		ViPUInt32 count = 0;
-		ViChar instrument_name[260] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, (char*)"TCPIP*?::*INSTR", list, count, instrument_name))
+#define INSTR_SIZE 260
+		ViChar instrument_name[INSTR_SIZE] = "";
+		if (VI_SUCCESS != viFindRsrc(ressource_manager, "TCPIP*?::*INSTR", list, count, instrument_name))
 		{
 			return { std::wstring(L"[!] viOpen() failled."), -1 };
 		}
+		assert(strnlen(instrument_name, INSTR_SIZE) > 0);
+
 		// Convert to wide string
-		std::string utf8_str = instrument_name;
-		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
-		device_name_ = converter.from_bytes(utf8_str);
+		device_name_ = ConvertUtf8ToWide(instrument_name);
+		assert(device_name_.size() > 0);
 	}
 
-	status = viOpen(ressource_manager, (ViRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
+	std::string device_utf8 = ConvertWideToUtf8(device_name_);
+	device_ = 0;
+	status = viOpen(ressource_manager, device_utf8.c_str(), VI_NO_LOCK, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failled."), -2 };
 	}
+	assert(device_ > 0);
 
 	// For Serial and TCP/IP socket connections enable the read Termination Character, or read's will timeout
 	ViChar fullAddress[100] = "";
@@ -47,11 +54,13 @@ err_struct cTcp::init()
 	{
 		return { std::wstring(L"[!] viGetAttribute() failled. It is not a ASRL device"), -3 };
 	}
+	viClear(device_);
 
 	viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE);
+	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0x0A); // CR=0x0D LF=0x0A
 
 	// Set timeout value to 500 ms
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 500);
+	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 100);
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
 	return last_error;
@@ -61,6 +70,7 @@ err_struct cTcp::close()
 {
 	std::wcout << L"[*] cSerial close() called\n";
 	viClose(device_);
+	viClose(ressource_manager);
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
 	return last_error;

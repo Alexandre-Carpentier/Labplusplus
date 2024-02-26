@@ -205,6 +205,27 @@ void cPressure::load_combobox(wxComboBox* combo, double floating)
 	}
 }
 
+void cPressure::DestroySubsystem()
+{
+	// Destroy and release previous ressource
+
+	std::cout << "[*] cMeasurementmanager->getInstance()\n";
+	meas_manager = meas_manager->getInstance();
+
+
+	// Destroy item in the list
+	bool isDestroyed = meas_manager->destroy_subsystem(PRESSURE_CONTROLER_INSTR);
+	// If item destroyed delete from memory
+	if (isDestroyed)
+	{
+		std::cout << "[*] [delete] m_daq in cPressure.cpp\n";
+
+		delete m_pressure_;
+		m_pressure_ = nullptr;
+	}
+	return;
+}
+
 void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 {
 	// Enable/disable controls
@@ -268,20 +289,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 {
 	// Destroy and release previous ressource
 
-	std::cout << "[*] cMeasurementmanager->getInstance()\n";
-	meas_manager = meas_manager->getInstance();
-
-	
-	// Destroy item in the list
-	bool isDestroyed = meas_manager->destroy_subsystem(PRESSURE_CONTROLER_INSTR);
-	// If item destroyed delete from memory
-	if (isDestroyed)
-	{
-		std::cout << "[*] [delete] m_daq in cPressure.cpp\n";
-
-		delete m_pressure_;
-		m_pressure_ = nullptr;
-	}
+	DestroySubsystem();
 
 	// Read the new sub system name selected
 	wxString current_device = this->addr_ctrl->GetValue();
@@ -378,6 +386,10 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		cPlot* m_plot = object_manager->get_plot();
 		m_plot->remove_chan_to_gui(m_plot->gui_get_last_active_channel_number()); // BUG // remove last
 		*/
+
+		// Kill instance
+
+		DestroySubsystem();
 
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();

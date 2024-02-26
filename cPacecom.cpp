@@ -67,8 +67,17 @@ void cPacecom::acquire()
     auto st = acquireloop.get_stop_token();
     while (!st.stop_requested())
     {
+        assert(setpoint< -1.0 && "setpoint < -1.0 bar in cPacecom::acquire()\n");
+        assert(setpoint > 20.0 && "setpoint >20.0 bar in cPacecom::acquire()\n");
+        assert(setpoint_saved < -1.0 && "setpoint_saved < -1.0 bar in cPacecom::acquire()\n");
+        assert(setpoint_saved > 20.0 && "setpoint_saved >20.0 bar in cPacecom::acquire()\n");
+
         if (setpoint != setpoint_saved)
         {
+
+            // PACE 6000 react with \r or \n or \r\n
+            // Be carefull to interact with the good end char...
+
             std::cout << "[*] New set point: " << setpoint <<"\n";
             std::wstring cmd;
             cmd = std::format(L"SOUR:PRES {}\r\n", setpoint);
@@ -83,6 +92,10 @@ void cPacecom::acquire()
 
         // Valid reading?
         // ex ":SENS:PRES - 0.0002771\r"
+        assert(msg.c_str() == nullptr && ":SENS?\\r\\n return msg == nullptr\n");
+        assert(msg.size() < 1 && ":SENS?\\r\\n return msg < 1 characters\n");
+        assert(msg.size() > 30 && ":SENS?\\r\\n return msg > 30 characters\n");
+
         if (msg.compare(0, wcslen(L":SENS:PRES"), L":SENS:PRES") == 0)
         {
             // extract floating point
@@ -105,7 +118,15 @@ void cPacecom::acquire()
 
             // C++ style
             std::wstring wValue = msg.substr(wcslen(L":SENS:PRES"));
+
+            assert(wValue.length() == 0 && ":SENS?\\r\\n return msg with no float value\n");
+            assert(wValue.length() > 20 && ":SENS?\\r\\n return msg with floatdigit > 20 values\n");
+
             readpoint = std::stof(wValue);
+
+            assert(readpoint < -1.0 && "readpoint < -1.0 bar\n");
+            assert(readpoint > 20.0 && "readpoint > 20.0 bar\n");
+
             // C++ style end
             
             std::cout << "[*] read pressure: " << readpoint << " bar\n";
@@ -133,6 +154,8 @@ DATAS cPacecom::read()
 
 void cPacecom::set(double value)
 {
+    assert(value < -1.0 && "setpoint < -1.0 bar in cPacecom::set(double value)\n");
+    assert(value > 20.0 && "setpoint >20.0 bar in cPacecom::set(double value)\n");
     setpoint = value;
 }
 

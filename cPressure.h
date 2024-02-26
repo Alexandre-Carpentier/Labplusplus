@@ -58,6 +58,8 @@ public:
 
 	void RefreshPort();
 
+	void DestroySubsystem();
+
 	void OnPressureEnableBtn(wxCommandEvent& evt);
 	void OnPressureAddrSelBtn(wxCommandEvent& evt);
 	void OnPaint(wxPaintEvent& event);

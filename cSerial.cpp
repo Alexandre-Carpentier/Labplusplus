@@ -11,58 +11,132 @@ cSerial::cSerial(std::wstring addr)
 	:cVisa()
 {
 	std::wcout << L"[*] cSerial constructor called\n";
+	assert(addr.size() > 0);
 	device_name_ = addr;
 }
 
 err_struct cSerial::init()
 {
 	std::wcout << L"[*] cSerial init() called\n";
+	assert(device_name_.size() > 0);
+	assert(ressource_manager > 0);
 
-	if (device_name_.compare(L"magic") == 0) // if magic used. No address is specified. Searching for the first one available
+	std::string device_utf8 = ConvertWideToUtf8(device_name_);
+
+	if (device_utf8.compare("magic") == 0) // if magic used. No address is specified. Searching for the first one available
 	{
+		device_utf8.clear();
+
 		//TCPIP0::169.254.254.001::inst0::INSTR
 		ViPFindList list = 0;
 		ViPUInt32 count = 0;
-		ViChar instrument_name[260] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, (char*)"ASRL*?::*INSTR", list, count, instrument_name))
+		
+#define INSTR_SIZE 512
+		char instr[INSTR_SIZE] = "";		
+		if (VI_SUCCESS != viFindRsrc(ressource_manager, "ASRL*?::*INSTR", list, count, instr))
 		{
 			return { std::wstring(L"[!] viFindRsrc() failled."), -1 };
 		}
 
-		// Convert to utf16 wide char (wchar_t)
-		std::string str_utf8 = instrument_name;
-		std::wstring_convert< std::codecvt_utf8_utf16<wchar_t>, wchar_t> converter;
-		device_name_ = converter.from_bytes(str_utf8);
-	}
-	else
-	{
-		/*
-		if (VI_SUCCESS != viOpenDefaultRM(&ressource_manager))
+		assert(count != nullptr);
+		assert(*count > 0 );
+		assert(list != nullptr);
+		assert(*list > 0 );
+
+		assert(strnlen(instr, INSTR_SIZE) > 0);
+
+		if (strnlen(instr, INSTR_SIZE) > 0)
 		{
-			return { std::wstring(L"[!] viOpenDefaultRM() failled."), -1 };
+			device_utf8 = instr; // load value into a standard string
 		}
-		*/
+		else
+		{
+			return { std::wstring(L"[!] viFindRsrc() failed. instrument returned is 0 characters"), -2 };
+		}
+
 	}
+	assert(device_utf8.size() > 0 );
+	assert(device_utf8.size() <  20 );
 
 	//status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
-
-	// build VISA ressource ADDR \\.\COM34
-	int ret = device_name_.compare(0, 7, L"\\\\.\\COM");
-	if ( ret == 0)
+	/*
+	// build VISA ressource address -> ex:\\.\COM34
+	// C Style
+	wchar_t* addr = nullptr;
+	int addr_length = (device_name_.size()+1);
+	addr = (wchar_t*) malloc(addr_length);
+	if(addr == nullptr)
 	{
-		// TCPIP0::169.254.254.001::inst0::INSTR
-		// \\\\.\\COM20
-		// ASRL*::INSTR
-
-		device_name_ = L"ASRL*::INSTR";
+		MessageBox(0, L"Fail", L"Fail to allocate addr buffer in cSerial::init()", S_OK);
+		return { std::wstring(L"[!] Fail to allocate addr buffer in cSerial::init()."), -2 };
 	}
 
+	// copy std::string
+	wchar_t com_id[4] = L"";
+	wcsncpy(addr, device_name_.c_str(), device_name_.size() + 1);
+	addr[device_name_.size() + 1] = L'\0';
+	for (int i = 0; i < wcslen(addr); i++)
+	{
+		int max_digit = 3;
+		if (addr[i] >= L'0' && addr[i] <= L'9')
+		{
+			// Sanitize
+			max_digit--;
+			if(max_digit==0)
+			{
+				return { std::wstring(L"[!] Fail to resolve addr com ID is > 3 digit."), -3 };
+			}
+			
+			com_id[i]=addr[i]; // One unicode char
+		}
+		i++;
+	}
+
+	// Sanitize
+	if (wcscmp(com_id, L"") == 0)
+	{
+		wcscpy(com_id, L"*");
+	}
+
+	free(addr);
+	addr = nullptr;
+
+	// C style end
+	*/
+
+	long com_numb = std::stol(device_utf8.substr(7));
+	if (com_numb < 0)
+	{
+		return { std::wstring(L"[!] strtol() failled."), -4 };
+	}
+	if (com_numb == 0)
+	{
+		return { std::wstring(L"[!] strtol() failled."), -5 };
+	}
+	if (com_numb > 255)
+	{
+		return { std::wstring(L"[!] strtol() failled."), -6 };
+	}
+
+	assert(com_numb >= 1 );
+	assert(com_numb < 255 );
+
+	std::string utf8_com_number = std::to_string(com_numb); // convert long to string
+	std::string visa_device = std::format("ASRL{}::INSTR", utf8_com_number);
+
+	assert(visa_device.size() <  14);
+
+	// TODO: check VI_NULL vs VI_NOLOCK
 	//status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
-	status = viOpen(ressource_manager, (ViRsrc)"ASRL4::INSTR", VI_NULL, 0, &device_);
+	//status = viOpen(ressource_manager, (ViRsrc)"ASRL4::INSTR", VI_NULL, 0, &device_);
+	device_ = 0;
+	status = viOpen(ressource_manager, visa_device.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
-		return { std::wstring(L"[!] viOpen() failled."), -2 };
+		return { std::wstring(L"[!] viOpen() failled."), -4 };
 	}
+
+	assert(device_ > 0);
 
 	// Clear line
 	status = viClear(device_);
@@ -72,10 +146,10 @@ err_struct cSerial::init()
 	viGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
 	if (strncmp("ASRL", fullAddress, 4) != 0)
 	{
-		return { std::wstring(L"[!] viGetAttribute() failled. It is not a ASRL device"), -3 };
+		return { std::wstring(L"[!] viGetAttribute() failled. It is not a ASRL device"), -5 };
 	}
 
-	// Set timeout value to x s
+	// Set timeout value to X s
 	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 100);
 
 	/*
@@ -128,6 +202,7 @@ err_struct cSerial::close()
 {
 	std::wcout << L"[*] cSerial close() called\n";
 	viClose(device_);
+	viClose(ressource_manager);
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
 	return last_error;

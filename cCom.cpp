@@ -67,7 +67,7 @@ err_struct cCom::init()
 	dcbSerialParams.StopBits = 0;
 	dcbSerialParams.Parity = 0;
 	dcbSerialParams.ByteSize = 8;
-	dcbSerialParams.EofChar = '\n';
+	dcbSerialParams.EofChar = '\r\n';
 
 	if (SetCommState(hCom, &dcbSerialParams) == 0)
 	{
@@ -103,6 +103,8 @@ err_struct cCom::init()
 
 err_struct cCom::write(std::wstring scpi)
 {
+	assert(scpi.size() > 0);
+
 	DWORD dwBytes = 0x0;
 	if (!WriteFile(hCom, scpi.c_str(), std::wcslen(scpi.c_str()), &dwBytes, nullptr))
 	{
@@ -111,6 +113,7 @@ err_struct cCom::write(std::wstring scpi)
 		return last_error;
 	}
 
+	assert(dwBytes > 0);
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
 	return last_error;
@@ -121,7 +124,7 @@ err_struct cCom::read(std::wstring& scpi)
 	size_t buff_size = 256;
 	std::vector<wchar_t> buffer;
 	buffer.resize(buff_size);
-
+	scpi.clear();
 	DWORD dwBytes = 0x0;
 
 	do

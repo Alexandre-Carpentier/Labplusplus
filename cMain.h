@@ -14,6 +14,19 @@
 #include <vector>
 #include <memory>
 
+#include"cOpen.h"
+#include"cPlay.h"
+#include"cPlot.h"
+#include"cFooter.h"
+#include"cGraphrender.h"
+#include"cStatrender.h"
+#include"cTable.h"
+#include"cCycleControler.h"
+#include"cConfig.h"
+#include"cObjectmanager.h"
+#include"cInicfg.h"
+#include "LoadBitmapFromRessource.h"
+
 #include "cDeviceMonitor.h"
 
 #pragma comment (lib, "WinGraph.lib")
@@ -28,7 +41,7 @@
 
 #pragma comment (lib, "Kernel32.lib")
 
-
+/*
 class cOpen;
 class cPlay;
 class cPlot;
@@ -39,20 +52,12 @@ class cCycleControler;
 class cConfig;
 class cObjectmanager;
 class cInicfg;
-
+*/
 class cMain :public wxFrame
 {
-
-
 public:
-
-	cMain();
-	~cMain();
-
-public:
-
-	enum { DISP_FREQ = 100 };						// ms to draw
-	enum { GRAPH_NBPOINTS = 1000000 };				// pts
+	enum { DISP_FREQ = 16 };						// ms to draw
+	enum { GRAPH_NBPOINTS = 10000 };				// pts
 
 	std::unique_ptr<cDeviceMonitor> devmon;
 
@@ -88,7 +93,8 @@ public:
 	wxPanel* plot_rightpanel = nullptr;
 	wxBoxSizer* plot_hsizer = nullptr;
 
-	cRender* m_render = nullptr;
+	cGraphrender* m_graphrender = nullptr;
+	cStatrender* m_statrender = nullptr;
 
 	cFooter* m_footer = nullptr;
 
@@ -97,6 +103,11 @@ public:
 	wxBoxSizer* main_vsizer = nullptr;
 
 	wxDECLARE_EVENT_TABLE();
+
+public:
+	cMain();
+	void OnCloseWindow(wxCloseEvent& event);
+	~cMain();
 
 	void settingsButtonClicked(wxCommandEvent& evt);
 	void openButtonClicked(wxCommandEvent& evt);
@@ -114,6 +125,6 @@ public:
 
 	wxPanel Getplotleftpanel(wxPanel* plot_leftpanel_);
 	void MeasurementFolderButtonClicked(wxCommandEvent& evt);
-
+	void StopDiscoverDeviceTimer();
 };
 

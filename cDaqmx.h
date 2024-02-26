@@ -71,6 +71,7 @@ public:
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
 	cMeasurement* m_daq_ = nullptr; // daq measurement gui
 
+	wxGridSizer* chan_grid = nullptr;
 	wxStaticBoxSizer* device_group_sizer = nullptr;
 	wxStaticBoxSizer* channel_group_sizer = nullptr;
 	wxStaticBoxSizer* channel_linearize_group_sizer = nullptr;
@@ -83,6 +84,9 @@ public:
 	//wxComboBox* max_ctrl = nullptr;
 	//wxComboBox* min_ctrl = nullptr;
 	//wxComboBox* mode_ctrl = nullptr;
+
+	wxButton* previous_chan = nullptr;
+	wxButton* next_chan = nullptr;
 
 	// enable
 	// Name to assign
@@ -214,7 +218,12 @@ public:
 	void OnChannelBtnNumberCliqued(wxCommandEvent& evt);
 	bool isDeviceMeasurable(std::string dev_name);
 
+	void SwitchChannelON(bool isDisplayed);
+
+	void UpdateChannelSig(bool isDisplayed);
+
 	void EnableChannelItems(bool isDisplayed);
+	void SwitchChannelColor(bool isDisplayed);
 	void show_voltage_param(bool show);
 	void show_tc_param(bool show);
 	void reload_current_channel_type();

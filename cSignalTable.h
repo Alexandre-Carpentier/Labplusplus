@@ -62,6 +62,11 @@ public:
 	std::list<CHAN_LEGEND_STRUCT> get_signal_table() {
 		return chan_list;
 	};
+
+	 void set_signal_table(std::list<CHAN_LEGEND_STRUCT> list) {
+		 chan_list = list;
+	};
+
 	size_t get_slot_signal_count(MEAS_TYPE type);
 
 	// register slot range / register slot

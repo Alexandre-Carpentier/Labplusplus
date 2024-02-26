@@ -25,16 +25,25 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
 {
     wxBoxSizer* h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
 
+    show = new wxCheckBox(this, IDCSHOWSIGNAL, /*Show*/"", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxCHK_2STATE);
+    show->SetValue(true);
+    this->Bind(wxEVT_CHECKBOX, &wxCustomButton::OnShowSignalChanged, this, IDCSHOWSIGNAL);
+
     wxButton* sinebtn = new wxButton(this, wxID_ANY, "", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxNO_BORDER);
     sinebtn->SetBitmap(wxBitmap(wxT("SINUSPNG"), wxBITMAP_TYPE_PNG_RESOURCE));
 
-    txt = new wxStaticText(this, wxID_ANY, name, wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
+    txt = new wxStaticText(this, wxID_ANY, name, wxDefaultPosition, this->FromDIP(wxSize(50, 20)), wxTE_CENTRE | wxNO_BORDER);
+    wxFont font = txt->GetFont();
+    font.SetPointSize(10);
+    font.SetWeight(wxFONTWEIGHT_BOLD);
+    txt->SetFont(font);
 
     picker = new wxColourPickerCtrl(this, IDCPICKER, *wxLIGHT_GREY, wxDefaultPosition,
-        this->FromDIP(wxSize(50, 15)), wxCLRP_DEFAULT_STYLE,
+        this->FromDIP(wxSize(50, 10)), wxCLRP_DEFAULT_STYLE,
         wxDefaultValidator,
         wxString(""));
 
+    h_sizer0->Add(show, 0, wxEXPAND|wxALL, 5);
     h_sizer0->Add(sinebtn, 0, wxEXPAND);
     h_sizer0->Add(txt, 0, wxALIGN_CENTER_VERTICAL);
     h_sizer0->AddStretchSpacer();
@@ -43,24 +52,36 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
 
     wxBoxSizer* h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
 
-    staticunit = new wxStaticText(this, wxID_ANY, "Unit: ", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
-    unit = new wxStaticText(this, wxID_ANY, "Volt", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
 
-    h_sizer1->Add(staticunit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
-    h_sizer1->Add(unit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
 
-    wxBoxSizer* h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
+    //wxBoxSizer* h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
 
     staticaddr = new wxStaticText(this, wxID_ANY, "Physical addr: ", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
     addr = new wxStaticText(this, wxID_ANY, address, wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
+    font = addr->GetFont();
+    font.SetPointSize(10);
+    font.SetStyle(wxFONTSTYLE_ITALIC);
+    addr->SetFont(font);
 
-    h_sizer2->Add(staticaddr, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
-    h_sizer2->Add(addr, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
+
+    staticunit = new wxStaticText(this, wxID_ANY, "Unit: ", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
+    unit = new wxStaticText(this, wxID_ANY, "Volt", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxTE_CENTRE | wxNO_BORDER);
+    font = unit->GetFont();
+    font.SetPointSize(10);
+    font.SetStyle(wxFONTSTYLE_ITALIC);
+    unit->SetFont(font);
+
+    h_sizer1->Add(staticaddr, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
+    h_sizer1->Add(addr, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
+    h_sizer1->Add(staticunit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
+    h_sizer1->Add(unit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
+
+
 
     wxBoxSizer* h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
-    min = new wxStaticText(this, wxID_ANY, "Min: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxNO_BORDER);
-    avg = new wxStaticText(this, wxID_ANY, "Average: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxNO_BORDER);
-    max = new wxStaticText(this, wxID_ANY, "Max: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxNO_BORDER);
+    min = new wxStaticText(this, wxID_ANY, "Min: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
+    avg = new wxStaticText(this, wxID_ANY, "Average: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
+    max = new wxStaticText(this, wxID_ANY, "Max: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
     reset = new wxButton(this, IDCRESET_STAT, "", wxPoint(0, 0), this->FromDIP(wxSize(10, 10)), wxNO_BORDER);
     reset->SetBitmap(wxBitmap(wxT("BACKARROWPNG"), wxBITMAP_TYPE_PNG_RESOURCE));
     this->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &wxCustomButton::reset_stat, this, IDCRESET_STAT);
@@ -72,29 +93,30 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     h_sizer3->Add(reset, 1, wxEXPAND);
 
 
-
+    /*
     wxBoxSizer* h_sizer4 = new wxBoxSizer(wxHORIZONTAL);
     show = new wxCheckBox(this, IDCSHOWSIGNAL, "Show", wxDefaultPosition, this->FromDIP(wxSize(100, 20)), wxTE_CENTRE | wxCHK_2STATE);
     show->SetValue(true);
     this->Bind(wxEVT_CHECKBOX, &wxCustomButton::OnShowSignalChanged, this, IDCSHOWSIGNAL);
 
     h_sizer4->Add(show, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
-
+    
     wxStaticLine* separator0 = new wxStaticLine(this,
         wxID_ANY,
         wxDefaultPosition,
-        this->FromDIP(wxSize(50, 2)),
+        this->FromDIP(wxSize(20, 2)),
         wxLI_HORIZONTAL,
         wxStaticLineNameStr
     );
-
+    */
     wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
     v_sizer->Add(h_sizer0, 1, wxEXPAND);
-    v_sizer->Add(separator0, 1, wxEXPAND);
+   
     v_sizer->Add(h_sizer1, 1, wxEXPAND);
-    v_sizer->Add(h_sizer2, 1, wxEXPAND);
+    //v_sizer->Add(h_sizer2, 1, wxEXPAND);
     v_sizer->Add(h_sizer3, 1, wxEXPAND);
-    v_sizer->Add(h_sizer4, 1, wxEXPAND);
+    //v_sizer->Add(separator0, 1, wxEXPAND);
+    //v_sizer->Add(h_sizer4, 1, wxEXPAND);
 
     this->SetSizer(v_sizer);
     SetMinSize(this->FromDIP(wxSize(buttonWidth, buttonHeight)));
@@ -287,7 +309,7 @@ void wxCustomButton::reset_stat(wxEvent& event)
     cObjectmanager* obj_manager = obj_manager->getInstance();
 
     cPlot* m_plot = obj_manager->get_plot();
-
     m_plot->reset_chan_statistic_labels(this->GetId());
+
     event.Skip();
 }

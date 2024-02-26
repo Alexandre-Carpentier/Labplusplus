@@ -6,7 +6,7 @@ std::unique_ptr<cProtocol> cProtocolFactory::make(PROTOCOLENUM type, std::wstrin
 	std::unique_ptr<cProtocol> protocol_obj = nullptr;
 
 
-	if (type == PROTOCOLENUM::SERIAL)
+	if (type == PROTOCOLENUM::COM)
 	{
 		if (addr.length() == 0)
 		{

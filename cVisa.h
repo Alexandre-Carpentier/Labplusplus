@@ -6,7 +6,10 @@
 #include <codecvt>
 #include <iostream>
 #include <vector>
+#include <cassert>
+
 #include "cProtocol.h"
+#include "encoding.h"
 
 // A Visa class is a protocol
 class cVisa : public cProtocol {
@@ -19,8 +22,8 @@ public:
 
 	err_struct last_error;
 
-	ViSession ressource_manager;
-	ViSession device_;
+	ViSession ressource_manager = 0;
+	ViSession device_ = 0;
 	ViStatus status = 0;
 };
 

@@ -1,8 +1,10 @@
 #ifndef _SERIAL_H__
 #define _SERIAL_H__
 #pragma comment (lib, "visa32.lib") 
-#include <visa.h> 
+#include <visa.h>
 
+#include <format>
+#include <string>
 #include <iostream>
 #include <locale>
 #include <codecvt>
