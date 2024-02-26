@@ -3,6 +3,7 @@
 #include <vector>
 #include <format>
 #include <cassert>
+#include <thread>
 
 #include "cVisa.h"
 #include "cTcp.h"
@@ -10,11 +11,10 @@
 #include "cProtocolFactory.h"
 
 #include "encoding.h"
-
-class cTick;
-class cMeasurement;
-
+#include "cTick.h"
 #include "cMeasurement.h"
+//class cTick;
+//class cMeasurement;
 
 class cPacecom : public cMeasurement {
 private:

@@ -34,7 +34,7 @@ err_struct cVisa::init()
 
 #define INSTR_SIZE 512
 		char instr[INSTR_SIZE] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, "?::*INSTR", list, count, instr))
+		if (VI_SUCCESS != viFindRsrc(ressource_manager, ViString("?::*INSTR"), list, count, instr))
 		{
 			return { std::wstring(L"[!] viOpen() failed."), -1 };
 		}
@@ -64,7 +64,7 @@ err_struct cVisa::init()
 	assert(dev_name_utf8.size() < 20);
 
 	device_ = 0;
-	status = viOpen(ressource_manager, dev_name_utf8.c_str(), VI_NO_LOCK, 0, &device_);
+	status = viOpen(ressource_manager, (ViString)dev_name_utf8.c_str(), VI_NO_LOCK, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failed."), -3 };

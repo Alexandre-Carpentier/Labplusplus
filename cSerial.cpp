@@ -33,7 +33,7 @@ err_struct cSerial::init()
 		
 #define INSTR_SIZE 512
 		char instr[INSTR_SIZE] = "";		
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, "ASRL*?::*INSTR", list, count, instr))
+		if (VI_SUCCESS != viFindRsrc(ressource_manager, ViString("ASRL*?::*INSTR"), list, count, instr))
 		{
 			return { std::wstring(L"[!] viFindRsrc() failled."), -1 };
 		}
@@ -130,7 +130,7 @@ err_struct cSerial::init()
 	//status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
 	//status = viOpen(ressource_manager, (ViRsrc)"ASRL4::INSTR", VI_NULL, 0, &device_);
 	device_ = 0;
-	status = viOpen(ressource_manager, visa_device.c_str(), VI_NULL, 0, &device_);
+	status = viOpen(ressource_manager,  (ViRsrc)visa_device.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failled."), -4 };

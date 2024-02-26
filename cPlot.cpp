@@ -54,7 +54,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 
 	plot_rightpanel_ = new wxPanel(inst, PLOTRIGHTPANEL, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
 	//plot_rightpanel_->SetBackgroundColour(wxColor(00, 60, 60));
-	plot_rightpanel_->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_DESKTOP));
+	plot_rightpanel_->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
 
 	/*
 	wxRect r = plot_rightpanel_->GetClientRect();
@@ -64,7 +64,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 	
 	*/
 
-	wxWindow* wxGraph = new wxWindow(plot_rightpanel_, PLOTWINDOW, wxDefaultPosition, wxSize(300, 300), wxSUNKEN_BORDER| wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN);
+	wxWindow* wxGraph = new wxWindow(plot_rightpanel_, PLOTWINDOW, wxDefaultPosition, wxSize(600, 600), wxSUNKEN_BORDER| wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN);
 	wxRect r = wxGraph->GetClientRect();
 	RECT rect;
 	rect.left = r.GetLeft(); rect.right = r.GetRight(); rect.top = r.GetTop(); rect.bottom = r.GetBottom();
