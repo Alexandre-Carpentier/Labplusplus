@@ -32,14 +32,14 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     wxButton* sinebtn = new wxButton(this, wxID_ANY, "", wxDefaultPosition, this->FromDIP(wxDefaultSize), wxNO_BORDER);
     sinebtn->SetBitmap(wxBitmap(wxT("SINUSPNG"), wxBITMAP_TYPE_PNG_RESOURCE));
 
-    txt = new wxStaticText(this, wxID_ANY, name, wxDefaultPosition, this->FromDIP(wxSize(50, 20)), wxTE_CENTRE | wxNO_BORDER);
+    txt = new wxStaticText(this, wxID_ANY, name, wxDefaultPosition, this->FromDIP(wxSize(70, 20)), wxTE_CENTRE | wxNO_BORDER);
     wxFont font = txt->GetFont();
     font.SetPointSize(10);
     font.SetWeight(wxFONTWEIGHT_BOLD);
     txt->SetFont(font);
 
     picker = new wxColourPickerCtrl(this, IDCPICKER, *wxLIGHT_GREY, wxDefaultPosition,
-        this->FromDIP(wxSize(50, 10)), wxCLRP_DEFAULT_STYLE,
+        this->FromDIP(wxSize(20, 10)), wxCLRP_DEFAULT_STYLE,
         wxDefaultValidator,
         wxString(""));
 

@@ -121,26 +121,21 @@ void cPacecom::acquire()
             //assert(wValue.length() == 0 );
             //assert(wValue.length() < 20 );
 
-            if (wValue.size() > 7)
-            {
-                wchar_t buffer[512] = L"";
-                if (wValue.size() < 512)
-                {
-                    wcsncpy(buffer, wValue.c_str(), 512);
-                    readpoint = wcstol(buffer, nullptr, 10);
-                    if (readpoint > 20)
-                        readpoint = 0;
+            std::string utf8 = ConvertWideToUtf8(wValue);
+            char* p = nullptr;
+            readpoint = strtod(utf8.c_str(), &p);
 
-                    if (readpoint < -1)
-                        readpoint = 0;
+            if (p == utf8.c_str())
+                readpoint = 0;
 
-                }
-                //readpoint = std::stof(wValue);
-            }
-            else 
-            {
-                std::cout << "[!] readpoint error - wValue size = 0\n";
-            }
+            if (readpoint > 20)
+                readpoint = 0;
+
+            if (readpoint < -1)
+                readpoint = 0;
+
+            //readpoint = std::stof(wValue);
+
 
             assert(readpoint > -1.0);
             assert(readpoint < 20.0 );
@@ -158,7 +153,7 @@ void cPacecom::acquire()
         
         std::cout << "setpoint " << setpoint << "setpoint_saved " << setpoint_saved << "\n";
         readpoint = setpoint;
-        Sleep(100);
+        Sleep(500);
     }
 }
 
