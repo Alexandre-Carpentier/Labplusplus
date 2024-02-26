@@ -52,7 +52,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints)
 
 	plot_leftpanel_->SetSizerAndFit(left_vsizer);
 
-	plot_rightpanel_ = new wxPanel(inst, PLOTRIGHTPANEL, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
+	plot_rightpanel_ = new wxPanel(inst, PLOTRIGHTPANEL, wxDefaultPosition, wxSize(600, 600), wxSUNKEN_BORDER);
 	//plot_rightpanel_->SetBackgroundColour(wxColor(00, 60, 60));
 	plot_rightpanel_->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
 

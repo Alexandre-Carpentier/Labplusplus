@@ -20,15 +20,18 @@ double get_instr_setpoint(cMeasurement *meas, std::vector<STEPSTRUCT> step_table
 	double val=0.0;
 	int current_step = 0;
 	std::string dev_name = meas->device_name();
+	std::cout << "[*] Found dev_name: " << dev_name << "\n";
 	for (auto& step : step_table)
 	{
 		if (current_step == step_number)
 		{
 			for (auto& controler : step.controler_vec)
 			{
+				std::cout << "[*] Searching controler: " << controler.first << "\n";
 				if (controler.first.find(dev_name) == 0)
 				{
 					val = controler.second;
+					std::cout << "[*] Command found: " << controler.second << "\n";
 					break;
 				}
 			}

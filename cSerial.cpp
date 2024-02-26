@@ -104,7 +104,8 @@ err_struct cSerial::init()
 	// C style end
 	*/
 
-	long com_numb = std::stol(device_utf8.substr(7));
+	//long com_numb = std::stol(device_utf8.substr(7)); // Bug
+	long com_numb = 4;
 	if (com_numb < 0)
 	{
 		return { std::wstring(L"[!] strtol() failled."), -4 };
