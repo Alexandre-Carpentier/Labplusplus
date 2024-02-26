@@ -11,7 +11,7 @@
 #include "cSerial.h"
 #include "cProtocolFactory.h"
 
-const int refresh_rate = 20000;
+const int refresh_rate = 5000;
 
 class cDev
 {
