@@ -125,8 +125,17 @@ void cPacecom::acquire()
             char* p = nullptr;
             readpoint = strtod(utf8.c_str(), &p);
 
+            if (p[0] == '\r')
+                std::cout << "[*] CR terminated.\n";
+
+            if (p[0] == '\n')
+                std::cout << "[*] LF terminated.\n";
+
             if (p == utf8.c_str())
+            {
+                std::cout << "[!] packet corrupted.\n";
                 readpoint = 0;
+            }    
 
             if (readpoint > 20)
                 readpoint = 0;
