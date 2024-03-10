@@ -67,10 +67,10 @@ void cPacecom::acquire()
     auto st = acquireloop.get_stop_token();
     while (!st.stop_requested())
     {
-        assert(setpoint< -1.0 && "setpoint < -1.0 bar in cPacecom::acquire()\n");
-        assert(setpoint > 20.0 && "setpoint >20.0 bar in cPacecom::acquire()\n");
-        assert(setpoint_saved < -1.0 && "setpoint_saved < -1.0 bar in cPacecom::acquire()\n");
-        assert(setpoint_saved > 20.0 && "setpoint_saved >20.0 bar in cPacecom::acquire()\n");
+        assert(setpoint > -1.0 );
+        assert(setpoint < 20.0 );
+        assert(setpoint_saved > -1.0 );
+        assert(setpoint_saved < 20.0 );
 
         if (setpoint != setpoint_saved)
         {
@@ -92,9 +92,8 @@ void cPacecom::acquire()
 
         // Valid reading?
         // ex ":SENS:PRES - 0.0002771\r"
-        assert(msg.c_str() == nullptr && ":SENS?\\r\\n return msg == nullptr\n");
-        assert(msg.size() < 1 && ":SENS?\\r\\n return msg < 1 characters\n");
-        assert(msg.size() > 30 && ":SENS?\\r\\n return msg > 30 characters\n");
+        //assert(msg.size() > 1 );
+        //assert(msg.size() < 30 );
 
         if (msg.compare(0, wcslen(L":SENS:PRES"), L":SENS:PRES") == 0)
         {
@@ -119,13 +118,36 @@ void cPacecom::acquire()
             // C++ style
             std::wstring wValue = msg.substr(wcslen(L":SENS:PRES"));
 
-            assert(wValue.length() == 0 && ":SENS?\\r\\n return msg with no float value\n");
-            assert(wValue.length() > 20 && ":SENS?\\r\\n return msg with floatdigit > 20 values\n");
+            //assert(wValue.length() == 0 );
+            //assert(wValue.length() < 20 );
 
-            readpoint = std::stof(wValue);
+            std::string utf8 = ConvertWideToUtf8(wValue);
+            char* p = nullptr;
+            readpoint = strtod(utf8.c_str(), &p);
 
-            assert(readpoint < -1.0 && "readpoint < -1.0 bar\n");
-            assert(readpoint > 20.0 && "readpoint > 20.0 bar\n");
+            if (p[0] == '\r')
+                std::cout << "[*] CR terminated.\n";
+
+            if (p[0] == '\n')
+                std::cout << "[*] LF terminated.\n";
+
+            if (p == utf8.c_str())
+            {
+                std::cout << "[!] packet corrupted.\n";
+                readpoint = 0;
+            }    
+
+            if (readpoint > 20)
+                readpoint = 0;
+
+            if (readpoint < -1)
+                readpoint = 0;
+
+            //readpoint = std::stof(wValue);
+
+
+            assert(readpoint > -1.0);
+            assert(readpoint < 20.0 );
 
             // C++ style end
             
@@ -140,7 +162,7 @@ void cPacecom::acquire()
         
         std::cout << "setpoint " << setpoint << "setpoint_saved " << setpoint_saved << "\n";
         readpoint = setpoint;
-        Sleep(100);
+        Sleep(500);
     }
 }
 
@@ -154,8 +176,8 @@ DATAS cPacecom::read()
 
 void cPacecom::set(double value)
 {
-    assert(value < -1.0 && "setpoint < -1.0 bar in cPacecom::set(double value)\n");
-    assert(value > 20.0 && "setpoint >20.0 bar in cPacecom::set(double value)\n");
+    assert(value > -1.0 );
+    assert(value <  20.0 );
     setpoint = value;
 }
 

@@ -39,6 +39,8 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	grid->SetDefaultCellOverflow(false);
 	grid->SetDefaultCellFont(grid->GetFont().Scale(1));
 	grid->SetDefaultCellAlignment(wxALIGN_CENTRE, wxALIGN_CENTRE);
+	//grid->SetUseNativeColLabels(false);
+	//grid->UseNativeColHeader(true);
 
 	int pos = 0;
 	grid->SetColLabelValue(pos, "Pace 6000 (bar)");
@@ -254,8 +256,13 @@ bool cTable::IsActiveLine(const int line)
 
 void cTable::GridResize(wxGrid* grid)
 {
-	wxSize size = inst_->FromDIP(grid->GetSize());
-	for (int i = 0; i < COL_NB + plugin_number; i++)
+	wxSize size = grid->GetSize();
+	//int cell_width = ((size.x - size.x / (COL_NB + pugin_number)) / (COL_NB + pugin_number));
+
+	int cell_width = (size.x / (COL_NB + pugin_number ) );
+	cell_width = (grid->GetClientSize().x - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X)) / 5;
+	
+	for (int i = 0; i < COL_NB + pugin_number; i++)
 	{
 		grid->SetColSize(i, ((size.x - size.x / (COL_NB + plugin_number)) / (COL_NB + plugin_number)));
 	}

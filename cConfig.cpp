@@ -184,7 +184,7 @@ cConfig::cConfig(wxWindow* inst)
 	wxTreeItemId config_voltage_node = config_tree_ctrl->AppendItem(config_root, "Measurement modules");
 
 	// Remove ".dll" in filename and add it to the tree
-	for (auto&& plugin : plugin_vec)
+	for (auto& plugin : plugin_vec)
 	{
 		plugin.name.resize(plugin.name.size() - 4); // suppress .dll from name
 		config_tree_ctrl->AppendItem(config_voltage_node, plugin.name);

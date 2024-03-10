@@ -5,11 +5,14 @@
 extern "C"
 {
 #include "cLua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+#include "..\LUA_LIB_542\include\lauxlib.h"
+#include "..\LUA_LIB_542\include\lualib.h"
+//#include "lauxlib.h"
+//#include "lualib.h"
 }
 #ifdef _WIN32
-#pragma comment (lib, "lua54.lib")
+//#pragma comment (lib, "lua54.lib")
+#pragma comment (lib, "..\\LUA_LIB_542\\lua54.lib")
 #endif
 
 #include "cDeviceBuilder.h"
