@@ -4,6 +4,8 @@ class cMain;
 
 cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config)
 {
+	cycle_controler = std::make_shared<cCycleControler>(m_table, inst);
+
 	std::cout << "cFooter ctor...\n";
 	inst_ = inst;
 	m_plot_ = m_plot;
@@ -80,40 +82,54 @@ wxBoxSizer* cFooter::GetSizer()
 
 void cFooter::startButtonClicked(wxCommandEvent& evt)
 {
-		// reset zoom slider to x1
 
-	scale_btn->slider_reset();
-
-		// show every signals
-
-	m_plot_->show_all_signals(true);
-
-
-	size_t measurement_number = meas_manager->get_measurement_pool_size();
-	std::cout << "[*] " << measurement_number << " measurements are in pool.\n";
-	if (measurement_number == 0)
-	{
-		wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
-		wxPostEvent(inst_, evt);
-		MessageBox(GetFocus(), L"No active device\ntry to enable one instrument first", L"Error", S_OK | MB_ICONERROR);
-		evt.Skip();
-		return;
-	}
 	if (m_plot_->get_graph_state() == false)
 	{
+
+			// reset zoom slider to x1
+
+		scale_btn->slider_reset();
+
+			// show every signals
+
+		m_plot_->show_all_signals(true);
+
+			// Sanity check
+
+		if (m_table_->get_loop_number() < 1)
+		{
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_EDITBTN);
+			wxPostEvent(inst_, evt);
+			MessageBox(GetFocus(), L"Fill the cycle table please", L"Error", S_OK | MB_ICONERROR);
+			evt.Skip();
+			return;
+		}
+
+			// Sanity check
+
+		size_t measurement_number = meas_manager->get_measurement_pool_size();
+		std::cout << "[*] " << measurement_number << " measurements are in pool.\n";
+		if (measurement_number == 0)
+		{
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
+			wxPostEvent(inst_, evt);
+			MessageBox(GetFocus(), L"No active device\ntry to enable one instrument first", L"Error", S_OK | MB_ICONERROR);
+			evt.Skip();
+			return;
+		}
+
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		if (daqconfig->m_daq_ != nullptr)
 		{
-			// Save last change in daq gui fields
+				// Save last change in daq gui fields
 
 			size_t channel_index = daqconfig->get_channel_index();
 			daqconfig->save_current_device_config(channel_index);
 			daqconfig->save_current_chan_config(channel_index);
 
-			// Retrieve current daq config		
+				// Retrieve current daq config		
 
 			CURRENT_DEVICE_CONFIG_STRUCT config = daqconfig->GetDaqConfigStruct();
-
 
 			int i = 0;
 			int c = 0;
@@ -167,20 +183,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
-		// retieve the cycle and save it in memory
 
-		cCycle* m_cycle = nullptr;
-		m_cycle = m_table_->load_cycle();
-		if (m_cycle == nullptr)
-		{
-			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_EDITBTN);
-			wxPostEvent(inst_, evt);
-			MessageBox(GetFocus(), L"Fill the cycle table please", L"Error", S_OK | MB_ICONERROR);
-		}
-		else
-		{
-			cycle_controler = new cCycleControler(m_cycle, m_table_, inst_);
-
+			/*
 			int iFilter = this->combo1->GetCurrentSelection();
 			FILTER_M Filtering = FILTER_NONE;
 			switch (iFilter)
@@ -225,9 +229,9 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			{
 				Rec = LOGGER_XLSX;
 			}
-
+			*/
 			////////////////////////////////////////////////////////////////////////////////
-			// STOP CONTINUOUSLY LOOKING UP FOR DEVICE
+			// STOP LOOK UP FOR DEVICE
 			////////////////////////////////////////////////////////////////////////////////
 			//cDeviceMonitor* devmon = devmon->getInstance();
 			//devmon->lookup_stop();
@@ -237,31 +241,36 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				m_main->StopDiscoverDeviceTimer();
 
 			////////////////////////////////////////////////////////////////////////////////
+			// CYCLE CONTROLER
+			////////////////////////////////////////////////////////////////////////////////
+			std::cout << "[*] Starting cycle controler.\n";
+			cycle_controler->start();
+
+			////////////////////////////////////////////////////////////////////////////////
 			// MEASUREMENT CONTROLER
 			////////////////////////////////////////////////////////////////////////////////
 			std::cout << "Launching Measurement controler\n";
-			cMeasurementControler* meas_controler = new cMeasurementControler(m_cycle, cycle_controler); //////////////////////LEAK/////////////////LEAK///////////////
+			meas_controler = make_shared<cMeasurementControler>(cycle_controler); 
 			meas_manager->set_measurement_controler(meas_controler);
-
 			meas_controler->start();
+
 			size_t sizesig = meas_manager->get_measurement_total_channel_number();
-			m_plot_->start_graph(Filtering, Rec, sizesig);
+			m_plot_->start_graph(FILTER_NONE, LOGGER_ASCII, sizesig);
 
 			startbtn->SetBackgroundColour(wxColor(250, 80, 90));
 			startbtn->SetLabelText(L"Stop");
-		}
+		
 	}
 	else
 	{
-		m_plot_->stop_graph();
+		std::cout << "[*] Stopping cycle controler.\n";
 		cycle_controler->stop();
-		Sleep(500);
-		std::cout << "cycle_controler deleted in Footer.cpp\n";
-		delete cycle_controler;
-		cycle_controler = nullptr;
+
+		m_plot_->stop_graph();
+
 
 		std::cout << "m_table_->destroy_cycle() in Footer.cpp\n";
-		m_table_->destroy_cycle();
+
 
 		startbtn->SetBackgroundColour(wxColor(180, 250, 90));
 		startbtn->SetLabelText(L"Start");
@@ -298,7 +307,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		meas_manager->stop_all_devices();
 
 		////////////////////////////////////////////////////////////////////////////////
-		// START CONTINUOUSLY LOOKING UP FOR DEVICE
+		// START LOOK UP FOR DEVICE
 		////////////////////////////////////////////////////////////////////////////////
 		cDeviceMonitor* devmon = devmon->getInstance();
 		devmon->lookup_start();
@@ -344,7 +353,7 @@ void cFooter::freqButtonClicked(wxCommandEvent& evt)
 	wxString str = freq->GetValue();
 
 
-	cMeasurementControler* m_controler = meas_manager->get_measurement_controler();
+	std::shared_ptr<cMeasurementControler> m_controler = meas_manager->get_measurement_controler();
 	if (m_controler != nullptr)
 	{
 		m_controler->set_aquisition_rate(wxAtoi(str));

@@ -1,12 +1,8 @@
 #include "cDaqmx.h"
 
-#include <wx/wx.h>
-#include <wx/combobox.h>
-#include <wx/dcbuffer.h>
-#include <format>
 
 
-
+/*
 class cMeasurementmanager;
 class cCycle;
 class cUsb6001;
@@ -15,6 +11,7 @@ class cMeasurement;
 class cPlot;
 class cImagePanel;
 class cSignalTable;
+*/
 
 cDaqmx::cDaqmx(wxWindow* inst)
 {
@@ -228,6 +225,8 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	//chanbtn[0]->SetForegroundColour(wxColor(120, 140, 120));
 
 	// To remove native grey border arround btn at initialization
+	// but slow
+	/*
 	int i = max_chan_number;
 	for (auto& ch : chanbtn)
 	{
@@ -236,6 +235,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		wxPostEvent(inst_, evt);
 
 	}
+	*/
 
 	//////////////////////////////////////////////////////////////////
 	// DAQ chan settings
@@ -564,6 +564,21 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCDAQACTIVATE);
 	wxPostEvent(inst_, evt);
+}
+
+cDaqmx::~cDaqmx()
+{
+	// Free memory on heap
+	cMeasurementmanager *meas_manager = meas_manager->getInstance();
+	bool isDestroyed = meas_manager->destroy_subsystem(MEAS_TYPE::DAQ_INSTR);
+	// If item destroyed delete from memory
+	if (isDestroyed)
+	{
+		std::cout << "[*] [delete] m_daq in cDaqmx.cpp\n";
+
+		delete m_daq_;
+		m_daq_ = nullptr;
+	}
 }
 
 void cDaqmx::OnPaint(wxPaintEvent& event)
@@ -1000,12 +1015,19 @@ void cDaqmx::EnableChanProperties()
 */
 void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 {
-	// Enable/disable controls
 	enable_pan = !enable_pan;
 	if (daq_activate)
 	{
 		if (!enable_pan)
 		{
+			// If DAQ = ON
+			
+			// Enable/disable controls
+			if (checkchan->GetLabel().compare("ON") == 0)
+			{
+				EnableChannelItems(!enable_pan);
+			}
+
 			constexpr size_t bufferSize = 1000;
 			char buffer[bufferSize] = {};
 			if (DAQmxGetSysDevNames(buffer, bufferSize) != 0)
@@ -1182,8 +1204,16 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 		}
 		else
 		{
-			this->daq_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
-			this->daq_activate->SetLabel("OFF");
+			// If DAQ = OFF
+
+			// Enable/disable controls
+			if (checkchan->GetLabel().compare("OFF"))
+			{
+				EnableChannelItems(!enable_pan);
+			}
+
+			daq_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
+			daq_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
 			checkchan->Enable(false);
@@ -1193,7 +1223,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			for (auto& chan : chanbtn)
 			{
 				chan->Enable(false);
-			}
+			}			
 		}
 	}
 	evt.Skip();
@@ -1211,8 +1241,8 @@ wxArrayString cDaqmx::LoadScalePresetArray(wxString filename)
 	//std::cout << "[*] Loading scale preset from file : " << filename << "\n";
 	//std::cout << "[*] Default location is : C:\\Users\\The Hive\\AppData\\Roaming \n";
 
-	wxFileConfig* rec_scale = nullptr;
-	rec_scale = new wxFileConfig(wxEmptyString, wxEmptyString, filename, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
+	std::unique_ptr<wxFileConfig> rec_scale;
+	rec_scale = std::make_unique<wxFileConfig>(wxEmptyString, wxEmptyString, filename, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
 	wxString group;
 	wxString entry;
 	wxString value;
@@ -1244,7 +1274,6 @@ wxArrayString cDaqmx::LoadScalePresetArray(wxString filename)
 
 		bok = rec_scale->GetNextGroup(group, group_cookie);
 	}
-	delete rec_scale;
 	m_scale.Add("Create new");
 	// End loading scale preset
 	return m_scale;
@@ -1775,8 +1804,8 @@ void cDaqmx::SwitchChannelON(bool isDisplayed)
 	}
 	else
 	{
-		this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
-		this->checkchan->SetLabel("ON");
+		checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
+		checkchan->SetLabel("ON");
 	}
 }
 

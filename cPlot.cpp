@@ -526,7 +526,6 @@ void cPlot::set_graph_filter(FILTER_M isFiltering)
 void cPlot::set_signal_name(std::string signame, int position)
 {
 	SetSignalLabel(hGraph, signame.c_str(), position);
-
 }
 
 void cPlot::start_graph(FILTER_M FilteringType, LOGGER_M ReccordingType, int SignalNumber)

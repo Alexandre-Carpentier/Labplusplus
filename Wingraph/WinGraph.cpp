@@ -1750,7 +1750,7 @@ BOOL Render(HGRAPH hGraph)
 
 		// Ymin to Ymax values
 
-		for (float ytmp = 0.0; ytmp <= 1.1; ytmp += 1.0 / (float)div)
+		for (float ytmp = 0.0f; ytmp <= 1.1f; ytmp += 1.0f / (float)div)
 		{
 			DrawString(-txtlen * 1.5f, ytmp - ((txtheight * 0.8f) / 2.0f), dtos(value, sizeof(value), reelval));
 			reelval += (SnapPlot->Ymax - SnapPlot->Ymin) / (float)div;

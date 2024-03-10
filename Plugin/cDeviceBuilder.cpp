@@ -2,40 +2,51 @@
 
 #pragma comment (lib, "Kernel32.lib")
 
-
+void DeviceBuilder1::ProduceIdentity(
+    std::string device_name,                                        // ex: "Keithley 2280S"
+    PLUGIN_ACCESS plugin_access_type,                               // ex: READ=0, WRITE=1, ALL=2
+    std::string plugin_measurement_name,                            // ex: "Voltage"
+    std::string plugin_measurement_unit                             // ex: "Volt"
+) const
+{
+    product->device_name = device_name;
+    product->plugin_access_type = plugin_access_type;
+    product->plugin_measurement_name = plugin_measurement_name;
+    product->plugin_measurement_unit = plugin_measurement_unit;
+}
 
 void DeviceBuilder1::ProduceProtocol(SCPIMODE mode) const
 {
     if (mode == SCPIMODE::COM)
     {
-        this->product->protocol = new plug_cCom;
+        product->protocol = new plug_cCom;
     }
     if (mode == SCPIMODE::TCP)
     {
-        this->product->protocol = new plug_cTcp;
+        product->protocol = new plug_cTcp;
     }
     if (mode == SCPIMODE::USB)
     {
-        this->product->protocol = new plug_cUsb;
+        product->protocol = new plug_cUsb;
     }
     if (mode == SCPIMODE::DAQMX)
     {
-        this->product->protocol = new plug_cDaq;
+        product->protocol = new plug_cDaq;
     }
     if (mode == SCPIMODE::VISA)
     {
-        this->product->protocol = new plug_cVisa;
+        product->protocol = new plug_cVisa;
     }
 }
 
 void DeviceBuilder1::ProducePanel(wxWindow* inst) const
 {
-    this->product->panel = new wxScrolled <wxPanel>(inst, wxID_ANY, wxDefaultPosition, inst->FromDIP(wxSize(400, 600)));
-    this->product->panel->FitInside();
-    this->product->panel->SetScrollRate(0, 40);
-    this->product->header_v_sizer = new wxBoxSizer(wxVERTICAL);
-    this->product->header_h_sizer = new wxBoxSizer(wxHORIZONTAL);
-    this->product->grid_sizer = new wxFlexGridSizer(30, 2, 10, inst->FromDIP(50));
+    product->panel = new wxScrolled <wxPanel>(inst, wxID_ANY, wxDefaultPosition, inst->FromDIP(wxSize(400, 600)));
+    product->panel->FitInside();
+    product->panel->SetScrollRate(0, 40);
+    product->header_v_sizer = new wxBoxSizer(wxVERTICAL);
+    product->header_h_sizer = new wxBoxSizer(wxHORIZONTAL);
+    product->grid_sizer = new wxFlexGridSizer(30, 2, 10, inst->FromDIP(50));
 }
 
 void DeviceBuilder1::ProduceImage(wxWindow* inst) const
@@ -91,20 +102,20 @@ void DeviceBuilder1::AddPanelCtrl(CONTROLTYPE type, int length, int height, std:
 
     if (type == CONTROLTYPE::BUT)
     {
-        ctrl = new wxButton(this->product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxSUNKEN_BORDER);
+        ctrl = new wxButton(product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxSUNKEN_BORDER);
     }
     if (type == CONTROLTYPE::TXT)
     {
-        ctrl = new wxStaticText(this->product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxNO_BORDER);
+        ctrl = new wxStaticText(product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxNO_BORDER);
     }
     if (type == CONTROLTYPE::TXTFIELD)
     {
-        ctrl = new wxTextCtrl(this->product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxTE_MULTILINE | wxTE_RICH | wxHSCROLL | wxSUNKEN_BORDER);
+        ctrl = new wxTextCtrl(product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxTE_MULTILINE | wxTE_RICH | wxHSCROLL | wxSUNKEN_BORDER);
     }
     if (type == CONTROLTYPE::SPINBUT)
     {
-        ctrl = new wxSpinCtrl(this->product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxNO_BORDER);
+        ctrl = new wxSpinCtrl(product->panel, wxID_ANY, label.c_str(), wxDefaultPosition, wxSize(length, height), wxNO_BORDER);
     }
 
-    this->product->grid_sizer->Add(ctrl, 1, wxALL, 10);
+    product->grid_sizer->Add(ctrl, 1, wxALL, 10);
 }

@@ -1,10 +1,6 @@
 #include "cTable.h"
 
-#include"cPlot.h"
 
-#include "cCycle.h"
-#include "cTick.h"
-#include <format>
 
 class cConfig;
 class cDevice;
@@ -14,6 +10,7 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	std::cout << "cTable ctor...\n";
 	inst_ = inst;
 	m_config_ = m_config;
+
 	table_leftpanel_ = new wxPanel(inst, IDCTABLEPANELLEFT, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
 	table_leftpanel_->SetBackgroundColour(wxColor(240, 240, 240));
 
@@ -31,13 +28,13 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	std::vector<std::string>name_vec = m_config_->get_plugin_name_vec();
 	std::vector<std::string>unit_vec = m_config_->get_plugin_unit_vec();
 
-	pugin_number = unit_vec.size();
+	plugin_number = unit_vec.size();
 	
 
 	// Create a wxGrid object
 	grid = new wxGrid(table_rightpanel_, IDCTABLEGRID, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
 
-	grid->CreateGrid(LINE_NB, COL_NB + pugin_number);
+	grid->CreateGrid(LINE_NB, COL_NB + plugin_number);
 	grid->SetDefaultRowSize(40, false);
 	grid->SetDefaultCellOverflow(false);
 	grid->SetDefaultCellFont(grid->GetFont().Scale(1));
@@ -107,45 +104,38 @@ cTable::~cTable()
 	// Save current row values
 }
 
-void cTable::destroy_cycle()
+int cTable::get_step_number()
 {
-	std::cout << "cTable->destroy_cycle()\n";
-	delete m_cycle;
-	m_cycle = nullptr;
-
-	// Stop stat
-	stat->stop();
+	return get_last_active_line();
 }
 
-cCycle* cTable::load_cycle()
+int cTable::get_loop_number()
 {
-	std::cout << "cTable->load_cycle()\n";
-	int j = get_last_active_line();
-
-	if (j <= 0)
-		return nullptr;
-
-	std::cout << "new cCycle()\n";
-	if(m_cycle != nullptr)
-	{
-		m_cycle = nullptr;
-	}
-	m_cycle = nullptr;
-	m_cycle = new cCycle();
-	m_cycle->create_cycle();
-
 	wxString loopnumber = loop->GetValue();
 	int iloopnumber = wxAtoi(loopnumber);
-	if (iloopnumber <= 0)
-		return nullptr;
+	if (iloopnumber < 0)
+		return 0;
 
-	m_cycle->set_current_loop(iloopnumber);
+	return iloopnumber;
+}
+
+double cTable::get_total_step_duration()
+{
+	double sec = 0.0;
+	for (int row = 0; row < get_last_active_line(); row++)
+	{
+		sec += wxAtof(grid->GetCellValue(row, get_last_active_col()));
+	}
+	return sec;
+}
+
+std::vector<STEPSTRUCT> cTable::get_step_table()
+{
+	std::vector<STEPSTRUCT> step_table;
 
 	// For each table line
-	for (int row = 0; row < j; row++)
+	for (int row = 0; row < get_last_active_line(); row++)
 	{
-		// Inc step number in struct
-		m_cycle->pcycle->total_step++;
 
 		// Fill the step struc for each line
 		STEPSTRUCT step;
@@ -162,19 +152,19 @@ cCycle* cTable::load_cycle()
 			// populate the std::pair with col name and col value
 			// put all std::pair in a vector
 			std::string name = grid->GetColLabelValue(col).ToStdString();
-			double value = wxAtof(grid->GetCellValue(row, col));		
-			step.controler_vec.push_back( std::make_pair(name, value) );
-			
+			double value = wxAtof(grid->GetCellValue(row, col));
+			step.controler_vec.push_back(std::make_pair(name, value));
+
 		}
 		// Add step to the std::vector
-		m_cycle->pcycle->step_table.push_back(step);
+		step_table.push_back(step);
 
 		// extract table information (duration, jump to, ...)
 		// to fill extra field needed
 	}
 
 	int index = 0;
-	for (auto& item : m_cycle->pcycle->step_table)
+	for (auto& item : step_table)
 	{
 		for (auto& controler : item.controler_vec)
 		{
@@ -192,54 +182,24 @@ cCycle* cTable::load_cycle()
 			}
 			index++;
 		}
-		// Sanity check
-		if (item.duration == 0.0)
-		{
-			MessageBox(GetFocus(), L"Step duration is too small", L"Be carefull", S_OK);
-			delete m_cycle;
-			return nullptr;
-		}
 	}
 
-	/*
-	for (int i = 0; i < j; i++)
-	{
-		double pressure = wxAtof(grid->GetCellValue(i, 0));
-		double voltage = wxAtof(grid->GetCellValue(i, 0));
-		double flow = wxAtof(grid->GetCellValue(i, 0));
-		double temperature = wxAtof(grid->GetCellValue(i, 0));
-		double position = wxAtof(grid->GetCellValue(i, 0));
-		double force = wxAtof(grid->GetCellValue(i, 0));
-		double htriger = wxAtof(grid->GetCellValue(i, 0));
-		double ltriger = wxAtof(grid->GetCellValue(i, 0));
-		int jumpto = wxAtoi(grid->GetCellValue(i, 1));
-		int jumpcount = wxAtoi(grid->GetCellValue(i, 2));
-		int frontshape = wxAtoi(grid->GetCellValue(i, 0));
-		double duration = wxAtof(grid->GetCellValue(i, 3));
+	return step_table;
+}
 
-		m_cycle->add_step_back(pressure,
-			voltage,
-			flow,
-			temperature,
-			position,
-			force,
-			htriger,
-			ltriger,
-			jumpto,
-			jumpcount,
-			frontshape,
-			duration
-		);
-	}
-	*/
+void cTable::start_statistic(std::shared_ptr<cCycle> m_cycle)
+{
+	stat->start(m_cycle);
+}
 
-	stat->start(m_cycle, this);
-	return m_cycle;
+void cTable::stop_statistic()
+{
+	stat->stop();
 }
 
 void cTable::set_line_highlight(const int line)
 {
-	for (int i = 0; i < COL_NB + pugin_number; i++)
+	for (int i = 0; i < COL_NB + plugin_number; i++)
 	{
 		grid->SetCellBackgroundColour(line - 1, i, *wxWHITE);
 		grid->SetCellBackgroundColour(line, i, *wxLIGHT_GREY);
@@ -250,9 +210,9 @@ void cTable::set_line_highlight(const int line)
 
 void cTable::set_lines_white()
 {
-	for (int line = 0; line < m_cycle->get_total_step_number(); line++)
+	for (int line = 0; line < get_last_active_line(); line++)
 	{
-		for (int i = 0; i < COL_NB + pugin_number; i++)
+		for (int i = 0; i < COL_NB + plugin_number; i++)
 		{
 			grid->SetCellBackgroundColour(line, i, *wxWHITE);
 			grid->Refresh();
@@ -267,16 +227,25 @@ int cTable::get_last_active_line()
 		if (!IsActiveLine(i))
 		{
 			return i;
-			//return i-1;
 		}
 	}
-	return LINE_NB;
+	return 0;
+}
+
+int cTable::get_last_active_col()
+{
+	int col_num = grid->GetNumberCols();
+
+	double duration = wxAtof(grid->GetCellValue(0, col_num));
+
+	assert(duration > 0.0);
+	return duration;
 }
 
 bool cTable::IsActiveLine(const int line)
 {
 	double cell = 0;
-	cell = wxAtof(grid->GetCellValue(line, COL_NB + pugin_number - 1));
+	cell = wxAtof(grid->GetCellValue(line, COL_NB + plugin_number - 1)); // look at duration
 	if (cell > 0.0)
 		return true;
 	else
@@ -286,9 +255,9 @@ bool cTable::IsActiveLine(const int line)
 void cTable::GridResize(wxGrid* grid)
 {
 	wxSize size = inst_->FromDIP(grid->GetSize());
-	for (int i = 0; i < COL_NB + pugin_number; i++)
+	for (int i = 0; i < COL_NB + plugin_number; i++)
 	{
-		grid->SetColSize(i, ((size.x - size.x / (COL_NB + pugin_number)) / (COL_NB + pugin_number)));
+		grid->SetColSize(i, ((size.x - size.x / (COL_NB + plugin_number)) / (COL_NB + plugin_number)));
 	}
 }
 
@@ -352,21 +321,25 @@ cDurationStatisticCtrl::~cDurationStatisticCtrl()
 }
 
 
-void cDurationStatisticCtrl::start(cCycle* m_cycle, cTable* m_table)
+void cDurationStatisticCtrl::start(std::shared_ptr<cCycle> m_cycle)
 {
 	// Save references
 	m_cycle_ = m_cycle;
-	m_table_ = m_table;
 
 	// Compute & display statistic timestamps
 	double sec = 0.0;
-	int j = m_table->get_last_active_line();
-	for (int i = 0; i < j; i++)
+	auto cycle_obj = m_cycle_->get_cycles();
+	auto step_table = cycle_obj->step_table;
+	for (auto& step : step_table)
 	{
-		sec += m_cycle->get_duration();
+		sec += step.duration;
 	}
-	auto duration_s = sec * m_cycle->get_current_loop();
-	auto step_number = j * m_cycle->get_current_loop();
+	assert(sec > 0);
+
+	//todo: loop count must be in step table
+
+	auto duration_s = sec * m_cycle_->get_total_loop_number();
+	//auto step_number = j * m_cycle_->get_current_loop();
 
 	// Fill indicators
 	wxString current_timestamp = "Started at :" + get_current_timestamp();
@@ -379,6 +352,8 @@ void cDurationStatisticCtrl::start(cCycle* m_cycle, cTable* m_table)
 	elapsed->SetLabelText(elapsed_timestamp);
 
 	saved_total_cycle = m_cycle->get_current_loop();
+	
+	int j = m_cycle->get_total_step_number();
 	saved_total_step = j;
 	wxString cycle_status = std::format("Performed: 0/{} cyles", saved_total_cycle);
 	cycle_step_state->SetLabelText(cycle_status);
@@ -542,8 +517,8 @@ void cDurationStatisticCtrl::Notify()
 	elapsed->SetLabelText(elapsed_timestamp);
 
 	// Compute number of cycle performed
-	auto current_cycle = saved_total_cycle - m_cycle_->get_current_loop();
-	auto total_cycle = saved_total_cycle;
+	size_t current_cycle = m_cycle_->get_total_loop_number()- (m_cycle_->get_current_loop());
+	size_t total_cycle = saved_total_cycle;
 	wxString performed = wxString::Format("Performed: %Iu/%Iu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
 	cycle_step_state->SetLabelText(performed);
 

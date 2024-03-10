@@ -1,7 +1,7 @@
 #include "cMeasurementmanager.h"
 #include "cMeasurementControler.h"
 
-void cMeasurementmanager::set_measurement_controler(cMeasurementControler* m_controler)
+void cMeasurementmanager::set_measurement_controler(std::shared_ptr<cMeasurementControler> m_controler)
 {
 	m_meas_controler_ = m_controler;
 }
@@ -11,7 +11,7 @@ void cMeasurementmanager::set_measurement(cMeasurement* measurement)
 	m_meas_pool.push_back(measurement);
 }
 
-cMeasurementControler* cMeasurementmanager::get_measurement_controler()
+std::shared_ptr<cMeasurementControler> cMeasurementmanager::get_measurement_controler()
 {
 	return m_meas_controler_;
 }
@@ -50,13 +50,6 @@ size_t cMeasurementmanager::get_measurement_total_channel_number()
 	}
 	std::cout << "[*] Measurement total signals:" << count << "\n";
 	return count;
-}
-
-void cMeasurementmanager::destroy_measurement_controler()
-{
-	std::cout << "[*] [delete] m_meas_controler_ in cMeasurementmanager.cpp\n";
-	delete m_meas_controler_;
-	m_meas_controler_ = nullptr;
 }
 
 void cMeasurementmanager::destroy_measurement_pool()

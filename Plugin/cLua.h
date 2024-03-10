@@ -18,6 +18,7 @@ cDevice* lua_start_vm(void* wxInst);
 void lua_display_stack(lua_State* L);
 
 static int lua_CreateBuilder(lua_State* L);
+static int luaProduceIdentity(lua_State* L);
 static int luaProduceProtocol(lua_State* L);
 static int luaProducePanel(lua_State* L);
 static int luaProduceImage(lua_State* L);
@@ -37,6 +38,8 @@ static void registerObj(lua_State* L)
 	lua_setfield(L, -2, "__gc");
 	lua_pushvalue(L, -1); 
 	lua_setfield(L, -2, "__index");
+	lua_pushcfunction(L, luaProduceIdentity);
+	lua_setfield(L, -2, "ProduceIdentity");
 	lua_pushcfunction(L, luaProduceProtocol); 
 	lua_setfield(L, -2, "ProduceProtocol");
 	lua_pushcfunction(L, luaProducePanel); 
@@ -58,6 +61,17 @@ static int lua_CreateBuilder(lua_State* L)
 	luaL_setmetatable(L, "builder");
 
 	return 1;
+}
+
+static int luaProduceIdentity(lua_State* L)
+{
+	std::string dev_name = lua_tostring(L, 2);
+	PLUGIN_ACCESS access = (PLUGIN_ACCESS) lua_tointeger(L, 3);
+	std::string measurement_type = lua_tostring(L, 4);
+	std::string unit = lua_tostring(L, 5);
+
+	(*reinterpret_cast<DeviceBuilder1**>(luaL_checkudata(L, 1, "builder")))->ProduceIdentity(dev_name, access, measurement_type, unit);
+	return 0;
 }
 
 static int luaProduceProtocol(lua_State* L) 

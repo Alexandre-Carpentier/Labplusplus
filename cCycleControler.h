@@ -2,38 +2,42 @@
 #include <wx/wx.h>
 #include <thread>
 #include <mutex>
+#include <iostream>
 
-class cCycle;
-class cTable;
+#include "enum.h"
+#include "cCycle.h"
+#include "cTable.h"
 
-class cCycleControler : public wxWindow
+class cCycleControler /* : public wxWindow*/
 {
+public:
+	// Create a lock shared by cCycleControler and cMeasurementControler
+	std::mutex cycle_mutex;
+
+	cCycleControler(cTable* m_table, wxWindow* inst);
+	void start();
+	void stop();
+	int get_current_step();
+	int get_current_loop();
+	int get_total_step();
+	int get_total_loop();
+	STEPSTRUCT get_current_step_param();
+	~cCycleControler();
 private:
-	cCycle* m_cycle_ = nullptr;
+	void poll();
+	std::shared_ptr<cCycle> m_cycle = std::make_shared<cCycle>();
+
 	cTable* m_table_ = nullptr;
 	wxWindow* inst_ = nullptr;
 
 	std::jthread thread;
 
-	long long start = PerformanceCounter();
-	long long end = PerformanceCounter();
-	double delta;
-	long long freq = PerformanceFrequency();
-public:
-	std::mutex critical_section; // used to synchronize cycle and measurement controler when read/write
-
-	bool bRunning = false;
-
-
-	cCycleControler(cCycle* m_cycle, cTable* m_table, wxWindow* inst);
-	void poll();
-	void stop();
 	inline long long PerformanceFrequency();
 	inline long long PerformanceCounter();
 
-	//std::mutex get_mutex_reference();
-
-	~cCycleControler();
-
+	long long start_tick = PerformanceCounter();
+	long long end_tick = PerformanceCounter();
+	double delta_tick;
+	long long freq = PerformanceFrequency();
 };
 

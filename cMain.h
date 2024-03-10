@@ -6,6 +6,8 @@
 #include <crtdbg.h>
 #endif
 */
+//#include <vld.h>
+
 #include "resource.h"
 #include <wx/wx.h>
 #include <wx/treectrl.h>

@@ -76,8 +76,6 @@ void lua_display_stack(lua_State* L)
 		std::string index_str = std::format("{} ", index);
 		switch (type)
 		{
-			
-
 			// booleans
 		case LUA_TBOOLEAN:
 			str = index_str + str + (lua_toboolean(L, index) ? "true" : "false") + "\n";
@@ -99,7 +97,6 @@ void lua_display_stack(lua_State* L)
 			break;
 		}
 	}
-
 	str = str + "\n";
 	std::cout << str;
 }
@@ -179,10 +176,8 @@ cDevice* lua_start_vm(void* wxInst)
 			CheckLua(L, lua_pcall(L, 1, 1, 0));
 		}
 	}
-
 	return dev;
 }
-
 
 bool lua_stop_vm(cDevice* dev)
 {

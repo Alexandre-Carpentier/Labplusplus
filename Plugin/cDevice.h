@@ -10,6 +10,11 @@
 #include "cProtocol.h"
 //#include "types.h"
 
+    //typedef std::shared_ptr<cDevice>(__cdecl* ATTACH)(wxWindow*);
+
+//typedef cDevice* (*ATTACH)(wxWindow*);
+
+
 enum PLUGIN_ACCESS {
     READ,
     WRITE,
@@ -31,6 +36,23 @@ enum PLUGIN_ACCESS {
 class cDevice
 {
 public:
+    // Plugin information
+//#define _C_STYLE_
+#ifdef _C_STYLE_
+// C style
+    char device_name[MAX_PATH] = "2280S";
+    PLUGIN_ACCESS plugin_access_type = READ;
+    char plugin_measurement_name[MAX_PATH] = "Voltage";
+    char plugin_measurement_unit[MAX_PATH] = "Volt";
+#else
+    //modern c++
+    std::string device_name = "2280S";
+    PLUGIN_ACCESS plugin_access_type = READ;
+    std::string plugin_measurement_name = "Voltage";
+    std::string plugin_measurement_unit = "Volt";
+#endif
+    short uniqueID = rand() % 100 + std::hash <std::string>{}(device_name);
+
     // cProtocol abstract COM,USB,TCP,DAQMX,VISA protocol
     plug_cProtocol* protocol;
 
@@ -57,8 +79,25 @@ public:
     {
         lua_state_ptr = inst;
     }
+#ifdef _C_STYLE_
+    // C style 
+    void scpi_open(char* addr);
+    void scpi_write(char* command);
+    char* scpi_read();
+    void scpi_close();
 
-    // SCPI interface
+
+    char* get_device_name();
+    int get_access_type();
+    char* get_measurement_name();
+    char* get_measurement_unit();
+
+    void set_device_name(char* name);
+    void set_access_type(int type);
+    void set_measurement_name(char* meas_name);
+    void set_measurement_unit(char* meas_unit); 
+     //modern c++
+#else
     void scpi_open(std::string addr);
     void scpi_write(std::string command);
     std::string scpi_read();
@@ -74,7 +113,7 @@ public:
     void set_access_type(int type);
     void set_measurement_name(std::string meas_name);
     void set_measurement_unit(std::string meas_unit);
-
+#endif
     // 
     // Get current measured value
     // Set current instrument set point
@@ -87,12 +126,7 @@ public:
         return lua_state_ptr;
     }
 
-private:
-    // Plugin information
-    std::string device_name = "2280S";
-    PLUGIN_ACCESS plugin_access_type = READ;
-    std::string plugin_measurement_name = "Voltage";
-    std::string plugin_measurement_unit = "Volt";
+
 
     // Store the lua instance here
     void* lua_state_ptr = nullptr; 

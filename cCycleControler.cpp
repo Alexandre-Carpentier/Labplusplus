@@ -1,68 +1,84 @@
 #include "cCycleControler.h"
-#include <wx/wx.h>
-#include <thread>
-#include <mutex>
-#include <iostream>
-#include "enum.h"
 
-#include "cCycle.h"
-#include "cTable.h"
+int cCycleControler::get_current_step()
+{
+	return m_cycle->get_current_step();
+}
+
+int cCycleControler::get_current_loop()
+{
+	return m_cycle->get_current_loop();
+}
+
+int cCycleControler::get_total_step()
+{
+	return m_cycle->get_total_step_number();
+}
+
+int cCycleControler::get_total_loop()
+{
+	return m_cycle->get_total_loop_number();
+}
+
+STEPSTRUCT cCycleControler::get_current_step_param()
+{
+	std::atomic <int> step = m_cycle->get_current_step();
+	std::vector<STEPSTRUCT> step_struct_vec = m_cycle->get_step_table();
+	assert(step_struct_vec.size() > 0);
+	return step_struct_vec[step];
+}
 
 void cCycleControler::poll()
 {
 	auto st = thread.get_stop_source();
 
-	end = PerformanceCounter();
+	end_tick = PerformanceCounter();
 
 	while (!st.stop_requested())
 	{
-		m_table_->set_line_highlight(m_cycle_->get_current_step());
-		start = PerformanceCounter();
+		m_table_->set_line_highlight(m_cycle->get_current_step());
+		start_tick = PerformanceCounter();
 
-		delta = (double)((end - start) / freq);
-		while (delta < (m_cycle_->get_duration()*10) and st.stop_requested() == false)
+		delta_tick = (double)((end_tick - start_tick) / freq);
+		while (delta_tick < (m_cycle->get_duration()*10) and st.stop_requested() == false)
 		{
-			end = PerformanceCounter();
-			delta = (double)((end - start) / (freq/10));
-			//Sleep(10);
+			end_tick = PerformanceCounter();
+			delta_tick = (double)((end_tick - start_tick) / (freq/10));
 		}
 
 		if (st.stop_requested())
 		{
 			goto kill;
 		}
-		if (m_cycle_ == nullptr)
-		{
-			goto kill;
-		}
-		critical_section.lock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
-		m_cycle_->next();
 
-		int total = m_cycle_->get_total_step_number();
-		int current = m_cycle_->get_current_step();
+		// protect
+		cycle_mutex.lock();
+
+		m_cycle->next();
+
+		int total = m_cycle->get_total_step_number();
+		int current = m_cycle->get_current_step();
 		if (total - current == 0)
 		{
 			std::cout << "[*] Cycle controler step end\n";
-			m_table_->set_lines_white();
-			int loopcount = m_cycle_->get_current_loop();
+			m_table_->set_lines_white(); // Set all lines to white colour
+			std::atomic<int> loopcount = m_cycle->get_current_loop();
 
 			if (loopcount > 0)
 			{
 				std::cout << "[*] Cycle controler next cycle loaded\n";
 				loopcount--;
-				m_cycle_->set_current_step(0);
-				m_cycle_->set_current_loop(loopcount);
+				m_cycle->set_current_step(0);
+				m_cycle->set_current_loop(loopcount);
 				m_table_->set_loop_count(loopcount);
 			}
 			if (loopcount <= 0)
 			{
-
 				// Update % in status bar
 				cObjectmanager* object_manager = object_manager->getInstance();
 				wxStatusBar* statusbar = object_manager->get_status_bar();
 				wxString statusstr = wxString::Format("100 %% performed...");
 				statusbar->SetLabelText(statusstr);
-				critical_section.unlock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
 
 				// Send virtual click on STOP btn
 				wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDC_STARTBTN);
@@ -72,31 +88,53 @@ void cCycleControler::poll()
 				break;
 			}
 		}
-		critical_section.unlock(); ////////////////////////////////////////////////////CRITICAL_SECTION//////////////
+		// unprotect
+		cycle_mutex.unlock();
 	}
 kill:
+
 	std::cout << "[*] Cycle controler exitting daemon\n";
 	MessageBox(GetFocus(), L"Exit control daemon", L"Success", MB_OK);
 }
 
 
-cCycleControler::cCycleControler(cCycle* m_cycle, cTable* m_table, wxWindow* inst)
+cCycleControler::cCycleControler(cTable* m_table, wxWindow* inst)
 {
 	std::cout << "cCycleControler ctor...\n";
-	m_cycle_ = m_cycle;
 	m_table_ = m_table;
 	inst_ = inst;
+}
 
+void cCycleControler::start()
+{
+	std::cout << "[*] cCycleControler start requested\n";
+
+		// build a new cycle based on cTable
+
+	m_cycle->clear_cycles();
+	m_cycle->set_current_step(0);
+	m_cycle->set_current_loop(m_table_->get_loop_number());
+	m_cycle->set_total_step_number(m_table_->get_step_number());
+	m_cycle->set_total_loop_number(m_table_->get_loop_number());
+
+	m_cycle->set_step_table(m_table_->get_step_table());
+
+		// Send the cycle to statistic module 
+	
+	m_table_->start_statistic(m_cycle);
+
+		// start the polling thread
+
+	assert(!thread.joinable()); // Thread must be stopped 
 	thread = std::jthread(&cCycleControler::poll, this);
-
-	bRunning = true;
 }
 
 void cCycleControler::stop()
 {
-	bRunning = false;
 	thread.request_stop();
-	std::cout << "[*] cCycleControler has joined\n";
+	thread.join();
+	m_cycle->clear_cycles();
+	std::cout << "[*] cCycleControler stop requested\n";
 }
 
 inline long long cCycleControler::PerformanceFrequency()
@@ -116,12 +154,6 @@ inline long long cCycleControler::PerformanceCounter()
 cCycleControler::~cCycleControler()
 {
 	std::cout << "cCycleControler dtor...\n";
+}
 
-}
-/*
-std::mutex cCycleControler::get_mutex_reference()
-{
-	return nullptr;
-}
-*/
 

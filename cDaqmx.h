@@ -3,11 +3,13 @@
 #include <wx/wx.h>
 #include <wx/combobox.h>
 #include <wx/treectrl.h>
-#include <string>
 #include <wx/fileconf.h>
+#include <wx/dcbuffer.h>
+#include <string>
+#include <format>
+#include <memory>
 
 #include "enum.h"
-
 #include "cMeasurementControler.h"
 #include "cMeasurement.h"
 #include "cObjectmanager.h"
@@ -22,8 +24,6 @@
 #include "cSignalTable.h"
 
 static wxImage temp_img;
-
-
 
 static wxPanel* config_rightpanel_ = nullptr;
 static wxTreeCtrl* config_tree_ctrl = nullptr;
@@ -170,8 +170,6 @@ public:
 
 	wxFlexGridSizer* flexchansizer3;
 
-
-
 	wxBoxSizer* chan_vsizer;
 
 	wxButton* chanbtn[max_chan_number];
@@ -185,6 +183,7 @@ public:
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
 	cDaqmx(wxWindow* inst);
+	~cDaqmx();
 
 	void OnPaint(wxPaintEvent& event);
 
@@ -203,7 +202,6 @@ public:
 
 	void load_combobox(wxComboBox* combo, wxString str);
 	void load_combobox(wxComboBox* combo, double floating);
-
 
 	wxArrayString LoadScalePresetArray(wxString filename);
 	//void EnableChanProperties();
