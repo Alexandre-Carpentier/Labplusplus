@@ -1,4 +1,5 @@
 #include "cFooter.h"
+#include "cGnuplot.h"
 
 class cMain;
 
@@ -82,7 +83,6 @@ wxBoxSizer* cFooter::GetSizer()
 
 void cFooter::startButtonClicked(wxCommandEvent& evt)
 {
-
 	if (m_plot_->get_graph_state() == false)
 	{
 
@@ -96,7 +96,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 			// Sanity check
 
-		if (m_table_->get_loop_number() < 1)
+		if ((m_table_->get_loop_number() < 1) || (m_table_->get_step_number() < 1))
 		{
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_EDITBTN);
 			wxPostEvent(inst_, evt);
@@ -306,6 +306,151 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 		meas_manager->stop_all_devices();
 
+		////////////////////////////////////////////////////////////////////////////////
+		// DRAW FULL GRAPH WITH GNUPLOT?
+		////////////////////////////////////////////////////////////////////////////////
+		cGnuplot cGnuplotDlg(this->inst_, IDCGNUPLOTDLG, "Create PDF graph and save campain?");
+		cGnuplotDlg.Centre();
+		int ret = cGnuplotDlg.ShowModal();
+		if (ret == wxID_OK)
+		{
+			// retrieve current file with raw data
+			std::string raw_name = m_plot_->get_graph_filename();
+			// remove (xx).lab
+			std::string raw_noext = raw_name.substr(0, raw_name.find_last_of("."));
+			raw_noext = raw_noext.substr(0, raw_noext.find_last_of("("));
+			// get new name
+			std::string name = cGnuplotDlg.get_filename();
+			// add extension
+			std::string new_name = raw_noext + name + std::string(".lab");
+			// rename the file
+			wxRenameFile(raw_name, new_name);
+
+			// read header to build the script accordingly
+			std::ifstream file(new_name);
+			std::string header;
+			std::getline(file, header);
+
+			// Count every collomn and add to vector for legend
+			std::vector<std::string> signals_vec;
+
+			std::string token;
+			std::stringstream input_stringstream(header);
+
+			//tokenize each col
+			int col = 0;
+			while (getline(input_stringstream, token, '\t'))
+			{
+				if (col >= 1)
+				{
+					signals_vec.push_back(token);
+				}
+				col++;
+			}	
+
+			std::string script_file = new_name;
+			script_file = script_file.substr(0, script_file.find("."));
+			std::string pdf_file = script_file+std::string(".pdf");
+			script_file = script_file + std::string(".plt");
+			//char const* gnuname = "gnu.script";
+			const std::string sig_colours[]
+			{
+				"#DB7093",
+				"#008000",
+				"#FFE4B5",
+				"#F4A460",
+				"#A0522D",
+				"#FFB6C1",
+				"#DA70D6",
+				"#6A5ACD",
+				"#4169E1",
+				"#87CEFA",
+				"#4682B4",
+				"#48D1CC",
+				"#008080",
+				"#2E8B57",
+				"#8FBC8F",
+				"#32CD32",
+				"#FFFF00",
+				"#DAA520",
+				"#FA8072",
+				"#FF6347",
+				"#DC143C",
+				"#800000"
+			};
+
+			FILE* f = fopen(script_file.c_str(), "w");
+			if (f != NULL)
+			{
+				// set gnuplot script
+
+				
+				fprintf(f, "set terminal pdf\n");
+				fprintf(f, "set encoding utf8\n");	
+				fprintf(f, "set output \"%s\"\n", pdf_file.c_str());
+				fprintf(f, "set encoding utf8\n");
+				fprintf(f, "#set xrange [0.0:600.0]\n");
+				fprintf(f, "#set xrange [0.0:20.0]\n");
+	
+				fprintf(f, "set key outside\n");
+				
+				for (int i =1; i <= signals_vec.size(); i++)
+				{
+					fprintf(f, "set style line %i linecolor rgb '%s' linewidth 0.1\n", i, sig_colours[i-1].c_str());
+					//fprintf(f, "set style line 2 linecolor rgb '#dd181f' linewidth 0.1\n");
+				}
+
+				fprintf(f, "set title \"%s\"\n", new_name.c_str());
+				fprintf(f, "set xlabel \"T(s)\"\n");
+				fprintf(f, "set ylabel \"Amplitude\"\n");
+				
+				int j = 1;
+				fprintf(f, "plot \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(0).c_str());
+				for (int i=j; i< signals_vec.size(); i++)
+				{
+					j++;
+					fprintf(f, ", \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(i).c_str());
+				}
+				fprintf(f, "\n");
+
+				fclose(f);
+
+				// Run GNUplot on the control script (for Windows)
+				char command[300];
+				const char* gnupath = "\"C:\\Program Files\\gnuplot\\bin\"";
+				sprintf(command, "gnuplot.exe \"%s\"", script_file.c_str());
+				printf("[*] Executing %s...\n", command);
+				system(command);
+
+				// Wait when building PDF file
+				if (!wxFileExists(pdf_file))
+				{
+					std::cout << "[!] Building pdf file takes time !\n";
+					Sleep(500);
+				}
+
+				if (!wxFileExists(pdf_file))
+				{
+					std::cout << "[!] Building pdf file takes time ! (waiting 5s more)\n";
+					Sleep(5000);
+				}
+				if (!wxFileExists(pdf_file))
+				{
+					fprintf(stderr, "Could not create %s.\n", pdf_file.c_str());
+				}
+				else
+				{
+					sprintf(command, "%s", pdf_file.c_str());
+					printf("[*] Executing %s...\n", command);
+					system(command);
+				}
+			}
+			else
+			{
+				fprintf(stderr, "Could not create %s.\n", script_file.c_str());
+			}	
+		}
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// START LOOK UP FOR DEVICE
 		////////////////////////////////////////////////////////////////////////////////

@@ -17,8 +17,6 @@ void cDevice::DisplayConfiguration()
     return;
 }
 
-
-
 #ifdef _C_STYLE_
 void cDevice::set_device_name(char* name)
 {

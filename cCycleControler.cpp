@@ -1,5 +1,7 @@
 #include "cCycleControler.h"
 
+
+
 int cCycleControler::get_current_step()
 {
 	return m_cycle->get_current_step();
@@ -94,7 +96,8 @@ void cCycleControler::poll()
 kill:
 
 	std::cout << "[*] Cycle controler exitting daemon\n";
-	MessageBox(GetFocus(), L"Exit control daemon", L"Success", MB_OK);
+	//MessageBox(GetFocus(), L"Exit control daemon", L"Success", MB_OK);
+
 }
 
 
@@ -125,14 +128,14 @@ void cCycleControler::start()
 
 		// start the polling thread
 
-	assert(!thread.joinable()); // Thread must be stopped 
+	//assert(!thread.joinable()); // Thread must be stopped 
 	thread = std::jthread(&cCycleControler::poll, this);
 }
 
 void cCycleControler::stop()
 {
 	thread.request_stop();
-	thread.join();
+	//thread.join();
 	m_cycle->clear_cycles();
 	std::cout << "[*] cCycleControler stop requested\n";
 }

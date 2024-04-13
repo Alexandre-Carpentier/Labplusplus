@@ -31,7 +31,11 @@
 
 #include "cDeviceMonitor.h"
 
-#pragma comment (lib, "WinGraph.lib")
+#if _WIN64
+#pragma comment (lib, "WinGraph64.lib")
+#else 
+#pragma comment (lib, "WinGraph32.lib")
+#endif
 
 #pragma comment (lib, "Advapi32.lib")
 #pragma comment (lib, "Gdi32.lib")

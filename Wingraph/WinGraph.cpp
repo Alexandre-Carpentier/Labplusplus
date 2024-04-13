@@ -81,6 +81,7 @@ typedef struct {
 	INT BufferSize;								// The total amount of point to handle							
 	BOOL bRunning;								// Status of the graph
 	LOGGER_M Logging;							// Logging type
+	char* logfilename;
 	FILTER_M Filtering;							// Filtering type
 	BOOL bAutoscale;							// Autoscale active
 	BOOL bDisplayCursor;						// Logging active
@@ -195,7 +196,6 @@ BOOL StartGraph(HGRAPH hGraph)
 	}
 
 	// Create the log file
-
 	if (pgraph->Logging == LOGGER_ASCII)
 	{
 		logfile = NULL;
@@ -209,6 +209,15 @@ BOOL StartGraph(HGRAPH hGraph)
 			LeaveCriticalSection(&cs);
 			return FALSE;
 		}
+		pgraph->logfilename = NULL;
+		pgraph->logfilename = (char*)malloc(sizeof(lpDateStr));
+		if(!pgraph->logfilename)
+		{
+			MessageBox(GetFocus(), "Error: impossible to allocate logfilename buffer in memory", "Error", MB_ICONERROR);
+			LeaveCriticalSection(&cs);
+			return FALSE;
+		}
+		strcpy_s(pgraph->logfilename, MAX_PATH, lpDateStr);
 
 		// try to open the file
 
@@ -659,6 +668,7 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 	pgraph->bAutoscale = true;
 	pgraph->bDisplayCursor = true;
 	pgraph->Logging = LOGGER_NONE;
+	pgraph->logfilename = NULL;
 	pgraph->Filtering = FILTER_NONE;
 	GetClientRect(pgraph->hGraphWnd, &DispArea);
 	InitGL(pgraph, DispArea.right, DispArea.bottom);
@@ -1092,6 +1102,26 @@ BOOL GetGraphState(HGRAPH hGraph)
 
 	return pgraph->bRunning;
 }
+
+/*-------------------------------------------------------------------------
+	GetGraphFilename: return the filename used to save data on disk. If not exist return NULL ptr.
+  -------------------------------------------------------------------------*/
+
+char* GetGraphFilename(HGRAPH hGraph)
+{
+	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
+
+	// Sanity check
+
+	if (NULL == pgraph)
+	{
+		printf("[!] Error at GetGraphFilename() graph handle is null\n");
+		return FALSE;
+	}
+
+	return pgraph->logfilename;
+}
+
 
 /*-------------------------------------------------------------------------
 	GetGraphRC: return the graph render context
@@ -2587,10 +2617,10 @@ BOOL GetUniqueFilename(CHAR* lpFilename, CHAR* lpFileExtension)
 	char name_format[32] = "";
 	if (strlen(lpFileExtension) > 10)
 	{
-		printf("[!] Error at GetUniqueFilename() lpFileExtension > 10 char\n");
+		printf("[!] Error at GetUniqueFilename() lpFileExtension > 10 char (forbiden)\n");
 		return FALSE;
 	}
-	sprintf_s(name_format, "yyyy_MMM_dd_%s", lpFileExtension);
+	sprintf_s(name_format, "yyyy_MM_dd_%s", lpFileExtension);
 	GetLocalTime(&t);
 	int ok = GetDateFormat(LOCALE_USER_DEFAULT,
 		0,

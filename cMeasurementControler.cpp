@@ -132,6 +132,7 @@ void cMeasurementControler::poll()
 				Sleep(1000);
 				if (m_plot_->get_graph_state() == false)
 				{					
+					// ---------------
 					std::cout << "cMeasurementcontroler->program break \n";
 					break;
 				}
@@ -170,6 +171,7 @@ void cMeasurementControler::poll()
 							if (old_pressure != value)
 							{
 								old_pressure = value; // save old value
+								meas->set(old_pressure);
 							}
 
 							// Read data from instrument
@@ -283,14 +285,12 @@ void cMeasurementControler::poll()
 				m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));
 			}
 		}
-		else
-		{
-			if (meas_pool.size() > 0)
-			{
-				zero_instrument(meas_pool);
-			}
-			break;
-		}	
+	}
+	// TODO:
+	// doesn't called 
+	if (meas_pool.size() > 0)
+	{
+		zero_instrument(meas_pool);
 	}
 	std::cout << "cMeasurementcontroler->exiting thread... \n";
 	return;

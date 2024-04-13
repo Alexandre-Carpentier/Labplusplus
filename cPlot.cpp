@@ -9,7 +9,6 @@
 #include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
 
-
 cPlot::cPlot(wxWindow* inst, int nbPoints)
 {
 	inst_ = inst;
@@ -400,7 +399,7 @@ void cPlot::update_chan_statistic_labels()
 
 	// BUG index different de i et decalle 
 	int index = 0;
-	for (int i = 0; i < chan_legend_struct_list.size(); i++)
+	for (size_t i = 0; i < chan_legend_struct_list.size(); i++)
 	{
 		if (it->type != MEAS_TYPE::VOID_INSTR)
 		{
@@ -511,6 +510,11 @@ HGRAPH cPlot::get_graph_handle()
 bool cPlot::get_graph_state()
 {
 	return GetGraphState(hGraph);
+}
+
+char* cPlot::get_graph_filename()
+{
+	return GetGraphFilename(hGraph);
 }
 
 int cPlot::get_graph_signal_count()

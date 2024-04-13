@@ -501,6 +501,7 @@ void cConfig::OnPaint(wxPaintEvent& event)
 	size.x = 0;
 	dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
 
+
 	event.Skip();
 }
 

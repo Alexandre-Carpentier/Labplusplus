@@ -259,10 +259,10 @@ void cTable::GridResize(wxGrid* grid)
 	wxSize size = grid->GetSize();
 	//int cell_width = ((size.x - size.x / (COL_NB + pugin_number)) / (COL_NB + pugin_number));
 
-	int cell_width = (size.x / (COL_NB + pugin_number ) );
+	int cell_width = (size.x / (COL_NB + plugin_number ) );
 	cell_width = (grid->GetClientSize().x - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X)) / 5;
 	
-	for (int i = 0; i < COL_NB + pugin_number; i++)
+	for (int i = 0; i < COL_NB + plugin_number; i++)
 	{
 		grid->SetColSize(i, ((size.x - size.x / (COL_NB + plugin_number)) / (COL_NB + plugin_number)));
 	}

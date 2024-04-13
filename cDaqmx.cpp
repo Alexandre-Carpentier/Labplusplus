@@ -591,7 +591,7 @@ void cDaqmx::OnPaint(wxPaintEvent& event)
 	// retrieving different size and proportions
 	wxRect size = config_rightpanel_->GetRect();
 	size.x = 0;
-	dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
+	dc.GradientFillLinear(size, wxColor(65, 65, 65), wxColor(255, 255, 255), wxUP);
 	wxSize sz = temp_img.GetSize();
 
 	// Scale the image

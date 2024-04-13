@@ -54,6 +54,7 @@ end
 
 
 function lua_init()
+print("[LUA] in init")
 -- retrieve the current device built previously
 device = builder1:GetObject();
 -- use scpi

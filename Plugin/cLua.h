@@ -10,7 +10,11 @@ extern "C"
 //#include "lauxlib.h"
 //#include "lualib.h"
 }
-#ifdef _WIN32
+#if _WIN32
+#pragma comment (lib, "..\\LUA_LIB_542_x86\\lua54.lib")
+#endif
+
+#if _WIN64
 //#pragma comment (lib, "lua54.lib")
 #pragma comment (lib, "..\\LUA_LIB_542\\lua54.lib")
 #endif
