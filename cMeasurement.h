@@ -57,6 +57,7 @@ public:
 	virtual void set_device_name(std::string name);
 	virtual void set_device_addr(std::string addr);
 
+	void start_device();
 	virtual void stop_device();
 	virtual ~cMeasurement() = default;
 };

@@ -29,6 +29,7 @@ public:
 	size_t get_measurement_total_channel_number(void);
 
 	void destroy_measurement_pool();
+	void start_all_devices();
 	void stop_all_devices();
 	bool destroy_subsystem(MEAS_TYPE type);
 };

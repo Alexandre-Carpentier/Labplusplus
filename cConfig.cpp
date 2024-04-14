@@ -90,8 +90,8 @@ cConfig::cConfig(wxWindow* inst)
 	config_leftpanel_->SetBackgroundColour(wxColor(220, 220, 225));
 
 	config_rightpanel_ = new wxPanel(inst, IDC_CONFIG_RIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
-	//config_rightpanel_->SetBackgroundColour(wxColor(245, 0, 0)); // To not overlap on control border must be paint with same color gradiant as in DAQ or plugin
-	config_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cConfig::OnPaint)); // Draw gradiant grey
+	//config_rightpanel_->SetBackgroundColour(wxColor(255, 55, 55)); // To not overlap on control border must be paint with same color gradiant as in DAQ or plugin
+	//config_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cConfig::OnPaint)); // Draw gradiant grey
 
 	/////////////////////////////////////////////////////////////
 	//
@@ -499,8 +499,13 @@ void cConfig::OnPaint(wxPaintEvent& event)
 	wxRect size = this->GetRect();
 
 	size.x = 0;
-	dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
+	//dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
 
+	// change the brush to fill the whole client rectangle
+	wxBrushList my_brush_list;
+	wxBrush* my_brush = my_brush_list.FindOrCreateBrush(wxColour(255, 20, 20), wxBRUSHSTYLE_SOLID);
+	dc.SetBrush(*my_brush); // custom filling
+	dc.DrawRectangle(size);
 
 	event.Skip();
 }

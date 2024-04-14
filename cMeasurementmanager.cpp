@@ -65,6 +65,15 @@ void cMeasurementmanager::destroy_measurement_pool()
 	m_meas_pool.clear();
 }
 
+void cMeasurementmanager::start_all_devices()
+{
+	for (auto meas : m_meas_pool)
+	{
+		std::cout << "[*] Starting: " << meas->device_name() << "\n";
+		meas->start_device();
+	}
+}
+
 void cMeasurementmanager::stop_all_devices()
 {
 	for (auto meas : m_meas_pool)

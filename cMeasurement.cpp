@@ -41,6 +41,7 @@ void cMeasurement::set_device_addr(std::string addr)
 	config_struct_.device_addr = addr;
 }
 
+void cMeasurement::start_device() {};
 void cMeasurement::stop_device() {};
 
 //cMeasurement::~cMeasurement();
