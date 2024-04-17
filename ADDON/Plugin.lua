@@ -9,16 +9,14 @@ function lua_entrypoint(wxInst)
 	-- 	return a builder instance
 	builder1 = builder()
 
-	-- ProduceProtocol(SCPIMODE)
-	-- 	Determine the protocol to use to link instrument. This is the
-	--  different implementation available here. COM is full compatible
-	--  RS232 driver implemented in the low level. TCP provide standard socket send/recv
-	--  communication. USB is using VISA from the IVI foundation and support National Instrument.
-	--  DAQMX is using National instrument Driver to communicate as well as VISA. 
-	-- 	arg1: SCPIMODE COM=0 , TCP=1, USB=2, DAQMX=3, VISA=4 
-	-- 	arg2: length
-	-- 	arg3: height
-	-- 	arg4: name of the control
+	builder1:ProduceIdentity("Keithley 2280S",2, "Voltage","Volt")
+	-- ProduceIdentity("name", PLUGIN_ACCESS, "meas unit", "unit")
+	-- 	Set the device name, access mode needed to be handled by core software, also add the measurement unit here.
+	-- 	arg1: Name of the equipment
+	-- 	arg2: PLUGIN_ACCESS READ=0 , WRITE=1, ALL=2
+	-- 	arg3: type of measurements ex: voltage
+	-- 	arg4: unit to attribute ex: Volt
+
 	builder1:ProduceProtocol(4)
 	
 	-- ProducePanel(wxWindow*)
@@ -50,13 +48,28 @@ function lua_entrypoint(wxInst)
 	builder1:AddPanelCtrl(2, 200, 200, "OUTP:0*CLS\n")
 
 	-- must return the builder object -> builder1
-	-- as the plugin use it to handle action and properties
+	-- as the plugin use it to handle behaviours and properties
 	return builder1:GetObject()
 end
 
 
 function lua_init()
+print("[LUA] in init")
+-- retrieve the current device built previously
+device = builder1:GetObject();
+-- use scpi
+device:scpi_open("192.168.0.1")
+device:scpi_write("*RST")
+device:scpi_close("192.168.0.1")
+end
 
+function lua_set(setpoint)
+print(setpoint)
+end
+
+function lua_read()
+readpoint = 12
+return readpoint
 end
 
 function lua_close()

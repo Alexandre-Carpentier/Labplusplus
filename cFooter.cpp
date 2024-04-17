@@ -1,9 +1,12 @@
 #include "cFooter.h"
+#include "cGnuplot.h"
 
 class cMain;
 
 cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config)
 {
+	cycle_controler = std::make_shared<cCycleControler>(m_table, inst);
+
 	std::cout << "cFooter ctor...\n";
 	inst_ = inst;
 	m_plot_ = m_plot;
@@ -80,40 +83,53 @@ wxBoxSizer* cFooter::GetSizer()
 
 void cFooter::startButtonClicked(wxCommandEvent& evt)
 {
-		// reset zoom slider to x1
-
-	scale_btn->slider_reset();
-
-		// show every signals
-
-	m_plot_->show_all_signals(true);
-
-
-	size_t measurement_number = meas_manager->get_measurement_pool_size();
-	std::cout << "[*] " << measurement_number << " measurements are in pool.\n";
-	if (measurement_number == 0)
-	{
-		wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
-		wxPostEvent(inst_, evt);
-		MessageBox(GetFocus(), L"No active device\ntry to enable one instrument first", L"Error", S_OK | MB_ICONERROR);
-		evt.Skip();
-		return;
-	}
 	if (m_plot_->get_graph_state() == false)
 	{
+
+			// reset zoom slider to x1
+
+		scale_btn->slider_reset();
+
+			// show every signals
+
+		m_plot_->show_all_signals(true);
+
+			// Sanity check
+
+		if ((m_table_->get_loop_number() < 1) || (m_table_->get_step_number() < 1))
+		{
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_EDITBTN);
+			wxPostEvent(inst_, evt);
+			MessageBox(GetFocus(), L"Fill the cycle table please", L"Error", S_OK | MB_ICONERROR);
+			evt.Skip();
+			return;
+		}
+
+			// Sanity check
+
+		size_t measurement_number = meas_manager->get_measurement_pool_size();
+		std::cout << "[*] " << measurement_number << " measurements are in pool.\n";
+		if (measurement_number == 0)
+		{
+			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
+			wxPostEvent(inst_, evt);
+			MessageBox(GetFocus(), L"No active device\ntry to enable one instrument first", L"Error", S_OK | MB_ICONERROR);
+			evt.Skip();
+			return;
+		}
+
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		if (daqconfig->m_daq_ != nullptr)
 		{
-			// Save last change in daq gui fields
+				// Save last change in daq gui fields
 
 			size_t channel_index = daqconfig->get_channel_index();
 			daqconfig->save_current_device_config(channel_index);
 			daqconfig->save_current_chan_config(channel_index);
 
-			// Retrieve current daq config		
+				// Retrieve current daq config		
 
 			CURRENT_DEVICE_CONFIG_STRUCT config = daqconfig->GetDaqConfigStruct();
-
 
 			int i = 0;
 			int c = 0;
@@ -167,20 +183,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
-		// retieve the cycle and save it in memory
 
-		cCycle* m_cycle = nullptr;
-		m_cycle = m_table_->load_cycle();
-		if (m_cycle == nullptr)
-		{
-			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_EDITBTN);
-			wxPostEvent(inst_, evt);
-			MessageBox(GetFocus(), L"Fill the cycle table please", L"Error", S_OK | MB_ICONERROR);
-		}
-		else
-		{
-			cycle_controler = new cCycleControler(m_cycle, m_table_, inst_);
-
+			/*
 			int iFilter = this->combo1->GetCurrentSelection();
 			FILTER_M Filtering = FILTER_NONE;
 			switch (iFilter)
@@ -225,9 +229,9 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			{
 				Rec = LOGGER_XLSX;
 			}
-
+			*/
 			////////////////////////////////////////////////////////////////////////////////
-			// STOP CONTINUOUSLY LOOKING UP FOR DEVICE
+			// STOP LOOK UP FOR DEVICE
 			////////////////////////////////////////////////////////////////////////////////
 			//cDeviceMonitor* devmon = devmon->getInstance();
 			//devmon->lookup_stop();
@@ -237,31 +241,41 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				m_main->StopDiscoverDeviceTimer();
 
 			////////////////////////////////////////////////////////////////////////////////
+			// CYCLE CONTROLER
+			////////////////////////////////////////////////////////////////////////////////
+			std::cout << "[*] Starting cycle controler.\n";
+			cycle_controler->start();
+
+			////////////////////////////////////////////////////////////////////////////////
+			// MEASUREMENT MANAGER
+			////////////////////////////////////////////////////////////////////////////////
+			meas_manager->start_all_devices();
+
+			////////////////////////////////////////////////////////////////////////////////
 			// MEASUREMENT CONTROLER
 			////////////////////////////////////////////////////////////////////////////////
 			std::cout << "Launching Measurement controler\n";
-			cMeasurementControler* meas_controler = new cMeasurementControler(m_cycle, cycle_controler); //////////////////////LEAK/////////////////LEAK///////////////
+			meas_controler = make_shared<cMeasurementControler>(cycle_controler); 
 			meas_manager->set_measurement_controler(meas_controler);
-
 			meas_controler->start();
+
 			size_t sizesig = meas_manager->get_measurement_total_channel_number();
-			m_plot_->start_graph(Filtering, Rec, sizesig);
+			m_plot_->start_graph(FILTER_NONE, LOGGER_ASCII, sizesig);
 
 			startbtn->SetBackgroundColour(wxColor(250, 80, 90));
 			startbtn->SetLabelText(L"Stop");
-		}
+		
 	}
 	else
 	{
-		m_plot_->stop_graph();
+		std::cout << "[*] Stopping cycle controler.\n";
 		cycle_controler->stop();
-		Sleep(500);
-		std::cout << "cycle_controler deleted in Footer.cpp\n";
-		delete cycle_controler;
-		cycle_controler = nullptr;
+
+		m_plot_->stop_graph();
+
 
 		std::cout << "m_table_->destroy_cycle() in Footer.cpp\n";
-		m_table_->destroy_cycle();
+
 
 		startbtn->SetBackgroundColour(wxColor(180, 250, 90));
 		startbtn->SetLabelText(L"Start");
@@ -298,7 +312,153 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		meas_manager->stop_all_devices();
 
 		////////////////////////////////////////////////////////////////////////////////
-		// START CONTINUOUSLY LOOKING UP FOR DEVICE
+		// DRAW FULL GRAPH WITH GNUPLOT?
+		////////////////////////////////////////////////////////////////////////////////
+		cGnuplot cGnuplotDlg(this->inst_, IDCGNUPLOTDLG, "Create PDF graph and save campain?");
+		cGnuplotDlg.Centre();
+
+		int ret = cGnuplotDlg.ShowModal();
+		if (ret == wxID_OK)
+		{
+			// retrieve current file with raw data
+			std::string raw_name = m_plot_->get_graph_filename();
+			// remove (xx).lab
+			std::string raw_noext = raw_name.substr(0, raw_name.find_last_of("."));
+			raw_noext = raw_noext.substr(0, raw_noext.find_last_of("("));
+			// get new name
+			std::string name = cGnuplotDlg.get_filename();
+			// add extension
+			std::string new_name = raw_noext + name + std::string(".lab");
+			// rename the file
+			wxRenameFile(raw_name, new_name);
+
+			// read header to build the script accordingly
+			std::ifstream file(new_name);
+			std::string header;
+			std::getline(file, header);
+
+			// Count every collomn and add to vector for legend
+			std::vector<std::string> signals_vec;
+
+			std::string token;
+			std::stringstream input_stringstream(header);
+
+			//tokenize each col
+			int col = 0;
+			while (getline(input_stringstream, token, '\t'))
+			{
+				if (col >= 1)
+				{
+					signals_vec.push_back(token);
+				}
+				col++;
+			}	
+
+			std::string script_file = new_name;
+			script_file = script_file.substr(0, script_file.find("."));
+			std::string pdf_file = script_file+std::string(".pdf");
+			script_file = script_file + std::string(".plt");
+			//char const* gnuname = "gnu.script";
+			const std::string sig_colours[]
+			{
+				"#DB7093",
+				"#008000",
+				"#FFE4B5",
+				"#F4A460",
+				"#A0522D",
+				"#FFB6C1",
+				"#DA70D6",
+				"#6A5ACD",
+				"#4169E1",
+				"#87CEFA",
+				"#4682B4",
+				"#48D1CC",
+				"#008080",
+				"#2E8B57",
+				"#8FBC8F",
+				"#32CD32",
+				"#FFFF00",
+				"#DAA520",
+				"#FA8072",
+				"#FF6347",
+				"#DC143C",
+				"#800000"
+			};
+
+			FILE* f = fopen(script_file.c_str(), "w");
+			if (f != NULL)
+			{
+				// set gnuplot script
+
+				
+				fprintf(f, "set terminal pdf\n");
+				fprintf(f, "set encoding utf8\n");	
+				fprintf(f, "set output \"%s\"\n", pdf_file.c_str());
+				fprintf(f, "set encoding utf8\n");
+				fprintf(f, "#set xrange [0.0:600.0]\n");
+				fprintf(f, "#set xrange [0.0:20.0]\n");
+	
+				fprintf(f, "set key outside\n");
+				
+				for (int i =1; i <= signals_vec.size(); i++)
+				{
+					fprintf(f, "set style line %i linecolor rgb '%s' linewidth 0.1\n", i, sig_colours[i-1].c_str());
+					//fprintf(f, "set style line 2 linecolor rgb '#dd181f' linewidth 0.1\n");
+				}
+
+				fprintf(f, "set title \"%s\"\n", new_name.c_str());
+				fprintf(f, "set xlabel \"T(s)\"\n");
+				fprintf(f, "set ylabel \"Amplitude\"\n");
+				
+				int j = 1;
+				fprintf(f, "plot \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(0).c_str());
+				for (int i=j; i< signals_vec.size(); i++)
+				{
+					j++;
+					fprintf(f, ", \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(i).c_str());
+				}
+				fprintf(f, "\n");
+
+				fclose(f);
+
+				// Run GNUplot on the control script (for Windows)
+				char command[300];
+				const char* gnupath = "\"C:\\Program Files\\gnuplot\\bin\"";
+				sprintf(command, "gnuplot.exe \"%s\"", script_file.c_str());
+				printf("[*] Executing %s...\n", command);
+				system(command);
+
+				// Wait when building PDF file
+				if (!wxFileExists(pdf_file))
+				{
+					std::cout << "[!] Building pdf file takes time !\n";
+					Sleep(500);
+				}
+
+				if (!wxFileExists(pdf_file))
+				{
+					std::cout << "[!] Building pdf file takes time ! (waiting 5s more)\n";
+					Sleep(5000);
+				}
+				if (!wxFileExists(pdf_file))
+				{
+					fprintf(stderr, "Could not create %s.\n", pdf_file.c_str());
+				}
+				else
+				{
+					sprintf(command, "%s", pdf_file.c_str());
+					printf("[*] Executing %s...\n", command);
+					system(command);
+				}
+			}
+			else
+			{
+				fprintf(stderr, "Could not create %s.\n", script_file.c_str());
+			}	
+		}
+		
+		////////////////////////////////////////////////////////////////////////////////
+		// START LOOK UP FOR DEVICE
 		////////////////////////////////////////////////////////////////////////////////
 		cDeviceMonitor* devmon = devmon->getInstance();
 		devmon->lookup_start();
@@ -344,7 +504,7 @@ void cFooter::freqButtonClicked(wxCommandEvent& evt)
 	wxString str = freq->GetValue();
 
 
-	cMeasurementControler* m_controler = meas_manager->get_measurement_controler();
+	std::shared_ptr<cMeasurementControler> m_controler = meas_manager->get_measurement_controler();
 	if (m_controler != nullptr)
 	{
 		m_controler->set_aquisition_rate(wxAtoi(str));

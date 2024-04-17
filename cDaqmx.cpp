@@ -1,12 +1,8 @@
 #include "cDaqmx.h"
 
-#include <wx/wx.h>
-#include <wx/combobox.h>
-#include <wx/dcbuffer.h>
-#include <format>
 
 
-
+/*
 class cMeasurementmanager;
 class cCycle;
 class cUsb6001;
@@ -15,6 +11,7 @@ class cMeasurement;
 class cPlot;
 class cImagePanel;
 class cSignalTable;
+*/
 
 cDaqmx::cDaqmx(wxWindow* inst)
 {
@@ -36,6 +33,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	for (int i = 0; i < max_chan_number; i++)
 	{
 		label.channel_enabled.push_back(false);
+		label.channel_permision.push_back(CHANREAD);
 
 		label.channel_name.push_back("Analog");
 		label.channel_name.at(i).append(std::to_string(i));
@@ -83,6 +81,13 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		label.channel_trigger[i].push_back("Fall");
 
 		label.channel_trigger_threshold[i] = "0";
+
+		label.digital_channel_type[i].push_back("Input");				
+		label.digital_channel_type[i].push_back("Output");
+
+		label.digital_channel_mode_type[i].push_back("Pullup");
+		label.digital_channel_mode_type[i].push_back("None");
+
 	}
 	////////////////////////////////////////////////////////////
 	// Load default configuration in memory
@@ -97,6 +102,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	for (int i = 0; i < max_chan_number; i++)
 	{
 		config.channel_enabled.push_back(false);
+		config.channel_permision.push_back(CHANREAD);
 
 		config.channel_name.push_back("Analog");
 		config.channel_name.at(i).append(std::to_string(i));
@@ -124,6 +130,10 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		config.channel_trigger[i] = "Disabled";
 
 		config.channel_trigger_threshold[i] = "0";
+
+		config.digital_channel_type[i] = "Input";
+		config.digital_channel_mode_type[i] = "Pullup";
+
 	}
 
 
@@ -134,25 +144,25 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	//image.LoadFile(wxT("multi_function_daq_img600x300.png"), wxBITMAP_TYPE_PNG);
 	//image.LoadFile(wxT("IDB_PNG2"), wxBITMAP_TYPE_ANY);
 
-	::wxInitAllImageHandlers();
+	//::wxInitAllImageHandlers();
 	wxBitmap bmp = wxBitmap("DAQPNG", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
 	temp_img = bmp.ConvertToImage();										// Convert bmp to image to scale purpose
 
+	// Attribute to paint with linear gradiant and double buffering
+	wxWindow::SetBackgroundStyle(wxBG_STYLE_PAINT);
 
 	config_rightpanel_ = new wxPanel(inst, IDC_DAQRIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
-	config_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165));		// Make inside group box dark grey
+	//config_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165));		// Make inside group box dark grey
 
 	config_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cDaqmx::OnPaint));
 	//inst->Connect(wxEVT_SIZING, wxSizeEventHandler(cDaqmx::OnPaint));
 
 	////////////////////////////////////////////////////////////
-
-
 	wxStaticText* dummy = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxSize(400, 0)));
 
 	////////////////////////////////////////////////////////////
 
-	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 20);
+	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(16, 2, 10, 20);
 
 	////////////////////////////////////////////////////////////
 
@@ -185,10 +195,36 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
 	addr_ctrl->Disable();
 
+	wxStaticText* dummy1 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy2 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy3 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy4 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy5 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy6 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy7 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy8 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy9 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy10 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy11 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxStaticText* dummy12 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+
 	flexsizer->Add(daq_activate);
 	//flexsizer->Add(enabledaq);
 	//flexsizer->Add(staticaddr);
 	flexsizer->Add(addr_ctrl);
+	flexsizer->Add(dummy1);
+	flexsizer->Add(dummy2);
+	flexsizer->Add(dummy3);
+	flexsizer->Add(dummy4);
+	flexsizer->Add(dummy5);
+	flexsizer->Add(dummy6);
+	flexsizer->Add(dummy7);
+	flexsizer->Add(dummy8);
+	flexsizer->Add(dummy9);
+	flexsizer->Add(dummy10);
+	flexsizer->Add(dummy11);
+	flexsizer->Add(dummy12);
+
 	device_group_sizer->Add(flexsizer);
 
 	wxBoxSizer* btn_hsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -216,18 +252,42 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	// Draw btn with channel numbers 0 1 2 3 4 5 ...
 
 	chan_grid = new  wxGridSizer(max_chan_number, 0, 0);
+	
+
+	
+	daqinfo_v_sizer = new wxBoxSizer(wxVERTICAL);
+
+	daq_type = new wxTextCtrl(config_rightpanel_, wxID_ANY, "DAQ module 1", wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	daq_type->SetBackgroundColour(wxColor(101, 153, 251));
 	for (int i = 0; i < max_chan_number; i++)
 	{
+		btn_box_sizer[i] = new wxBoxSizer(wxVERTICAL);
+
+		// create indicator for the btn type first
+		chanbtntype[i] = new wxButton(config_rightpanel_, wxID_ANY, "R", wxDefaultPosition, inst->FromDIP(wxSize(18, 18)), wxBORDER_NONE);
+		chanbtntype[i]->SetFont(chanbtntype[i]->GetFont().Scale(0.7f));
+		chanbtntype[i]->SetBackgroundColour(wxColour(210, 180, 138));
+		chanbtntype[i]->Enable(false);
+		btn_box_sizer[i]->Add(chanbtntype[i]);
+
+		// create the channels btn
 		std::string ind; ind.append(std::to_string(i));
 		chanbtn[i] = new wxButton(config_rightpanel_, IDCCHANBTN0 + i, ind, wxDefaultPosition, inst->FromDIP(wxSize(18, 18)), wxBORDER_SUNKEN);
 		inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cDaqmx::OnChannelBtnNumberCliqued, this, IDCCHANBTN0 + i);
 		chanbtn[i]->SetFont(chanbtn[i]->GetFont().Scale(0.7f));
 		chanbtn[i]->Enable(false);
-		chan_grid->Add(chanbtn[i]);
+		btn_box_sizer[i]->Add(chanbtn[i]);
+
+		chan_grid->Add(btn_box_sizer[i]);
 	}
+
+	daqinfo_v_sizer->Add(daq_type);
+	daqinfo_v_sizer->Add(chan_grid);
 	//chanbtn[0]->SetForegroundColour(wxColor(120, 140, 120));
 
 	// To remove native grey border arround btn at initialization
+	// but slow
+	/*
 	int i = max_chan_number;
 	for (auto& ch : chanbtn)
 	{
@@ -236,6 +296,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		wxPostEvent(inst_, evt);
 
 	}
+	*/
 
 	//////////////////////////////////////////////////////////////////
 	// DAQ chan settings
@@ -282,7 +343,6 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	checkchan->Disable();
 
 	////////////////////////////////////////////////////////////
-
 	static_chan_name = new wxStaticText(channel_group, IDCSTATICCHANNAME, L"Name to assign:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	static_chan_name->SetFont(static_chan_name->GetFont().Scale(text_size));
 	//static_chan_name->SetBackgroundColour(*bgcolor);
@@ -372,6 +432,28 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
+	static_digitaltype = new wxStaticText(channel_group, wxID_ANY, L"Digital access:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	static_digitaltype->SetFont(static_digitaltype->GetFont().Scale(text_size));
+	//statictype->SetBackgroundColour(*bgcolor);
+
+	digitaltype = new wxComboBox(channel_group, IDCDIGITALTYPE, label.digital_channel_type[1].front(), wxDefaultPosition, inst->FromDIP(static_ctrl_size), label.digital_channel_type[1], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
+	inst_->Bind(wxEVT_TEXT, &cDaqmx::OnDaqDigitalChanTypeModified, this, IDCDIGITALTYPE);
+	digitaltype->SetFont(digitaltype->GetFont().Scale(text_size));
+	digitaltype->Disable();
+
+	////////////////////////////////////////////////////////////
+
+	static_digitalmode = new wxStaticText(channel_group, wxID_ANY, L"Digital mode:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	static_digitalmode->SetFont(static_digitalmode->GetFont().Scale(text_size));
+	//statictype->SetBackgroundColour(*bgcolor);
+
+	digitalmode = new wxComboBox(channel_group, IDCDIGITALTYPE, label.digital_channel_mode_type[0].front(), wxDefaultPosition, inst->FromDIP(static_ctrl_size), label.digital_channel_mode_type[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
+	inst_->Bind(wxEVT_TEXT, &cDaqmx::OnDaqDigitalChanModeModified, this, IDCDIGITALMODE);
+	digitalmode->SetFont(digitalmode->GetFont().Scale(text_size));
+	digitalmode->Disable();
+
+	////////////////////////////////////////////////////////////
+
 	flexchansizer1->Add(checkchan, 0);
 	flexchansizer1->Add(staticenablechan, 0);
 	flexchansizer1->Add(static_chan_name, 0);
@@ -395,6 +477,11 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	flexchansizer1->Add(chan_tc_min_range);
 	flexchansizer1->Add(static_chan_tc_max_range);
 	flexchansizer1->Add(chan_tc_max_range);
+
+	flexchansizer1->Add(static_digitaltype);
+	flexchansizer1->Add(digitaltype);
+	flexchansizer1->Add(static_digitalmode);
+	flexchansizer1->Add(digitalmode);
 
 	channel_group_sizer->Add(flexchansizer1);
 
@@ -552,7 +639,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	grid_hsizer->Add(chan_vsizer, 0, wxALIGN_CENTER);
 
 	chan_vsizer->Add(btn_hsizer, 0, wxEXPAND);
-	chan_vsizer->Add(chan_grid, 0);
+	chan_vsizer->Add(daqinfo_v_sizer, 0);
 	chan_vsizer->Add(chan_hsizer, 0, wxEXPAND);
 	
 	chan_hsizer->Add(device_group_sizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));
@@ -566,6 +653,21 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	wxPostEvent(inst_, evt);
 }
 
+cDaqmx::~cDaqmx()
+{
+	// Free memory on heap
+	cMeasurementmanager *meas_manager = meas_manager->getInstance();
+	bool isDestroyed = meas_manager->destroy_subsystem(MEAS_TYPE::DAQ_INSTR);
+	// If item destroyed delete from memory
+	if (isDestroyed)
+	{
+		std::cout << "[*] [delete] m_daq in cDaqmx.cpp\n";
+
+		delete m_daq_;
+		m_daq_ = nullptr;
+	}
+}
+
 void cDaqmx::OnPaint(wxPaintEvent& event)
 {
 	// Load bitmap from ressource
@@ -574,10 +676,37 @@ void cDaqmx::OnPaint(wxPaintEvent& event)
 	wxBufferedPaintDC dc(this, wxBUFFER_CLIENT_AREA);
 
 	// retrieving different size and proportions
-	wxRect size = config_rightpanel_->GetRect();
-	size.x = 0;
-	dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
-	wxSize sz = temp_img.GetSize();
+	wxRect size_all = config_rightpanel_->GetRect();
+	size_all.x = 0;
+
+	wxRect size_top = size_all;
+	size_top.height = size_top.height * 3 / 4;
+
+	wxRect size_mid = size_all;
+	size_mid.y = size_mid.height * 10 / 16;
+	//size_mid.height = size_mid.height * 12 / 16;
+
+	//wxRect size_bot = size_all;
+	//size_bot.y = size_mid.height;
+
+	// load a brush and draw a rectangle rectangle
+	wxBrushList my_brush_list;
+	wxBrush* my_brush = my_brush_list.FindOrCreateBrush(wxColour(255,255,255), wxBRUSHSTYLE_SOLID);
+	dc.SetPen(*wxTRANSPARENT_PEN);
+	dc.SetBrush(*my_brush); // custom filling
+	dc.DrawRectangle(size_top);
+
+	//dc.GradientFillLinear(size_bottom, wxColor(65, 65, 65), wxColor(255, 255, 255), wxUP);
+	dc.GradientFillLinear(size_mid, wxColor(65, 65, 65), wxColor(255, 255, 255), wxUP);
+
+	// load a brush and draw a rectangle rectangle
+	//my_brush_list;
+	//my_brush = my_brush_list.FindOrCreateBrush(wxColour(65, 65, 65), wxBRUSHSTYLE_SOLID);
+	//dc.SetPen(*wxLIGHT_GREY_PEN);
+	//dc.SetBrush(*wxMEDIUM_GREY_BRUSH); // custom filling
+	//dc.DrawRectangle(size_bot);
+
+
 
 	// Scale the image
 	/*
@@ -587,8 +716,8 @@ void cDaqmx::OnPaint(wxPaintEvent& event)
 	int new_width = sz.GetWidth() * r;
 	temp_img = temp_img.Scale(new_width, sz.GetHeight()*r);
 	*/
-
-	int pos = (size.width / 2) - (sz.x / 2);				// Center
+	wxSize sz = temp_img.GetSize();
+	int pos = (size_all.width / 2) - (sz.x / 2);				// Center
 	dc.DrawBitmap(temp_img, pos, 0, false);					// Draw the final bmp on context
 
 	event.Skip();
@@ -802,6 +931,15 @@ void cDaqmx::save_current_chan_config(int channel_index)
 	// Channel Tc max temperature
 	config.channel_tc_max[channel_index] = chan_tc_max_range->GetValue();
 
+	// Digital type (input/output)
+	config.digital_channel_type[channel_index] = digitaltype->GetValue();
+
+	// Digital mode (pullup/none)
+	config.digital_channel_mode_type[channel_index] = digitalmode->GetValue();
+
+	// Channel Tc max temperature
+	config.channel_tc_max[channel_index] = chan_tc_max_range->GetValue();
+
 	// Channel linearize preset
 	config.channel_linearize[channel_index] = chan_scale->GetValue();
 
@@ -1000,12 +1138,19 @@ void cDaqmx::EnableChanProperties()
 */
 void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 {
-	// Enable/disable controls
 	enable_pan = !enable_pan;
 	if (daq_activate)
 	{
 		if (!enable_pan)
 		{
+			// If DAQ = ON
+			
+			// Enable/disable controls
+			if (checkchan->GetLabel().compare("ON") == 0)
+			{
+				EnableChannelItems(!enable_pan);
+			}
+
 			constexpr size_t bufferSize = 1000;
 			char buffer[bufferSize] = {};
 			if (DAQmxGetSysDevNames(buffer, bufferSize) != 0)
@@ -1058,6 +1203,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				}
 				std::cout << "Dev name: " << name << "\n";
 				std::cout << "product_type: " << product_type << "\n";
+				daq_type->SetLabel(product_type+std::string("::")+name);
 				addr_ctrl->Append(name);
 			}
 			// Add separator
@@ -1070,11 +1216,15 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			std::vector<std::string> channels;
 			for (auto name : names)
 			{
+				config.channel_permision.clear();
+
 				if (isDeviceMeasurable(name) == false)
 				{
 					std::cout << "[!] " << name << " is not measurable, skip next\n";
 					continue;
 				}
+
+				// Find anlog input
 				if (DAQmxGetDevAIPhysicalChans(name.c_str(), buffer, bufferSize) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
@@ -1092,9 +1242,34 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					token = s.substr(pos_start, pos_end - pos_start);
 					pos_start = pos_end + delim_len;
 					channels.push_back(token);
+					config.channel_permision.push_back(CHANREAD); // READ ONLY
 				}
 
 				channels.push_back(s.substr(pos_start));
+				config.channel_permision.push_back(CHANREAD); // READ ONLY
+
+				// Find digital ouput
+				if (DAQmxGetDevDOLines(name.c_str(), buffer, bufferSize) != 0)
+				{
+					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
+					evt.Skip();
+					return;
+				}
+
+				s = buffer;
+				pos_start = 0; pos_end = 0; delim_len = delimiter.length();
+				token = "";
+
+
+				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+					token = s.substr(pos_start, pos_end - pos_start);
+					pos_start = pos_end + delim_len;
+					channels.push_back(token); 
+					config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
+				}
+
+				channels.push_back(s.substr(pos_start));
+				config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
 			}
 
 			if (channels.size() == 0)
@@ -1112,6 +1287,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			//Hide unused channel in the button grid
 			for (int i = channels.size(); i < label.chan_number; i++)
 			{
+				chanbtntype[i]->Show(false);
 				chanbtn[i]->Show(false);
 			}
 
@@ -1129,6 +1305,23 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				config.channel_physical_name[i] = channels.at(i);
 			}
 			label.chan_number = channels.size();
+
+			// fill btn with R/W label
+			for (int i = 0; i < channels.size(); i++)
+			{
+				set_chan_permision(config.channel_permision[i], i);
+			}
+			
+			// Switch control between ANALOG and DIGITAL
+			if (label.channel_permision.at(0) == CHANREAD)
+			{
+				display_channel_as(CHANREAD);
+			}
+			else
+			{
+				display_channel_as(CHANWRITE);
+			}
+
 
 			/*
 			// Update channels legend numbers
@@ -1179,11 +1372,24 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			{
 				chan->Enable(true);
 			}
+			for (auto& chantype : chanbtntype)
+			{
+				chantype->Enable(true);
+			}
+			daqinfo_v_sizer->Fit(this);
 		}
 		else
 		{
-			this->daq_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
-			this->daq_activate->SetLabel("OFF");
+			// If DAQ = OFF
+
+			// Enable/disable controls
+			if (checkchan->GetLabel().compare("OFF"))
+			{
+				EnableChannelItems(!enable_pan);
+			}
+
+			daq_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
+			daq_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
 			checkchan->Enable(false);
@@ -1193,6 +1399,10 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			for (auto& chan : chanbtn)
 			{
 				chan->Enable(false);
+			}		
+			for (auto& chantype : chanbtntype)
+			{
+				chantype->Enable(false);
 			}
 		}
 	}
@@ -1211,8 +1421,8 @@ wxArrayString cDaqmx::LoadScalePresetArray(wxString filename)
 	//std::cout << "[*] Loading scale preset from file : " << filename << "\n";
 	//std::cout << "[*] Default location is : C:\\Users\\The Hive\\AppData\\Roaming \n";
 
-	wxFileConfig* rec_scale = nullptr;
-	rec_scale = new wxFileConfig(wxEmptyString, wxEmptyString, filename, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
+	std::unique_ptr<wxFileConfig> rec_scale;
+	rec_scale = std::make_unique<wxFileConfig>(wxEmptyString, wxEmptyString, filename, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
 	wxString group;
 	wxString entry;
 	wxString value;
@@ -1244,7 +1454,6 @@ wxArrayString cDaqmx::LoadScalePresetArray(wxString filename)
 
 		bok = rec_scale->GetNextGroup(group, group_cookie);
 	}
-	delete rec_scale;
 	m_scale.Add("Create new");
 	// End loading scale preset
 	return m_scale;
@@ -1501,6 +1710,65 @@ void cDaqmx::DaqChanAllOn(bool enable)
 */
 }
 
+void cDaqmx::display_channel_as(int access)
+{
+	// Show or hide Analog or digital first channel
+	if (access == CHANREAD)
+	{
+
+		statictype->Show();
+		static_chan_max_input_range->Show();
+		static_chan_min_input_range->Show();
+		static_chan_input_mode_type->Show();
+
+		meas_type_ctrl->Show();
+		chan_max_input_range->Show();
+		chan_min_input_range->Show();
+		chan_input_mode_type->Show();
+		chan_scale->Show();
+		chan_slope->Show();
+		chan_shift->Show();
+		chan_unit->Show();
+		chan_filter->Show();
+		chan_filter_intensity->Show();
+		chan_trigger->Show();
+		chan_trigger_threshold->Show();
+
+		static_digitalmode->Hide();
+		static_digitaltype->Hide();
+		digitalmode->Hide();
+		digitaltype->Hide();
+	}
+	else
+	{
+
+		statictype->Hide();
+		static_chan_max_input_range->Hide();
+		static_chan_min_input_range->Hide();
+		static_chan_input_mode_type->Hide();
+		static_chan_tc_type->Hide();
+		static_chan_tc_min_range->Hide();
+
+		meas_type_ctrl->Hide();
+		chan_max_input_range->Hide();
+		chan_min_input_range->Hide();
+		chan_input_mode_type->Hide();
+		chan_scale->Hide();
+		chan_slope->Hide();
+		chan_shift->Hide();
+		chan_unit->Hide();
+		chan_filter->Hide();
+		chan_filter_intensity->Hide();
+		chan_trigger->Hide();
+		chan_trigger_threshold->Hide();
+
+		static_digitalmode->Show();
+		static_digitaltype->Show();
+		digitalmode->Show();
+		digitaltype->Show();
+	}
+}
+
 void cDaqmx::OnDaqChanNameModified(wxCommandEvent& evt)
 {
 	// Filter click from previous and next
@@ -1527,6 +1795,30 @@ void cDaqmx::OnDaqChanPhysicalAddressNameModified(wxCommandEvent& evt)
 	m_plot->update_chan_physical_name_to_gui(chan_addr_ctrl->GetValue().ToStdString(), label.channel_index);
 }
 
+
+void cDaqmx::OnDaqDigitalChanTypeModified(wxCommandEvent& evt)
+{
+	// Save current device and channels
+	save_current_device_config(label.channel_index);
+	save_current_chan_config(label.channel_index);
+
+	// TODO: switch controls
+
+	channel_group_sizer->Layout();
+}
+
+
+void cDaqmx::OnDaqDigitalChanModeModified(wxCommandEvent& evt)
+{
+	// Save current device and channels
+	save_current_device_config(label.channel_index);
+	save_current_chan_config(label.channel_index);
+
+	// TODO: switch controls
+
+	channel_group_sizer->Layout();
+}
+
 void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 {
 	// Save current device and channels
@@ -1551,6 +1843,8 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	{
 	case 0:
 	{
+		chanbtntype[label.channel_index]->SetLabel("R");
+		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(210, 180, 138));
 		show_tc_param(false);
 		show_voltage_param(true);
 		wanted_type = DAQmx_Val_Voltage;
@@ -1558,6 +1852,8 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	}
 	case 1:
 	{
+		chanbtntype[label.channel_index]->SetLabel("T");
+		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(220, 105, 110));
 		show_tc_param(true);
 		show_voltage_param(false);
 		wanted_type = DAQmx_Val_Temp_TC;
@@ -1565,6 +1861,9 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	}
 	case 2:
 	{
+		chanbtntype[label.channel_index]->SetLabel("T");
+		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(220, 105, 110));
+		
 		show_tc_param(false);
 		show_voltage_param(false);
 		wanted_type = DAQmx_Val_Temp_Thrmstr;
@@ -1775,8 +2074,8 @@ void cDaqmx::SwitchChannelON(bool isDisplayed)
 	}
 	else
 	{
-		this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
-		this->checkchan->SetLabel("ON");
+		checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
+		checkchan->SetLabel("ON");
 	}
 }
 
@@ -1866,6 +2165,9 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		chan_trigger->Enable(false);
 		chan_trigger_threshold->Enable(false);
 
+		digitalmode->Enable(false);
+		digitaltype->Enable(false);
+
 		// Mark button grid item as dark
 		//chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120));
 
@@ -1928,6 +2230,8 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 			chan_trigger_threshold->Enable(true);
 		}
 
+		digitalmode->Enable(true);
+		digitaltype->Enable(true);
 		// Mark button grid item as green
 		//chanbtn[label.channel_index]->SetBackgroundColour(wxColor(160, 250, 160));
 
@@ -1995,8 +2299,48 @@ void cDaqmx::reload_current_channel_type()
 		show_voltage_param(true);
 	}
 
+	// Switch control between ANALOG and DIGITAL
+	if (label.channel_permision.at(label.channel_index) == CHANREAD)
+	{
+		display_channel_as(CHANREAD);
+	}
+	else
+	{
+		display_channel_as(CHANWRITE);
+	}
+
 	inst_->Layout();
 	return;
+}
+
+void cDaqmx::set_chan_permision(int access)
+{
+	label.channel_permision.at(label.channel_index) = access;
+	if (access == CHANREAD)
+	{
+		chanbtntype[label.channel_index]->SetLabel("R");
+		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(210, 180, 138));
+	}
+	if (access == CHANWRITE)
+	{
+		chanbtntype[label.channel_index]->SetLabel("W");
+		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(138, 180, 210));
+	}
+}
+
+void cDaqmx::set_chan_permision(int access, int chan_number)
+{
+	label.channel_permision.at(chan_number) = access;
+	if (access == CHANREAD)
+	{
+		chanbtntype[chan_number]->SetLabel("R");
+		chanbtntype[chan_number]->SetBackgroundColour(wxColour(210, 180, 138));
+	}
+	if (access == CHANWRITE)
+	{
+		chanbtntype[chan_number]->SetLabel("W");
+		chanbtntype[chan_number]->SetBackgroundColour(wxColour(138, 180, 210));
+	}
 }
 
 wxPanel* cDaqmx::get_right_panel()

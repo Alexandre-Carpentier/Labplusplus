@@ -4,7 +4,8 @@
 #include <deque>
 #include <iostream>
 #include <vector>
-
+#include <memory>
+		
 #include "cTick.h"
 #include "WinGraph.h"
 #include "data_types.h"
@@ -42,7 +43,7 @@ private:
 	DATAS result_struct;
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 public:
-
+	cMeasurement();
 	virtual int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
 
 	virtual std::string device_name();
@@ -56,6 +57,7 @@ public:
 	virtual void set_device_name(std::string name);
 	virtual void set_device_addr(std::string addr);
 
+	void start_device();
 	virtual void stop_device();
 	virtual ~cMeasurement() = default;
 };

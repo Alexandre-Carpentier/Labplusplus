@@ -46,6 +46,7 @@ extern "C" {
 	__declspec(dllexport)VOID SetSignalAverageValue(HGRAPH hGraph, INT SIGNB, DOUBLE val);
 	__declspec(dllexport)VOID SetSignalMaxValue(HGRAPH hGraph, INT SIGNB, DOUBLE val);
 	__declspec(dllexport)BOOL GetGraphState(HGRAPH hGraph);
+	__declspec(dllexport)char* GetGraphFilename(HGRAPH hGraph);
 	__declspec(dllexport)HGLRC GetGraphRC(HGRAPH);
 	__declspec(dllexport)HDC GetGraphDC(HGRAPH);
 	__declspec(dllexport)HWND GetGraphParentWnd(HGRAPH);

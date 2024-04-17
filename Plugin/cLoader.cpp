@@ -88,13 +88,42 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 }
 //#endif
 
-cDevice* Attach(wxWindow* inst)
+
+cDevice* PLUGIN_Attach(wxWindow * inst)
 {
     // Load LUA
-    cDevice *dev = lua_start_vm(inst);
+    cDevice* dev = lua_start_vm(inst);
+
+    //transfert ownership to smart ptr
+    //std::shared_ptr<cDevice> dev( lua_start_vm(inst));
+
     return dev;
 }
 
+bool PLUGIN_Dettach()
+{
+    // TODO:
+    // Free memory
+    // release ressources
+    return true;
+}
+
+bool PLUGIN_Start()
+{
+    // TODO:
+    // Start acquire loop
+    MessageBox(0, 0, 0, 0);
+    return true;
+}
+
+bool PLUGIN_Stop()
+{
+    // TODO:
+    // Stop loop properly
+    return true;
+}
+
+/*
 cDevice* Attach_(wxWindow* inst)
 {  
     // Define the object builder first
@@ -151,9 +180,9 @@ cDevice* Attach_(wxWindow* inst)
     // Display attributres of the object for debug purposes
     dev->DisplayConfiguration();
     // Use SCPI
-    dev->scpi_open("COM0");
-    dev->scpi_write("*IDN?");
+    //dev->scpi_open("COM0");
+    //dev->scpi_write("*IDN?");
     dev->scpi_close();
     return dev.release(); // Release smart pointer... to raw pointer...
 }
-
+*/

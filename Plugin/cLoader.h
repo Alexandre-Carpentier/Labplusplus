@@ -16,14 +16,17 @@
 #include <wx/sizer.h>
 #include "types.h"
 #include "cDeviceBuilder.h"
-class cDevice;
 
 // Entrypoint to load custom GUI
-extern "C" __declspec(dllexport)cDevice * Attach(wxWindow * inst);
+extern "C"
+{
+	__declspec(dllexport)cDevice* PLUGIN_Attach(wxWindow* inst);
+	__declspec(dllexport)bool PLUGIN_Dettach();
+	__declspec(dllexport)bool PLUGIN_Start();
+	__declspec(dllexport)bool PLUGIN_Stop();
+}
 
 class cLoader
 {
 };
-
-
 #endif

@@ -67,7 +67,7 @@ err_struct cCom::init()
 	dcbSerialParams.StopBits = 0;
 	dcbSerialParams.Parity = 0;
 	dcbSerialParams.ByteSize = 8;
-	dcbSerialParams.EofChar = '\r\n';
+	dcbSerialParams.EofChar = '\n';
 
 	if (SetCommState(hCom, &dcbSerialParams) == 0)
 	{
