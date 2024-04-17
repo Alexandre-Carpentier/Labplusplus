@@ -1,37 +1,23 @@
 #include "cMeasurementControler.h"
 
-#include <wx/wx.h>
-#include <wx/app.h> 
-#include <thread>
-#include <Windows.h>
-
-#include "cCycle.h"
-#include "cCycleControler.h"
-#include "cPlot.h"
-#include "cFooter.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
-#include "cUSB6001.h"
-#include "cMeasurement.h"
-#include "cTick.h"
 
 double get_instr_setpoint(cMeasurement *meas, std::vector<STEPSTRUCT> step_table, int step_number)
 {
 	double val=0.0;
 	int current_step = 0;
 	std::string dev_name = meas->device_name();
-	std::cout << "[*] Found dev_name: " << dev_name << "\n";
+	//std::cout << "[*] Found dev_name: " << dev_name << "\n";
 	for (auto& step : step_table)
 	{
 		if (current_step == step_number)
 		{
 			for (auto& controler : step.controler_vec)
 			{
-				std::cout << "[*] Searching controler: " << controler.first << "\n";
+				//std::cout << "[*] Searching controler: " << controler.first << "\n";
 				if (controler.first.find(dev_name) == 0)
 				{
 					val = controler.second;
-					std::cout << "[*] Command found: " << controler.second << "\n";
+					//std::cout << "[*] Command found: " << controler.second << "\n";
 					break;
 				}
 			}
@@ -169,10 +155,12 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
+	static double old_pressure = 0.0;
+
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
-
+		old_pressure = 0.0;
 		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();
@@ -208,7 +196,8 @@ void cMeasurementControler::poll()
 						{
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						{					
-							static double old_pressure=0.0;
+							assert(m_cyclecontroler_ != nullptr);
+	
 							m_cyclecontroler_->critical_section.lock(); ////////////////////////////////CRITICAL_SECTION///////////
 							auto cycle = m_cycle_->get_cycle();
 							if (cycle)

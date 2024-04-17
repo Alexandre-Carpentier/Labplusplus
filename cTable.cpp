@@ -112,6 +112,8 @@ cTable::~cTable()
 void cTable::destroy_cycle()
 {
 	std::cout << "cTable->destroy_cycle()\n";
+	assert(m_cycle != nullptr);
+
 	delete m_cycle;
 	m_cycle = nullptr;
 

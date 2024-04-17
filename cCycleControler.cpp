@@ -56,7 +56,6 @@ void cCycleControler::poll()
 			}
 			if (loopcount <= 0)
 			{
-
 				// Update % in status bar
 				cObjectmanager* object_manager = object_manager->getInstance();
 				wxStatusBar* statusbar = object_manager->get_status_bar();
@@ -83,6 +82,10 @@ kill:
 cCycleControler::cCycleControler(cCycle* m_cycle, cTable* m_table, wxWindow* inst)
 {
 	std::cout << "cCycleControler ctor...\n";
+	assert(m_cycle != nullptr);
+	assert(m_table != nullptr);
+	assert(inst != nullptr);
+
 	m_cycle_ = m_cycle;
 	m_table_ = m_table;
 	inst_ = inst;
@@ -115,8 +118,11 @@ inline long long cCycleControler::PerformanceCounter()
 
 cCycleControler::~cCycleControler()
 {
-	std::cout << "cCycleControler dtor...\n";
 
+	assert(m_cycle_ != nullptr);
+	assert(m_table_ != nullptr);
+
+	std::cout << "cCycleControler dtor...\n";
 }
 /*
 std::mutex cCycleControler::get_mutex_reference()
