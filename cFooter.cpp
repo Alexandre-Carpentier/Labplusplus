@@ -442,7 +442,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				}
 				if (!wxFileExists(pdf_file))
 				{
-					fprintf(stderr, "Could not create %s.\n", pdf_file.c_str());
+					fprintf(stderr, "Could not open %s.\n", pdf_file.c_str());
+					MessageBox(0, L"Could not open pdf file.", L"Fail", S_OK);
 				}
 				else
 				{
@@ -454,6 +455,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			else
 			{
 				fprintf(stderr, "Could not create %s.\n", script_file.c_str());
+				MessageBox(0, L"Could not open script file.", L"Fail", S_OK);
 			}	
 		}
 		

@@ -1280,6 +1280,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				{
 					fake_chan = std::format("DevSim/ai{}", i);
 					channels.push_back(fake_chan);
+					config.channel_permision.push_back(CHANREAD);
 				}
 
 			}
