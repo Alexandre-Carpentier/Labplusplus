@@ -522,9 +522,16 @@ int cPlot::get_graph_signal_count()
 	return GetGraphSignalCount(hGraph);
 }
 
-void cPlot::set_graph_filter(FILTER_M isFiltering)
+void cPlot::set_signal_filter(FILTER_M isFiltering, int position)
 {
-	SetFilteringMode(hGraph, isFiltering);
+	int index = GuiPositionToWingraphPosition(position);
+	SetFilteringMode(hGraph, isFiltering, index);
+}
+
+void cPlot::set_signal_filter_threshold(float intensity, int position)
+{
+	int index = GuiPositionToWingraphPosition(position);
+	SetFilteringThreshold(hGraph, intensity, index);
 }
 
 void cPlot::set_signal_name(std::string signame, int position)
@@ -532,7 +539,7 @@ void cPlot::set_signal_name(std::string signame, int position)
 	SetSignalLabel(hGraph, signame.c_str(), position);
 }
 
-void cPlot::start_graph(FILTER_M FilteringType, LOGGER_M ReccordingType, int SignalNumber)
+void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber)
 {
 	if (GetGraphState(hGraph) == FALSE)
 	{
@@ -544,7 +551,7 @@ void cPlot::start_graph(FILTER_M FilteringType, LOGGER_M ReccordingType, int Sig
 				return;
 			}
 		}
-		SetFilteringMode(hGraph, FilteringType);
+
 		SetRecordingMode(hGraph, ReccordingType);
 		StartGraph(hGraph);
 	}

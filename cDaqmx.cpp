@@ -194,19 +194,20 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cDaqmx::OnDaqAddrSelBtn, this, IDCADDR);
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
 	addr_ctrl->Disable();
-
-	wxStaticText* dummy1 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy2 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy3 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy4 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy5 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy6 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy7 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy8 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy9 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy10 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy11 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	wxStaticText* dummy12 = new wxStaticText(config_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
+	wxSize sz = text_ctrl_size;
+	sz.x = 10;
+	wxStaticText* dummy1 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy2 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy3 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy4 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy5 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy6 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy7 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy8 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy9 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy10 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy11 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	wxStaticText* dummy12 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
 
 	flexsizer->Add(daq_activate);
 	//flexsizer->Add(enabledaq);
@@ -358,7 +359,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	staticchan->SetFont(staticchan->GetFont().Scale(text_size));
 	//staticchan->SetBackgroundColour(*bgcolor);
 
-	chan_addr_ctrl = new wxComboBox(channel_group, IDCCHANADDR, label.channel_physical_name[0].front(), wxDefaultPosition, inst->FromDIP(static_ctrl_size), label.channel_physical_name[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
+	chan_addr_ctrl = new wxComboBox(channel_group, IDCCHANADDR, label.channel_physical_name[0].front(), wxDefaultPosition, inst->FromDIP(text_ctrl_size), label.channel_physical_name[0], wxCB_READONLY | wxSUNKEN_BORDER, wxDefaultValidator, _T(""));
 	inst_->Bind(wxEVT_TEXT, &cDaqmx::OnDaqChanPhysicalAddressNameModified, this, IDCCHANADDR);
 	chan_addr_ctrl->SetFont(chan_addr_ctrl->GetFont().Scale(text_size));
 	chan_addr_ctrl->Disable();
@@ -459,7 +460,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	flexchansizer1->Add(static_chan_name, 0);
 	flexchansizer1->Add(chan_name, 0);
 	flexchansizer1->Add(staticchan, 0);
-	flexchansizer1->Add(chan_addr_ctrl, 0);
+	flexchansizer1->Add(chan_addr_ctrl, 1);
 	flexchansizer1->Add(statictype, 0);
 	flexchansizer1->Add(meas_type_ctrl, 0);
 
@@ -495,7 +496,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	wxStaticBox* channel_linearize_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Signal template");
+	channel_linearize_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Signal template");
 	channel_linearize_group_sizer = new wxStaticBoxSizer(channel_linearize_group, wxVERTICAL);
 
 	////////////////////////////////////////////////////////////
@@ -562,7 +563,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	wxStaticBox* channel_signal_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Signal operation");
+	channel_signal_group = new wxStaticBox(config_rightpanel_, wxID_ANY, "Signal operation");
 	channel_signal_group_sizer = new wxStaticBoxSizer(channel_signal_group, wxVERTICAL);
 
 	////////////////////////////////////////////////////////////
@@ -777,8 +778,12 @@ void cDaqmx::show_next_channel()
 void cDaqmx::OnNextCliqued(wxCommandEvent& evt)
 {
 	show_next_channel();
+
 	// Display the current selected channel measure type
 	reload_current_channel_type();
+
+	// Resize and replace items correctly
+	channel_group_sizer->Layout();
 
 	evt.Skip();
 }
@@ -811,6 +816,7 @@ void cDaqmx::show_previous_channel()
 
 		// If channel disabled gray it out
 		// EnableChannelItems(label.channel_enabled.at(label.channel_index));
+
 	}
 }
 
@@ -820,6 +826,9 @@ void cDaqmx::OnPreviousCliqued(wxCommandEvent& evt)
 
 	// Display the current selected channel measure type
 	reload_current_channel_type();
+
+	// Resize and replace items correctly
+	channel_group_sizer->Layout();
 
 	evt.Skip();
 }
@@ -1027,6 +1036,12 @@ void cDaqmx::load_current_chan_config(int channel_index)
 
 	// Channel Tc max temperature
 	chan_tc_max_range->SetValue(config.channel_tc_max[channel_index]);
+
+	// Digital in/out
+	digitaltype->SetValue(config.digital_channel_type[channel_index]);
+
+	// Digital mode
+	digitalmode->SetValue(config.digital_channel_mode_type[channel_index]);
 
 	// Channel linearize preset
 	load_combobox(chan_scale, config.channel_linearize[channel_index]);
@@ -1299,11 +1314,38 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			}
 			chan_addr_ctrl->SetSelection(0);
 
-			// fill analog channel physical name in the config structure
+			// update name info in struct
+			int prev = -1;
+			int device_index = 0;
+			for (int i = 0; i < channels.size(); i++)
+			{
+				if (prev==-1){ prev = config.channel_permision[i];} // init previous state once
+
+				if (config.channel_permision[i] == CHANREAD)
+				{
+					if (prev != config.channel_permision[i]) { device_index = 0; } // If state change start index at 0
+
+					config.channel_name[i] = std::format("Analog{}", device_index);
+					prev = CHANREAD;
+					device_index++;
+				}
+				else
+				{
+					if (prev != config.channel_permision[i]) { device_index = 0; } // If state change start index at 0
+
+					config.channel_name[i] = std::format("Digital{}", device_index);
+					prev = CHANWRITE;
+					device_index++;
+				}
+			}
+
+			// update physical name info in struct
 			for (int i = 0; i < channels.size(); i++)
 			{
 				config.channel_physical_name[i] = channels.at(i);
 			}
+
+			// Resize chan number
 			label.chan_number = channels.size();
 
 			// fill btn with R/W label
@@ -1725,10 +1767,14 @@ void cDaqmx::display_channel_as(int access)
 		chan_max_input_range->Show();
 		chan_min_input_range->Show();
 		chan_input_mode_type->Show();
+
+		channel_linearize_group->Show();
 		chan_scale->Show();
 		chan_slope->Show();
 		chan_shift->Show();
 		chan_unit->Show();
+
+		channel_signal_group->Show();
 		chan_filter->Show();
 		chan_filter_intensity->Show();
 		chan_trigger->Show();
@@ -1753,10 +1799,14 @@ void cDaqmx::display_channel_as(int access)
 		chan_max_input_range->Hide();
 		chan_min_input_range->Hide();
 		chan_input_mode_type->Hide();
+
+		channel_linearize_group->Hide();
 		chan_scale->Hide();
 		chan_slope->Hide();
 		chan_shift->Hide();
 		chan_unit->Hide();
+
+		channel_signal_group->Hide();
 		chan_filter->Hide();
 		chan_filter_intensity->Hide();
 		chan_trigger->Hide();
@@ -1906,6 +1956,10 @@ void cDaqmx::OnDaqChanEnableBtn(wxCommandEvent& evt)
 	bool state = label.channel_enabled.at(label.channel_index);
 	SwitchChannelON(state);
 	UpdateChannelSig(state);
+
+	// TODO: If a command create a new device 
+
+
 	EnableChannelItems(state);
 	SwitchChannelColor(state);
 	/*

@@ -147,6 +147,7 @@ public:
 	// filter
 	// filter intensity
 	wxString scale_file_name = "Lab++ScalePreset.ini";
+	wxStaticBox* channel_linearize_group = nullptr;
 	wxStaticText* static_chan_scale;
 	std::string str_scale;
 	wxComboBox* chan_scale;
@@ -171,6 +172,7 @@ public:
 
 	// trigger
 	// threshold
+	wxStaticBox* channel_signal_group = nullptr;
 	wxStaticText* static_chan_trigger;
 	std::string str_trigger;
 	wxComboBox* chan_trigger;
@@ -193,7 +195,7 @@ public:
 	const int STATIC_CTRL_STYLE = wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL;
 	const wxSize static_ctrl_size = wxSize(80, 20);
 	const int TEXT_CTRL_STYLE = wxSUNKEN_BORDER;
-	const wxSize text_ctrl_size = wxSize(100, 24);
+	const wxSize text_ctrl_size = wxSize(110, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
 	cDaqmx(wxWindow* inst);

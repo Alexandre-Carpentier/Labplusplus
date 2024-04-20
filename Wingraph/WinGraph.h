@@ -41,7 +41,8 @@ extern "C" {
 	__declspec(dllexport)VOID SetYminVal(HGRAPH hGraph, double ymin); // Set the Y min axe value of the graph, autoscale clear this value when enable
 	__declspec(dllexport)VOID SetYmaxVal(HGRAPH hGraph, double ymax); // Set the Y max axe value of the graph, autoscale clear this value when enable
 	__declspec(dllexport)VOID SetZoomFactor(HGRAPH hGraph, int zoom); // Set the X scale factor value of the graph
-	__declspec(dllexport)VOID SetFilteringMode(HGRAPH hGraph, FILTER_M filtering);
+	__declspec(dllexport)VOID SetFilteringMode(HGRAPH hGraph, FILTER_M filtering, INT iSignalNumber);
+	__declspec(dllexport)VOID SetFilteringThreshold(HGRAPH hGraph, FLOAT intensity , INT iSignalNumber);
 	__declspec(dllexport)VOID SetSignalMinValue(HGRAPH hGraph, INT SIGNB, DOUBLE val);
 	__declspec(dllexport)VOID SetSignalAverageValue(HGRAPH hGraph, INT SIGNB, DOUBLE val);
 	__declspec(dllexport)VOID SetSignalMaxValue(HGRAPH hGraph, INT SIGNB, DOUBLE val);

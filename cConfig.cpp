@@ -115,6 +115,9 @@ cConfig::cConfig(wxWindow* inst)
 	m_daqmx = new cDaqmx(book);
 	PLUGIN_DATA Daqmx_struct;
 	Daqmx_struct.name = L"USB-DAQ-6001.dll";
+	Daqmx_struct.input_count = 48;
+	Daqmx_struct.outputcount = 0;
+	Daqmx_struct.signal_count = Daqmx_struct.input_count + Daqmx_struct.outputcount;
 	Daqmx_struct.panel = m_daqmx->get_right_panel();
 	Daqmx_struct.hInst = nullptr;
 	Daqmx_struct.device = nullptr;
@@ -132,13 +135,16 @@ cConfig::cConfig(wxWindow* inst)
 
 	PLUGIN_DATA Pressure_struct;
 	Pressure_struct.name = L"Pace 6000.dll";
+	Pressure_struct.input_count = 1;
+	Pressure_struct.outputcount = 1;
+	Pressure_struct.signal_count = Pressure_struct.input_count + Pressure_struct.outputcount;
 	Pressure_struct.panel = m_pressure->get_right_panel();
 	Pressure_struct.hInst = nullptr;
 	Pressure_struct.device = nullptr;
 	Pressure_struct.Attach = nullptr;
-	Daqmx_struct.Dettach = nullptr;
-	Daqmx_struct.PStart = nullptr;
-	Daqmx_struct.PStop = nullptr;
+	Pressure_struct.Dettach = nullptr;
+	Pressure_struct.PStart = nullptr;
+	Pressure_struct.PStop = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
 	// Add cTension to plugin vec
@@ -340,6 +346,9 @@ void cConfig::load_plugins(wxWindow* parent, std::wstring folder_path)
 
 				PLUGIN_DATA plugin_data;
 				plugin_data.name = plugin_name;
+				plugin_data.input_count = 1;
+				plugin_data.outputcount = 1;
+				plugin_data.signal_count = plugin_data.input_count + plugin_data.outputcount;
 				plugin_data.panel = plugin_panel;
 				plugin_data.device = dev;
 				plugin_data.hInst = hModule;

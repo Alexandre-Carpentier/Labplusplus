@@ -63,7 +63,9 @@ private:
 		PLUGIN_DETTACH Dettach = nullptr;
 		PLUGIN_START PStart = nullptr;
 		PLUGIN_STOP PStop = nullptr;
-		//
+		// Signal configuration
+		size_t input_count;
+		size_t outputcount;
 		size_t signal_count;
 		short uniqueID;
 	};

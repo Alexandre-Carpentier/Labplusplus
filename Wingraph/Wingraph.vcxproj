@@ -73,6 +73,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>G:\CODE\VS_PROJET\Lab++\c_dll_tdm\dev\include;$(IncludePath)</IncludePath>
+    <LibraryPath>G:\CODE\VS_PROJET\Lab++\c_dll_tdm\dev\lib\64-bit\msvc64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>G:\CODE\VS_PROJET\Lab++\c_dll_tdm\dev\include;$(IncludePath)</IncludePath>
+    <LibraryPath>G:\CODE\VS_PROJET\Lab++\c_dll_tdm\dev\lib\32-bit\msvc;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
