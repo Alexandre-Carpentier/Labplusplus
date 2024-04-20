@@ -118,10 +118,12 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
+	static double old_pressure = 0.0;
+
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
-
+		old_pressure = 0.0;
 		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();

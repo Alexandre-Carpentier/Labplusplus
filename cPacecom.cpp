@@ -33,8 +33,8 @@ int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
     //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISATCP, L"TCPIP0::169.254.254.001::inst0::INSTR");
     //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISASERIAL, L"\\\\.\\COM20");
     
-    device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
-    //device = factory.make(PROTOCOLENUM::VISASERIAL, config_struct_.device_addr.ToStdWstring());
+    //device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
+    device = factory.make(PROTOCOLENUM::VISASERIAL, config_struct_.device_addr.ToStdWstring());
 
     // TODO: test device not null
 
@@ -125,33 +125,40 @@ void cPacecom::acquire()
             char* p = nullptr;
             readpoint = strtod(utf8.c_str(), &p);
 
-            if (p[0] == '\r')
-                std::cout << "[*] CR terminated.\n";
+            //if (p[0] == '\r')
+                //std::cout << "[OK] CR terminated.\n";
 
-            if (p[0] == '\n')
-                std::cout << "[*] LF terminated.\n";
+            //if (p[0] == '\n')
+                //std::cout << "[OK] LF terminated.\n";
 
             if (p == utf8.c_str())
             {
-                std::cout << "[!] packet corrupted.\n";
-                readpoint = 0;
+                std::cout << "[NAN] packet corrupted.\n";
+                readpoint = setpoint;
+                //readpoint = NAN;
             }    
-
-            if (readpoint > 20)
+            else if (readpoint > 20)
+            {
+                std::cout << "[>20] packet corrupted.\n";
+                assert(false);
                 readpoint = 0;
-
-            if (readpoint < -1)
+            }
+            else if (readpoint < -1)
+            {
+                std::cout << "[<-1] packet corrupted.\n";
+                assert(false);
                 readpoint = 0;
-
+            }
+                
             //readpoint = std::stof(wValue);
 
 
-            assert(readpoint > -1.0);
-            assert(readpoint < 20.0 );
+            //assert(readpoint > -1.0);
+            //assert(readpoint < 20.0);
 
             // C++ style end
             
-            std::cout << "[*] read pressure: " << readpoint << " bar\n";
+            //std::cout << "[*] read pressure: " << readpoint << " bar\n";
             Sleep(100);
 
             // skip end loop
@@ -160,7 +167,7 @@ void cPacecom::acquire()
        
         // if reading issue -> assuming readpoint is the setpoint
         
-        std::cout << "setpoint " << setpoint << "setpoint_saved " << setpoint_saved << "\n";
+        std::cout << "[*] setpoint is " << setpoint << "and setpoint_saved is " << setpoint_saved << "\n";
         readpoint = setpoint;
         Sleep(500);
     }
