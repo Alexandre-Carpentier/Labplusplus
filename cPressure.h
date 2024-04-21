@@ -9,6 +9,8 @@
 #include <wx/fileconf.h>
 #include "data_types.h"
 
+#include "cTable.h"
+
 static wxImage pace_img;
 
 class cMeasurementmanager;
@@ -36,6 +38,7 @@ public:
 
 
 	wxWindow* inst_ = nullptr;
+	cTable* m_table_ = nullptr;
 	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
 	cMeasurement* m_pressure_ = nullptr; // daq measurement gui
@@ -59,6 +62,9 @@ public:
 	void RefreshPort();
 
 	void DestroySubsystem();
+
+	void set_table(cTable* m_table);
+	void UpdateChannelTable(bool isDisplayed);
 
 	void OnPressureEnableBtn(wxCommandEvent& evt);
 	void OnPressureAddrSelBtn(wxCommandEvent& evt);

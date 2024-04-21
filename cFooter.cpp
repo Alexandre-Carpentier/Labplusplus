@@ -156,6 +156,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
+
 		if (pressureconfig->m_pressure_ != nullptr)
 		{
 			pressureconfig->save_current_device_config(0);
@@ -270,7 +271,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 
 		meas_manager->stop_all_devices();
-
 		////////////////////////////////////////////////////////////////////////////////
 		// DRAW FULL GRAPH WITH GNUPLOT?
 		////////////////////////////////////////////////////////////////////////////////
@@ -351,8 +351,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			if (f != NULL)
 			{
 				// set gnuplot script
-
-				
+	
 				fprintf(f, "set terminal pdf\n");
 				fprintf(f, "set encoding utf8\n");	
 				fprintf(f, "set output \"%s\"\n", pdf_file.c_str());

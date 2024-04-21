@@ -18,6 +18,7 @@
 #include "cUSB6001.h"
 #include "cDaqsim.h"
 #include "cPlot.h"
+#include "cTable.h"
 #include "cDaqmxScaleDlg.h"
 #include "cImagePanel.h"
 #include "data_types.h"
@@ -37,8 +38,8 @@ private:
 	cImagePanel* InstrImg = nullptr;
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
-	void set_chan_permision(int access);
-	void set_chan_permision(int access, int chan_number);
+	void set_chan_mode(int access);
+	void set_chan_mode(int access, int chan_number);
 public:
 	// Signal color map
 	float COLORS[32][3] =
@@ -71,6 +72,7 @@ public:
 
 
 	wxWindow* inst_ = nullptr;
+	cTable* m_table_ = nullptr;
 
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
 	cMeasurement* m_daq_ = nullptr; // daq measurement gui
@@ -239,12 +241,15 @@ public:
 	void SwitchChannelON(bool isDisplayed);
 
 	void UpdateChannelSig(bool isDisplayed);
+	void UpdateChannelTable(bool isDisplayed);
 
 	void EnableChannelItems(bool isDisplayed);
 	void SwitchChannelColor(bool isDisplayed);
 	void show_voltage_param(bool show);
 	void show_tc_param(bool show);
 	void reload_current_channel_type();
+
+	void set_table(cTable* m_table);
 
 	wxPanel* get_right_panel();
 	size_t get_channel_index();

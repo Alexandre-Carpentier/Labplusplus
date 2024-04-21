@@ -51,7 +51,7 @@ public:
 	virtual size_t chan_count();
 
 	virtual DATAS read();
-	virtual void set(double value);
+	virtual void set(double *value, size_t length);
 
 	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
 	virtual void set_device_name(std::string name);

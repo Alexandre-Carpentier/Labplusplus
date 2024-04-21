@@ -181,11 +181,12 @@ DATAS cPacecom::read()
     return result;
 }
 
-void cPacecom::set(double value)
+void cPacecom::set(double* value, size_t length)
 {
-    assert(value > -1.0 );
-    assert(value <  20.0 );
-    setpoint = value;
+    assert(length > 0);
+    assert(value[0] > -1.0);
+    assert(value[0] <  20.0 );
+    setpoint = value[0];
 }
 
 void cPacecom::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)

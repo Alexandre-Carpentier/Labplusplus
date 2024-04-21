@@ -23,7 +23,8 @@ private:
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 
 
-	TaskHandle taskHandle;
+	TaskHandle analog_taskHandle;
+	TaskHandle digital_taskHandle;
 	int32 DAQret;
 	int sample_number = 2;
 	float64 multiple_data[1200];
@@ -38,6 +39,7 @@ public:
 	int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
 
 	DATAS read() override;
+	void set(double* value, size_t length) override;
 
 	void stop_device()override;
 

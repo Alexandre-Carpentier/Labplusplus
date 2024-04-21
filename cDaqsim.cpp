@@ -47,6 +47,14 @@ DATAS cDaqsim::read()
     return result;
 }
 
+void cDaqsim::set(double* value, size_t length)
+{
+    assert(value != nullptr);
+    assert(length>0);
+
+    current_fake_value = value;
+}
+
 void cDaqsim::stop_device() { std::cout << "cDaqsim->stoping...\n"; }
 
 cDaqsim::~cDaqsim() { std::cout << "cDaqsim dtor...\n"; };

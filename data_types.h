@@ -7,6 +7,9 @@
 
 #define max_chan_number  48
 
+#define CHANANALOG 0
+#define CHANDIGITAL 1
+
 #define CHANREAD 0
 #define CHANWRITE  1
 
@@ -17,10 +20,11 @@ typedef struct {
 	wxArrayString  device_name;
 	// Channels config
 
-	int chan_number;// = max_chan_number;												// flex sizer 1
+	int chan_number;// = max_chan_number;										// flex sizer 1
 	int channel_index;
 	std::vector <bool> channel_enabled;											// enable channel
 	std::vector<std::string> channel_name;										// Name to assign
+	std::vector <int> channel_mode;												// ANALOG/DIGITAL channel
 	std::vector <int> channel_permision;										// READ/WRITE channel
 	wxArrayString channel_physical_name[max_chan_number];						// physical channel
 
@@ -65,13 +69,14 @@ typedef struct {
 	int channel_index;
 	std::vector <bool> channel_enabled;											// enable channel
 	std::vector<std::string> channel_name;										// Name to assign
+	std::vector <int> channel_mode;												// ANALOG/DIGITAL channel
 	std::vector <int> channel_permision;										// READ/WRITE channel
 	wxString channel_physical_name[max_chan_number];							// physical channel
 
 	//////////////////////////////////////////////////////////
 	// ANALOG
 	//////////////////////////////////////////////////////////
-	wxString channel_type[max_chan_number];										// channel type: Voltage, termocouple, thermistor
+	wxString channel_type[max_chan_number];										// channel type: Voltage, termocouple, thermistor, LOGIC_IN
 	wxString channel_max[max_chan_number];										// Max input range
 	wxString channel_min[max_chan_number];										// Min input range
 	wxString channel_mode_type[max_chan_number];								// Input mode type
@@ -106,7 +111,8 @@ enum MEAS_TYPE
 	PRESSURE_CONTROLER_INSTR,
 	VOLTAGE_CONTROLER_INSTR,
 	FLOW_CONTROLER_INSTR,
-	VALVE_CONTROLER_INSTR,
+	FLOW_METER_INSTR,
+	VALVE_CONTROLER_INSTR
 };
 
 typedef struct

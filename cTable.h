@@ -34,6 +34,12 @@ public:
 	bool IsActiveLine(const int line);
 	void start_statistic(std::shared_ptr<cCycle>);
 	void stop_statistic();
+
+	// Add or remove devices
+public:
+	void enable_device_col(std::string name);
+	void disable_device_col(std::string name);
+
 	// cMain access
 	wxPanel* Getleftpan();
 	wxPanel* Getrightpan();
@@ -45,9 +51,10 @@ private:
 	wxPanel* table_leftpanel_ = nullptr;
 	wxPanel* table_rightpanel_ = nullptr;
 	wxBoxSizer* table_hsizer_ = nullptr;
-	const int COL_NB = 4; // Whitout plugin 
+	const int COL_NB = 3; // Whitout plugin 
+	std::vector<bool> col_enable; // Used to enable colomn
 	const int LINE_NB = 200;
-	size_t plugin_number = 0;
+	size_t output_number = 0;
 
 	cDurationStatisticCtrl* stat = nullptr;
 

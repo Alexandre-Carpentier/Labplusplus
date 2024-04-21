@@ -34,9 +34,10 @@ DATAS cPacesim::read()
     return result;
 }
 
-void cPacesim::set(double value)
+void cPacesim::set(double* value, size_t length)
 {
-    current_fake_value = value;
+    assert(length > 0);
+    current_fake_value = value[0];
 }
 
 void cPacesim::stop_device() { std::cout << "cPacesim->stoping...\n"; }

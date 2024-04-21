@@ -32,6 +32,7 @@ cPressure::cPressure(wxWindow* inst)
 	////////////////////////////////////////////////////////////
 	label.device_enabled = false;	
 	label.device_name.push_back("Simulated");
+	label.channel_permision.push_back(CHANWRITE);
 
 	////////////////////////////////////////////////////////////
 	// Load default configuration in memory
@@ -63,7 +64,7 @@ cPressure::cPressure(wxWindow* inst)
 	device_group_sizer = new wxStaticBoxSizer(device_group, wxVERTICAL);
 
 	////////////////////////////////////////////////////////////
-	wxStaticText* enablepressure = new wxStaticText(device_group, IDCSTATICENABLEDAQ, L"Pace 6000:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	wxStaticText* enablepressure = new wxStaticText(device_group, IDCSTATICENABLEDAQ, L"PACE6000:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
 	enablepressure->SetFont(enablepressure->GetFont().Scale(text_size));
 	enablepressure->SetBackgroundColour(*bgcolor);
 	enablepressure->Hide(); // Just use enabledaq to fill the flex sizer -> hide it after creating
@@ -149,7 +150,7 @@ void cPressure::save_current_device_config(int channel_index)
 	// Device name
 	//int iSelection = addr_ctrl->GetCurrentSelection();
 	//config.device_name = label.device_name[iSelection];
-	config.device_name = "Pace 6000";
+	config.device_name = "PACE6000";
 	config.device_addr = addr_ctrl->GetValue();
 
 	return;
@@ -220,6 +221,36 @@ void cPressure::DestroySubsystem()
 	return;
 }
 
+void cPressure::set_table(cTable* m_table)
+{
+	assert(m_table != nullptr);
+	m_table_ = m_table; // Save cTable to add or remove colomn afterward
+}
+
+void cPressure::UpdateChannelTable(bool isDisplayed)
+{
+	assert(m_table_ != nullptr);
+	assert(label.channel_permision.size() > 0);
+	if (m_table_)
+	{
+		// ex: NI-DAQ_0(Volt)
+		if (label.channel_permision.at(label.channel_index) == CHANWRITE) // If channel is a controler
+		{
+			std::string col_name = std::format("PACE6000_{}(Bar)", label.channel_index);
+			std::cout << "[*] Enabling controler in cTable colomn at: \"" << col_name << "\"\n";
+
+			if (isDisplayed == true)
+			{
+				m_table_->enable_device_col(col_name);
+			}
+			else if (isDisplayed == false)
+			{
+				m_table_->disable_device_col(col_name);
+			}
+		}
+	}
+}
+
 void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 {
 	// Enable/disable controls
@@ -234,6 +265,7 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 		size_t element_nb = m_plot->get_chan_number_to_gui();
 		*/
 
+		UpdateChannelTable(enable_pan);
 
 		if (enable_pan)
 		{
@@ -260,7 +292,6 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			this->pressure_controler_activate->SetLabel("ON");
 
 			addr_ctrl->Enable(true);			
-
 			EnablePressureChannel(true);
 		}
 		else
@@ -310,7 +341,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 			m_pressure_ = new cPacesim;
 			meas_manager->set_measurement(m_pressure_);
 			m_pressure_->set_device_addr("Simulated");
-			m_pressure_->set_device_name("Pace 6000");
+			m_pressure_->set_device_name("PACE60006000");
 		}
 		evt.Skip();
 		return;
@@ -340,7 +371,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 	meas_manager->set_measurement(m_pressure_);
 
 	m_pressure_->set_device_addr(current);
-	m_pressure_->set_device_name("Pace 6000");
+	m_pressure_->set_device_name("PACE6000");
 	
 	evt.Skip();
 	return;
@@ -416,7 +447,7 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURE_CONTROLER_INSTR, "Pace 6000", instr_name, "Bar", wxColor(45, 30, 30)))
+		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURE_CONTROLER_INSTR, "PACE6000", instr_name, "Bar", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
 		}

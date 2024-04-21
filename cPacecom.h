@@ -39,7 +39,7 @@ public:
 
 	void acquire();
 	DATAS read() override;
-	void set(double value) override;
+	void set(double* value, size_t length) override;
 
 	void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)override;
 	void set_device_name(std::string name)override;

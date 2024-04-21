@@ -5,19 +5,21 @@
 #include <thread>
 #include <Windows.h>
 
-double get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step)
+bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
 {
-	double val=0.0;
 	std::string dev_name = meas->device_name();
+	int i = 0;
+
 	for (auto& controler : step.controler_vec)
 	{
 		if (controler.first.find(dev_name) == 0)
 		{
-			val = controler.second;
-			break;
+			values[i] = controler.second;
+			i++;
 		}
 	}	
-	return val;
+	*read = i;
+	return true;
 }
 
 void zero_instrument(std::vector<cMeasurement*> meas_pool)
@@ -27,7 +29,11 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 	for (auto meas : meas_pool)
 	{
 		// Write data to instrument (controler)
-		meas->set(0.0);
+		size_t length = meas->chan_count();
+		double* values = new double(length);
+		memset(values, 0.0, length);
+		meas->set(values, length);
+		delete(values);
 	}
 }
 
@@ -78,7 +84,11 @@ void cMeasurementControler::poll()
 		{
 			// Write data to instrument (controler)
 		
-			meas->set(0.0);
+			size_t length = meas->chan_count();
+			double* values = new double(length);
+			memset(values, 0.0, length);
+			meas->set(values, length);
+			delete(values);
 		
 
 			// Read data from instrument
@@ -149,7 +159,8 @@ void cMeasurementControler::poll()
 				std::vector<double> read_pool;
 				for (auto meas : meas_pool)
 				{
-						double value = 0.0;
+					std::unique_ptr<double> value ;
+
 						MEAS_TYPE type = meas->device_type();
 		
 						switch (type)
@@ -159,22 +170,34 @@ void cMeasurementControler::poll()
 							//
 						case MEAS_TYPE::VOLTAGE_CONTROLER_INSTR:
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
+						case MEAS_TYPE::DAQ_INSTR:
 						{
-							static double old_pressure = 0.0;
+							size_t length = meas->chan_count();
+							static double *old_value = nullptr;
+
+							old_value = new double(length);
+
+							double* value = new double (length);
+
 							// protect
 							m_cyclecontroler_->cycle_mutex.lock();
 
 							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-							value = get_instr_setpoint(meas, step);
+							
+							size_t read = 0;
+							bool success = get_instr_setpoint(meas, step, value, length, &read);
 
 							// unprotect
 							m_cyclecontroler_->cycle_mutex.unlock();
 
-							if (old_pressure != value)
+							if (old_value != value)
 							{
-								old_pressure = value; // save old value
-								meas->set(old_pressure);
+								old_value =value; // save old value
+								meas->set(old_value, length);
 							}
+
+							delete value;
+							delete old_value; // use after free !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 							// Read data from instrument
 							val = meas->read();
@@ -188,6 +211,7 @@ void cMeasurementControler::poll()
 
 							break;
 						}
+						/*
 						// WRITE
 						//
 						//
@@ -199,7 +223,7 @@ void cMeasurementControler::poll()
 							m_cyclecontroler_->cycle_mutex.lock();
 
 							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-							value = get_instr_setpoint(meas, step);
+							value = get_instr_setpoint((meas, step, value, length, &read);
 
 							// unprotect
 							m_cyclecontroler_->cycle_mutex.unlock();
@@ -213,7 +237,7 @@ void cMeasurementControler::poll()
 						// READ
 						//
 						//
-						case MEAS_TYPE::DAQ_INSTR:
+						case MEAS_TYPE::FLOW_METER_INSTR:
 						{
 							// Read data from instrument
 							val = meas->read();
@@ -226,7 +250,11 @@ void cMeasurementControler::poll()
 							val.buffer_size = 0;
 							break;
 						}
+						*/
+
 						}
+						
+
 						/*
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						{					
@@ -286,6 +314,7 @@ void cMeasurementControler::poll()
 				// Update acquire rate
 				m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));
 			}
+
 		}
 	}
 	// TODO:
@@ -294,6 +323,8 @@ void cMeasurementControler::poll()
 	{
 		zero_instrument(meas_pool);
 	}
+
+
 	std::cout << "cMeasurementcontroler->exiting thread... \n";
 	return;
 }

@@ -11,6 +11,7 @@ class cDaqsim : public cMeasurement {
 private:
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 	DATAS result;
+	double *current_fake_value=nullptr;
 public:
 
 	cDaqsim();
@@ -21,6 +22,7 @@ public:
 	int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
 
 	DATAS read() override;
+	void set(double* value, size_t length) override;
 
 	void stop_device()override;
 

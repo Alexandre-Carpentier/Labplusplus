@@ -27,14 +27,17 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	// Retrieve ADDON information
 	std::vector<std::string>name_vec = m_config_->get_plugin_name_vec();
 	std::vector<std::string>unit_vec = m_config_->get_plugin_unit_vec();
+	std::vector<size_t>output_vec = m_config_->get_plugin_output_number();
 
-	plugin_number = unit_vec.size();
-	
+	for (auto& outp : output_vec)
+	{
+		output_number += outp;
+	}
 
 	// Create a wxGrid object
 	grid = new wxGrid(table_rightpanel_, IDCTABLEGRID, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
 
-	grid->CreateGrid(LINE_NB, COL_NB + plugin_number);
+	grid->CreateGrid(LINE_NB, COL_NB + output_number);
 	grid->SetDefaultRowSize(40, false);
 	grid->SetDefaultCellOverflow(false);
 	grid->SetDefaultCellFont(grid->GetFont().Scale(1));
@@ -43,14 +46,28 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	//grid->UseNativeColHeader(true);
 
 	int pos = 0;
-	grid->SetColLabelValue(pos, "Pace 6000 (bar)");
+	//grid->SetColLabelValue(pos, "Pace 6000 (bar)");
+	size_t elements = name_vec.size(); // total item
 
-	int j = 0;
-	for (auto& unit : unit_vec)
+	int j = 0; // output_vec index
+	for (auto& output : output_vec)
 	{
-		pos++;
-		std::string name = name_vec.at(j); j++;
-		grid->SetColLabelValue(pos, name + std::string("(") + std::string(unit) + std::string(")"));
+		if (output == 0)
+		{
+			continue;
+		}
+
+		std::string name = name_vec.at(j); std::string unit = unit_vec.at(j);  
+		
+		for (int n = 0; n < output; n++) // Add each output from output_vec
+		{			
+			grid->SetColLabelValue(pos, name + std::format("_{}", n) + std::string("(") + unit + std::string(")"));
+			grid->SetColSize(pos, 0); // Hide it
+			col_enable.push_back(false);
+			pos++; // col index
+		}
+
+		j++; // output_vec index
 	}
 
 	//grid->SetColLabelValue(1, "Voltage (V)");
@@ -61,10 +78,15 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	//grid->SetColLabelValue(1, "Triger H (V)");
 	//grid->SetColLabelValue(2, "Triger L (V)");
 
-	grid->SetColLabelValue(++pos, "Jump to (i)");
-	grid->SetColLabelValue(++pos, "Jump count (n)");
-	//grid->SetColLabelValue(5, "Front");
-	grid->SetColLabelValue(++pos, "Duration (s)");
+	grid->SetColLabelValue(pos, "Jump to (i)");
+	pos++;
+	col_enable.push_back(true);
+	grid->SetColLabelValue(pos, "Jump count (n)");
+	pos++;
+	col_enable.push_back(true);
+	grid->SetColLabelValue(pos, "Duration (s)");
+	pos++;
+	col_enable.push_back(true);
 
 	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 50);
 	wxStaticText* staticloop = new wxStaticText(table_rightpanel_, IDCSTATICLOOP, L"Total iteration:");
@@ -97,6 +119,8 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 
 	table_hsizer_->Show(false);
 	//set_line_highlight(2);
+
+	m_config_->set_table(this); // share cTable with plugin
 }
 
 cTable::~cTable()
@@ -155,8 +179,10 @@ std::vector<STEPSTRUCT> cTable::get_step_table()
 			// put all std::pair in a vector
 			std::string name = grid->GetColLabelValue(col).ToStdString();
 			double value = wxAtof(grid->GetCellValue(row, col));
-			step.controler_vec.push_back(std::make_pair(name, value));
-
+			if (grid->GetColSize(col) != 0)
+			{
+				step.controler_vec.push_back(std::make_pair(name, value));
+			}
 		}
 		// Add step to the std::vector
 		step_table.push_back(step);
@@ -199,9 +225,39 @@ void cTable::stop_statistic()
 	stat->stop();
 }
 
+void cTable::enable_device_col(std::string name)
+{
+	// Find col by name and update col_enable
+	int sz = grid->GetNumberCols();
+	for (int i = 0; i < sz; i++)
+	{
+		std::string table_name = grid->GetColLabelValue(i).ToStdString();
+		if (name.compare(table_name) == 0)
+		{
+			std::cout << "[*] Found col in cTable at: " << name << "\n";
+			col_enable.at(i) = true;
+		}
+	}
+}
+
+void cTable::disable_device_col(std::string name)
+{
+	// Find col by name and update col_enable
+	int sz = grid->GetNumberCols();
+	for (int i = 0; i < sz; i++)
+	{
+		if (name.compare(grid->GetColLabelValue(i).ToStdString()) == 0)
+		{
+			std::cout << "[*] Found col in cTable at: " << name << "\n";
+			col_enable.at(i) = false;
+			grid->SetColSize(i, 0); // Hide it
+		}
+	}
+}
+
 void cTable::set_line_highlight(const int line)
 {
-	for (int i = 0; i < COL_NB + plugin_number; i++)
+	for (int i = 0; i < COL_NB + output_number; i++)
 	{
 		grid->SetCellBackgroundColour(line - 1, i, *wxWHITE);
 		grid->SetCellBackgroundColour(line, i, *wxLIGHT_GREY);
@@ -214,7 +270,7 @@ void cTable::set_lines_white()
 {
 	for (int line = 0; line < get_last_active_line(); line++)
 	{
-		for (int i = 0; i < COL_NB + plugin_number; i++)
+		for (int i = 0; i < COL_NB + output_number; i++)
 		{
 			grid->SetCellBackgroundColour(line, i, *wxWHITE);
 			grid->Refresh();
@@ -247,7 +303,7 @@ int cTable::get_last_active_col()
 bool cTable::IsActiveLine(const int line)
 {
 	double cell = 0;
-	cell = wxAtof(grid->GetCellValue(line, COL_NB + plugin_number - 1)); // look at duration
+	cell = wxAtof(grid->GetCellValue(line, COL_NB + output_number - 1)); // look at duration
 	if (cell > 0.0)
 		return true;
 	else
@@ -259,12 +315,22 @@ void cTable::GridResize(wxGrid* grid)
 	wxSize size = grid->GetSize();
 	//int cell_width = ((size.x - size.x / (COL_NB + pugin_number)) / (COL_NB + pugin_number));
 
-	int cell_width = (size.x / (COL_NB + plugin_number ) );
-	cell_width = (grid->GetClientSize().x - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X)) / 5;
-	
-	for (int i = 0; i < COL_NB + plugin_number; i++)
+	// Count visible col
+	size_t displayed = 0;
+	for (auto item : col_enable)
 	{
-		grid->SetColSize(i, ((size.x - size.x / (COL_NB + plugin_number)) / (COL_NB + plugin_number)));
+		if(item==true)
+			displayed++;
+	}
+	int cell_width = (size.x / (displayed));
+	cell_width = (grid->GetClientSize().x - wxSystemSettings::GetMetric(wxSYS_VSCROLL_X)) / 5;
+
+	for (int i = 0; i < COL_NB + output_number; i++)
+	{
+		if (col_enable.at(i) == true)
+		{
+			grid->SetColSize(i, ((size.x - size.x / (displayed)) / (displayed)));
+		}
 	}
 }
 

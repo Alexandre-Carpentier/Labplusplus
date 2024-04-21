@@ -22,8 +22,8 @@
 #include "cMeasurementControler.h"
 
 //#pragma comment (lib, "Plugin.lib")
-#include "..\Lab\Plugin\cDevice.h"
-//#include "..\Lab++\Plugin\cDevice.h"
+//#include "..\Lab\Plugin\cDevice.h"
+#include "..\Lab++\Plugin\cDevice.h"
 
 class cConfig : public wxFrame
 {
@@ -38,9 +38,12 @@ private:
 	wxBoxSizer* config_panel_sizer = nullptr;
 	wxPanel* config_panel = nullptr;
 
+	cTable* m_table_ = nullptr;
 	cPlot* m_plot_ = nullptr;
 	cDaqmx* m_daqmx = nullptr;
+	cDevice* m_daq_dev = nullptr;
 	cPressure* m_pressure = nullptr;
+	cDevice* m_pressure_dev = nullptr;
 	cTension* m_tension = nullptr;
 
 	typedef cDevice* (*PLUGIN_ATTACH)(wxWindow*);
@@ -72,7 +75,7 @@ private:
 	std::vector<PLUGIN_DATA> plugin_vec;
 
 public:
-	cConfig(wxWindow* inst);
+	cConfig(wxWindow* inst, cTable* m_table);
 	~cConfig();
 	void OnClickdrop(wxMouseEvent& evt);
 	void StopTest(bool stop);
@@ -89,8 +92,10 @@ public:
 	std::vector<cDevice*> get_device_vec();
 	std::vector<std::string> get_plugin_name_vec();
 	std::vector<std::string> get_plugin_unit_vec();
+	std::vector<size_t> get_plugin_output_number();
 
 	void set_graph(cPlot* m_plot);
+	void set_table(cTable* m_table);
 	void OnPaint(wxPaintEvent& event);
 };
 

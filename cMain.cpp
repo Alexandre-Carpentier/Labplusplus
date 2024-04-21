@@ -145,7 +145,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	// CONFIG WND
 	////////////////////////////////////////////////////////////////////////////////
 
-	m_config = new cConfig(this);
+	m_config = new cConfig(this, m_table);
 	manager->set_config(m_config);
 	config_leftpanel = m_config->Getleftpan();
 	config_rightpanel = m_config->Getrightpan();
