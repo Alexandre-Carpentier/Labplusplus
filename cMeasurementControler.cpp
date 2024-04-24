@@ -14,7 +14,8 @@ bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, siz
 	{
 		if (controler.first.find(dev_name) == 0)
 		{
-			values[i] = controler.second;
+			*values = controler.second;
+			values++;
 			i++;
 		}
 	}	

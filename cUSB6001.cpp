@@ -355,22 +355,22 @@ DATAS cUsb6001::read()
     double timeout_s = 2.0;
 
     int position = 0;
-    size_t AI_number = 0;
-    size_t DI_number = 0;
-    for (auto access : config_struct_.channel_mode)
+    size_t AIO_number = 0;
+    size_t DIO_number = 0;
+    for (auto type : config_struct_.channel_mode)
     {
-        if (access == CHANANALOG)
+        if (type == CHANANALOG)
         {
             if (config_struct_.channel_enabled.at(position))
             {
-                AI_number++;
+                AIO_number++;
             }      
         }
-        if (access == CHANDIGITAL)
+        if (type == CHANDIGITAL)
         {
             if (config_struct_.channel_enabled.at(position))
             {
-                DI_number++;
+                DIO_number++;
             }
         }         
         position++;
@@ -398,7 +398,7 @@ DATAS cUsb6001::read()
         }
 
         // averaging
-        for (int k = 0; k < AI_number; k++)
+        for (int k = 0; k < AIO_number; k++)
         {
             result.buffer[k] = 0.0;
             for (int i = sample_number * k; i < sample_number * (k + 1); i++)
@@ -409,7 +409,7 @@ DATAS cUsb6001::read()
         }
 
         // scaling
-        for (int j = 0; j < AI_number; j++)
+        for (int j = 0; j < AIO_number; j++)
         {
             double a = 0.0;
             double b = 0.0;
@@ -428,11 +428,16 @@ DATAS cUsb6001::read()
         int32 bytes_per_samples = 0;
 
         // Digital input
-        DAQret = DAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DI_number, &sample_read, &bytes_per_samples, NULL);
+        DAQret = DAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
+        if (DAQret != 0)
+        {
+            //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+        }
+        
         for (int i=0; i< sample_read; i++)
         {
             std::cout << "byte: " << read_buffer[i] << "\n";
-            result.buffer[AI_number+ i] = read_buffer[i];
+            result.buffer[AIO_number+ i] = read_buffer[i];
         }
     }
     return result;
@@ -448,7 +453,7 @@ void cUsb6001::set(double* value, size_t length)
     uInt8 write_buffer[4] = { 0b00000000, 0b00000000, 0b00000000, 0b00000000 };
     int32 sample_written = 0;
 
-    // populate write buffer (convert to bytes)
+    // populate write buffer 
 
     for (uInt8 i = 0; i < length; i ++)
     {
@@ -458,7 +463,7 @@ void cUsb6001::set(double* value, size_t length)
         
         if (value[i] > 0.0)
         {
-            write_buffer[i] |= (uInt8)1;
+            write_buffer[i] = (uInt8)1;
             std::cout << "[*] write_buffer[i]" << std::bitset<8>(write_buffer[i]) << "\n";
         }       
     }
