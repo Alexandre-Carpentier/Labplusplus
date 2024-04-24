@@ -28,6 +28,38 @@ size_t cUsb6001::chan_count()
     return nb_sig;
 }
 
+size_t cUsb6001::chan_read_count()
+{
+    size_t nb_sig = 0;
+    int index = 0;
+    for (auto enable : config_struct_.channel_enabled)
+    {
+        if (enable == true)
+        {
+            if(config_struct_.channel_permision[index] == CHANREAD)
+                nb_sig++;
+        }
+        index++;
+    }
+    return nb_sig;
+}
+
+size_t cUsb6001::chan_write_count()
+{
+    size_t nb_sig = 0;
+    int index = 0;
+    for (auto enable : config_struct_.channel_enabled)
+    {
+        if (enable == true)
+        {
+            if (config_struct_.channel_permision[index] == CHANWRITE)
+                nb_sig++;
+        }
+        index++;
+    }
+    return nb_sig;
+}
+
 int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 {
     std::cout << "[*] cUsb6001->launching...\n";
@@ -277,8 +309,6 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                         return 0;
                     }
                 }
-
-
             }
         }
     }
@@ -294,6 +324,8 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
             analog_taskHandle = nullptr;
         }
     }
+    else { DAQmxClearTask(analog_taskHandle); analog_taskHandle = nullptr; }
+
     if (digital_count > 0)
     {
         DAQret = DAQmxStartTask(digital_taskHandle);
@@ -305,6 +337,7 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
             digital_taskHandle = nullptr;
         }
     }
+    else { DAQmxClearTask(digital_taskHandle); digital_taskHandle = nullptr; }
 
     size_t nb_sig = chan_count();
     std::cout << "[*] result.buffer_size set to " << nb_sig << " in Usb6001.cpp\n";
@@ -407,7 +440,41 @@ DATAS cUsb6001::read()
 
 void cUsb6001::set(double* value, size_t length)
 {
-    // TODO
+    assert(length < MAX_CHAN);
+    assert(value != nullptr);
+
+    double timeout_s = 2.0;
+    bool bAutostart = true;
+    uInt8 write_buffer[4] = { 0b00000000, 0b00000000, 0b00000000, 0b00000000 };
+    int32 sample_written = 0;
+
+    // populate write buffer (convert to bytes)
+
+    for (uInt8 i = 0; i < length; i ++)
+    {
+        std::cout << "[*] write\n";
+        std::cout << "[*] length: " << length << "\n";
+        std::cout << "[*] value[i]: " << value[i] << "\n";
+        
+        if (value[i] > 0.0)
+        {
+            write_buffer[i] |= (uInt8)1;
+            std::cout << "[*] write_buffer[i]" << std::bitset<8>(write_buffer[i]) << "\n";
+        }       
+    }
+
+    // write
+
+    if (digital_taskHandle)
+    {
+        DAQret = DAQmxWriteDigitalLines(digital_taskHandle, 1, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, write_buffer, &sample_written, NULL);
+
+        if (DAQret != 0)
+        {
+            std::cout << "[!] DAQ digital write failed\n";
+        }
+    }
+
 }
 
 void cUsb6001::stop_device()

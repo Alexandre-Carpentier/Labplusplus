@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <format>
+#include <bitset>
 class cTick;
 class cMeasurement;
 
@@ -35,6 +37,8 @@ public:
 	std::string device_name() override;
 	MEAS_TYPE device_type() override;
 	size_t chan_count() override;
+	size_t chan_read_count() override;
+	size_t chan_write_count() override;
 
 	int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
 

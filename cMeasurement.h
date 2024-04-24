@@ -49,6 +49,8 @@ public:
 	virtual std::string device_name();
 	virtual MEAS_TYPE device_type();
 	virtual size_t chan_count();
+	virtual size_t chan_read_count();
+	virtual size_t chan_write_count();
 
 	virtual DATAS read();
 	virtual void set(double *value, size_t length);

@@ -128,12 +128,12 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
-	static double old_pressure = 0.0;
+	static double old_pressure[MAX_CHAN];
 
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
-		old_pressure = 0.0;
+		old_pressure[0] = 0.0;
 		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();
@@ -171,33 +171,40 @@ void cMeasurementControler::poll()
 						case MEAS_TYPE::VOLTAGE_CONTROLER_INSTR:
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						case MEAS_TYPE::DAQ_INSTR:
-						{
-							size_t length = meas->chan_count();
-							static double *old_value = nullptr;
+						{						
+							static double old_value[MAX_CHAN];
 
-							old_value = new double(length);
 
-							double* value = new double (length);
+							double value[MAX_CHAN];
+							ZeroMemory(value, MAX_CHAN);
 
 							// protect
 							m_cyclecontroler_->cycle_mutex.lock();
 
-							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-							
+							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();						
+							size_t length = meas->chan_write_count();						
 							size_t read = 0;
+
+							assert(length < MAX_CHAN);
 							bool success = get_instr_setpoint(meas, step, value, length, &read);
+							assert(length == read);
+							assert(read < MAX_CHAN);
 
 							// unprotect
 							m_cyclecontroler_->cycle_mutex.unlock();
-
-							if (old_value != value)
+							int mod = 0;
+							for (int i = 0; i < read; i++)
 							{
-								old_value =value; // save old value
-								meas->set(old_value, length);
+								if (old_value[i] != value[i])
+								{
+									mod++;
+									old_value[i] = value[i]; // save old value
+								}
 							}
 
-							delete value;
-							delete old_value; // use after free !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+							// call if modified
+							if (mod > 0)
+								meas->set(old_value, read);
 
 							// Read data from instrument
 							val = meas->read();
