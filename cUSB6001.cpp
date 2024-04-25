@@ -356,13 +356,27 @@ DATAS cUsb6001::read()
 
     int position = 0;
     size_t AIO_number = 0;
+    size_t AI_number = 0;
+    size_t AO_number = 0;
+
     size_t DIO_number = 0;
+    size_t DI_number = 0;
+    size_t DO_number = 0;
+
     for (auto type : config_struct_.channel_mode)
     {
         if (type == CHANANALOG)
         {
             if (config_struct_.channel_enabled.at(position))
             {
+                if (config_struct_.channel_permision.at(position) == CHANREAD)
+                {
+                    AI_number++;
+                }
+                else
+                {
+                    AO_number++;
+                }
                 AIO_number++;
             }      
         }
@@ -370,74 +384,102 @@ DATAS cUsb6001::read()
         {
             if (config_struct_.channel_enabled.at(position))
             {
+                if (config_struct_.channel_permision.at(position) == CHANWRITE)
+                {
+                    DO_number++;
+                }
+                else
+                {
+                    DI_number++;
+                }
                 DIO_number++;
             }
         }         
         position++;
     }
 
-    //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
-    DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 256);// "Digital0" 
-    DAQret = DAQmxGetAIMeasType(analog_taskHandle, buff, &chan_type);
-
-    if (chan_type == DAQmx_Val_Voltage)
+    if (AIO_number > 0)
     {
-        
-        int32 read_nb = 0;
-        DAQret = DAQmxReadAnalogF64(analog_taskHandle, sample_number, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result.buffer_size * sample_number, &read_nb, NULL); // Read multiple sample
-        if (read_nb != sample_number)
-        {
-            std::cout << "[!] DAQmxReadAnalogF64() read issue in Usb6001.cpp\n";
-        }
+        //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
+        DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 256);// "Digital0" 
+        DAQret = DAQmxGetAIMeasType(analog_taskHandle, buff, &chan_type);
 
-        if (0 != DAQret)
+        if (chan_type == DAQmx_Val_Voltage)
         {
-            MessageBox(0, 0, L"DAQmxReadAnalogF64 Failed", 0);
-            DAQmxClearTask(analog_taskHandle);
-            //TODO: exit
-        }
 
-        // averaging
-        for (int k = 0; k < AIO_number; k++)
-        {
-            result.buffer[k] = 0.0;
-            for (int i = sample_number * k; i < sample_number * (k + 1); i++)
+            int32 read_nb = 0;
+            DAQret = DAQmxReadAnalogF64(analog_taskHandle, sample_number, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result.buffer_size * sample_number, &read_nb, NULL); // Read multiple sample
+            if (read_nb != sample_number)
             {
-                result.buffer[k] += multiple_data[i];
+                std::cout << "[!] DAQmxReadAnalogF64() read issue in Usb6001.cpp\n";
             }
-            result.buffer[k] = result.buffer[k] / sample_number;
-        }
 
-        // scaling
-        for (int j = 0; j < AIO_number; j++)
-        {
-            double a = 0.0;
-            double b = 0.0;
-            config_struct_.channel_linearize_slope[j].ToCDouble(&a);
-            config_struct_.channel_linearize_shift[j].ToCDouble(&b);
-            result.buffer[j] = a * result.buffer[j] + b;
+            if (0 != DAQret)
+            {
+                MessageBox(0, 0, L"DAQmxReadAnalogF64 Failed", 0);
+                DAQmxClearTask(analog_taskHandle);
+                //TODO: exit
+            }
+
+            // averaging
+            for (int k = 0; k < AIO_number; k++)
+            {
+                result.buffer[k] = 0.0;
+                for (int i = sample_number * k; i < sample_number * (k + 1); i++)
+                {
+                    result.buffer[k] += multiple_data[i];
+                }
+                result.buffer[k] = result.buffer[k] / sample_number;
+            }
+
+            // scaling
+            for (int j = 0; j < AIO_number; j++)
+            {
+                double a = 0.0;
+                double b = 0.0;
+                config_struct_.channel_linearize_slope[j].ToCDouble(&a);
+                config_struct_.channel_linearize_shift[j].ToCDouble(&b);
+                result.buffer[j] = a * result.buffer[j] + b;
+            }
         }
     }
-    
-
+    if(DIO_number>0)
     {
-
-        uInt8 read_buffer[48];
-        memset(read_buffer, 0, 48);
-        int32 sample_read = 0;
-        int32 bytes_per_samples = 0;
-
-        // Digital input
-        DAQret = DAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
-        if (DAQret != 0)
+        if (DI_number > 0)
         {
-            //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+            uInt8 read_buffer[48];
+            memset(read_buffer, 0, 48);
+            int32 sample_read = 0;
+            int32 bytes_per_samples = 0;
+
+            // Digital input
+            DAQret = DAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
+            if (DAQret != 0)
+            {
+                //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+            }
+
+            for (int i = 0; i < sample_read; i++)
+            {
+                result.buffer[DI_number + i] = read_buffer[i];
+            }
         }
-        
-        for (int i=0; i< sample_read; i++)
+        else if (DO_number > 0)
         {
-            std::cout << "byte: " << read_buffer[i] << "\n";
-            result.buffer[AIO_number+ i] = read_buffer[i];
+            uInt8 read_buffer[48];
+            memset(read_buffer, 0, 48);
+            int32 sample_read = 0;
+            int32 bytes_per_samples = 0;
+            // Digital input
+            DAQret = DAQmxReadDigitalLines(digital_taskHandle, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 48, &sample_read, &bytes_per_samples, NULL);
+            if (DAQret != 0)
+            {
+                //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+            }
+            for (int i = 0; i < sample_read; i++)
+            {
+                result.buffer[AIO_number + i] = static_cast<double>(read_buffer[i]); // concat after Analog input
+            }
         }
     }
     return result;
@@ -457,11 +499,11 @@ void cUsb6001::set(double* value, size_t length)
 
     for (uInt8 i = 0; i < length; i ++)
     {
-        std::cout << "[*] write\n";
-        std::cout << "[*] length: " << length << "\n";
-        std::cout << "[*] value[i]: " << value[i] << "\n";
+        std::cout << "[WRITE]";
+        //std::cout << "[*] length: " << length << "\n";
+        //std::cout << "[*] double[0][1][2][3]: " << *value << *(value+1) << *(value+2) << *(value+3) << "\n";
         
-        if (value[i] > 0.0)
+        if ((*value)+i > 0.0)
         {
             write_buffer[i] = (uInt8)1;
             std::cout << "[*] write_buffer[i]" << std::bitset<8>(write_buffer[i]) << "\n";
