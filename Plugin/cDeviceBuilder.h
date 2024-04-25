@@ -30,13 +30,25 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase; // To get module base of the dll
 // 
 // 
 // 
+                                                                        
 class Builder {
 public:
     virtual ~Builder() {}
-    virtual void ProduceProtocol(SCPIMODE mode) const = 0; // One object to build
-    virtual void ProducePanel(wxWindow* inst) const = 0; // Multiple wxControl* to build
-    virtual void ProduceImage(wxWindow* inst) const = 0;   // Load afiliated picture on top of panel
-    virtual void AddPanelCtrl(CONTROLTYPE type, int length, int height, std::string label)const = 0; // Build a button on the panel
+    virtual void ProduceIdentity(                                       // One object to build
+        std::string device_name,                                        // ex: "Keithley 2280S"
+        PLUGIN_ACCESS plugin_access_type,                               // ex: READ=0, WRITE=1, ALL=2
+        std::string plugin_measurement_name,                            // ex: "Voltage"
+        std::string plugin_measurement_unit                             // ex: "Volt"
+    ) const = 0;
+    virtual void ProduceProtocol(SCPIMODE mode) const = 0;              // One object to build
+    virtual void ProducePanel(wxWindow* inst) const = 0;                // Multiple wxControl* to build
+    virtual void ProduceImage(wxWindow* inst) const = 0;                // Load afiliated picture on top of panel
+    virtual void AddPanelCtrl(
+        CONTROLTYPE type, 
+        int length, 
+        int height, 
+        std::string label
+    )const = 0; // Build a button on the panel
 };
 
 class DeviceBuilder1 : public Builder {
@@ -64,6 +76,12 @@ public:
 
     // build selected protocol
 
+    void ProduceIdentity(
+        std::string device_name,                                        // ex: "Keithley 2280S"
+        PLUGIN_ACCESS plugin_access_type,                               // ex: READ=0, WRITE=1, ALL=2
+        std::string plugin_measurement_name,                            // ex: "Voltage"
+        std::string plugin_measurement_unit                             // ex: "Volt"
+    ) const override;
     void ProduceProtocol(SCPIMODE mode)const override;
     void ProducePanel(wxWindow* inst)const override;
     void ProduceImage(wxWindow* inst)const override;
@@ -115,7 +133,7 @@ public:
         // Scale controls on the panel before returning the full object
         //product->right_panel->SetSizerAndFit(product->grid_sizer);
 
-        return this->product;
+        return product;
     }
 };
 #endif

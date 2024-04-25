@@ -29,8 +29,6 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 
 	Bind(wxEVT_CLOSE_WINDOW, &cMain::OnCloseWindow, this);
 
-
-
 	/////////////////////////////////////////////////////////////
 	//
 	//	Launch the device monitor tool
@@ -243,14 +241,31 @@ void cMain::OnCloseWindow(wxCloseEvent& event)
 
 cMain::~cMain()
 {
-	std::cout << "cfg_saver, m_table, m_config, m_plot, m_render, m_footer deleted in cMain.cpp\n";
-	delete cfg_saver;
+	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
+	delete cfg_saver; //save before destroying objects
 	delete m_table;
 	delete m_config;
 	delete m_plot;
 	delete m_graphrender;
 	delete m_statrender;
 	delete m_footer;
+
+	cfg_saver = nullptr; 
+	m_table = nullptr;
+	m_config = nullptr;
+	m_plot = nullptr;
+	m_graphrender = nullptr;
+	m_statrender = nullptr;
+	m_footer = nullptr;
+
+	// destroy singleton
+	std::cout << "cObjectmanager->getInstance()\n";
+	cObjectmanager* manager = manager->getInstance();
+	manager->kill();
+
+	std::cout << "cSignalTable->getInstance()\n";
+	cSignalTable* sigt = sigt->getInstance();
+	sigt->kill();
 
 #ifdef _DEBUG
 	//_CrtDumpMemoryLeaks();

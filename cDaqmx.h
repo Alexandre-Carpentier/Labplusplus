@@ -3,11 +3,13 @@
 #include <wx/wx.h>
 #include <wx/combobox.h>
 #include <wx/treectrl.h>
-#include <string>
 #include <wx/fileconf.h>
+#include <wx/dcbuffer.h>
+#include <string>
+#include <format>
+#include <memory>
 
 #include "enum.h"
-
 #include "cMeasurementControler.h"
 #include "cMeasurement.h"
 #include "cObjectmanager.h"
@@ -21,9 +23,9 @@
 #include "data_types.h"
 #include "cSignalTable.h"
 
+
+
 static wxImage temp_img;
-
-
 
 static wxPanel* config_rightpanel_ = nullptr;
 static wxTreeCtrl* config_tree_ctrl = nullptr;
@@ -35,6 +37,8 @@ private:
 	cImagePanel* InstrImg = nullptr;
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
+	void set_chan_permision(int access);
+	void set_chan_permision(int access, int chan_number);
 public:
 	// Signal color map
 	float COLORS[32][3] =
@@ -127,6 +131,12 @@ public:
 	std::string str_tc_max_range;
 	wxTextCtrl* chan_tc_max_range;
 
+	// Digital param
+	wxStaticText *static_digitaltype = nullptr;
+	wxComboBox *digitaltype = nullptr;
+	wxStaticText* static_digitalmode = nullptr;
+	wxComboBox* digitalmode = nullptr;
+
 	wxFlexGridSizer* flexchansizer1;
 
 	// linearize
@@ -170,10 +180,12 @@ public:
 
 	wxFlexGridSizer* flexchansizer3;
 
-
-
 	wxBoxSizer* chan_vsizer;
 
+	wxBoxSizer* btn_box_sizer[max_chan_number];
+	wxBoxSizer* daqinfo_v_sizer = nullptr;
+	wxTextCtrl* daq_type = nullptr;
+	wxButton* chanbtntype[max_chan_number];
 	wxButton* chanbtn[max_chan_number];
 
 	// Style
@@ -185,6 +197,7 @@ public:
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
 	cDaqmx(wxWindow* inst);
+	~cDaqmx();
 
 	void OnPaint(wxPaintEvent& event);
 
@@ -204,9 +217,11 @@ public:
 	void load_combobox(wxComboBox* combo, wxString str);
 	void load_combobox(wxComboBox* combo, double floating);
 
-
 	wxArrayString LoadScalePresetArray(wxString filename);
 	//void EnableChanProperties();
+	void OnDaqDigitalChanTypeModified(wxCommandEvent& evt);
+	void OnDaqDigitalChanModeModified(wxCommandEvent& evt);
+
 	void OnDaqChanTypeModified(wxCommandEvent& evt);
 	void OnDaqChanNameModified(wxCommandEvent& evt);
 	void OnDaqChanPhysicalAddressNameModified(wxCommandEvent& evt);
@@ -214,6 +229,7 @@ public:
 	void OnDaqAddrSelBtn(wxCommandEvent& evt);
 	void OnDaqScaleSelBtn(wxCommandEvent& evt);
 	void DaqChanAllOn(bool enable);
+	void display_channel_as(int access);
 	void OnDaqChanEnableBtn(wxCommandEvent& evt);
 	void OnChannelBtnNumberCliqued(wxCommandEvent& evt);
 	bool isDeviceMeasurable(std::string dev_name);

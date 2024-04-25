@@ -31,6 +31,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -73,14 +74,17 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files %28x86%29\IVI Foundation\IVI\Lib\msc;C:\Program Files %28x86%29\IVI Foundation\VISA\WinNT\lib\msc;G:\CODE\VS_PROJET\Lab++\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\IVI Foundation\IVI\Include;C:\Program Files (x86)\IVI Foundation\VISA\WinNT\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>x64\Debug;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;G:\CODE\VS_PROJET\Lab++\ADDON;G:\CODE\VS_PROJET\Lab++\LUA_LIB_542</LibraryPath>
-    <IncludePath>C:\Program Files\IVI Foundation\VISA\Win64\Include;G:\CODE\VS_PROJET\Lab++\LUA_LIB_542\include;$(IncludePath)</IncludePath>
+    <LibraryPath>x64\Debug;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;G:\CODE\VS_PROJET\Lab++\ADDON;G:\CODE\VS_PROJET\Lab++\LUA_LIB_542;G:\CODE\VS_PROJET\Lab++\sciplot-0.3.1\sciplot-0.3.1\sciplot</LibraryPath>
+    <IncludePath>C:\Program Files\IVI Foundation\VISA\Win64\Include;G:\CODE\VS_PROJET\Lab++\LUA_LIB_542\include;G:\CODE\VS_PROJET\Lab++\sciplot;$(IncludePath)</IncludePath>
+    <SourcePath>G:\CODE\VS_PROJET\Lab++\sciplot-0.3.1\sciplot-0.3.1\sciplot;$(SourcePath)</SourcePath>
+    <ExternalIncludePath>G:\CODE\VS_PROJET\Lab++\;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LibraryPath>G:\CODE\VS_PROJET\Lab++\x64\Release;$(LibraryPath);C:\Program Files\IVI Foundation\VISA\Win64\Lib_x64\msc;$(LibraryPath)</LibraryPath>
@@ -171,6 +175,7 @@
     <ClCompile Include="cDropper.cpp" />
     <ClCompile Include="cFilter.cpp" />
     <ClCompile Include="cFooter.cpp" />
+    <ClCompile Include="cGnuplot.cpp" />
     <ClCompile Include="cImagePanel.cpp" />
     <ClCompile Include="cInicfg.cpp" />
     <ClCompile Include="cMain.cpp" />
@@ -217,6 +222,7 @@
     <ClInclude Include="cDropper.h" />
     <ClInclude Include="cFilter.h" />
     <ClInclude Include="cFooter.h" />
+    <ClInclude Include="cGnuplot.h" />
     <ClInclude Include="cImagePanel.h" />
     <ClInclude Include="cInicfg.h" />
     <ClInclude Include="cMain.h" />

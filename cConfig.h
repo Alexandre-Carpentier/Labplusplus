@@ -25,7 +25,6 @@
 //#include "..\Lab\Plugin\cDevice.h"
 #include "..\Lab++\Plugin\cDevice.h"
 
-
 class cConfig : public wxFrame
 {
 private:
@@ -44,15 +43,29 @@ private:
 	cPressure* m_pressure = nullptr;
 	cTension* m_tension = nullptr;
 
-	typedef cDevice* (WINAPI* ATTACH)(wxWindow*);
-	ATTACH Attach = nullptr;
+	typedef cDevice* (*PLUGIN_ATTACH)(wxWindow*);
+	PLUGIN_ATTACH Attach = nullptr;
+	typedef bool (*PLUGIN_DETTACH)();
+	PLUGIN_DETTACH Dettach = nullptr;
+	typedef bool (*PLUGIN_START)();
+	PLUGIN_START PStart = nullptr;
+	typedef bool (*PLUGIN_STOP)();
+	PLUGIN_START PStop = nullptr;
+
 	struct PLUGIN_DATA
 	{
 		std::wstring name = L"";
 		wxPanel* panel = nullptr;
-		cDevice* device = nullptr;
+		cDevice* device;
 		HINSTANCE hInst = nullptr;
-		ATTACH Attach = nullptr;
+		// Fct ptr
+		PLUGIN_ATTACH Attach = nullptr;
+		PLUGIN_DETTACH Dettach = nullptr;
+		PLUGIN_START PStart = nullptr;
+		PLUGIN_STOP PStop = nullptr;
+		//
+		size_t signal_count;
+		short uniqueID;
 	};
 	std::vector<PLUGIN_DATA> plugin_vec;
 
@@ -61,7 +74,8 @@ public:
 	~cConfig();
 	void OnClickdrop(wxMouseEvent& evt);
 	void StopTest(bool stop);
-	void load_plugin(wxWindow* parent, std::wstring folder_path);
+	void unload_plugins();
+	void load_plugins(wxWindow* parent, std::wstring folder_path);
 	wxPanel* Getleftpan();
 	wxPanel* Getrightpan();
 	wxBoxSizer* Get_hsizer();

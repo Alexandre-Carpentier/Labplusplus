@@ -5,12 +5,12 @@ template <typename T>
 class cSingleton
 {
 protected:
-    // Constructeur/destructeur
+    // Cto/dTor
     cSingleton() { }
     ~cSingleton() { std::cout << "destroying singleton.\n"; }
 
 public:
-    // Interface publique
+    // Public interface
     static T* getInstance()
     {
         if (NULL == _singleton)
@@ -26,13 +26,15 @@ public:
         return (static_cast<T*> (_singleton));
     }
 
-    static void kill()
+    static bool kill()
     {
         if (nullptr != _singleton)
         {
             delete _singleton;
             _singleton = nullptr;
+            return true;
         }
+        return false;
     }
 
 private:

@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <wx/wx.h>
 #include "enum.h"
 
@@ -6,11 +7,13 @@
 #include <Windows.h>
 #include <string>
 
+#include "cCycleControler.h"
+
 #include "cPlot.h"
 #include "cConfig.h"
 #include "cTable.h"
 #include "cCycle.h"
-#include "cCycleControler.h"
+
 #include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
 #include "cMeasurementControler.h"
@@ -33,14 +36,20 @@ class cMeasurementmanager;
 class wxScaleButton;
 */
 
+class cCycleControler;
+
 class cFooter
 {
+private:
+	
 public:
+	std::shared_ptr<cCycleControler> cycle_controler;
 	wxWindow* inst_ = nullptr;
 	cPlot* m_plot_ = nullptr;
 	cTable* m_table_ = nullptr;
 	cConfig* m_config_ = nullptr;
-	cCycleControler* cycle_controler = nullptr;
+
+	std::shared_ptr<cMeasurementControler> meas_controler;
 
 	wxPanel* footerpanel = nullptr;
 	wxBoxSizer* hfootersizer = nullptr;

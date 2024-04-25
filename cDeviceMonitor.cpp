@@ -62,7 +62,7 @@ void cDeviceMonitor::Notify()
 			dev.set_type(L"RS232");
 			dev.set_name(L"Unknown");		
 		}
-		std::cout << "[*] Found: " << dev.get_type() << " " << dev.get_name() << " at COM" << item << "\n";
+		std::cout << "[*] cDeviceMonitor found: " << dev.get_type() << " " << dev.get_name() << " at COM" << item << "\n";
 		dev_list.push_back(dev);
 	}
 }

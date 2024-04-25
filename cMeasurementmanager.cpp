@@ -1,7 +1,7 @@
 #include "cMeasurementmanager.h"
 #include "cMeasurementControler.h"
 
-void cMeasurementmanager::set_measurement_controler(cMeasurementControler* m_controler)
+void cMeasurementmanager::set_measurement_controler(std::shared_ptr<cMeasurementControler> m_controler)
 {
 	m_meas_controler_ = m_controler;
 }
@@ -11,7 +11,7 @@ void cMeasurementmanager::set_measurement(cMeasurement* measurement)
 	m_meas_pool.push_back(measurement);
 }
 
-cMeasurementControler* cMeasurementmanager::get_measurement_controler()
+std::shared_ptr<cMeasurementControler> cMeasurementmanager::get_measurement_controler()
 {
 	return m_meas_controler_;
 }
@@ -52,13 +52,6 @@ size_t cMeasurementmanager::get_measurement_total_channel_number()
 	return count;
 }
 
-void cMeasurementmanager::destroy_measurement_controler()
-{
-	std::cout << "[*] [delete] m_meas_controler_ in cMeasurementmanager.cpp\n";
-	delete m_meas_controler_;
-	m_meas_controler_ = nullptr;
-}
-
 void cMeasurementmanager::destroy_measurement_pool()
 {
 	for (auto meas : m_meas_pool)
@@ -70,6 +63,15 @@ void cMeasurementmanager::destroy_measurement_pool()
 		meas = nullptr;
 	}
 	m_meas_pool.clear();
+}
+
+void cMeasurementmanager::start_all_devices()
+{
+	for (auto meas : m_meas_pool)
+	{
+		std::cout << "[*] Starting: " << meas->device_name() << "\n";
+		meas->start_device();
+	}
 }
 
 void cMeasurementmanager::stop_all_devices()

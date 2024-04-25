@@ -204,6 +204,12 @@ err_struct cSerial::close()
 	std::wcout << L"[*] cSerial close() called\n";
 	viClose(device_);
 	viClose(ressource_manager);
+	/*
+	'Lab++.exe' (Win32) : Déchargé 'C:\Program Files\IVI Foundation\VISA\Win64\NIvisa\PxiPlugins\NiViPpiP.dll'
+'Lab++.exe' (Win32) : Déchargé 'C:\Program Files\Keysight\IO Libraries Suite\bin\ioModInstPpi.dll'
+Le thread 0x73d4 s'est arrêté avec le code 0 (0x0).
+'Lab++.exe' (Win32) : Déchargé 'C:\Program Files\IVI Foundation\VISA\Win64\NIvisa\PxiPlugins\NiViPpiD.dll'
+*/
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
 	return last_error;

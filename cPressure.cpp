@@ -41,8 +41,6 @@ cPressure::cPressure(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-
-
 	::wxInitAllImageHandlers();
 	wxBitmap bmp = wxBitmap("PACEPNG", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
 	pace_img = bmp.ConvertToImage();										// Convert bmp to image to scale purpose
@@ -109,10 +107,9 @@ cPressure::cPressure(wxWindow* inst)
 
 cPressure::~cPressure()
 {
-	if (m_pressure_ != nullptr)
-	{
-		delete m_pressure_;
-	}
+	// Free memory on heap
+	cMeasurementmanager* meas_manager = meas_manager->getInstance();
+	meas_manager->destroy_subsystem(MEAS_TYPE::PRESSURE_CONTROLER_INSTR);
 }
 
 void cPressure::RefreshPort()
@@ -210,15 +207,12 @@ void cPressure::DestroySubsystem()
 	// Destroy and release previous ressource
 
 	std::cout << "[*] cMeasurementmanager->getInstance()\n";
-	meas_manager = meas_manager->getInstance();
-
-
-	// Destroy item in the list
+	cMeasurementmanager* meas_manager = meas_manager->getInstance();
 	bool isDestroyed = meas_manager->destroy_subsystem(PRESSURE_CONTROLER_INSTR);
 	// If item destroyed delete from memory
 	if (isDestroyed)
 	{
-		std::cout << "[*] [delete] m_daq in cPressure.cpp\n";
+		std::cout << "[*] [delete] m_daq in cDaqmx.cpp\n";
 
 		delete m_pressure_;
 		m_pressure_ = nullptr;
@@ -291,6 +285,10 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 
 	DestroySubsystem();
 
+	// get singleton
+
+	cMeasurementmanager* meas_manager = meas_manager->getInstance();
+
 	// Read the new sub system name selected
 	wxString current_device = this->addr_ctrl->GetValue();
 	std::string current = current_device.ToStdString();
@@ -338,8 +336,9 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 		evt.Skip();
 		return;
 	}
-
+	assert(meas_manager != nullptr);
 	meas_manager->set_measurement(m_pressure_);
+
 	m_pressure_->set_device_addr(current);
 	m_pressure_->set_device_name("Pace 6000");
 	

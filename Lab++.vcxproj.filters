@@ -203,6 +203,9 @@
     <ClCompile Include="cStatrender.cpp">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
+    <ClCompile Include="cGnuplot.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -345,6 +348,9 @@
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
     <ClInclude Include="cStatrender.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="cGnuplot.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
   </ItemGroup>

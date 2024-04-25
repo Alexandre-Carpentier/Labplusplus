@@ -69,6 +69,7 @@ public:
 	// Wingraph
 	HGRAPH get_graph_handle();
 	bool get_graph_state();
+	char* get_graph_filename();
 	int get_graph_signal_count();
 	void set_graph_filter(FILTER_M FilteringType);
 	void set_signal_name(std::string signame, int position);  // change the signal name in the WinGraph module

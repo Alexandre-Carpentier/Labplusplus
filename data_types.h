@@ -7,6 +7,9 @@
 
 #define max_chan_number  48
 
+#define CHANREAD 0
+#define CHANWRITE  1
+
 typedef struct {
 
 	// General config
@@ -18,7 +21,12 @@ typedef struct {
 	int channel_index;
 	std::vector <bool> channel_enabled;											// enable channel
 	std::vector<std::string> channel_name;										// Name to assign
+	std::vector <int> channel_permision;										// READ/WRITE channel
 	wxArrayString channel_physical_name[max_chan_number];						// physical channel
+
+	//////////////////////////////////////////////////////////
+	// ANALOG
+	//////////////////////////////////////////////////////////
 	wxArrayString channel_type[max_chan_number];								// channel type: Voltage, termocouple, thermistor
 	wxArrayString channel_max[max_chan_number];									// Max input range
 	wxArrayString channel_min[max_chan_number];									// Min input range
@@ -36,6 +44,13 @@ typedef struct {
 	// flex sizer 3
 	wxArrayString channel_trigger[max_chan_number];								// trigger
 	std::string channel_trigger_threshold[max_chan_number];						// threshold
+
+	//////////////////////////////////////////////////////////
+	// DIGITAL
+	//////////////////////////////////////////////////////////
+	wxArrayString digital_channel_type[max_chan_number];						// channel type: input/output
+	wxArrayString digital_channel_mode_type[max_chan_number];					// Input mode type: internal pullup/ no pullup
+
 }DEVICE_CONFIG_STRUCT;
 
 typedef struct {
@@ -45,12 +60,17 @@ typedef struct {
 	wxString  device_name;
 	wxString  device_addr;
 	// Channels config
-
+	
 	int chan_number;// = max_chan_number;										// flex sizer 1
 	int channel_index;
 	std::vector <bool> channel_enabled;											// enable channel
 	std::vector<std::string> channel_name;										// Name to assign
+	std::vector <int> channel_permision;										// READ/WRITE channel
 	wxString channel_physical_name[max_chan_number];							// physical channel
+
+	//////////////////////////////////////////////////////////
+	// ANALOG
+	//////////////////////////////////////////////////////////
 	wxString channel_type[max_chan_number];										// channel type: Voltage, termocouple, thermistor
 	wxString channel_max[max_chan_number];										// Max input range
 	wxString channel_min[max_chan_number];										// Min input range
@@ -68,6 +88,13 @@ typedef struct {
 	// flex sizer 3
 	std::string channel_trigger[max_chan_number];								// trigger
 	wxString channel_trigger_threshold[max_chan_number];						// threshold
+
+	//////////////////////////////////////////////////////////
+	// DIGITAL
+	//////////////////////////////////////////////////////////
+	wxString digital_channel_type[max_chan_number];								// channel type: input/output
+	wxString digital_channel_mode_type[max_chan_number];						// Input mode type: internal pullup/ no pullup
+
 }CURRENT_DEVICE_CONFIG_STRUCT;
 
 
@@ -78,7 +105,8 @@ enum MEAS_TYPE
 	DAQ_INSTR,
 	PRESSURE_CONTROLER_INSTR,
 	VOLTAGE_CONTROLER_INSTR,
-	FLOW_CONTROLER_INSTR
+	FLOW_CONTROLER_INSTR,
+	VALVE_CONTROLER_INSTR,
 };
 
 typedef struct

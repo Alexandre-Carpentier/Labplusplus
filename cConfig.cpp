@@ -4,6 +4,7 @@
 #include "enum.h"
 #include <thread>
 
+/*
 class cPlot;
 class cCycle;
 class cDaqmx;
@@ -11,7 +12,7 @@ class cPressure;
 class cTension;
 class cObjectmanager;
 class cMeasurementControler;
-
+*/
 
 
 /*---------------- - Duplication-------------------------------- -
@@ -89,8 +90,8 @@ cConfig::cConfig(wxWindow* inst)
 	config_leftpanel_->SetBackgroundColour(wxColor(220, 220, 225));
 
 	config_rightpanel_ = new wxPanel(inst, IDC_CONFIG_RIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
-	//config_rightpanel_->SetBackgroundColour(wxColor(245, 0, 0)); // To not overlap on control border must be paint with same color gradiant as in DAQ or plugin
-	config_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cConfig::OnPaint)); // Draw gradiant grey
+	//config_rightpanel_->SetBackgroundColour(wxColor(255, 55, 55)); // To not overlap on control border must be paint with same color gradiant as in DAQ or plugin
+	//config_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cConfig::OnPaint)); // Draw gradiant grey
 
 	/////////////////////////////////////////////////////////////
 	//
@@ -116,8 +117,11 @@ cConfig::cConfig(wxWindow* inst)
 	Daqmx_struct.name = L"USB-DAQ-6001.dll";
 	Daqmx_struct.panel = m_daqmx->get_right_panel();
 	Daqmx_struct.hInst = nullptr;
-	//Daqmx_struct.device = nullptr;
-	//Daqmx_struct.Attach = nullptr;
+	Daqmx_struct.device = nullptr;
+	Daqmx_struct.Attach = nullptr;
+	Daqmx_struct.Dettach = nullptr;
+	Daqmx_struct.PStart = nullptr;
+	Daqmx_struct.PStop = nullptr;
 	plugin_vec.push_back(Daqmx_struct);
 
 	// Add cPressure to plugin vec
@@ -132,9 +136,13 @@ cConfig::cConfig(wxWindow* inst)
 	Pressure_struct.hInst = nullptr;
 	Pressure_struct.device = nullptr;
 	Pressure_struct.Attach = nullptr;
+	Daqmx_struct.Dettach = nullptr;
+	Daqmx_struct.PStart = nullptr;
+	Daqmx_struct.PStop = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
 	// Add cTension to plugin vec
+	/*
 	m_tension = new cTension(book);
 	PLUGIN_DATA Tension_struct;
 	Tension_struct.name = L"Keitley 2280S.dll";
@@ -142,8 +150,11 @@ cConfig::cConfig(wxWindow* inst)
 	Tension_struct.hInst = nullptr;
 	Tension_struct.device = nullptr;
 	Tension_struct.Attach = nullptr;
+	Daqmx_struct.Dettach = nullptr;
+	Daqmx_struct.PStart = nullptr;
+	Daqmx_struct.PStop = nullptr;
 	plugin_vec.push_back(Tension_struct);
-
+	*/
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
@@ -156,7 +167,7 @@ cConfig::cConfig(wxWindow* inst)
 	wDir.append(lpszDir);
 	wDir.append(L"\\ADDON");
 	std::cout << "[*] Try to load plugin in folder: " << wDir << "\n";
-	load_plugin(book, wDir);
+	load_plugins(book, wDir);
 
 	mainSizer->Add(book, 1, wxEXPAND);
 	config_rightpanel_->SetSizer(mainSizer);
@@ -208,10 +219,29 @@ cConfig::cConfig(wxWindow* inst)
 cConfig::~cConfig()
 {
 	std::cout << "cConfig dtor...\n";
-	// Save current row values
+	//unload_plugins(); // Error occured when wxWidget use the garbage collector after
+	delete m_daqmx;
+	delete m_pressure;
+	delete m_tension;
+	m_daqmx = nullptr;
+	m_pressure = nullptr;
+	m_tension = nullptr;
 }
 
-void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
+void cConfig::unload_plugins()
+{
+	for (auto& plugin : plugin_vec)
+	{
+		if (plugin.hInst != nullptr)
+		{
+			plugin.Dettach();
+			FreeLibrary(plugin.hInst);
+			plugin.hInst = nullptr;
+		}
+	}
+}
+
+void cConfig::load_plugins(wxWindow* parent, std::wstring folder_path)
 {
 	WIN32_FIND_DATA ffd;
 	LARGE_INTEGER filesize;
@@ -247,27 +277,54 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 			dllfilepath.append(ffd.cFileName);
 
 			HINSTANCE hModule = nullptr;
-			std::cout << "[*] Found plugin module to load: " << dllfilepath << "\n";
+			//std::cout << "[*] Found plugin module to load: " << dllfilepath << "\n";
 			hModule = LoadLibrary(dllfilepath.c_str());
 			if (hModule)
 			{
 				std::cout << "[*] Loading...\n";
 				Attach = nullptr;
-				Attach = (ATTACH)GetProcAddress(hModule, "Attach");
+				Attach = (PLUGIN_ATTACH)GetProcAddress(hModule, "PLUGIN_Attach");
 				if (!Attach)
 				{
-					std::cout << "[!] Failed to load module with GetProcAddress(). \n";
+					std::cout << "[!] Failed to load function Attach() with GetProcAddress(). \n";
 					FreeLibrary(hModule);
 					continue;
 					//break;
 				}
-				std::cout << "[*] Loading success. \n";
+				Dettach = nullptr;
+				Dettach = (PLUGIN_DETTACH)GetProcAddress(hModule, "PLUGIN_Dettach");
+				if (!Dettach)
+				{
+					std::cout << "[!] Failed to load function Dettach() with GetProcAddress(). \n";
+					FreeLibrary(hModule);
+					continue;
+				}
+				PStart = nullptr;
+				PStart = (PLUGIN_START)GetProcAddress(hModule, "PLUGIN_Start");
+				if (!PStart)
+				{
+					std::cout << "[!] Failed to load function PStart() with GetProcAddress(). \n";
+					FreeLibrary(hModule);
+					continue;
+				}
+				PStop = nullptr;
+				PStop = (PLUGIN_STOP)GetProcAddress(hModule, "PLUGIN_Stop");
+				if (!PStop)
+				{
+					std::cout << "[!] Failed to load function PStop() with GetProcAddress(). \n";
+					FreeLibrary(hModule);
+					continue;
+				}
+				std::cout << "[*] Found plugin module to load: " << dllfilepath << "\n";
+				std::cout << "[*] Loading success. \n";		
 
 				// Populate vector of PLUGIN_DATA
 				std::wstring plugin_name = ffd.cFileName;
 
 				// Attach the plugin DLL to the core system here
-				cDevice* dev = Attach(parent);
+				cDevice* dev = nullptr;
+				dev = Attach(parent);
+				assert(dev != nullptr);
 
 				wxPanel* plugin_panel = nullptr;
 				if (dev != nullptr)
@@ -287,6 +344,9 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 				plugin_data.device = dev;
 				plugin_data.hInst = hModule;
 				plugin_data.Attach = Attach;
+				plugin_data.Dettach = Dettach;
+				plugin_data.PStart = PStart;
+				plugin_data.PStop = PStop;
 				plugin_vec.push_back(plugin_data); // Add struct
 			}
 			else
@@ -303,7 +363,6 @@ void cConfig::load_plugin(wxWindow* parent, std::wstring folder_path)
 	{
 
 	}
-
 	FindClose(hFind);
 	return;	// return vector of wide string
 }
@@ -440,7 +499,13 @@ void cConfig::OnPaint(wxPaintEvent& event)
 	wxRect size = this->GetRect();
 
 	size.x = 0;
-	dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
+	//dc.GradientFillLinear(size, wxColor(105, 105, 105), wxColor(255, 255, 255), wxUP);
+
+	// change the brush to fill the whole client rectangle
+	wxBrushList my_brush_list;
+	wxBrush* my_brush = my_brush_list.FindOrCreateBrush(wxColour(255, 20, 20), wxBRUSHSTYLE_SOLID);
+	dc.SetBrush(*my_brush); // custom filling
+	dc.DrawRectangle(size);
 
 	event.Skip();
 }
