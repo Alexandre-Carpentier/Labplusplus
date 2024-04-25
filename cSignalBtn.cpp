@@ -23,7 +23,7 @@ END_EVENT_TABLE()
 wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wxString address, wxColor color) :
     wxWindow(parent, id)
 {
-    wxBoxSizer* h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
+    h_sizer0 = new wxBoxSizer(wxHORIZONTAL);
 
     show = new wxCheckBox(this, IDCSHOWSIGNAL, /*Show*/"", wxDefaultPosition, this->FromDIP(wxSize(20, 20)), wxTE_CENTRE | wxCHK_2STATE);
     show->SetValue(true);
@@ -50,7 +50,7 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     h_sizer0->Add(picker, 0, wxALIGN_CENTER_VERTICAL);
     h_sizer0->AddStretchSpacer();
 
-    wxBoxSizer* h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
+    h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
 
 
 
@@ -78,7 +78,7 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
 
 
 
-    wxBoxSizer* h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
+    h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
     min = new wxStaticText(this, wxID_ANY, "Min: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
     avg = new wxStaticText(this, wxID_ANY, "Average: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
     max = new wxStaticText(this, wxID_ANY, "Max: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
@@ -92,6 +92,32 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     h_sizer3->Add(max, 1, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
     h_sizer3->Add(reset, 1, wxEXPAND);
 
+
+   h_sizer4 = new wxBoxSizer(wxHORIZONTAL);
+
+    wxStaticText* staticfiltertxt = new wxStaticText(this, IDC_FILTERTXT, L"Filter:", wxDefaultPosition, this->FromDIP(wxSize(40, 25)), wxTE_CENTER);
+    staticfiltertxt->SetBackgroundColour(wxColor(240, 245, 250));
+
+    wxArrayString   m_arrItems1;
+    m_arrItems1.Add(wxT("None"));
+    m_arrItems1.Add(wxT("Hanning"));
+    m_arrItems1.Add(wxT("Besel"));
+    m_arrItems1.Add(wxT("EMA"));
+    combo1 = new wxComboBox(this, IDC_FILTERCOMBO, L"None", wxDefaultPosition, this->FromDIP(wxSize(40, 25)), m_arrItems1, wxCB_READONLY);
+    combo1->SetBackgroundColour(wxColor(240, 245, 255));
+    this->Bind(wxEVT_COMMAND_COMBOBOX_CLOSEUP, &wxCustomButton::OnFilterSignalChanged, this, IDC_FILTERCOMBO);
+
+    wxStaticText* staticfilterthresholdtxt = new wxStaticText(this, IDC_STATICFILTERTXT, L"threshold [0;1]:", wxDefaultPosition, this->FromDIP(wxSize(100, 25)), wxTE_CENTER);
+    staticfilterthresholdtxt->SetBackgroundColour(wxColor(240, 245, 250));
+
+    filterthresholdtxt = new wxTextCtrl(this, IDC_FILTERTEXTCTRL, L"0.5", wxDefaultPosition, this->FromDIP(wxSize(50, 25)));
+    filterthresholdtxt->SetBackgroundColour(wxColor(255, 255, 255));
+    this->Bind(wxEVT_COMMAND_TEXT_UPDATED, &wxCustomButton::OnFilterThresholdSignalChanged, this, IDC_FILTERTEXTCTRL);
+
+    h_sizer4->Add(staticfiltertxt, 0);
+    h_sizer4->Add(combo1, 1);
+    h_sizer4->Add(staticfilterthresholdtxt,0);
+    h_sizer4->Add(filterthresholdtxt,0);
 
     /*
     wxBoxSizer* h_sizer4 = new wxBoxSizer(wxHORIZONTAL);
@@ -116,7 +142,7 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     //v_sizer->Add(h_sizer2, 1, wxEXPAND);
     v_sizer->Add(h_sizer3, 1, wxEXPAND);
     //v_sizer->Add(separator0, 1, wxEXPAND);
-    //v_sizer->Add(h_sizer4, 1, wxEXPAND);
+    v_sizer->Add(h_sizer4, 1, wxEXPAND);
 
     this->SetSizer(v_sizer);
     SetMinSize(this->FromDIP(wxSize(buttonWidth, buttonHeight)));
@@ -149,19 +175,17 @@ void wxCustomButton::set_unit(wxString unit)
 void wxCustomButton::set_min(double val)
 {
     this->min->SetLabel(wxString::Format(wxT("min: %.2lf"), val));
-    Layout();
     this->min_ = val;
 }
 void wxCustomButton::set_average(double val)
 {
     this->avg->SetLabel(wxString::Format(wxT("avg: %.2lf"), val));
-    Layout();
     this->avg_ = val;
 }
 void wxCustomButton::set_max(double val)
 {
     this->max->SetLabel(wxString::Format(wxT("max: %.2lf"), val));
-    Layout();
+    h_sizer3->Layout(); // Layout again
     this->max_ = val;
 }
 void wxCustomButton::set_color(wxColor color)
@@ -244,7 +268,7 @@ void wxCustomButton::render(wxDC& dc)
     //if (pressedDown)
         //dc.SetBrush(*wxLIGHT_GREY_BRUSH);
     //else
-    dc.SetBrush(*wxTRANSPARENT_BRUSH);
+        dc.SetBrush(*wxTRANSPARENT_BRUSH);
     //dc.SetBrush(*wxGREY_BRUSH);
 
 
@@ -272,6 +296,71 @@ void wxCustomButton::OnShowSignalChanged(wxEvent& event)
 
     bool isChecked = show->GetValue();
     m_plot->set_signal_visible(isChecked, this->GetId());
+    event.Skip();
+}
+
+void wxCustomButton::OnFilterThresholdSignalChanged(wxEvent& event)
+{
+    std::cout << "cObjectmanager->getInstance()\n";
+    cObjectmanager* obj_manager = obj_manager->getInstance();
+
+    cPlot* m_plot = obj_manager->get_plot();
+
+    wxString text = filterthresholdtxt->GetValue();
+
+    float f = std::atof(text);
+
+    if (f > 1)
+    {
+        filterthresholdtxt->SetValue("1.0");
+        f = 1.0;
+    }
+
+    if (f < 0)
+    {
+        filterthresholdtxt->SetValue("0.0");
+        f = 0;
+    }
+     
+    m_plot->set_signal_filter_threshold(f, this->GetId());
+    event.Skip();
+}
+
+
+void wxCustomButton::OnFilterSignalChanged(wxEvent& event)
+{
+    std::cout << "cObjectmanager->getInstance()\n";
+    cObjectmanager* obj_manager = obj_manager->getInstance();
+
+    cPlot* m_plot = obj_manager->get_plot();
+
+    int iFilter = this->combo1->GetCurrentSelection();
+    FILTER_M Filtering = FILTER_NONE;
+    switch (iFilter)
+    {
+    case 0:
+    {
+        Filtering = FILTER_NONE;
+        break;
+    }
+    case 1:
+    {
+        Filtering = FILTER_HANNING;
+        break;
+    }
+    case 2:
+    {
+        Filtering = FILTER_BESEL;
+        break;
+    }
+    case 3:
+    {
+        Filtering = FILTER_EMA;
+        break;
+    }
+    }
+
+    m_plot->set_signal_filter(Filtering, this->GetId());
     event.Skip();
 }
 

@@ -5,6 +5,8 @@
 #include "datetimeapi.h"
 #include "fileapi.h"
 
+#include "nilibddc.h"
+
 #pragma comment (lib, "gdi32.lib")
 #pragma comment (lib, "User32.lib")
 #pragma comment (lib, "Opengl32.lib")
@@ -56,6 +58,8 @@ typedef struct {
 	char signame[260];
 	float color[3];
 	bool show;
+	FILTER_M filter;
+	float filter_threshold;
 	DATA_STATISTIC stat;
 	double* X;
 	double* Y;
@@ -195,72 +199,106 @@ BOOL StartGraph(HGRAPH hGraph)
 		pDATA->show = true;
 	}
 
-	// Create the log file
-	if (pgraph->Logging == LOGGER_ASCII)
+	if (pgraph->Logging != LOGGER_NONE)
 	{
-		logfile = NULL;
-
-		// create unique filename
-
-		char lpDateStr[MAX_PATH] = "";
-		if (!GetUniqueFilename(lpDateStr, (char*)".lab"))
+		// Create the log file
+		if (pgraph->Logging == LOGGER_ASCII)
 		{
-			MessageBox(GetFocus(), "Error: impossible to generate an unique filename in the current directory", "Error", MB_ICONERROR);
-			LeaveCriticalSection(&cs);
-			return FALSE;
+			logfile = NULL;
+
+			// create unique filename
+
+			char lpDateStr[MAX_PATH] = "";
+			if (!GetUniqueFilename(lpDateStr, (char*)".lab"))
+			{
+				MessageBox(GetFocus(), "Error: impossible to generate an unique filename in the current directory", "Error", MB_ICONERROR);
+				LeaveCriticalSection(&cs);
+				return FALSE;
+			}
+			if (pgraph->logfilename != NULL)
+			{
+				free(pgraph->logfilename);
+				pgraph->logfilename = NULL;
+			}
+			pgraph->logfilename = (char*)malloc(sizeof(lpDateStr));
+			if (!pgraph->logfilename)
+			{
+				MessageBox(GetFocus(), "Error: impossible to allocate logfilename buffer in memory", "Error", MB_ICONERROR);
+				LeaveCriticalSection(&cs);
+				return FALSE;
+			}
+			strcpy_s(pgraph->logfilename, MAX_PATH, lpDateStr);
+
+			// try to open the file
+
+			fopen_s(&logfile, lpDateStr, "w+");
+			if (!logfile)
+			{
+				MessageBox(GetFocus(), "Error: impossible to read/write the file", "Error", MB_ICONERROR);
+				LeaveCriticalSection(&cs);
+				return FALSE;
+			}
+
+			// make logfile header
+
+			fprintf(logfile, "Time(s)");
+			for (int u = 0; u < pgraph->signalcount; u++)
+			{
+				pDATA = (DATA*)pgraph->signal[u];
+				fprintf_s(logfile, "\t%s", pDATA->signame);
+			}
+			fprintf_s(logfile, "\n");
 		}
-		pgraph->logfilename = NULL;
-		pgraph->logfilename = (char*)malloc(sizeof(lpDateStr));
-		if(!pgraph->logfilename)
+
+		if (pgraph->Logging == LOGGER_XLSX)
 		{
-			MessageBox(GetFocus(), "Error: impossible to allocate logfilename buffer in memory", "Error", MB_ICONERROR);
-			LeaveCriticalSection(&cs);
-			return FALSE;
+			/*
+			// create unique filename
+
+			char lpDateStr[MAX_PATH] = "";
+			if (!GetUniqueFilename(lpDateStr, (char*)".xlsx"))
+			{
+				MessageBox(GetFocus(), "Error: impossible to generate an unique filename in the current directory", "Error", MB_ICONERROR);
+				LeaveCriticalSection(&cs);
+				return FALSE;
+			}
+
+			// open Excel and load instance
+			XL = excel_create_instance();
+
+			// Write header
+			char one_line[64] = "Logger header\tAnalog0\tAnalog1\t";
+			//excel_addline(XL, one_line);
+			*/
 		}
-		strcpy_s(pgraph->logfilename, MAX_PATH, lpDateStr);
 
-		// try to open the file
-
-		fopen_s(&logfile, lpDateStr, "w+");
-		if (!logfile)
+		if (pgraph->Logging == LOGGER_TDMS)
 		{
-			MessageBox(GetFocus(), "Error: impossible to read/write the file", "Error", MB_ICONERROR);
-			LeaveCriticalSection(&cs);
-			return FALSE;
-		}
+			// create unique filename
 
-		// make logfile header
-
-		fprintf(logfile, "Time(s)");
-		for (int u = 0; u < pgraph->signalcount; u++)
-		{
-			pDATA = (DATA*)pgraph->signal[u];
-			fprintf_s(logfile, "\t%s", pDATA->signame);
+			char lpDateStr[MAX_PATH] = "";
+			if (!GetUniqueFilename(lpDateStr, (char*)".tdms"))
+			{
+				MessageBox(GetFocus(), "Error: impossible to generate an unique filename in the current directory", "Error", MB_ICONERROR);
+				LeaveCriticalSection(&cs);
+				return FALSE;
+			}
+			if (pgraph->logfilename != NULL)
+			{
+				free(pgraph->logfilename);
+				pgraph->logfilename = NULL;
+			}
+			pgraph->logfilename = (char*)malloc(sizeof(lpDateStr));
+			if (!pgraph->logfilename)
+			{
+				MessageBox(GetFocus(), "Error: impossible to allocate logfilename buffer in memory", "Error", MB_ICONERROR);
+				LeaveCriticalSection(&cs);
+				return FALSE;
+			}
+			strcpy_s(pgraph->logfilename, MAX_PATH, lpDateStr);
 		}
-		fprintf_s(logfile, "\n");
 	}
 
-	if (pgraph->Logging == LOGGER_XLSX)
-	{
-		/*
-		// create unique filename
-
-		char lpDateStr[MAX_PATH] = "";
-		if (!GetUniqueFilename(lpDateStr, (char*)".xlsx"))
-		{
-			MessageBox(GetFocus(), "Error: impossible to generate an unique filename in the current directory", "Error", MB_ICONERROR);
-			LeaveCriticalSection(&cs);
-			return FALSE;
-		}
-
-		// open Excel and load instance
-		XL = excel_create_instance();
-
-		// Write header
-		char one_line[64] = "Logger header\tAnalog0\tAnalog1\t";
-		//excel_addline(XL, one_line);
-		*/
-	}
 
 	// Save the start time x=0
 
@@ -517,6 +555,11 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize)
 		// set default signal color
 
 		pDATA->color[0] = 0.5f; pDATA->color[1] = 0.5f; pDATA->color[2] = 0.01f * i;
+
+		// set default filtering mode
+
+		pDATA->filter = FILTER_NONE;
+		pDATA->filter_threshold = 0.5f;
 
 		// Update the number of signal inside object HGRAPH
 
@@ -957,7 +1000,7 @@ VOID SetZoomFactor(HGRAPH hGraph, int zoom)
 	SetFilteringMode: set the EMA filtering state
   -------------------------------------------------------------------------*/
 
-VOID SetFilteringMode(HGRAPH hGraph, FILTER_M filtering)
+VOID SetFilteringMode(HGRAPH hGraph, FILTER_M filtering, INT iSignalNumber)
 {
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
@@ -969,7 +1012,40 @@ VOID SetFilteringMode(HGRAPH hGraph, FILTER_M filtering)
 		return;
 	}
 
-	pgraph->Filtering = filtering;
+	if (iSignalNumber > MAX_SIGNAL_COUNT || iSignalNumber < 0)
+	{
+		printf("[!] Error at SetFilteringMode() signal number not in range\n");
+		return;
+	}
+
+	pgraph->signal[iSignalNumber]->filter = filtering;
+}
+
+VOID SetFilteringThreshold(HGRAPH hGraph, FLOAT intensity, INT iSignalNumber)
+{
+	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
+
+	// Sanity check
+
+	if (NULL == pgraph)
+	{
+		printf("[!] Error at SetFilteringThreshold() graph handle is null\n");
+		return;
+	}
+
+	if (iSignalNumber > MAX_SIGNAL_COUNT || iSignalNumber < 0)
+	{
+		printf("[!] Error at SetFilteringThreshold() signal number not in range\n");
+		return;
+	}
+
+	if (intensity > 1 || intensity < 0)
+	{
+		printf("[!] Error at SetFilteringThreshold() threshold not in range [0;1]\n");
+		return;
+	}
+
+	pgraph->signal[iSignalNumber]->filter_threshold = intensity;
 }
 
 VOID SetSignalMinValue(HGRAPH hGraph, INT SIGNB, DOUBLE val)
@@ -1541,46 +1617,52 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 			return;
 		}
 
-		// Low pass filter 
+		// Is filter enable ?
 
-		if (pgraph->Filtering == FILTER_EMA)
+		if (pDATA->filter != FILTER_NONE)
 		{
-			double a = 0.1; // Custom cut freq 
-			if (pgraph->cur_nbpoints == 0)
-				y[index] = y[index]; // First point skip to prevent INF
-			else
-				y[index] = a * y[index] + (1 - a) * pDATA->Y[pgraph->cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
-		}
+			// Low pass filter 
 
-		// Hanning window filter
-
-		if (pgraph->Filtering == FILTER_HANNING) // experimental (not properly working)
-		{
-			const int window_size = 20;																		// Define the Hann windows size here
-			static double dataOut[window_size];
-			static int accumulator = 0;
-			if (accumulator < window_size)
+			if (pDATA->filter == FILTER_EMA)
 			{
-				printf("[*] Hanning filter collecting...\n");
-				LeaveCriticalSection(&cs);
-				accumulator++;
-				return;
+				//double a = 0.1; // Custom cut freq 
+				float a = pDATA->filter_threshold;
+				if (pgraph->cur_nbpoints == 0)
+					y[index] = y[index]; // First point skip to prevent INF
+				else
+					y[index] = a * y[index] + (1 - a) * pDATA->Y[pgraph->cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
 			}
-			accumulator = 0;
 
-			for (int i = 0; i < window_size; i++)
+			// Hanning window filter
+
+			if (pDATA->filter == FILTER_HANNING) // experimental (not properly working)
 			{
+				const int window_size = 20;																		// Define the Hann windows size here
+				static double dataOut[window_size];
+				static int accumulator = 0;
+				if (accumulator < window_size)
+				{
+					printf("[*] Hanning filter collecting...\n");
+					LeaveCriticalSection(&cs);
+					accumulator++;
+					return;
+				}
+				accumulator = 0;
 
-				const double PI = 3.14159;
-				double multiplier = 0.5 * (1 - cos(2 * PI * i / window_size));
-				dataOut[i] = multiplier * y[index];
+				for (int i = 0; i < window_size; i++)
+				{
+
+					const double PI = 3.14159;
+					double multiplier = 0.5 * (1 - cos(2 * PI * i / window_size));
+					dataOut[i] = multiplier * y[index];
+				}
 			}
-		}
 
-		// Besel filter
+			// Besel filter
 
-		if (pgraph->Filtering == FILTER_BESEL)
-		{
+			if (pDATA->filter == FILTER_BESEL)
+			{
+			}
 		}
 
 		// Add points to the selected buffer	
@@ -1590,7 +1672,7 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 		// Perform some statistics
 
-	// period
+		// period
 		pDATA->stat.period_s = pDATA->X[pgraph->cur_nbpoints] - pDATA->X[0];								// Update current period
 
 		//min
@@ -1824,7 +1906,7 @@ BOOL Render(HGRAPH hGraph)
 						double dy = 0.0;
 						dy = (SnapPlot->Ymin - SnapPlot->Ymax) * (1 - normal_pos_y_shifted);
 						dy = SnapPlot->Ymax + dy;
-						DrawString(normal_pos_x + 0.05, normal_pos_y - 0.05, dtos(value, sizeof(value), dy));
+						DrawString(normal_pos_x + 0.05f, normal_pos_y - 0.05f, dtos(value, sizeof(value), dy));
 
 						//printf("x=%lf	y=%lf	xnorm=%lf	ynorm=%lf\n", normal_pos_x, normal_pos_y, normal_pos_x_shifted, normal_pos_y_shifted);
 

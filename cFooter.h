@@ -58,7 +58,6 @@ public:
 	wxStaticText* staticratetxt = nullptr;
 	wxTextCtrl* ratetxt = nullptr;
 
-	wxComboBox* combo1 = nullptr;
 	wxComboBox* combo2 = nullptr;
 	wxTextCtrl* freq = nullptr;
 
@@ -71,8 +70,6 @@ public:
 	wxBoxSizer* GetSizer();
 
 	void startButtonClicked(wxCommandEvent& evt);
-
-	void filterButtonClicked(wxCommandEvent& evt);
 
 	void freqButtonClicked(wxCommandEvent& evt);
 

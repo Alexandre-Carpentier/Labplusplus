@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <format>
+#include <bitset>
 class cTick;
 class cMeasurement;
 
@@ -23,7 +25,8 @@ private:
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 
 
-	TaskHandle taskHandle;
+	TaskHandle analog_taskHandle;
+	TaskHandle digital_taskHandle;
 	int32 DAQret;
 	int sample_number = 2;
 	float64 multiple_data[1200];
@@ -34,10 +37,13 @@ public:
 	std::string device_name() override;
 	MEAS_TYPE device_type() override;
 	size_t chan_count() override;
+	size_t chan_read_count() override;
+	size_t chan_write_count() override;
 
 	int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
 
 	DATAS read() override;
+	void set(double* value, size_t length) override;
 
 	void stop_device()override;
 

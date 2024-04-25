@@ -156,6 +156,8 @@ inline long long cCycleControler::PerformanceCounter()
 
 cCycleControler::~cCycleControler()
 {
+
+	assert(m_table_ != nullptr);
 	std::cout << "cCycleControler dtor...\n";
 }
 

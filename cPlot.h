@@ -71,10 +71,11 @@ public:
 	bool get_graph_state();
 	char* get_graph_filename();
 	int get_graph_signal_count();
-	void set_graph_filter(FILTER_M FilteringType);
+	void set_signal_filter(FILTER_M FilteringType, int position);
+	void set_signal_filter_threshold(float intensity, int position);
 	void set_signal_name(std::string signame, int position);  // change the signal name in the WinGraph module
 	void show_all_signals(bool isDisplayed);
-	void start_graph(FILTER_M FilteringType, LOGGER_M ReccordingType, int SignalNumber);
+	void start_graph(LOGGER_M ReccordingType, int SignalNumber);
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);
 

@@ -16,6 +16,18 @@ MEAS_TYPE cPacesim::device_type() { return PRESSURE_CONTROLER_INSTR; };
 
 size_t cPacesim::chan_count()
 {
+    size_t nb_sig = 2;
+    return nb_sig;
+}
+
+size_t cPacesim::chan_read_count()
+{
+    size_t nb_sig = 1;
+    return nb_sig;
+}
+
+size_t cPacesim::chan_write_count()
+{
     size_t nb_sig = 1;
     return nb_sig;
 }
@@ -34,9 +46,10 @@ DATAS cPacesim::read()
     return result;
 }
 
-void cPacesim::set(double value)
+void cPacesim::set(double* value, size_t length)
 {
-    current_fake_value = value;
+    assert(length > 0);
+    current_fake_value = value[0];
 }
 
 void cPacesim::stop_device() { std::cout << "cPacesim->stoping...\n"; }

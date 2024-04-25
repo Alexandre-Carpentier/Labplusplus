@@ -41,13 +41,17 @@ public:
 #ifdef _C_STYLE_
 // C style
     char device_name[MAX_PATH] = "2280S";
-    PLUGIN_ACCESS plugin_access_type = READ;
+    PLUGIN_ACCESS plugin_access_type = ALL;
+    int plugin_input_number = 1;
+    int plugin_output_number = 1;
     char plugin_measurement_name[MAX_PATH] = "Voltage";
     char plugin_measurement_unit[MAX_PATH] = "Volt";
 #else
     //modern c++
     std::string device_name = "2280S";
-    PLUGIN_ACCESS plugin_access_type = READ;
+    PLUGIN_ACCESS plugin_access_type = ALL;
+    int plugin_input_number = 1;
+    int plugin_output_number = 1;
     std::string plugin_measurement_name = "Voltage";
     std::string plugin_measurement_unit = "Volt";
 #endif
@@ -106,6 +110,9 @@ public:
 
     std::string get_device_name();
     int get_access_type();
+    int get_input_number() { return plugin_input_number; };
+    int get_output_number() { return plugin_output_number; };
+
     std::string get_measurement_name();
     std::string get_measurement_unit();
 

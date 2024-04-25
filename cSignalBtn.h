@@ -12,6 +12,11 @@ class cPlot;
 
 class wxCustomButton : public wxWindow
 {
+    wxBoxSizer* h_sizer0=nullptr;
+    wxBoxSizer* h_sizer1 = nullptr;
+    wxBoxSizer* h_sizer3 = nullptr;
+    wxBoxSizer* h_sizer4 = nullptr;
+
     wxStaticText* txt = nullptr;
     wxStaticText* staticunit = nullptr;
     wxStaticText* unit = nullptr;
@@ -24,6 +29,9 @@ class wxCustomButton : public wxWindow
     wxButton* reset = nullptr;
     wxCheckBox* show = nullptr;
 
+    wxComboBox* combo1 = nullptr;
+    wxTextCtrl* filterthresholdtxt = nullptr;
+
     bool pressedDown;
     wxString name_;
     wxString address_;
@@ -34,7 +42,7 @@ class wxCustomButton : public wxWindow
     wxColor color_;
 
     static const int buttonWidth = 300;
-    static const int buttonHeight = 65;
+    static const int buttonHeight = 105;
 
 public:
     wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wxString address, wxColor color);
@@ -64,6 +72,8 @@ public:
     void mouseMoved(wxMouseEvent& event);
     void OnPickerChanged(wxColourPickerEvent& event);
     void OnShowSignalChanged(wxEvent& event);
+    void OnFilterSignalChanged(wxEvent& event);
+    void OnFilterThresholdSignalChanged(wxEvent& event);
     void mouseDown(wxMouseEvent& event);
     void mouseWheelMoved(wxMouseEvent& event);
     void mouseReleased(wxMouseEvent& event);

@@ -30,20 +30,6 @@ cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_conf
 	ratetxt = new wxTextCtrl(inst_, IDC_RATETXTCTRL, L"0 ms", wxDefaultPosition, inst->FromDIP(wxSize(80, 25)));
 
 
-	wxStaticText* staticfiltertxt = new wxStaticText(inst_, IDC_FILTERTXT, L"Filter:", wxDefaultPosition, inst->FromDIP(wxSize(70, 25)), wxTE_CENTER);
-	staticfiltertxt->SetBackgroundColour(wxColor(240, 245, 250));
-	staticfiltertxt->Hide();
-
-	wxArrayString   m_arrItems1;
-	m_arrItems1.Add(wxT("None"));
-	m_arrItems1.Add(wxT("Hanning"));
-	m_arrItems1.Add(wxT("Besel"));
-	m_arrItems1.Add(wxT("EMA"));
-	combo1 = new wxComboBox(inst_, IDC_FILTERCOMBO, L"None", wxDefaultPosition, inst->FromDIP(wxSize(100, 25)), m_arrItems1, wxCB_READONLY, wxDefaultValidator, _T("ID_COMBOBOX1"));
-	combo1->SetBackgroundColour(wxColor(240, 245, 255));
-	inst->Bind(wxEVT_COMMAND_COMBOBOX_CLOSEUP, &cFooter::filterButtonClicked, this, IDC_FILTERCOMBO);
-	combo1->Hide();
-
 	scale_btn = new wxScaleButton((wxFrame*)inst_, wxID_ANY);
 
 	wxStaticText* staticrectxt = new wxStaticText(inst_, IDC_RECTXT, L"Rec:", wxDefaultPosition, inst->FromDIP(wxSize(70, 25)), wxTE_CENTER);
@@ -139,6 +125,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				if (chan == true)
 				{
 					m_plot_->set_signal_name(config.channel_name.at(c), i);
+					m_plot_->set_signal_filter(FILTER_NONE, i);
+					m_plot_->set_signal_filter_threshold(0.5, i);
 					i++;
 				}
 				c++;
@@ -168,6 +156,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
+
 		if (pressureconfig->m_pressure_ != nullptr)
 		{
 			pressureconfig->save_current_device_config(0);
@@ -183,87 +172,59 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
+		int iRec = this->combo2->GetCurrentSelection();
+		LOGGER_M Rec = LOGGER_NONE;
+		if (iRec == 0)
+		{
+			Rec = LOGGER_NONE;
+		}
+		else if (iRec == 1)
+		{
+			Rec = LOGGER_ASCII;
+		}
+		else if (iRec == 2)
+		{
+			Rec = LOGGER_TDMS;
+		}
+		else if (iRec == 3)
+		{
+			Rec = LOGGER_XLSX;
+		}
 
-			/*
-			int iFilter = this->combo1->GetCurrentSelection();
-			FILTER_M Filtering = FILTER_NONE;
-			switch (iFilter)
-			{
-			case 0:
-			{
-				Filtering = FILTER_NONE;
-				break;
-			}
-			case 1:
-			{
-				Filtering = FILTER_HANNING;
-				break;
-			}
-			case 2:
-			{
-				Filtering = FILTER_BESEL;
-				break;
-			}
-			case 3:
-			{
-				Filtering = FILTER_EMA;
-				break;
-			}
-			}
+		////////////////////////////////////////////////////////////////////////////////
+		// STOP LOOK UP FOR DEVICE
+		////////////////////////////////////////////////////////////////////////////////
+		//cDeviceMonitor* devmon = devmon->getInstance();
+		//devmon->lookup_stop();
+		cMain* m_main = nullptr;
+		m_main = dynamic_cast<cMain*>(inst_);
+		if (m_main)
+			m_main->StopDiscoverDeviceTimer();
 
-			int iRec = this->combo2->GetCurrentSelection();
-			LOGGER_M Rec = LOGGER_NONE;
-			if (iRec == 0)
-			{
-				Rec = LOGGER_NONE;
-			}
-			else if (iRec == 1)
-			{
-				Rec = LOGGER_ASCII;
-			}
-			else if (iRec == 2)
-			{
-				Rec = LOGGER_TDMS;
-			}
-			else if (iRec == 3)
-			{
-				Rec = LOGGER_XLSX;
-			}
-			*/
-			////////////////////////////////////////////////////////////////////////////////
-			// STOP LOOK UP FOR DEVICE
-			////////////////////////////////////////////////////////////////////////////////
-			//cDeviceMonitor* devmon = devmon->getInstance();
-			//devmon->lookup_stop();
-			cMain* m_main = nullptr;
-			m_main = dynamic_cast<cMain*>(inst_);
-			if(m_main)
-				m_main->StopDiscoverDeviceTimer();
+		////////////////////////////////////////////////////////////////////////////////
+		// CYCLE CONTROLER
+		////////////////////////////////////////////////////////////////////////////////
+		std::cout << "[*] Starting cycle controler.\n";
+		cycle_controler->start();
 
-			////////////////////////////////////////////////////////////////////////////////
-			// CYCLE CONTROLER
-			////////////////////////////////////////////////////////////////////////////////
-			std::cout << "[*] Starting cycle controler.\n";
-			cycle_controler->start();
+		////////////////////////////////////////////////////////////////////////////////
+		// MEASUREMENT MANAGER
+		////////////////////////////////////////////////////////////////////////////////
+		meas_manager->start_all_devices();
 
-			////////////////////////////////////////////////////////////////////////////////
-			// MEASUREMENT MANAGER
-			////////////////////////////////////////////////////////////////////////////////
-			meas_manager->start_all_devices();
+		////////////////////////////////////////////////////////////////////////////////
+		// MEASUREMENT CONTROLER
+		////////////////////////////////////////////////////////////////////////////////
+		std::cout << "Launching Measurement controler\n";
+		meas_controler = make_shared<cMeasurementControler>(cycle_controler);
+		meas_manager->set_measurement_controler(meas_controler);
+		meas_controler->start();
 
-			////////////////////////////////////////////////////////////////////////////////
-			// MEASUREMENT CONTROLER
-			////////////////////////////////////////////////////////////////////////////////
-			std::cout << "Launching Measurement controler\n";
-			meas_controler = make_shared<cMeasurementControler>(cycle_controler); 
-			meas_manager->set_measurement_controler(meas_controler);
-			meas_controler->start();
+		size_t sizesig = meas_manager->get_measurement_total_channel_number();
+		m_plot_->start_graph(Rec, sizesig);
 
-			size_t sizesig = meas_manager->get_measurement_total_channel_number();
-			m_plot_->start_graph(FILTER_NONE, LOGGER_ASCII, sizesig);
-
-			startbtn->SetBackgroundColour(wxColor(250, 80, 90));
-			startbtn->SetLabelText(L"Stop");
+		startbtn->SetBackgroundColour(wxColor(250, 80, 90));
+		startbtn->SetLabelText(L"Stop");
 		
 	}
 	else
@@ -310,7 +271,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 
 		meas_manager->stop_all_devices();
-
 		////////////////////////////////////////////////////////////////////////////////
 		// DRAW FULL GRAPH WITH GNUPLOT?
 		////////////////////////////////////////////////////////////////////////////////
@@ -325,6 +285,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			// remove (xx).lab
 			std::string raw_noext = raw_name.substr(0, raw_name.find_last_of("."));
 			raw_noext = raw_noext.substr(0, raw_noext.find_last_of("("));
+			// replace _ by -
+			std::replace(raw_noext.begin(), raw_noext.end(), '_', '-');
 			// get new name
 			std::string name = cGnuplotDlg.get_filename();
 			// add extension
@@ -389,8 +351,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			if (f != NULL)
 			{
 				// set gnuplot script
-
-				
+	
 				fprintf(f, "set terminal pdf\n");
 				fprintf(f, "set encoding utf8\n");	
 				fprintf(f, "set output \"%s\"\n", pdf_file.c_str());
@@ -442,7 +403,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				}
 				if (!wxFileExists(pdf_file))
 				{
-					fprintf(stderr, "Could not create %s.\n", pdf_file.c_str());
+					fprintf(stderr, "Could not open %s.\n", pdf_file.c_str());
+					MessageBox(0, L"Could not open pdf file.", L"Fail", S_OK);
 				}
 				else
 				{
@@ -454,6 +416,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			else
 			{
 				fprintf(stderr, "Could not create %s.\n", script_file.c_str());
+				MessageBox(0, L"Could not open script file.", L"Fail", S_OK);
 			}	
 		}
 		
@@ -464,38 +427,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		devmon->lookup_start();
 	}
 
-	evt.Skip();
-}
-
-void cFooter::filterButtonClicked(wxCommandEvent& evt)
-{
-	int iFilter = this->combo1->GetCurrentSelection();
-	FILTER_M Filtering = FILTER_NONE;
-	switch (iFilter)
-	{
-	case 0:
-	{
-		Filtering = FILTER_NONE;
-		break;
-	}
-	case 1:
-	{
-		Filtering = FILTER_HANNING;
-		break;
-	}
-	case 2:
-	{
-		Filtering = FILTER_BESEL;
-		break;
-	}
-	case 3:
-	{
-		Filtering = FILTER_EMA;
-		break;
-	}
-	}
-
-	m_plot_->set_graph_filter(Filtering);
 	evt.Skip();
 }
 

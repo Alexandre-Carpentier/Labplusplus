@@ -18,6 +18,7 @@
 #include "cUSB6001.h"
 #include "cDaqsim.h"
 #include "cPlot.h"
+#include "cTable.h"
 #include "cDaqmxScaleDlg.h"
 #include "cImagePanel.h"
 #include "data_types.h"
@@ -37,8 +38,8 @@ private:
 	cImagePanel* InstrImg = nullptr;
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
-	void set_chan_permision(int access);
-	void set_chan_permision(int access, int chan_number);
+	void set_chan_mode(int access);
+	void set_chan_mode(int access, int chan_number);
 public:
 	// Signal color map
 	float COLORS[32][3] =
@@ -71,6 +72,7 @@ public:
 
 
 	wxWindow* inst_ = nullptr;
+	cTable* m_table_ = nullptr;
 
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
 	cMeasurement* m_daq_ = nullptr; // daq measurement gui
@@ -147,6 +149,7 @@ public:
 	// filter
 	// filter intensity
 	wxString scale_file_name = "Lab++ScalePreset.ini";
+	wxStaticBox* channel_linearize_group = nullptr;
 	wxStaticText* static_chan_scale;
 	std::string str_scale;
 	wxComboBox* chan_scale;
@@ -171,6 +174,7 @@ public:
 
 	// trigger
 	// threshold
+	wxStaticBox* channel_signal_group = nullptr;
 	wxStaticText* static_chan_trigger;
 	std::string str_trigger;
 	wxComboBox* chan_trigger;
@@ -193,7 +197,7 @@ public:
 	const int STATIC_CTRL_STYLE = wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL;
 	const wxSize static_ctrl_size = wxSize(80, 20);
 	const int TEXT_CTRL_STYLE = wxSUNKEN_BORDER;
-	const wxSize text_ctrl_size = wxSize(100, 24);
+	const wxSize text_ctrl_size = wxSize(110, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
 	cDaqmx(wxWindow* inst);
@@ -237,12 +241,15 @@ public:
 	void SwitchChannelON(bool isDisplayed);
 
 	void UpdateChannelSig(bool isDisplayed);
+	void UpdateChannelTable(bool isDisplayed);
 
 	void EnableChannelItems(bool isDisplayed);
 	void SwitchChannelColor(bool isDisplayed);
 	void show_voltage_param(bool show);
 	void show_tc_param(bool show);
 	void reload_current_channel_type();
+
+	void set_table(cTable* m_table);
 
 	wxPanel* get_right_panel();
 	size_t get_channel_index();

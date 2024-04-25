@@ -81,9 +81,10 @@ void cDevice::OnPaint()
 }
 -----------------Duplication---------------------------------*/
 
-cConfig::cConfig(wxWindow* inst)
+cConfig::cConfig(wxWindow* inst, cTable* m_table)
 {
 	inst_ = inst; // wxFrame is the parent
+
 	std::cout << "cConfig ctor...\n";
 
 	config_leftpanel_ = new wxPanel(inst, IDC_CONFIG_LEFT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
@@ -113,11 +114,18 @@ cConfig::cConfig(wxWindow* inst)
 
 	// Add cDaqmx to plugin vec
 	m_daqmx = new cDaqmx(book);
+	m_daq_dev = new cDevice();
+	m_daq_dev->set_access_type(ALL);
+	m_daq_dev->set_device_name("NI-DAQ");
+	m_daq_dev->set_measurement_unit("Volt");
 	PLUGIN_DATA Daqmx_struct;
-	Daqmx_struct.name = L"USB-DAQ-6001.dll";
+	Daqmx_struct.name = L"NI-DAQ.dll";
+	Daqmx_struct.input_count = 32;
+	Daqmx_struct.outputcount = 16;
+	Daqmx_struct.signal_count = Daqmx_struct.input_count + Daqmx_struct.outputcount;
 	Daqmx_struct.panel = m_daqmx->get_right_panel();
 	Daqmx_struct.hInst = nullptr;
-	Daqmx_struct.device = nullptr;
+	Daqmx_struct.device = m_daq_dev;
 	Daqmx_struct.Attach = nullptr;
 	Daqmx_struct.Dettach = nullptr;
 	Daqmx_struct.PStart = nullptr;
@@ -126,19 +134,22 @@ cConfig::cConfig(wxWindow* inst)
 
 	// Add cPressure to plugin vec
 	m_pressure = new cPressure(book);
-
-	//cDevice pressure_dev;
-	//pressure_dev.set_device_name("Pace 6000");
-
+	cDevice* m_pressure_dev = new cDevice();
+	m_pressure_dev->set_access_type(ALL);
+	m_pressure_dev->set_device_name("PACE6000");
+	m_pressure_dev->set_measurement_unit("Bar");
 	PLUGIN_DATA Pressure_struct;
 	Pressure_struct.name = L"Pace 6000.dll";
+	Pressure_struct.input_count = 1;
+	Pressure_struct.outputcount = 1;
+	Pressure_struct.signal_count = Pressure_struct.input_count + Pressure_struct.outputcount;
 	Pressure_struct.panel = m_pressure->get_right_panel();
 	Pressure_struct.hInst = nullptr;
-	Pressure_struct.device = nullptr;
+	Pressure_struct.device = m_pressure_dev;
 	Pressure_struct.Attach = nullptr;
-	Daqmx_struct.Dettach = nullptr;
-	Daqmx_struct.PStart = nullptr;
-	Daqmx_struct.PStop = nullptr;
+	Pressure_struct.Dettach = nullptr;
+	Pressure_struct.PStart = nullptr;
+	Pressure_struct.PStop = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
 	// Add cTension to plugin vec
@@ -221,7 +232,9 @@ cConfig::~cConfig()
 	std::cout << "cConfig dtor...\n";
 	//unload_plugins(); // Error occured when wxWidget use the garbage collector after
 	delete m_daqmx;
+	delete m_daq_dev;
 	delete m_pressure;
+	delete m_pressure_dev;
 	delete m_tension;
 	m_daqmx = nullptr;
 	m_pressure = nullptr;
@@ -340,6 +353,9 @@ void cConfig::load_plugins(wxWindow* parent, std::wstring folder_path)
 
 				PLUGIN_DATA plugin_data;
 				plugin_data.name = plugin_name;
+				plugin_data.input_count = dev->get_input_number();
+				plugin_data.outputcount = dev->get_output_number();
+				plugin_data.signal_count = plugin_data.input_count + plugin_data.outputcount;
 				plugin_data.panel = plugin_panel;
 				plugin_data.device = dev;
 				plugin_data.hInst = hModule;
@@ -415,8 +431,18 @@ std::vector<std::string> cConfig::get_plugin_unit_vec()
 	std::vector<std::string> vec;
 	for (auto& plugin : plugin_vec)
 	{
-		if(plugin.device)
+		if(plugin.outputcount>0)
 			vec.push_back(plugin.device->get_measurement_unit());
+	}
+	return vec;
+}
+
+std::vector<size_t> cConfig::get_plugin_output_number()
+{
+	std::vector<size_t> vec;
+	for (auto& plugin : plugin_vec)
+	{
+			vec.push_back(plugin.outputcount);
 	}
 	return vec;
 }
@@ -430,6 +456,15 @@ void cConfig::set_graph(cPlot* m_plot)
 {
 	m_plot_ = m_plot;
 }
+
+void cConfig::set_table(cTable* m_table)
+{
+	// Save cTable to add or remove colomn afterward
+	m_table_ = m_table;
+	m_daqmx->set_table(m_table);
+	m_pressure->set_table(m_table);
+}
+
 
 void cConfig::OnClickdrop(wxMouseEvent& evt)
 {

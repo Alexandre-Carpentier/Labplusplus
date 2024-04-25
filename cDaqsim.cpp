@@ -26,6 +26,23 @@ size_t cDaqsim::chan_count()
     return nb_sig;
 }
 
+size_t cDaqsim::chan_read_count()
+{
+    size_t nb_sig = 0;
+    for (auto enable : config_struct_.channel_enabled)
+    {
+        if (enable == true)
+        {
+            nb_sig++;
+        }
+    }
+    return nb_sig;
+}
+size_t cDaqsim::chan_write_count()
+{
+    return 0;
+}
+
 int cDaqsim::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 {
     config_struct_ = config_struct;
@@ -45,6 +62,14 @@ DATAS cDaqsim::read()
         }
     }
     return result;
+}
+
+void cDaqsim::set(double* value, size_t length)
+{
+    assert(value != nullptr);
+    assert(length>0);
+
+    current_fake_value = value;
 }
 
 void cDaqsim::stop_device() { std::cout << "cDaqsim->stoping...\n"; }
