@@ -492,21 +492,20 @@ void cUsb6001::set(double* value, size_t length)
 
     double timeout_s = 2.0;
     bool bAutostart = true;
-    uInt8 write_buffer[4] = { 0b00000000, 0b00000000, 0b00000000, 0b00000000 };
+    uInt8 write_buffer[MAX_CHAN];
+    ZeroMemory(write_buffer, sizeof(write_buffer));
     int32 sample_written = 0;
 
     // populate write buffer 
 
     for (uInt8 i = 0; i < length; i ++)
     {
-        std::cout << "[WRITE]";
         //std::cout << "[*] length: " << length << "\n";
         //std::cout << "[*] double[0][1][2][3]: " << *value << *(value+1) << *(value+2) << *(value+3) << "\n";
         
         if ((*value)+i > 0.0)
         {
             write_buffer[i] = (uInt8)1;
-            std::cout << "[*] write_buffer[i]" << std::bitset<8>(write_buffer[i]) << "\n";
         }       
     }
 
