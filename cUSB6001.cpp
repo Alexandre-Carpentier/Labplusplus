@@ -308,6 +308,29 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                         digital_taskHandle = nullptr;
                         return 0;
                     }
+
+                    int32 output_state = 0;
+                    DAQret = DAQmxGetDOOutputDriveType(digital_taskHandle, chan.c_str(), &output_state);
+                    std::cout << "[*] Configuring output to open collector, current state is: " << output_state << "\n";
+                    if (0 != DAQret)
+                    {
+                        std::cout << "[!] DAQmxGetDOOutputDriveType() failed\n";
+                    }
+
+                    DAQret = DAQmxSetDOOutputDriveType(digital_taskHandle, chan.c_str(), DAQmx_Val_OpenCollector);
+                    std::cout << "[*] Trying open collector: " << DAQmx_Val_OpenCollector << "\n";
+                    if (0 != DAQret)
+                    {
+                        std::cout << "[!] DAQmxSetDOOutputDriveType() failed\n";
+                    }
+
+                    DAQret = DAQmxGetDOOutputDriveType(digital_taskHandle, chan.c_str(), &output_state);
+                    std::cout << "[*] Configured state is: " << output_state << "\n";
+                    if (0 != DAQret)
+                    {
+                        std::cout << "[!] DAQmxGetDOOutputDriveType() failed\n";
+                    }
+
                 }
             }
         }
@@ -436,7 +459,7 @@ DATAS cUsb6001::read()
         
         for (int i=0; i< sample_read; i++)
         {
-            std::cout << "byte: " << read_buffer[i] << "\n";
+            //std::cout << "byte: " << read_buffer[i] << "\n";
             result.buffer[AIO_number+ i] = read_buffer[i];
         }
     }

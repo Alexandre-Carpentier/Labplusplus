@@ -1228,13 +1228,14 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 			// Channel specific
 
+			config.channel_mode.clear();
+			config.channel_permision.clear();
 
 		// List all channels available on each device and concat them 
 			std::vector<std::string> channels;
 			for (auto name : names)
 			{
-				config.channel_mode.clear();
-				config.channel_permision.clear();
+
 
 				if (isDeviceMeasurable(name) == false)
 				{
@@ -1250,23 +1251,27 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					return;
 				}
 
-				std::string s(buffer);
-				std::string delimiter = ", ";
-				size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-				std::string token;
+				if (strlen(buffer) > 0)
+				{
+					std::string s(buffer);
+					std::string delimiter = ", ";
+					size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+					std::string token;
 
 
-				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-					token = s.substr(pos_start, pos_end - pos_start);
-					pos_start = pos_end + delim_len;
-					channels.push_back(token);
+					while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+						token = s.substr(pos_start, pos_end - pos_start);
+						pos_start = pos_end + delim_len;
+						channels.push_back(token);
+						config.channel_mode.push_back(CHANANALOG);
+						config.channel_permision.push_back(CHANREAD); // READ ONLY
+					}
+
+					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANANALOG);
 					config.channel_permision.push_back(CHANREAD); // READ ONLY
-				}
-
-				channels.push_back(s.substr(pos_start));
-				config.channel_mode.push_back(CHANANALOG);
-				config.channel_permision.push_back(CHANREAD); // READ ONLY
+				}	
+				ZeroMemory(buffer, sizeof(buffer));
 
 				// Find digital lines
 				if (DAQmxGetDevDOLines(name.c_str(), buffer, bufferSize) != 0)
@@ -1275,30 +1280,32 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					evt.Skip();
 					return;
 				}
+				if (strlen(buffer) > 0)
+				{
+					s = buffer;
+					pos_start = 0; pos_end = 0; delim_len = delimiter.length();
+					token = "";
 
-				s = buffer;
-				pos_start = 0; pos_end = 0; delim_len = delimiter.length();
-				token = "";
 
+					while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+						token = s.substr(pos_start, pos_end - pos_start);
+						pos_start = pos_end + delim_len;
+						channels.push_back(token);
+						config.channel_mode.push_back(CHANDIGITAL);
+						config.channel_permision.push_back(CHANREAD); // WRITE ONLY
+					}
 
-				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-					token = s.substr(pos_start, pos_end - pos_start);
-					pos_start = pos_end + delim_len;
-					channels.push_back(token); 
+					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANDIGITAL);
 					config.channel_permision.push_back(CHANREAD); // WRITE ONLY
 				}
-
-				channels.push_back(s.substr(pos_start));
-				config.channel_mode.push_back(CHANDIGITAL);
-				config.channel_permision.push_back(CHANREAD); // WRITE ONLY
 			}
 
 			if (channels.size() == 0)
 			{
 				// create fake simulated channels
 				std::string fake_chan;
-				for (int i = 0; i < 32; i++)
+				for (int i = 0; i < channels.size(); i++)
 				{
 					fake_chan = std::format("DevSim/ai{}", i);
 					channels.push_back(fake_chan);
