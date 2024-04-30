@@ -188,6 +188,7 @@ void cMeasurementControler::poll()
 
 							assert(length < MAX_CHAN);
 							bool success = get_instr_setpoint(meas, step, value, length, &read);
+							//std::cout << std::format("[GET] double[]:{};{};{};{}, length:{}\n", value[0], value[1], value[2], value[3], read);
 							assert(length == read);
 							assert(read < MAX_CHAN);
 
