@@ -91,7 +91,6 @@ void cMeasurementControler::poll()
 			memset(values, 0.0, length);
 			meas->set(values, length);
 			delete(values);
-		
 
 			// Read data from instrument
 			val = meas->read();

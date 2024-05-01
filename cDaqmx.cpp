@@ -83,8 +83,8 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 		label.channel_trigger_threshold[i] = "0";
 
-		label.digital_channel_type[i].push_back("Input");				
-		label.digital_channel_type[i].push_back("Output");
+		label.digital_channel_type[i].push_back("Output");				
+		label.digital_channel_type[i].push_back("Input");
 
 		label.digital_channel_mode_type[i].push_back("Pullup");
 		label.digital_channel_mode_type[i].push_back("None");
@@ -133,7 +133,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 		config.channel_trigger_threshold[i] = "0";
 
-		config.digital_channel_type[i] = "Input";
+		config.digital_channel_type[i] = "Output";
 		config.digital_channel_mode_type[i] = "Pullup";
 
 	}
@@ -1300,12 +1300,12 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 						pos_start = pos_end + delim_len;
 						channels.push_back(token);
 						config.channel_mode.push_back(CHANDIGITAL);
-						config.channel_permision.push_back(CHANREAD); // WRITE ONLY
+						config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
 					}
 
 					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANDIGITAL);
-					config.channel_permision.push_back(CHANREAD); // WRITE ONLY
+					config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
 				}
 			}
 
@@ -2002,90 +2002,15 @@ void cDaqmx::OnDaqChanEnableBtn(wxCommandEvent& evt)
 	bool state = label.channel_enabled.at(label.channel_index);
 	SwitchChannelON(state);
 	UpdateChannelSig(state);
-	if (label.channel_permision.at(label.channel_index) == CHANWRITE)
+	//if (label.channel_permision.at(label.channel_index) == CHANWRITE)
+	if(digitaltype->GetValue().compare("Output") == 0)
 	{
 		UpdateChannelTable(state);
 	}
 
 	EnableChannelItems(state);
 	SwitchChannelColor(state);
-	/*
-	if (!label.channel_enabled[label.channel_index])
-	{
-		checkchan->SetBackgroundColour(wxColor(250, 120, 120)); // RED
-		checkchan->SetLabel("OFF");
 
-		//If cPlot legend active remove it
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		m_plot->remove_chan_to_gui(label.channel_index);
-
-		// Disallow editing
-		chan_name->Enable(false);
-		chan_addr_ctrl->Enable(false);
-		meas_type_ctrl->Enable(false);
-		chan_max_input_range->Enable(false);
-		chan_min_input_range->Enable(false);
-		chan_input_mode_type->Enable(false);
-		chan_scale->Enable(false);
-		chan_slope->Enable(false);
-		chan_shift->Enable(false);
-		chan_unit->Enable(false);
-		chan_filter->Enable(false);
-		chan_filter_intensity->Enable(false);
-		chan_trigger->Enable(false);
-		chan_trigger_threshold->Enable(false);
-
-		// Mark button grid item as dark
-		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120));
-
-	}
-	else
-	{
-		this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN
-		this->checkchan->SetLabel("ON");
-
-		//Update cPlot gui with the chan name and color
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		wxString chan_name_str = chan_name->GetValue();
-		wxString chan_physical_name = chan_addr_ctrl->GetValue();
-		wxString chan_physical_unit = meas_type_ctrl->GetValue();
-		m_plot->add_chan_to_gui(chan_name_str.ToStdString() , chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255), label.channel_index);
-
-		// Allow editing
-		chan_name->Enable(true);
-		chan_addr_ctrl->Enable(true);
-		meas_type_ctrl->Enable(true);
-		chan_max_input_range->Enable(true);
-		chan_min_input_range->Enable(true);
-		chan_input_mode_type->Enable(true);
-		chan_scale->Enable(true);
-		if (chan_scale->GetValue().compare("Custom scale") == 0)
-		{
-			chan_slope->Enable(true);
-			chan_shift->Enable(true);
-			chan_unit->Enable(true);
-		}
-		chan_filter->Enable(true);
-		if (chan_filter->GetValue().compare("Disabled") != 0)
-		{
-			chan_filter_intensity->Enable(true);
-		}
-		chan_trigger->Enable(true);
-		if (chan_trigger->GetValue().compare("Disabled") != 0)
-		{
-			chan_trigger_threshold->Enable(true);
-		}
-
-		// Mark button grid item as green
-		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(160, 250, 160));
-
-	}
-	// Autosearch for channels
-	*/
 	evt.Skip();
 }
 
