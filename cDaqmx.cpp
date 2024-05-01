@@ -1168,8 +1168,13 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				EnableChannelItems(!enable_pan);
 			}
 
+			//clear first
+			config.channel_mode.clear();
+			config.channel_permision.clear();
+
 			constexpr size_t bufferSize = 1000;
 			char buffer[bufferSize] = {};
+			ZeroMemory(buffer, bufferSize);
 			if (DAQmxGetSysDevNames(buffer, bufferSize) != 0)
 			{
 				MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetSysDevNames() failed to resolve devices.\n", S_OK | MB_ICONERROR);
@@ -1228,21 +1233,21 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 			// Channel specific
 
-
-		// List all channels available on each device and concat them 
+			// List all channels available on each device and concat them 
 			std::vector<std::string> channels;
+			config.channel_mode.clear();
+			config.channel_permision.clear();
+
 			for (auto name : names)
 			{
-				config.channel_mode.clear();
-				config.channel_permision.clear();
-
 				if (isDeviceMeasurable(name) == false)
 				{
 					std::cout << "[!] " << name << " is not measurable, skip next\n";
 					continue;
 				}
 
-				// Find anlog lines
+				// Find analog lines
+				ZeroMemory(buffer, bufferSize);
 				if (DAQmxGetDevAIPhysicalChans(name.c_str(), buffer, bufferSize) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
@@ -1250,25 +1255,31 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					return;
 				}
 
-				std::string s(buffer);
-				std::string delimiter = ", ";
-				size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-				std::string token;
+				if (strlen(buffer) > 0)
+				{
+					std::cout << "[*] Found Ananlog input on " << name << "\n";
+					std::string s(buffer);
+					std::string delimiter = ", ";
+					size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+					std::string token;
 
 
-				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-					token = s.substr(pos_start, pos_end - pos_start);
-					pos_start = pos_end + delim_len;
-					channels.push_back(token);
+					while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+						token = s.substr(pos_start, pos_end - pos_start);
+						pos_start = pos_end + delim_len;
+						channels.push_back(token);
+						config.channel_mode.push_back(CHANANALOG);
+						config.channel_permision.push_back(CHANREAD); // READ ONLY
+					}
+
+					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANANALOG);
 					config.channel_permision.push_back(CHANREAD); // READ ONLY
 				}
 
-				channels.push_back(s.substr(pos_start));
-				config.channel_mode.push_back(CHANANALOG);
-				config.channel_permision.push_back(CHANREAD); // READ ONLY
 
 				// Find digital lines
+				ZeroMemory(buffer, bufferSize);
 				if (DAQmxGetDevDOLines(name.c_str(), buffer, bufferSize) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
@@ -1276,22 +1287,26 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					return;
 				}
 
-				s = buffer;
-				pos_start = 0; pos_end = 0; delim_len = delimiter.length();
-				token = "";
+				if (strlen(buffer) > 0)
+				{
+					std::cout << "[*] Found Ananlog input on " << name << "\n";
+					s = buffer;
+					pos_start = 0; pos_end = 0; delim_len = delimiter.length();
+					token = "";
 
 
-				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-					token = s.substr(pos_start, pos_end - pos_start);
-					pos_start = pos_end + delim_len;
-					channels.push_back(token); 
+					while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+						token = s.substr(pos_start, pos_end - pos_start);
+						pos_start = pos_end + delim_len;
+						channels.push_back(token);
+						config.channel_mode.push_back(CHANDIGITAL);
+						config.channel_permision.push_back(CHANREAD); // WRITE ONLY
+					}
+
+					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANDIGITAL);
 					config.channel_permision.push_back(CHANREAD); // WRITE ONLY
 				}
-
-				channels.push_back(s.substr(pos_start));
-				config.channel_mode.push_back(CHANDIGITAL);
-				config.channel_permision.push_back(CHANREAD); // WRITE ONLY
 			}
 
 			if (channels.size() == 0)

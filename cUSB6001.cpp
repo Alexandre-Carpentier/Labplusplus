@@ -264,7 +264,6 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                     }
 
                 }
-
             }
             else if (config_struct_.channel_mode.at(c) == CHANDIGITAL)
             {
