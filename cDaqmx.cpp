@@ -1987,7 +1987,7 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* object_manager = object_manager->getInstance();
 	cPlot* m_plot = object_manager->get_plot();
-	m_plot->update_chan_physical_unit_to_gui("°C", label.channel_index); // If temperature measurement update unit in channel listed in graph
+	m_plot->update_chan_physical_unit_to_gui("°C", label.channel_index); // If temperature measurement then update unit in channel listed in graph
 
 	//inst_->Layout();
 	//Refresh();
