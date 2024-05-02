@@ -87,7 +87,7 @@ void cMeasurementControler::poll()
 		
 			//size_t length = meas->chan_count();
 			size_t length = meas->chan_write_count();
-			double* values = new double(length);
+			double* values = new double();
 			memset(values, 0.0, length);
 			meas->set(values, length);
 			delete(values);
