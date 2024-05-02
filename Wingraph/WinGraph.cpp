@@ -5,7 +5,7 @@
 #include "datetimeapi.h"
 #include "fileapi.h"
 
-#include "nilibddc.h"
+//#include "nilibddc.h"
 
 #pragma comment (lib, "gdi32.lib")
 #pragma comment (lib, "User32.lib")

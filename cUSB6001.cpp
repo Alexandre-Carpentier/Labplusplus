@@ -264,7 +264,6 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                     }
 
                 }
-
             }
             else if (config_struct_.channel_mode.at(c) == CHANDIGITAL)
             {
@@ -298,7 +297,7 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                         digital_taskHandle,
                         chan.c_str(),           // DEV1/ai0
                         name.c_str(),           // Digital 0
-                        DAQmx_Val_ChanPerLine   // lineGrouping:  DAQmx_Val_ChanPerLine/ DAQmx_Val_ChanForAllLines              
+                        DAQmx_Val_ChanForAllLines/* DAQmx_Val_ChanPerLine */  // lineGrouping:  DAQmx_Val_ChanPerLine/ DAQmx_Val_ChanForAllLines              
                     );
 
                     if (0 != DAQret)
@@ -470,8 +469,14 @@ DATAS cUsb6001::read()
             memset(read_buffer, 0, 48);
             int32 sample_read = 0;
             int32 bytes_per_samples = 0;
+
+            uInt32 chan_number_in_task = 0;
+            DAQmxGetTaskNumChans(digital_taskHandle, &chan_number_in_task);
+            std::cout << "[*] Chan number: " << chan_number_in_task << "in current task.\n";
+
             // Digital input
             DAQret = DAQmxReadDigitalLines(digital_taskHandle, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 48, &sample_read, &bytes_per_samples, NULL);
+
             if (DAQret != 0)
             {
                 //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);

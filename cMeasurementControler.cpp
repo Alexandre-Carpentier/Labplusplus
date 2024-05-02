@@ -30,7 +30,7 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 	for (auto meas : meas_pool)
 	{
 		// Write data to instrument (controler)
-		size_t length = meas->chan_count();
+		size_t length = meas->chan_write_count();
 		double* values = new double(length);
 		memset(values, 0.0, length);
 		meas->set(values, length);
@@ -85,12 +85,12 @@ void cMeasurementControler::poll()
 		{
 			// Write data to instrument (controler)
 		
-			size_t length = meas->chan_count();
+			//size_t length = meas->chan_count();
+			size_t length = meas->chan_write_count();
 			double* values = new double(length);
 			memset(values, 0.0, length);
 			meas->set(values, length);
 			delete(values);
-		
 
 			// Read data from instrument
 			val = meas->read();
