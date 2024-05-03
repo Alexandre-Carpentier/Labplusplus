@@ -508,7 +508,7 @@ void cUsb6001::set(double* value, size_t length)
         //std::cout << "[*] length: " << length << "\n";
         //std::cout << "[*] double[0][1][2][3]: " << *value << *(value+1) << *(value+2) << *(value+3) << "\n";
         
-        if ((*value)+i > 0.0)
+        if (value[i] > 0.0)
         {
             write_buffer[i] = (uInt8)1;
         }       
@@ -518,7 +518,7 @@ void cUsb6001::set(double* value, size_t length)
 
     if (digital_taskHandle)
     {
-        DAQret = DAQmxWriteDigitalLines(digital_taskHandle, 1, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, write_buffer, &sample_written, NULL);
+        DAQret = DAQmxWriteDigitalLines(digital_taskHandle, 2, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, write_buffer, &sample_written, NULL);
 
         if (DAQret != 0)
         {
