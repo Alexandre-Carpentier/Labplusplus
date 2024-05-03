@@ -26,7 +26,7 @@ private:
 
 
 	TaskHandle analog_taskHandle;
-	TaskHandle digital_taskHandle;
+	TaskHandle digital_taskHandle[MAX_CHAN];
 	int32 DAQret;
 	int sample_number = 2;
 	float64 multiple_data[1200];
