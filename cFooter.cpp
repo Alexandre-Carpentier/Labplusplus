@@ -361,7 +361,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	
 				fprintf(f, "set key outside\n");
 				
-				for (int i =1; i <= signals_vec.size(); i++)
+				for (size_t i =1; i <= signals_vec.size(); i++)
 				{
 					fprintf(f, "set style line %i linecolor rgb '%s' linewidth 0.1\n", i, sig_colours[i-1].c_str());
 					//fprintf(f, "set style line 2 linecolor rgb '#dd181f' linewidth 0.1\n");

@@ -1341,7 +1341,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			// update name info in struct
 			int prev = -1;
 			int device_index = 0;
-			for (int i = 0; i < channels.size(); i++)
+			for (size_t i = 0; i < channels.size(); i++)
 			{
 				if (prev==-1){ prev = config.channel_mode[i];} // init previous state once
 
