@@ -184,7 +184,7 @@ void cMeasurementControler::poll()
 								m_cyclecontroler_->cycle_mutex.lock();
 
 								STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-								size_t length = meas->chan_read_count(); // chan_write_count changed to read
+								size_t length = meas->chan_write_count(); 
 								size_t read = 0;
 
 								assert(length < MAX_CHAN);
