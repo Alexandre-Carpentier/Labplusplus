@@ -366,7 +366,7 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 DATAS cUsb6001::read()
 { 
     int32 chan_type = 0;
-    char buff[256]=""; 
+    char buff[512]=""; 
     double timeout_s = 2.0;
 
     int position = 0;
@@ -377,6 +377,8 @@ DATAS cUsb6001::read()
     size_t DIO_number = 0;
     size_t DI_number = 0;
     size_t DO_number = 0;
+
+    std::vector<uInt8> results;
 
     for (auto type : config_struct_.channel_mode)
     {
@@ -416,11 +418,35 @@ DATAS cUsb6001::read()
     if (AIO_number > 0)
     {
         //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
-        DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 256);// "Digital0" 
-        DAQret = DAQmxGetAIMeasType(analog_taskHandle, buff, &chan_type);
 
-        if (chan_type == DAQmx_Val_Voltage)
+        std::vector<std::string> channel_task_name;
+        DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 512);// "Digital0" 
+
+        strcat(buff, ",");
+        const char* separator = ",";
+        char* strToken = strtok(buff, separator);
+        if (strToken != NULL)
         {
+            std::string tok = strToken;
+            channel_task_name.push_back(tok);
+        }
+        while (strToken != NULL) {
+            printf("%s\n", strToken);
+            strToken = strtok(NULL, separator);
+            if (strToken != NULL)
+            {
+                std::string tok = strToken;
+                channel_task_name.push_back(tok);
+            }               
+        }
+
+        for (auto& token : channel_task_name)
+        {
+            DAQret = DAQmxGetAIMeasType(analog_taskHandle, token.c_str(), &chan_type);
+        }
+
+        //if (chan_type == DAQmx_Val_Voltage || chan_type == DAQmx_Val_Temp_TC || chan_type == DAQmx_Val_Temp_Thrmstr)
+        //{
 
             int32 read_nb = 0;
             DAQret = DAQmxReadAnalogF64(analog_taskHandle, sample_number, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result.buffer_size * sample_number, &read_nb, NULL); // Read multiple sample
@@ -456,10 +482,20 @@ DATAS cUsb6001::read()
                 config_struct_.channel_linearize_shift[j].ToCDouble(&b);
                 result.buffer[j] = a * result.buffer[j] + b;
             }
-        }
+        //}
     }
     if(DIO_number>0)
     {
+        for (auto& task : digital_taskHandle)
+        {
+            if (task)
+            {
+                char digital_chan_names[512] = "";
+                DAQret = DAQmxGetTaskChannels(digital_taskHandle, digital_chan_names, 512);// "Digital0" 
+                std::cout << "[*] Digital task channel: " << digital_chan_names << "\n";
+            }
+        }
+
         if (DI_number > 0)
         {
             uInt8 read_buffer[48];
@@ -481,26 +517,40 @@ DATAS cUsb6001::read()
         }
         else if (DO_number > 0)
         {
-            uInt8 read_buffer[48];
-            memset(read_buffer, 0, 48);
-            int32 sample_read = 0;
-            int32 bytes_per_samples = 0;
+            uInt8 read_buffer[1];
 
-            uInt32 chan_number_in_task = 0;
-            DAQmxGetTaskNumChans(digital_taskHandle, &chan_number_in_task);
-            std::cout << "[*] Chan number: " << chan_number_in_task << "in current task.\n";
-
-            // Digital input
-            DAQret = DAQmxReadDigitalLines(digital_taskHandle, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 48, &sample_read, &bytes_per_samples, NULL);
-
-            if (DAQret != 0)
+            
+            size_t total_sample_read = 0;
+            for (auto& task : digital_taskHandle)
             {
-                //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+                if (task)
+                {
+                    int32 sample_read = 0;
+                    int32 bytes_per_samples = 0;
+
+                    uInt32 chan_number_in_task = 0;
+                    DAQmxGetTaskNumChans(task, &chan_number_in_task);
+                    std::cout << "[*] Chan number: " << chan_number_in_task << "in current task.\n";
+
+                    // Digital input
+                    DAQret = DAQmxReadDigitalLines(task, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 1, &sample_read, &bytes_per_samples, NULL);
+                    total_sample_read += sample_read;
+
+                    results.push_back(read_buffer[0]);
+
+                    if (DAQret != 0)
+                    {
+                        //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+                    }
+                    chan_number_in_task++;
+                }
             }
-            for (int i = 0; i < sample_read; i++)
+            
+            for (int i = 0; i < total_sample_read; i++)
             {
-                result.buffer[AIO_number + i] = static_cast<double>(read_buffer[i]); // concat after Analog input
+                result.buffer[AIO_number + i] = static_cast<double>(results[i]); // concat after Analog input
             }
+            
         }
     }
     return result;

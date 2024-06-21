@@ -31,10 +31,13 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 	{
 		// Write data to instrument (controler)
 		size_t length = meas->chan_write_count();
-		double* values = new double(length);
-		memset(values, 0.0, length);
-		meas->set(values, length);
-		delete(values);
+		if (length > 0)
+		{
+			double* values = new double(length);
+			memset(values, 0.0, length);
+			meas->set(values, length);
+			delete(values);
+		}
 	}
 }
 
@@ -86,19 +89,22 @@ void cMeasurementControler::poll()
 			// Write data to instrument (controler)
 		
 			//size_t length = meas->chan_count();
-			size_t length = meas->chan_write_count();
-			double* values = new double();
-			memset(values, 0.0, length);
-			meas->set(values, length);
-			delete(values);
-
-			// Read data from instrument
-			val = meas->read();
-			for (int c = buffer_index; c < val.buffer_size; c++)
+			if (meas->chan_write_count() > 0)
 			{
-				Y[c] = val.buffer[c];
+				size_t length = meas->chan_write_count();
+				double* values = new double();
+				memset(values, 0.0, length);
+				meas->set(values, length);
+				delete(values);
 
-				buffer_index++;
+				// Read data from instrument
+				val = meas->read();
+				for (int c = buffer_index; c < val.buffer_size; c++)
+				{
+					Y[c] = val.buffer[c];
+
+					buffer_index++;
+				}
 			}
 		}
 
@@ -172,42 +178,51 @@ void cMeasurementControler::poll()
 						case MEAS_TYPE::VOLTAGE_CONTROLER_INSTR:
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						case MEAS_TYPE::DAQ_INSTR:
-						{						
+						{
 							static double old_value[MAX_CHAN];
 
-
-							double value[MAX_CHAN];
-							ZeroMemory(value, MAX_CHAN);
-
-							// protect
-							m_cyclecontroler_->cycle_mutex.lock();
-
-							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();						
-							size_t length = meas->chan_write_count();						
-							size_t read = 0;
-
-							assert(length < MAX_CHAN);
-							bool success = get_instr_setpoint(meas, step, value, length, &read);
-							//std::cout << std::format("[GET] double[]:{};{};{};{}, length:{}\n", value[0], value[1], value[2], value[3], read);
-							assert(length == read);
-							assert(read < MAX_CHAN);
-
-							// unprotect
-							m_cyclecontroler_->cycle_mutex.unlock();
-							int mod = 0;
-							for (int i = 0; i < read; i++)
+							if (meas->chan_write_count() > 0)
 							{
-								if (old_value[i] != value[i])
+								double value[MAX_CHAN];
+								ZeroMemory(value, MAX_CHAN);
+
+								// protect
+								m_cyclecontroler_->cycle_mutex.lock();
+
+								STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
+								size_t length = meas->chan_write_count(); 
+								size_t read = 0;
+
+								assert(length < MAX_CHAN);
+								bool success = get_instr_setpoint(meas, step, value, length, &read);
+								//std::cout << std::format("[GET] double[]:{};{};{};{}, length:{}\n", value[0], value[1], value[2], value[3], read);
+								
+								if (length != read)
 								{
-									mod++;
-									old_value[i] = value[i]; // save old value
+									MessageBox(GetFocus(), L"Can't read instrument command\nExiting...", L"Fail", S_OK);
 								}
+
+								assert(length == read);
+								assert(read < MAX_CHAN);
+
+								// unprotect
+								m_cyclecontroler_->cycle_mutex.unlock();
+								int mod = 0;
+								for (int i = 0; i < read; i++)
+								{
+									if (old_value[i] != value[i])
+									{
+										mod++;
+										old_value[i] = value[i]; // save old value
+									}
+								}
+
+								// call if modified
+								if (mod > 0)
+									meas->set(old_value, read);
+
+
 							}
-
-							// call if modified
-							if (mod > 0)
-								meas->set(old_value, read);
-
 							// Read data from instrument
 							val = meas->read();
 

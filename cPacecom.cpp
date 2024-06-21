@@ -19,7 +19,7 @@ MEAS_TYPE cPacecom::device_type() { return PRESSURE_CONTROLER_INSTR; };
 
 size_t cPacecom::chan_count()
 {
-    size_t nb_sig = 2;
+    size_t nb_sig = 1;
     return nb_sig;
 }
 

@@ -786,7 +786,6 @@ void cDaqmx::OnNextCliqued(wxCommandEvent& evt)
 
 	// Resize and replace items correctly
 	channel_group_sizer->Layout();
-
 	evt.Skip();
 }
 
@@ -841,7 +840,7 @@ void cDaqmx::OnPreviousCliqued(wxCommandEvent& evt)
 void cDaqmx::save_current_device_config(int channel_index)
 {
 	std::cout << "[*] Saving device GUI field in memory at channel " << channel_index << ".\n";
-
+	
 	// Device enable
 	config.device_enabled = false;
 	if (daq_activate->GetLabelText().compare("ON") == 0)
@@ -1238,6 +1237,9 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			config.channel_mode.clear();
 			config.channel_permision.clear();
 
+			label.channel_mode.clear();
+			label.channel_permision.clear();
+
 			for (auto name : names)
 			{
 				if (isDeviceMeasurable(name) == false)
@@ -1270,11 +1272,15 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 						channels.push_back(token);
 						config.channel_mode.push_back(CHANANALOG);
 						config.channel_permision.push_back(CHANREAD); // READ ONLY
+						label.channel_mode.push_back(CHANANALOG);
+						label.channel_permision.push_back(CHANREAD); // READ ONLY
 					}
 
 					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANANALOG);
 					config.channel_permision.push_back(CHANREAD); // READ ONLY
+					label.channel_mode.push_back(CHANANALOG);
+					label.channel_permision.push_back(CHANREAD); // READ ONLY
 				}
 
 
@@ -1301,11 +1307,15 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 						channels.push_back(token);
 						config.channel_mode.push_back(CHANDIGITAL);
 						config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
+						label.channel_mode.push_back(CHANDIGITAL);
+						label.channel_permision.push_back(CHANWRITE); // WRITE ONLY
 					}
 
 					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANDIGITAL);
 					config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
+					label.channel_mode.push_back(CHANDIGITAL);
+					label.channel_permision.push_back(CHANWRITE); // WRITE ONLY
 				}
 			}
 
@@ -1319,6 +1329,8 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					channels.push_back(fake_chan);
 					config.channel_mode.push_back(CHANANALOG);
 					config.channel_permision.push_back(CHANREAD);
+					label.channel_mode.push_back(CHANANALOG);
+					label.channel_permision.push_back(CHANREAD);
 				}
 
 			}
@@ -1341,7 +1353,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			// update name info in struct
 			int prev = -1;
 			int device_index = 0;
-			for (int i = 0; i < channels.size(); i++)
+			for (size_t i = 0; i < channels.size(); i++)
 			{
 				if (prev==-1){ prev = config.channel_mode[i];} // init previous state once
 
@@ -1939,8 +1951,8 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	{
 	case 0:
 	{
-		chanbtntype[label.channel_index]->SetLabel("A");
-		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(210, 180, 138));
+		chanbtntype[label.channel_index]->SetLabel("A"); 
+		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(92, 228, 178));
 		show_tc_param(false);
 		show_voltage_param(true);
 		wanted_type = DAQmx_Val_Voltage;
@@ -1989,7 +2001,7 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	cPlot* m_plot = object_manager->get_plot();
 	m_plot->update_chan_physical_unit_to_gui("°C", label.channel_index); // If temperature measurement then update unit in channel listed in graph
 
-	//inst_->Layout();
+	Layout();
 	//Refresh();
 	channel_group_sizer->Layout();
 }
@@ -2003,9 +2015,13 @@ void cDaqmx::OnDaqChanEnableBtn(wxCommandEvent& evt)
 	SwitchChannelON(state);
 	UpdateChannelSig(state);
 	//if (label.channel_permision.at(label.channel_index) == CHANWRITE)
-	if(digitaltype->GetValue().compare("Output") == 0)
+
+	if (label.channel_permision.at(label.channel_index) == CHANWRITE)
 	{
-		UpdateChannelTable(state);
+		if (digitaltype->GetValue().compare("Output") == 0)
+		{
+			UpdateChannelTable(state);
+		}
 	}
 
 	EnableChannelItems(state);

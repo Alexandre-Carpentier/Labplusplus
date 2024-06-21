@@ -197,9 +197,10 @@
     <ClCompile Include="cSignalBtn.cpp" />
     <ClCompile Include="cSignalTable.cpp" />
     <ClCompile Include="cSingleton.cpp" />
+    <ClCompile Include="cSupplysim.cpp" />
     <ClCompile Include="cTable.cpp" />
     <ClCompile Include="cTcp.cpp" />
-    <ClCompile Include="cTension.cpp" />
+    <ClCompile Include="cVoltage.cpp" />
     <ClCompile Include="cTick.cpp" />
     <ClCompile Include="cUSB6001.cpp" />
     <ClCompile Include="cVisa.cpp" />
@@ -245,9 +246,10 @@
     <ClInclude Include="cSignalTable.h" />
     <ClInclude Include="cSingleton.h" />
     <ClInclude Include="cStatrender.h" />
+    <ClInclude Include="cSupplysim.h" />
     <ClInclude Include="cTable.h" />
     <ClInclude Include="cTcp.h" />
-    <ClInclude Include="cTension.h" />
+    <ClInclude Include="cVoltage.h" />
     <ClInclude Include="cTick.h" />
     <ClInclude Include="cUSB6001.h" />
     <ClInclude Include="cVisa.h" />

@@ -25,7 +25,7 @@
 		cycle->total_step = 0;
 		cycle->current_loop = 0;
 		cycle->total_loop = 0;
-		for (int x = 0; x < cycle->step_table.size(); x++)
+		for (size_t x = 0; x < cycle->step_table.size(); x++)
 		{
 			cycle->step_table[x].controler_vec.clear();
 		}

@@ -16,7 +16,7 @@ MEAS_TYPE cPacesim::device_type() { return PRESSURE_CONTROLER_INSTR; };
 
 size_t cPacesim::chan_count()
 {
-    size_t nb_sig = 2;
+    size_t nb_sig = 1;
     return nb_sig;
 }
 
