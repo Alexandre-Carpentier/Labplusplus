@@ -10,7 +10,6 @@
 #include "WinGraph.h"
 #include "data_types.h"
 
-
 #define MAX_CHAN 64
 
 struct DATAS

@@ -31,10 +31,13 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 	{
 		// Write data to instrument (controler)
 		size_t length = meas->chan_write_count();
-		double* values = new double(length);
-		memset(values, 0.0, length);
-		meas->set(values, length);
-		delete(values);
+		if (length > 0)
+		{
+			double* values = new double(length);
+			memset(values, 0.0, length);
+			meas->set(values, length);
+			delete(values);
+		}
 	}
 }
 
@@ -86,19 +89,22 @@ void cMeasurementControler::poll()
 			// Write data to instrument (controler)
 		
 			//size_t length = meas->chan_count();
-			size_t length = meas->chan_write_count();
-			double* values = new double();
-			memset(values, 0.0, length);
-			meas->set(values, length);
-			delete(values);
-
-			// Read data from instrument
-			val = meas->read();
-			for (int c = buffer_index; c < val.buffer_size; c++)
+			if (meas->chan_write_count() > 0)
 			{
-				Y[c] = val.buffer[c];
+				size_t length = meas->chan_write_count();
+				double* values = new double();
+				memset(values, 0.0, length);
+				meas->set(values, length);
+				delete(values);
 
-				buffer_index++;
+				// Read data from instrument
+				val = meas->read();
+				for (int c = buffer_index; c < val.buffer_size; c++)
+				{
+					Y[c] = val.buffer[c];
+
+					buffer_index++;
+				}
 			}
 		}
 
@@ -190,6 +196,12 @@ void cMeasurementControler::poll()
 								assert(length < MAX_CHAN);
 								bool success = get_instr_setpoint(meas, step, value, length, &read);
 								//std::cout << std::format("[GET] double[]:{};{};{};{}, length:{}\n", value[0], value[1], value[2], value[3], read);
+								
+								if (length != read)
+								{
+									MessageBox(GetFocus(), L"Can't read instrument command\nExiting...", L"Fail", S_OK);
+								}
+
 								assert(length == read);
 								assert(read < MAX_CHAN);
 

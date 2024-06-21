@@ -224,8 +224,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		m_plot_->start_graph(Rec, sizesig);
 
 		startbtn->SetBackgroundColour(wxColor(250, 80, 90));
-		startbtn->SetLabelText(L"Stop");
-		
+		startbtn->SetLabelText(L"Stop");		
 	}
 	else
 	{
@@ -234,9 +233,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 		m_plot_->stop_graph();
 
-
 		std::cout << "m_table_->destroy_cycle() in Footer.cpp\n";
-
 
 		startbtn->SetBackgroundColour(wxColor(180, 250, 90));
 		startbtn->SetLabelText(L"Start");

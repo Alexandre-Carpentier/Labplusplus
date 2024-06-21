@@ -69,6 +69,15 @@
     <Filter Include="Fichiers sources\Measurement\Protocol\TCPIP">
       <UniqueIdentifier>{6a4be1ee-b26b-40d8-a104-ea51c8548a73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\voltage\NI DAQmx">
+      <UniqueIdentifier>{7d9796a8-bbe6-405a-9f08-09a7168d2e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\voltage\DC supply">
+      <UniqueIdentifier>{564cc757-5af4-4ecd-89c9-4b521fa2b7dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\voltage\DC supply">
+      <UniqueIdentifier>{55f02436-c915-48f6-8e82-7bc4ac695f33}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp">
@@ -79,12 +88,6 @@
     </ClCompile>
     <ClCompile Include="cConfig.cpp">
       <Filter>Fichiers sources\MainWindow\config</Filter>
-    </ClCompile>
-    <ClCompile Include="cDaqmx.cpp">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
-    </ClCompile>
-    <ClCompile Include="cDaqmxScaleDlg.cpp">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
     </ClCompile>
     <ClCompile Include="cFooter.cpp">
       <Filter>Fichiers sources\MainWindow\footer</Filter>
@@ -161,9 +164,6 @@
     <ClCompile Include="cPressure.cpp">
       <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
     </ClCompile>
-    <ClCompile Include="cTension.cpp">
-      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
-    </ClCompile>
     <ClCompile Include="cPasesim.cpp">
       <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
     </ClCompile>
@@ -206,6 +206,18 @@
     <ClCompile Include="cGnuplot.cpp">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
+    <ClCompile Include="cDaqmxScaleDlg.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClCompile>
+    <ClCompile Include="cDaqmx.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClCompile>
+    <ClCompile Include="cVoltage.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplysim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -216,12 +228,6 @@
     </ClInclude>
     <ClInclude Include="cConfig.h">
       <Filter>Fichiers sources\MainWindow\config</Filter>
-    </ClInclude>
-    <ClInclude Include="cDaqmx.h">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
-    </ClInclude>
-    <ClInclude Include="cDaqmxScaleDlg.h">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
     </ClInclude>
     <ClInclude Include="cFooter.h">
       <Filter>Fichiers sources\MainWindow\footer</Filter>
@@ -308,9 +314,6 @@
     <ClInclude Include="cPressure.h">
       <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
     </ClInclude>
-    <ClInclude Include="cTension.h">
-      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
-    </ClInclude>
     <ClInclude Include="cPacesim.h">
       <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
     </ClInclude>
@@ -352,6 +355,18 @@
     </ClInclude>
     <ClInclude Include="cGnuplot.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClInclude>
+    <ClInclude Include="cDaqmxScaleDlg.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClInclude>
+    <ClInclude Include="cDaqmx.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClInclude>
+    <ClInclude Include="cVoltage.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cSupplysim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

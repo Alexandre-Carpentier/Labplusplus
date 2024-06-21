@@ -786,7 +786,6 @@ void cDaqmx::OnNextCliqued(wxCommandEvent& evt)
 
 	// Resize and replace items correctly
 	channel_group_sizer->Layout();
-
 	evt.Skip();
 }
 

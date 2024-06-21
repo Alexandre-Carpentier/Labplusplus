@@ -4,6 +4,7 @@
 #include "enum.h"
 #include <thread>
 
+class cVoltage;
 /*
 class cPlot;
 class cCycle;
@@ -152,6 +153,26 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	Pressure_struct.PStop = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
+	// Add cVoltage to plugin vec
+	m_voltage = new cVoltage(book);
+	cDevice* m_voltage_dev = new cDevice();
+	m_voltage_dev->set_access_type(ALL);
+	m_voltage_dev->set_device_name("DC 2280S");
+	m_voltage_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA Voltage_struct;
+	Voltage_struct.name = L"2280S.dll";
+	Voltage_struct.input_count = 1;
+	Voltage_struct.outputcount = 1;
+	Voltage_struct.signal_count = Voltage_struct.input_count + Voltage_struct.outputcount;
+	Voltage_struct.panel = m_voltage->get_right_panel();
+	Voltage_struct.hInst = nullptr;
+	Voltage_struct.device = m_voltage_dev;
+	Voltage_struct.Attach = nullptr;
+	Voltage_struct.Dettach = nullptr;
+	Voltage_struct.PStart = nullptr;
+	Voltage_struct.PStop = nullptr;
+	plugin_vec.push_back(Voltage_struct);
+
 	// Add cTension to plugin vec
 	/*
 	m_tension = new cTension(book);
@@ -234,11 +255,11 @@ cConfig::~cConfig()
 	delete m_daqmx;
 	delete m_daq_dev;
 	delete m_pressure;
-	delete m_pressure_dev;
-	delete m_tension;
+	//delete m_pressure_dev;
+	delete m_voltage;
 	m_daqmx = nullptr;
 	m_pressure = nullptr;
-	m_tension = nullptr;
+	m_voltage = nullptr;
 }
 
 void cConfig::unload_plugins()
@@ -452,6 +473,11 @@ cPressure* cConfig::get_pressuredevice()
 	return m_pressure;
 }
 
+cVoltage* cConfig::get_voltagedevice()
+{
+	return m_voltage;
+}
+
 void cConfig::set_graph(cPlot* m_plot)
 {
 	m_plot_ = m_plot;
@@ -463,6 +489,7 @@ void cConfig::set_table(cTable* m_table)
 	m_table_ = m_table;
 	m_daqmx->set_table(m_table);
 	m_pressure->set_table(m_table);
+	m_voltage->set_table(m_table);
 }
 
 

@@ -17,13 +17,15 @@
 #include "cCycle.h"
 #include "cDaqmx.h"
 #include "cPressure.h"
-#include "cTension.h"
+#include "cVoltage.h"
 #include "cObjectmanager.h"
 #include "cMeasurementControler.h"
 
 //#pragma comment (lib, "Plugin.lib")
 //#include "..\Lab\Plugin\cDevice.h"
 #include "..\Lab++\Plugin\cDevice.h"
+
+class cVoltage;
 
 class cConfig : public wxFrame
 {
@@ -43,8 +45,7 @@ private:
 	cDaqmx* m_daqmx = nullptr;
 	cDevice* m_daq_dev = nullptr;
 	cPressure* m_pressure = nullptr;
-	cDevice* m_pressure_dev = nullptr;
-	cTension* m_tension = nullptr;
+	cVoltage* m_voltage = nullptr;
 
 	typedef cDevice* (*PLUGIN_ATTACH)(wxWindow*);
 	PLUGIN_ATTACH Attach = nullptr;
@@ -87,6 +88,7 @@ public:
 
 	// Plugin and device access here
 	cPressure* get_pressuredevice();
+	cVoltage* get_voltagedevice();
 	cDaqmx* get_nidaq();
 
 	std::vector<cDevice*> get_device_vec();

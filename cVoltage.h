@@ -1,5 +1,5 @@
-#ifndef _Tension_H_
-#define _Tension_H_
+#ifndef _VOLTAGE_H_
+#define _VOLTAGE_H_
 
 #include <winsock2.h> 
 #include <wx/wx.h>
@@ -9,23 +9,17 @@
 #include <wx/fileconf.h>
 #include "data_types.h"
 
+#include "cTable.h"
 
-class cMeasurementmanager;
-class cCycle;
-class cUsb6001;
-class cDaqsim;
-class cMeasurement;
-class cPlot;
-class cImagePanel;
+static wxImage voltage_instrument_img;
 
 
 
+static wxPanel* voltage_instrument_rightpanel_ = nullptr;
 
-class cTension : public wxFrame
+class cVoltage : public wxFrame
 {
 private:
-	wxPanel* config_rightpanel_ = nullptr;
-	wxStaticBoxSizer* device_group_sizer;
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
 
@@ -38,13 +32,13 @@ public:
 
 
 	wxWindow* inst_ = nullptr;
-
+	cTable* m_table_ = nullptr;
+	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
-	cMeasurement* m_Tension_ = nullptr; // daq measurement gui
-
+	cMeasurement* m_voltage_ = nullptr; // daq measurement gui
 
 	bool enable_pan = false;
-	wxButton* tension_controler_activate;
+	wxButton* voltage_controler_activate;
 
 	wxComboBox* addr_ctrl = nullptr;
 
@@ -56,10 +50,20 @@ public:
 	const wxSize text_ctrl_size = wxSize(120, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
-	cTension(wxWindow* inst);
+	cVoltage(wxWindow* inst);
+	~cVoltage();
 
-	void OnTensionEnableBtn(wxCommandEvent& evt);
-	void OnTensionAddrSelBtn(wxCommandEvent& evt);
+	void RefreshPort();
+
+	void DestroySubsystem();
+
+	void set_table(cTable* m_table);
+	void UpdateChannelTable(bool isDisplayed);
+
+	void OnVoltageEnableBtn(wxCommandEvent& evt);
+	void OnVoltageAddrSelBtn(wxCommandEvent& evt);
+	void OnPaint(wxPaintEvent& event);
+	void EnableVoltageChannel(bool isDisplayed);
 
 	void save_current_device_config(int channel_index);
 	void load_current_device_config(int channel_index);
@@ -69,8 +73,10 @@ public:
 
 	wxPanel* get_right_panel();
 
-	CURRENT_DEVICE_CONFIG_STRUCT GetTensionConfigStruct();
+	CURRENT_DEVICE_CONFIG_STRUCT GetVoltageConfigStruct();
 
 };
+
+
 
 #endif
