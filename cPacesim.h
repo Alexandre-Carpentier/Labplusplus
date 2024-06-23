@@ -1,9 +1,10 @@
 #pragma once
 #include <winsock2.h> 
 #include <vector>
+/*
 class cTick;
 class cMeasurement;
-
+*/
 #include "cMeasurement.h"
 
 class cPacesim : public cMeasurement {

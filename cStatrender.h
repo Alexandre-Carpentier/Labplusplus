@@ -5,8 +5,12 @@
 #include <sstream>
 #include <string>
 
+#include "cPlot.h"
+#include "cFooter.h"
+/*
 class cPlot;
 class cFooter;
+*/
 
 class cStatrender : public wxTimer
 {
@@ -18,7 +22,6 @@ public:
 	cStatrender(cPlot* m_plot, const short disp_freq);
 
 	void add_freq_footer(cFooter* m_footer);
-
 
 	void Notify();
 

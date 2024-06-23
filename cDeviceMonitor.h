@@ -4,14 +4,18 @@
 
 #include <vector>
 #include <string>
+#include <format>
 
-#include "cSingleton.h"
+#include "encoding.h"
+//#include "cSingleton.h"
+#include "cSingletonSafe.h"
 #include "cVisa.h"
-#include "cTcp.h"
-#include "cSerial.h"
+#include "cVisatcp.h"
+#include "cVisaserial.h"
 #include "cProtocolFactory.h"
+#include "ListUsbDevice.h"
 
-const int refresh_rate = 5000;
+const int refresh_rate = 10000;
 
 class cDev
 {
@@ -30,27 +34,22 @@ private:
 	std::wstring name_;
 };
 
-class cDeviceMonitor : public wxTimer, public cSingleton<cDeviceMonitor>
+class cDeviceMonitor /*: public wxTimer, public cSingletonSafe*/
 {
+
 public:
 	cDeviceMonitor()
 	{
-		Start(refresh_rate);
+		//Start(refresh_rate);
 	}
+	virtual ~cDeviceMonitor() {}
 
 	void Notify();
 	std::vector<cDev> get_device_vec();
 	void lookup_start();
 	void lookup_stop();
 
-	virtual ~cDeviceMonitor()
-	{
-
-	}
-
 private:
-
 	std::vector<cDev> dev_list;
 };
-
 

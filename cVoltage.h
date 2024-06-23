@@ -1,20 +1,13 @@
 #ifndef _VOLTAGE_H_
 #define _VOLTAGE_H_
-
-#include <winsock2.h> 
 #include <wx/wx.h>
-#include <wx/combobox.h>
-#include <wx/treectrl.h>
-#include <string>
-#include <wx/fileconf.h>
 #include "data_types.h"
-
-#include "cTable.h"
+class cTable;
+class cMeasurementmanager;
+class cMeasurement;
+class cDeviceMonitor;
 
 static wxImage voltage_instrument_img;
-
-
-
 static wxPanel* voltage_instrument_rightpanel_ = nullptr;
 
 class cVoltage : public wxFrame
@@ -22,7 +15,6 @@ class cVoltage : public wxFrame
 private:
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
-
 public:
 	// Signal color map
 	float COLORS[3] =
@@ -30,8 +22,8 @@ public:
 		0.1f, 0.0f, 0.8f
 	};
 
-
 	wxWindow* inst_ = nullptr;
+	cDeviceMonitor* devmon_ = nullptr;
 	cTable* m_table_ = nullptr;
 	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
@@ -50,7 +42,7 @@ public:
 	const wxSize text_ctrl_size = wxSize(120, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
-	cVoltage(wxWindow* inst);
+	cVoltage(wxWindow* inst, cDeviceMonitor* devmon);
 	~cVoltage();
 
 	void RefreshPort();

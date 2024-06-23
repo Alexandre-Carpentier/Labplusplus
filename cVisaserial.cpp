@@ -1,23 +1,23 @@
-#include "cSerial.h"
+#include "cVisaserial.h"
 
 cSerial::cSerial()
 	:cVisa()
 {
-	std::wcout << L"[*] cSerial default constructor called\n";
+	//std::wcout << L"[*] cSerial default constructor called\n";
 	device_name_ = L"magic";
 }
 
 cSerial::cSerial(std::wstring addr)
 	:cVisa()
 {
-	std::wcout << L"[*] cSerial constructor called\n";
+	//std::wcout << L"[*] cSerial constructor called\n";
 	assert(addr.size() > 0);
 	device_name_ = addr;
 }
 
 err_struct cSerial::init()
 {
-	std::wcout << L"[*] cSerial init() called\n";
+	//std::wcout << L"[*] cSerial init() called\n";
 	assert(device_name_.size() > 0);
 	assert(ressource_manager > 0);
 
@@ -161,7 +161,7 @@ err_struct cSerial::init()
 	}
 
 	// Set timeout value to X s
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 100);
+	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 1000);
 
 	/*
 	#define VI_ATTR_ASRL_AVAIL_NUM                (0x3FFF00ACUL
@@ -211,7 +211,7 @@ err_struct cSerial::init()
 
 err_struct cSerial::close()
 {
-	std::wcout << L"[*] cSerial close() called\n";
+	//std::wcout << L"[*] cSerial close() called\n";
 	viClose(device_);
 	viClose(ressource_manager);
 	/*

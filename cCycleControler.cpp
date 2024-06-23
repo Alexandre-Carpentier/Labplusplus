@@ -1,6 +1,20 @@
 #include "cCycleControler.h"
+#include <wx/wx.h>
+#include <thread>
+#include <Windows.h>
+#include <mutex>
+#include <memory>
+#include <vector>
 
-
+#include "cCycle.h"
+#include "cCycleControler.h"
+#include "cPlot.h"
+#include "cFooter.h"
+#include "cObjectmanager.h"
+#include "cMeasurementmanager.h"
+#include "cUSB6001.h"
+#include "cMeasurement.h"
+#include "cTick.h"
 
 int cCycleControler::get_current_step()
 {

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <wx/wx.h>
 #include "cMain.h"
-#include <cassert>
+
 
 class cApp :public wxApp
 {

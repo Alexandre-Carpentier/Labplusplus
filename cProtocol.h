@@ -1,11 +1,12 @@
 #pragma once
 #include <iostream>
+
 struct err_struct {
 	std::wstring err_msg;
 	int err_code;
 };
 
-class cProtocol
+class IProtocol
 {
 public:
 	// Abstract interface
@@ -15,7 +16,7 @@ public:
 	virtual err_struct close() = 0;
 
 	// Be sure to make derived class destructor callable
-	virtual ~cProtocol() {};
+	virtual ~IProtocol() {};
 
 	err_struct last_error;
 	std::wstring  device_name_;

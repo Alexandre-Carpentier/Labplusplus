@@ -1,36 +1,13 @@
 #pragma once
-
-#include <wx/wx.h>
 #include <thread>
-#include <Windows.h>
-#include <mutex>
-#include <memory>
 #include <vector>
-
-#include "cCycle.h"
-#include "cCycleControler.h"
-#include "cPlot.h"
-#include "cFooter.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
-#include "cUSB6001.h"
-#include "cMeasurement.h"
-#include "cTick.h"
-//#include "cSingleton.h"
-/*
-class cCycle;
-class cCycleControler;
-class cPlot;
-class cFooter;
+#include <iostream>
 class cObjectmanager;
 class cMeasurementmanager;
-class cUSB6001;
+class cPlot;
+class cFooter;
 class cMeasurement;
-class cTick;
-*/
-
 class cCycleControler;
-
 
 class cMeasurementControler
 {

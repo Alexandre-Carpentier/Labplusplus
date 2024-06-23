@@ -1,31 +1,15 @@
 #pragma once
-
-//#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-//#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
-
-#include <wx/dcbuffer.h>
 #include <wx/wx.h>
-#include <wx/combobox.h>
-#include <wx/treectrl.h>
 #include <wx/simplebook.h>
 
-#include <locale>
-#include <codecvt>
-#include <map>
-
-#include "cPlot.h"
-#include "cCycle.h"
-#include "cDaqmx.h"
-#include "cPressure.h"
-#include "cVoltage.h"
-#include "cObjectmanager.h"
-#include "cMeasurementControler.h"
-
-//#pragma comment (lib, "Plugin.lib")
-//#include "..\Lab\Plugin\cDevice.h"
-#include "..\Lab++\Plugin\cDevice.h"
-
+class cTable;
+class cPlot;
+class cDaqmx;
+class cDevice;
+class cPressure;
 class cVoltage;
+class cOscope;
+class cDeviceMonitor;
 
 class cConfig : public wxFrame
 {
@@ -40,12 +24,14 @@ private:
 	wxBoxSizer* config_panel_sizer = nullptr;
 	wxPanel* config_panel = nullptr;
 
+	cDeviceMonitor* devmon_ = nullptr;
 	cTable* m_table_ = nullptr;
 	cPlot* m_plot_ = nullptr;
 	cDaqmx* m_daqmx = nullptr;
 	cDevice* m_daq_dev = nullptr;
 	cPressure* m_pressure = nullptr;
 	cVoltage* m_voltage = nullptr;
+	cOscope* m_oscope = nullptr;
 
 	typedef cDevice* (*PLUGIN_ATTACH)(wxWindow*);
 	PLUGIN_ATTACH Attach = nullptr;
@@ -76,7 +62,7 @@ private:
 	std::vector<PLUGIN_DATA> plugin_vec;
 
 public:
-	cConfig(wxWindow* inst, cTable* m_table);
+	cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon);
 	~cConfig();
 	void OnClickdrop(wxMouseEvent& evt);
 	void StopTest(bool stop);
@@ -89,6 +75,7 @@ public:
 	// Plugin and device access here
 	cPressure* get_pressuredevice();
 	cVoltage* get_voltagedevice();
+	cOscope* get_oscopedevice();
 	cDaqmx* get_nidaq();
 
 	std::vector<cDevice*> get_device_vec();

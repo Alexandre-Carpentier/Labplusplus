@@ -6,7 +6,7 @@
 
 #include "enum.h"
 #include "cCycle.h"
-#include "cTable.h"
+class cTable;
 
 class cCycleControler /* : public wxWindow*/
 {

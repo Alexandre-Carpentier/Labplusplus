@@ -12,7 +12,7 @@
 #include "encoding.h"
 
 // A Visa class is a protocol
-class cVisa : public cProtocol {
+class cVisa : public IProtocol {
 public:
 	cVisa();
 	err_struct init() override;

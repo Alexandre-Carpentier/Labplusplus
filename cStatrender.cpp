@@ -1,8 +1,5 @@
 #include "cStatrender.h"
 
-#include "cPlot.h"
-#include "cFooter.h"
-
 cStatrender::cStatrender(cPlot* m_plot, const short disp_freq) : wxTimer()
 {
 	std::cout << "cStatrender ctor...\n";

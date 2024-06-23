@@ -1,9 +1,15 @@
 #include "cFooter.h"
+#include <memory>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include "cCycleControler.h"
+#include "cMain.h"
 #include "cGnuplot.h"
+#include "cDeviceMonitor.h"
 
-class cMain;
-
-cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config)
+cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config, cDeviceMonitor* devmon)
 {
 	cycle_controler = std::make_shared<cCycleControler>(m_table, inst);
 
@@ -71,7 +77,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 {
 	if (m_plot_->get_graph_state() == false)
 	{
-
 			// reset zoom slider to x1
 
 		scale_btn->slider_reset();
@@ -155,8 +160,10 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(false);
 		}
 
+		// Launch Pressure System
+		//
+		//
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
-
 		if (pressureconfig->m_pressure_ != nullptr)
 		{
 			pressureconfig->save_current_device_config(0);
@@ -172,6 +179,45 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
+		// Launch Voltage System
+		//
+		//
+		cVoltage* voltageconfig = obj_manager->get_voltagedevice();
+		if (voltageconfig->m_voltage_ != nullptr)
+		{
+			voltageconfig->save_current_device_config(0);
+			CURRENT_DEVICE_CONFIG_STRUCT config = voltageconfig->GetVoltageConfigStruct();
+
+			if (voltageconfig->m_voltage_->launch_device(config) < 0)
+			{
+				evt.Skip();
+				return;
+			}
+
+			// Lock pressure controler interface
+			voltageconfig->device_group_sizer->GetStaticBox()->Enable(false);
+		}
+
+		// Launch Oscope System
+		//
+		//
+		cOscope* oscopeconfig = obj_manager->get_oscopedevice();
+		if (oscopeconfig->m_oscope_ != nullptr)
+		{
+			oscopeconfig->save_current_device_config(0);
+			CURRENT_DEVICE_CONFIG_STRUCT config = oscopeconfig->GetOscopeConfigStruct();
+
+			if (oscopeconfig->m_oscope_->launch_device(config) < 0)
+			{
+				evt.Skip();
+				return;
+			}
+
+			// Lock oscope controler interface
+			oscopeconfig->device_group_sizer->GetStaticBox()->Enable(false);
+		}
+
+		/////////////////////////////////////////////////////////
 		int iRec = this->combo2->GetCurrentSelection();
 		LOGGER_M Rec = LOGGER_NONE;
 		if (iRec == 0)
@@ -196,10 +242,10 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		////////////////////////////////////////////////////////////////////////////////
 		//cDeviceMonitor* devmon = devmon->getInstance();
 		//devmon->lookup_stop();
-		cMain* m_main = nullptr;
-		m_main = dynamic_cast<cMain*>(inst_);
-		if (m_main)
-			m_main->StopDiscoverDeviceTimer();
+		//cMain* m_main = nullptr;
+		//m_main = dynamic_cast<cMain*>(inst_);
+		//if (m_main)
+			//m_main->StopDiscoverDeviceTimer();
 
 		////////////////////////////////////////////////////////////////////////////////
 		// CYCLE CONTROLER
@@ -240,8 +286,11 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
+		cVoltage* voltageconfig = obj_manager->get_voltagedevice();
+		cOscope* oscopeconfig = obj_manager->get_oscopedevice();
 
-		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) )
+
+		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) && (voltageconfig == nullptr) && (oscopeconfig == nullptr))
 		{
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
 			wxPostEvent(inst_, evt);
@@ -265,6 +314,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 			// Unlock pressure controler interface
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(true);
+			voltageconfig->device_group_sizer->GetStaticBox()->Enable(true);
+			oscopeconfig->device_group_sizer->GetStaticBox()->Enable(true);
 		}
 
 		meas_manager->stop_all_devices();
@@ -360,7 +411,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				
 				for (size_t i =1; i <= signals_vec.size(); i++)
 				{
-					fprintf(f, "set style line %i linecolor rgb '%s' linewidth 0.1\n", i, sig_colours[i-1].c_str());
+					fprintf(f, "set style line %zi linecolor rgb '%s' linewidth 0.1\n", i, sig_colours[i-1].c_str());
 					//fprintf(f, "set style line 2 linecolor rgb '#dd181f' linewidth 0.1\n");
 				}
 
@@ -420,8 +471,9 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		////////////////////////////////////////////////////////////////////////////////
 		// START LOOK UP FOR DEVICE
 		////////////////////////////////////////////////////////////////////////////////
-		cDeviceMonitor* devmon = devmon->getInstance();
-		devmon->lookup_start();
+		//cDeviceMonitor* devmon = devmon->getInstance();
+
+		//devmon->lookup_start();
 	}
 
 	evt.Skip();

@@ -1,21 +1,26 @@
 #pragma once
 #include <wx/wx.h>
 #include <wx/grid.h>
-#include <vector>
-#include <Windows.h>
-#include "enum.h"
-#include <string>
-#include <memory>
-#include "cObjectmanager.h"
 
-#include "cConfig.h"
-#include"cPlot.h"
 
 #include "cCycle.h"
+#include "cConfig.h"
+#include "enum.h"
+
 #include "cTick.h"
-#include <format>
+#include "cObjectmanager.h"
 
 class cDurationStatisticCtrl;
+/*
+
+#include"cPlot.h"
+
+
+
+
+
+
+*/
 
 class cTable
 {

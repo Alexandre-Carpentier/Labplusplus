@@ -1,5 +1,4 @@
 #pragma once
-
 #include "data_types.h"
 
 bool is_a_number(size_t numb);

@@ -1,9 +1,12 @@
 #include "cTable.h"
 
+#include <Windows.h>
+#include <string>
+#include <memory>
+#include <format>
+#include <vector>
 
 
-class cConfig;
-class cDevice;
 
 cTable::cTable(wxWindow* inst, cConfig* m_config)
 {

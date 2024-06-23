@@ -1,7 +1,5 @@
 #include "cDaqmxScaleDlg.h"
 
-
-
 ScaleDialog::ScaleDialog(wxWindow* parent, wxWindowID id,
 	const wxString& title,
 	const wxPoint& pos,

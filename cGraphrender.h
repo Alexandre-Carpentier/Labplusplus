@@ -5,8 +5,12 @@
 #include <sstream>
 #include <string>
 
+#include "cPlot.h"
+#include "cFooter.h"
+/*
 class cPlot;
 class cFooter;
+*/
 
 class cGraphrender : public wxTimer
 {

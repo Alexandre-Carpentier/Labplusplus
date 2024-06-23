@@ -3,6 +3,7 @@
 #include "cIniCfg.h"
 
 #include <Windows.h>
+#include <format>
 
 #include"cObjectmanager.h"
 #include"cTable.h"

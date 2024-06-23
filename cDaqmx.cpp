@@ -1,17 +1,17 @@
 #include "cDaqmx.h"
+#include <winsock2.h> 
+#include <wx/wx.h>
+#include <wx/dcbuffer.h>
+#include <wx/combobox.h>
 
+#include <string>
+#include <wx/fileconf.h>
 
+#include "cTable.h"
+#include "cDaqmxScaleDlg.h"
 
-/*
-class cMeasurementmanager;
-class cCycle;
-class cUsb6001;
-class cDaqsim;
-class cMeasurement;
-class cPlot;
-class cImagePanel;
-class cSignalTable;
-*/
+#include "cUSB6001.h"
+#include "cDaqsim.h"
 
 cDaqmx::cDaqmx(wxWindow* inst)
 {

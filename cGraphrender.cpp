@@ -1,8 +1,5 @@
 #include "cGraphrender.h"
 
-#include "cPlot.h"
-#include "cFooter.h"
-
 cGraphrender::cGraphrender(cPlot* m_plot, const short disp_freq) : wxTimer()
 {
 	std::cout << "cGraphrender ctor...\n";
