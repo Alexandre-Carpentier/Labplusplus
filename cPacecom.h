@@ -5,10 +5,9 @@
 #include <cassert>
 #include <thread>
 
-
 #include "cVisa.h"
-#include "cTcp.h"
-#include "cSerial.h"
+#include "cVisatcp.h"
+#include "cVisaserial.h"
 #include "cProtocolFactory.h"
 
 #include "encoding.h"
@@ -24,7 +23,7 @@ private:
 	DATAS result;
 
 	cProtocolFactory factory;
-	std::unique_ptr<cProtocol> device;
+	std::unique_ptr<IProtocol> device;
 	err_struct err;
 
 	std::jthread acquireloop;

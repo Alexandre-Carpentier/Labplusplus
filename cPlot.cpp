@@ -1,13 +1,4 @@
 #include "cPlot.h"
-#include "cSignalBtn.h"
-
-#include "cDaqmx.h"
-#include "cUSB6001.h"
-#include "enum.h"
-
-#include "cMeasurementControler.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
 
 cPlot::cPlot(wxWindow* inst, int nbPoints)
 {

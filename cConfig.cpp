@@ -1,20 +1,25 @@
-
 #include "cConfig.h"
 
-#include "enum.h"
-#include <thread>
+//#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+//#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
-class cVoltage;
-/*
-class cPlot;
-class cCycle;
-class cDaqmx;
-class cPressure;
-class cTension;
-class cObjectmanager;
-class cMeasurementControler;
-*/
 
+#include <wx/dcbuffer.h>
+#include <wx/combobox.h>
+#include <wx/treectrl.h>
+
+
+//#pragma comment (lib, "Plugin.lib")
+//#include "..\Lab\Plugin\cDevice.h"
+#include "..\Lab++\Plugin\cDevice.h"
+
+#include "cTable.h"
+#include "cPlot.h"
+
+#include "cDeviceMonitor.h"
+#include "cPressure.h"
+#include "cVoltage.h"
+#include "cOscope.h"
 
 /*---------------- - Duplication-------------------------------- -
 void cDevice::DisplayConfiguration()
@@ -82,10 +87,10 @@ void cDevice::OnPaint()
 }
 -----------------Duplication---------------------------------*/
 
-cConfig::cConfig(wxWindow* inst, cTable* m_table)
+cConfig::cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon)
 {
 	inst_ = inst; // wxFrame is the parent
-
+	devmon_ = devmon;
 	std::cout << "cConfig ctor...\n";
 
 	config_leftpanel_ = new wxPanel(inst, IDC_CONFIG_LEFT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
@@ -134,7 +139,7 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	plugin_vec.push_back(Daqmx_struct);
 
 	// Add cPressure to plugin vec
-	m_pressure = new cPressure(book);
+	m_pressure = new cPressure(book, devmon_);
 	cDevice* m_pressure_dev = new cDevice();
 	m_pressure_dev->set_access_type(ALL);
 	m_pressure_dev->set_device_name("PACE6000");
@@ -154,10 +159,10 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	plugin_vec.push_back(Pressure_struct);
 
 	// Add cVoltage to plugin vec
-	m_voltage = new cVoltage(book);
+	m_voltage = new cVoltage(book, devmon_);
 	cDevice* m_voltage_dev = new cDevice();
 	m_voltage_dev->set_access_type(ALL);
-	m_voltage_dev->set_device_name("DC 2280S");
+	m_voltage_dev->set_device_name("2280S");
 	m_voltage_dev->set_measurement_unit("Volt");
 	PLUGIN_DATA Voltage_struct;
 	Voltage_struct.name = L"2280S.dll";
@@ -172,6 +177,26 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	Voltage_struct.PStart = nullptr;
 	Voltage_struct.PStop = nullptr;
 	plugin_vec.push_back(Voltage_struct);
+
+	// Add cOscope to plugin vec
+	m_oscope = new cOscope(book, devmon_);
+	cDevice* m_oscope_dev = new cDevice();
+	m_oscope_dev->set_access_type(READ);
+	m_oscope_dev->set_device_name("DSOX1202G");
+	m_oscope_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA Oscope_struct;
+	Oscope_struct.name = L"DSOX1202G.dll";
+	Oscope_struct.input_count = 1;
+	Oscope_struct.outputcount = 1;
+	Oscope_struct.signal_count = Oscope_struct.input_count + Oscope_struct.outputcount;
+	Oscope_struct.panel = m_oscope->get_right_panel();
+	Oscope_struct.hInst = nullptr;
+	Oscope_struct.device = m_oscope_dev;
+	Oscope_struct.Attach = nullptr;
+	Oscope_struct.Dettach = nullptr;
+	Oscope_struct.PStart = nullptr;
+	Oscope_struct.PStop = nullptr;
+	plugin_vec.push_back(Oscope_struct);
 
 	// Add cTension to plugin vec
 	/*
@@ -190,6 +215,8 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
+	manager->set_voltagedevice(m_voltage); // Singleton saver...bad
+	manager->set_oscopedevice(m_oscope); // Singleton saver...bad
 
 	/////////////////////////////////////////////////////
 	// load and add dll instrument to plugin vec
@@ -305,7 +332,7 @@ void cConfig::load_plugins(wxWindow* parent, std::wstring folder_path)
 			filesize.HighPart = ffd.nFileSizeHigh;
 			//_tprintf(TEXT("  %s   %ld bytes\n"), ffd.cFileName, filesize.QuadPart);
 
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 			std::wstring dllfilepath = folder_path;
 			dllfilepath.append(L"\\");
 			dllfilepath.append(ffd.cFileName);
@@ -478,6 +505,11 @@ cVoltage* cConfig::get_voltagedevice()
 	return m_voltage;
 }
 
+cOscope* cConfig::get_oscopedevice()
+{
+	return m_oscope;
+}
+
 void cConfig::set_graph(cPlot* m_plot)
 {
 	m_plot_ = m_plot;
@@ -487,9 +519,10 @@ void cConfig::set_table(cTable* m_table)
 {
 	// Save cTable to add or remove colomn afterward
 	m_table_ = m_table;
-	m_daqmx->set_table(m_table);
-	m_pressure->set_table(m_table);
-	m_voltage->set_table(m_table);
+	m_daqmx->set_table(m_table_);
+	m_pressure->set_table(m_table_);
+	m_voltage->set_table(m_table_);
+	m_oscope->set_table(m_table_);
 }
 
 

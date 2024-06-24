@@ -1,31 +1,17 @@
 #include "cVoltage.h"
-
-#include <wx/wx.h>
-#include <wx/combobox.h>
 #include <wx/dcbuffer.h>
-#include <format>
-#include <locale>
-
 #include "enum.h"
-
-#include "cMeasurementControler.h"
-#include "cMeasurement.h"
-#include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
-#include "cCycle.h"
-#include "cPlot.h"
-#include "cImagePanel.h"
-
 #include "cDeviceMonitor.h"
+#include "cTable.h"
 #include "cSupplysim.h"
+#include "cSupplyusb.h"
 
-
-
-
-cVoltage::cVoltage(wxWindow* inst)
+cVoltage::cVoltage(wxWindow* inst, cDeviceMonitor* devmon)
 {
 	std::cout << "cVoltage ctor...\n";
 	inst_ = inst;
+	devmon_ = devmon;
 
 	////////////////////////////////////////////////////////////
 	// Load default labels in memory
@@ -42,9 +28,9 @@ cVoltage::cVoltage(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	::wxInitAllImageHandlers();
+	//::wxInitAllImageHandlers();
 	wxBitmap bmp = wxBitmap("DCSUPPLYPNG", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
-	voltage_instrument_img = bmp.ConvertToImage();										// Convert bmp to image to scale purpose
+	voltage_instrument_img = bmp.ConvertToImage();								// Convert bmp to image to scale purpose
 
 	voltage_instrument_rightpanel_ = new wxPanel(inst, IDC_VOLTAGERIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
 	voltage_instrument_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165));		// Make inside group box dark grey
@@ -117,8 +103,8 @@ void cVoltage::RefreshPort()
 {
 	std::wcout << L"[*] Refresh port called\n";
 
-	cDeviceMonitor* devmon = devmon->getInstance();
-	std::vector<cDev> dev_list = devmon->get_device_vec();
+	//cDeviceMonitor* devmon = devmon->getInstance();
+	std::vector<cDev> dev_list = devmon_->get_device_vec();
 	addr_ctrl->Clear();
 
 	for (auto& dev : dev_list)
@@ -213,7 +199,7 @@ void cVoltage::DestroySubsystem()
 	// If item destroyed delete from memory
 	if (isDestroyed)
 	{
-		std::cout << "[*] [delete] m_daq in cDaqmx.cpp\n";
+		std::cout << "[*] [delete] m_voltage_ in cVoltage.cpp\n";
 
 		delete m_voltage_;
 		m_voltage_ = nullptr;
@@ -337,11 +323,11 @@ void cVoltage::OnVoltageAddrSelBtn(wxCommandEvent& evt)
 	{
 		if (m_voltage_ == nullptr)
 		{
-			std::cout << "[*] [new] Create cPacesim\n";
+			std::cout << "[*] [new] Create cSupplysim\n";
 			m_voltage_ = new cSupplysim;
 			meas_manager->set_measurement(m_voltage_);
 			m_voltage_->set_device_addr("Simulated");
-			m_voltage_->set_device_name("DC 2280S");
+			m_voltage_->set_device_name("2280S");
 		}
 		evt.Skip();
 		return;
@@ -357,7 +343,7 @@ void cVoltage::OnVoltageAddrSelBtn(wxCommandEvent& evt)
 
 	// Then create appropriate voltage object
 	std::cout << "[*] [new] Create cSupplyusb\n";
-	//m_voltage_ = new cSupplyusb;
+	m_voltage_ = new cSupplyusb;
 
 	// Object failed to be created in memory
 	if (m_voltage_ == nullptr)

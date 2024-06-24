@@ -1,5 +1,7 @@
 #include "cPacesim.h"
 #include "cMeasurement.h"
+#include "cTick.h"
+
 #include <string>
 
 cPacesim::cPacesim()

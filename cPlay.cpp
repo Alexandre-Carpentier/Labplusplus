@@ -1,5 +1,4 @@
 #include "cPlay.h"
-#include "xlsx.h"
 
 cPlay::cPlay(wxWindow* inst)
 {

@@ -1,0 +1,153 @@
+#include "cSupplyusb.h"
+#include "cMeasurement.h"
+#include <string>
+
+static double readpoint = 0.0;
+static double setpoint = 0.0;
+
+cSupplyusb::cSupplyusb()
+{
+    std::cout << "cSupplyusb ctor...\n";
+    result.buffer_size = 1;
+};
+
+std::string cSupplyusb::device_name() {
+    return config_struct_.device_name.ToStdString();
+}
+
+MEAS_TYPE cSupplyusb::device_type() { return VOLTAGE_CONTROLER_INSTR; };
+
+size_t cSupplyusb::chan_count()
+{
+    size_t nb_sig = 1;
+    return nb_sig;
+}
+
+size_t cSupplyusb::chan_read_count()
+{
+    size_t nb_sig = 1;
+    return nb_sig;
+}
+
+size_t cSupplyusb::chan_write_count()
+{
+    size_t nb_sig = 1;
+    return nb_sig;
+}
+
+int cSupplyusb::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+{
+    config_struct_ = config_struct;
+    readpoint = 0.0;
+    setpoint = 0.0;
+
+    // Create the proper implementation of cProtocol with the factory method
+    //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISATCP, L"TCPIP0::169.254.254.001::inst0::INSTR");
+    //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISASERIAL, L"\\\\.\\COM20");
+
+    //device = factory.make(PROTOCOLENUM::VISASERIAL, L"ASRL*::INSTR");
+    device = factory.make(PROTOCOLENUM::VISAUSB, config_struct_.device_addr.ToStdWstring());
+
+    // TODO: test device not null
+
+    err = device->init();
+
+    if (err.err_code != 0)
+    {
+        MessageBox(GetFocus(), L"Failed to launch cSupplyusb at init()", L"FAIL", S_OK);
+        return -1;
+    }
+    // Reset the device and configure default settings
+    device->write(L"*RST\n");
+    device->write(L":TRAC:CLE\n");
+    device->write(L"CURR 0.1\n"); // limit current to 100mA
+    device->write(L":VOLTage:LIMit 10\n"); // limit voltage to 10V
+    device->write(L":VOLT 0\n"); // set output to 0V
+    device->write(L":OUTP ON\n"); // output enable
+
+    // acquizition loop
+    acquireloop = std::jthread(&cSupplyusb::acquire, this);
+
+    return 0;
+}
+
+void cSupplyusb::acquire()
+{
+    double setpoint_saved = 0.0;
+    auto st = acquireloop.get_stop_token();
+    while (!st.stop_requested())
+    {
+        assert(setpoint >= 0.0);
+        assert(setpoint <= 70.0);
+        assert(setpoint_saved >= 0.0);
+        assert(setpoint_saved <= 70.0);
+
+        if (setpoint != setpoint_saved)
+        {
+            std::cout << "[*] New set point: " << setpoint << "\n";
+            std::wstring cmd;
+            
+            cmd = std::format(L":VOLT {}\n", setpoint);
+            device->write(cmd); // Set to value
+            //device->write(L"SOUR:PRES 0\r\n");
+            setpoint_saved = setpoint;
+        }
+
+        std::wstring msg;
+        device->write(L":MEAS:VOLT? 32,5\n"); // Set to value
+        device->read(msg);
+
+        std::string utf8 = ConvertWideToUtf8(msg);
+        char* p = nullptr;
+        readpoint = strtod(utf8.c_str(), &p);
+
+        assert(readpoint > 0.0);
+        assert(readpoint < 80.0);
+
+        // if reading issue -> assuming readpoint is the setpoint
+
+        std::cout << "[*] setpoint is " << setpoint << "and setpoint_saved is " << setpoint_saved << "\n";
+        readpoint = setpoint;
+        Sleep(500);
+    }
+}
+
+DATAS cSupplyusb::read()
+{
+    result.buffer[0] = readpoint;
+    result.buffer_size = 1;
+
+    return result;
+}
+
+void cSupplyusb::set(double* value, size_t length)
+{
+    assert(length > 0);
+    assert(value[0] > -1.0);
+    assert(value[0] < 20.0);
+    setpoint = value[0];
+}
+
+void cSupplyusb::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+{
+    config_struct_ = config_struct;
+}
+
+void cSupplyusb::set_device_name(std::string name)
+{
+    config_struct_.device_name = name;
+}
+
+void cSupplyusb::stop_device() {
+    std::cout << "cSupplyusb->stoping...\n"; acquireloop.request_stop();
+
+    device->write(L":VOLT 0\n"); // Set to value
+    Sleep(500);
+    device->write(L":OUTP 0\r\n"); // Set to value
+    device->write(L"LOC\r\n"); // Set to value
+    device->close();
+}
+
+cSupplyusb::~cSupplyusb() { std::cout << "cSupplyusb dtor...\n"; };
+
+

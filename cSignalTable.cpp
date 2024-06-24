@@ -1,4 +1,3 @@
-#include "data_types.h"
 #include "cSignalTable.h"
 
 bool is_a_number(size_t numb)

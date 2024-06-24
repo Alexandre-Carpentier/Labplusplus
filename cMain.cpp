@@ -1,4 +1,16 @@
 #include "cMain.h"
+#include <wx/wx.h>
+#include <wx/treectrl.h>
+#include <wx/grid.h>
+#include <wx/dcbuffer.h>
+#include <vector>
+#include <memory>
+
+#include "cDeviceMonitor.h"
+#include "cConfig.h"
+#include "cTable.h"
+
+#include "resource.h"
 
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 EVT_TOOL(IDTOOL_OPENBTN, cMain::openButtonClicked)
@@ -14,7 +26,6 @@ EVT_SIZE(cMain::Sizeevt)
 EVT_SIZING(cMain::Moveevt)
 EVT_MAXIMIZE(cMain::Maximizeevt)
 wxEND_EVENT_TABLE()
-
 
 cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1200, 600))
 {
@@ -34,7 +45,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	//	Launch the device monitor tool
 	//
 
-	devmon = std::make_unique<cDeviceMonitor>();
+	devmon = new cDeviceMonitor;
 	devmon->Notify();
 
 	std::cout << "Current scale factor: " << this->GetDPIScaleFactor() << "\n";
@@ -145,7 +156,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	// CONFIG WND
 	////////////////////////////////////////////////////////////////////////////////
 
-	m_config = new cConfig(this, m_table);
+	m_config = new cConfig(this, m_table, devmon);
 	manager->set_config(m_config);
 	config_leftpanel = m_config->Getleftpan();
 	config_rightpanel = m_config->Getrightpan();
@@ -208,7 +219,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// FOOTER
 	////////////////////////////////////////////////////////////////////////////////
-	m_footer = new cFooter(this, m_plot, m_table, m_config);
+	m_footer = new cFooter(this, m_plot, m_table, m_config, devmon);
 	manager->set_footer(m_footer);
 	wxBoxSizer* hfootersier = m_footer->GetSizer();
 
@@ -251,6 +262,8 @@ cMain::~cMain()
 	delete m_graphrender;
 	delete m_statrender;
 	delete m_footer;
+	delete devmon;
+	devmon = nullptr;
 
 	cfg_saver = nullptr; 
 	m_table = nullptr;

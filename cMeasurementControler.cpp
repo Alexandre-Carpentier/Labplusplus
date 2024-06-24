@@ -1,8 +1,14 @@
 #include "cMeasurementControler.h"
 
+#include "cCycleControler.h"
+#include "cMeasurement.h"
+#include "cMeasurementmanager.h"
+#include "cObjectmanager.h"
+#include "cFooter.h"
+
 #include <wx/wx.h>
 #include <wx/app.h> 
-#include <thread>
+
 #include <Windows.h>
 
 bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)

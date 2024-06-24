@@ -1,36 +1,31 @@
 #include "cPressure.h"
-
-#include <wx/wx.h>
-#include <wx/combobox.h>
 #include <wx/dcbuffer.h>
-#include <format>
-#include <locale>
-
 #include "enum.h"
-
-#include "cMeasurementControler.h"
-#include "cMeasurement.h"
-#include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
-#include "cCycle.h"
-#include "cPlot.h"
-#include "cImagePanel.h"
-
 #include "cDeviceMonitor.h"
+#include "cTable.h"
 #include "cPacesim.h"
 #include "cPacecom.h"
 
-
-
-cPressure::cPressure(wxWindow* inst)
+cPressure::cPressure(wxWindow* inst, cDeviceMonitor* devmon)
 {
 	std::cout << "cPressure ctor...\n";
 	inst_ = inst;
+	devmon_ = devmon;
+
+	//cDeviceMonitor* devmon = devmon->getInstance();
+	std::vector<cDev> dev_list = devmon->get_device_vec();
 
 	////////////////////////////////////////////////////////////
 	// Load default labels in memory
 	////////////////////////////////////////////////////////////
 	label.device_enabled = false;	
+	label.device_name.clear();
+	for (auto device : dev_list)
+	{
+		std::wstring full_name = device.get_addr();
+		label.device_name.push_back(full_name);
+	}
 	label.device_name.push_back("Simulated");
 	label.channel_permision.push_back(CHANWRITE);
 
@@ -38,7 +33,10 @@ cPressure::cPressure(wxWindow* inst)
 	// Load default configuration in memory
 	////////////////////////////////////////////////////////////
 	config.device_enabled = false;
-	config.device_name = wxT("Simulated");
+	config.device_name.clear();
+
+	config.device_name = label.device_name[0];
+	//config.device_name = wxT("Simulated");
 
 	////////////////////////////////////////////////////////////
 
@@ -87,7 +85,7 @@ cPressure::cPressure(wxWindow* inst)
 	addr_ctrl = new wxComboBox(device_group, IDCPRESSUREADDR, label.device_name[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
 	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
-	RefreshPort();
+	//RefreshPort();
 	addr_ctrl->Disable();
 	
 	
@@ -117,8 +115,8 @@ void cPressure::RefreshPort()
 {
 	std::wcout << L"[*] Refresh port called\n";
 
-	cDeviceMonitor* devmon = devmon->getInstance();
-	std::vector<cDev> dev_list = devmon->get_device_vec();
+	//cDeviceMonitor* devmon = devmon->getInstance();
+	std::vector<cDev> dev_list = devmon_->get_device_vec();
 	addr_ctrl->Clear();
 
 	for (auto& dev : dev_list)
@@ -213,7 +211,7 @@ void cPressure::DestroySubsystem()
 	// If item destroyed delete from memory
 	if (isDestroyed)
 	{
-		std::cout << "[*] [delete] m_daq in cDaqmx.cpp\n";
+		std::cout << "[*] [delete] m_pressure_ in cPressure.cpp\n";
 
 		delete m_pressure_;
 		m_pressure_ = nullptr;
@@ -269,7 +267,7 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 
 		if (enable_pan)
 		{
-			RefreshPort();
+			//RefreshPort();
 
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_COMBOBOX_SELECTED, IDCPRESSUREADDR);
 			wxPostEvent(inst_, evt);

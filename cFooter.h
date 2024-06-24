@@ -1,18 +1,25 @@
 #pragma once
-#include <memory>
-#include <wx/wx.h>
-#include "enum.h"
+class cTable;
+class cConfig;
+class cMeasurementControler;
+class cCycleControler;
+class cMeasurementmanager;
+class cDeviceMonitor;
 
+#include <wx/wx.h>
+
+
+#include "cScaleBtn.h"
+
+/*
 #include <vector>
 #include <Windows.h>
-#include <string>
-
-#include "cCycleControler.h"
 
 #include "cPlot.h"
 #include "cConfig.h"
 #include "cTable.h"
 #include "cCycle.h"
+#include "cGnuplot.h"
 
 #include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
@@ -20,23 +27,24 @@
 #include "cDaqmx.h"
 #include "cPressure.h"
 #include "cUsb6001.h"
-#include "cScaleBtn.h"
 
 #include "data_types.h"
 #include "cMain.h"
 #include "cDeviceMonitor.h"
+
+#include "enum.h"
+*/
 /*
 class cPlot;
-class cConfig;
-class cTable;
-class cCycle;
-class cCycleControler;
-class cObjectmanager;
-class cMeasurementmanager;
-class wxScaleButton;
-*/
 
-class cCycleControler;
+
+class cCycle;
+
+class cObjectmanager;
+
+class wxScaleButton;
+
+*/
 
 class cFooter
 {
@@ -65,7 +73,7 @@ public:
 	cMeasurementmanager* meas_manager = nullptr;
 
 
-	cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config);
+	cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config, cDeviceMonitor* devmon);
 
 	wxBoxSizer* GetSizer();
 

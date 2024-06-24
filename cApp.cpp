@@ -1,5 +1,8 @@
 #include "cApp.h"
+
+#include <wx/wx.h>
 #include <wx/setup.h>
+
 
 wxIMPLEMENT_APP_CONSOLE(cApp);
 //wxIMPLEMENT_APP(cApp);

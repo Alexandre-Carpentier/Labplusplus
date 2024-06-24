@@ -3,25 +3,38 @@
 #include <wx/wx.h>
 #include <wx/treectrl.h>
 #include <wx/grid.h>
-
 #include <wx/bannerwindow.h>
-
 
 #include <list>
 #include <vector>
 #include <Windows.h>
 #include <process.h>
+
 #include "WinGraph.h"
 #include "cSignalTable.h"
 
-static HGRAPH hGraph;
+#include "cMeasurementmanager.h"
+#include "cSignalBtn.h"
 
+static HGRAPH hGraph;
+/*
 class cMeasurementControler;
 class cObjectmanager;
 class cMeasurementmanager;
+*/
+/*
 
-#include "cSignalBtn.h"
 #include "cMeasurement.h"
+
+
+#include "cDaqmx.h"
+#include "cUSB6001.h"
+#include "enum.h"
+
+#include "cMeasurementControler.h"
+#include "cObjectmanager.h"
+
+*/
 
 class cPlot
 {

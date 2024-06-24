@@ -1,26 +1,13 @@
 #ifndef _PRESSURE_H_
 #define _PRESSURE_H_
-
-#include <winsock2.h> 
 #include <wx/wx.h>
-#include <wx/combobox.h>
-#include <wx/treectrl.h>
-#include <string>
-#include <wx/fileconf.h>
 #include "data_types.h"
-
-#include "cTable.h"
+class cTable;
+class cMeasurementmanager;
+class cMeasurement;
+class cDeviceMonitor;
 
 static wxImage pace_img;
-
-class cMeasurementmanager;
-class cCycle;
-class cUsb6001;
-class cDaqsim;
-class cMeasurement;
-class cPlot;
-class cImagePanel;
-
 static wxPanel* pace_rightpanel_ = nullptr;
 
 class cPressure : public wxFrame
@@ -38,6 +25,7 @@ public:
 
 
 	wxWindow* inst_ = nullptr;
+	cDeviceMonitor* devmon_ = nullptr;
 	cTable* m_table_ = nullptr;
 	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
@@ -56,7 +44,7 @@ public:
 	const wxSize text_ctrl_size = wxSize(120, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
-	cPressure(wxWindow* inst);
+	cPressure(wxWindow* inst, cDeviceMonitor* devmon);
 	~cPressure();
 
 	void RefreshPort();

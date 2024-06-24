@@ -9,7 +9,7 @@
 #include "cProtocol.h"
 
 // A Com class is a protocol
-class cCom : public cProtocol {
+class cCom : public IProtocol {
 public:
 	cCom();
 	cCom(std::wstring addr);
@@ -25,9 +25,6 @@ private:
 	DCB dcbSerialParams;
 
 	std::string instrument_name;
-
-
-
 };
 
 #endif

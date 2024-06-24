@@ -1,14 +1,6 @@
 #include "cObjectmanager.h"
 
-#include <wx/wx.h>
-//#include "cSingleton.h"
-
-#include "cPlot.h"
-#include "cFooter.h"
-#include "cGraphrender.h"
-#include "cTable.h"
-#include "cConfig.h"
-#include "cMeasurementControler.h"
+class cRender;
 
 void cObjectmanager::set_status_bar(wxStatusBar* statusBar)
 {
@@ -28,6 +20,16 @@ void cObjectmanager::set_daqmx(cDaqmx* m_daq)
 void cObjectmanager::set_pressuredevice(cPressure* m_pressure)
 {
 	m_pressure_ = m_pressure;
+}
+
+void cObjectmanager::set_voltagedevice(cVoltage* m_voltage)
+{
+	m_voltage_ = m_voltage;
+}
+
+void cObjectmanager::set_oscopedevice(cOscope* m_oscope)
+{
+	m_oscope_ = m_oscope;
 }
 
 void cObjectmanager::set_table(cTable* m_table)
@@ -68,6 +70,16 @@ cDaqmx* cObjectmanager::get_daqmx()
 cPressure* cObjectmanager::get_pressuredevice()
 {
 	return m_pressure_;
+}
+
+cVoltage* cObjectmanager::get_voltagedevice()
+{
+	return m_voltage_;
+}
+
+cOscope* cObjectmanager::get_oscopedevice()
+{
+	return m_oscope_;
 }
 
 cTable* cObjectmanager::get_table()

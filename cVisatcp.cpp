@@ -1,4 +1,4 @@
-#include "cTcp.h"
+#include "cVisatcp.h"
 
 cTcp::cTcp()
 	:cVisa()

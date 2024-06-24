@@ -1,4 +1,27 @@
 #pragma once
+#if _WIN64
+#pragma comment (lib, "WinGraph64.lib")
+#else 
+#pragma comment (lib, "WinGraph32.lib")
+#endif
+#pragma comment (lib, "Advapi32.lib")
+#pragma comment (lib, "Gdi32.lib")
+#pragma comment (lib, "Winspool.lib")
+#pragma comment (lib, "Ole32.lib")
+#pragma comment (lib, "Comctl32.lib")
+#pragma comment (lib, "Comdlg32.lib")
+#pragma comment (lib, "Rpcrt4.lib")
+#pragma comment (lib, "Kernel32.lib")
+#pragma comment(lib, "SetupAPI.lib")
+#pragma comment(lib, "Winusb.lib")
+
+class cDeviceMonitor;
+
+#include"cObjectmanager.h"
+#include"cGraphrender.h"
+#include"cStatrender.h"
+#include"cInicfg.h"
+
 /*
 #ifdef _DEBUG
 #define _CRTDBG_MAP_ALLOC
@@ -8,56 +31,32 @@
 */
 //#include <vld.h>
 
-#include "resource.h"
-#include <wx/wx.h>
-#include <wx/treectrl.h>
-#include <wx/grid.h>
-#include <wx/dcbuffer.h>
-#include <vector>
-#include <memory>
-
+/*
 #include"cOpen.h"
 #include"cPlay.h"
 #include"cPlot.h"
-#include"cFooter.h"
-#include"cGraphrender.h"
+
+
 #include"cStatrender.h"
-#include"cTable.h"
+
 #include"cCycleControler.h"
-#include"cConfig.h"
-#include"cObjectmanager.h"
+
+
 #include"cInicfg.h"
 #include "LoadBitmapFromRessource.h"
 
-#include "cDeviceMonitor.h"
 
-#if _WIN64
-#pragma comment (lib, "WinGraph64.lib")
-#else 
-#pragma comment (lib, "WinGraph32.lib")
-#endif
-
-#pragma comment (lib, "Advapi32.lib")
-#pragma comment (lib, "Gdi32.lib")
-#pragma comment (lib, "Winspool.lib")
-#pragma comment (lib, "Ole32.lib")
-#pragma comment (lib, "Comctl32.lib")
-#pragma comment (lib, "Comdlg32.lib")
-#pragma comment (lib, "Rpcrt4.lib")
-
-#pragma comment (lib, "Kernel32.lib")
-
-/*
 class cOpen;
 class cPlay;
 class cPlot;
 class cFooter;
+class cObjectmanager;
 class cRender;
 class cTable;
 class cCycleControler;
 class cConfig;
-class cObjectmanager;
 class cInicfg;
+
 */
 class cMain :public wxFrame
 {
@@ -65,7 +64,7 @@ public:
 	enum { DISP_FREQ = 16 };						// ms to draw
 	enum { GRAPH_NBPOINTS = 10000 };				// pts
 
-	std::unique_ptr<cDeviceMonitor> devmon;
+	cDeviceMonitor* devmon;
 
 	wxStatusBar* statusBar = nullptr;
 	wxToolBar* toolbar = nullptr;
