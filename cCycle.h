@@ -1,3 +1,12 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        cCycle.h
+// Purpose:     cCycle class
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     GNU GPL
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <vector>
 #include <iostream>

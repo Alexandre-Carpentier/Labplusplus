@@ -1,5 +1,10 @@
 #include "cUsb.h"
+#if _WIN64
 extern "C" void initusb_asm();
+#else 
+
+#endif
+
 
 cUsb::cUsb()
 {
@@ -22,7 +27,9 @@ cUsb::cUsb(std::wstring addr)
 err_struct cUsb::init()
 {
 	std::cout << "[*] cUsb init() called\n";
+#if _WIN64
 	initusb_asm();
+#endif
 
 	if (device_name_.compare(L"magic") == 0)
 	{
