@@ -104,10 +104,6 @@ void cOscopeusb::acquire()
         assert(readpoint > -400);
         assert(readpoint < 400);
 
-        //device->write(L"*OPC?"); // Wait until completion
-        //device->read(msg);
-
-
         Sleep(2000);
     }
 }
@@ -123,7 +119,7 @@ DATAS cOscopeusb::read()
 void cOscopeusb::set(double* value, size_t length)
 {
     assert(length > 0);
-    assert(value[0] > -1.0);
+    assert(value[0] > -20.0);
     assert(value[0] < 20.0);
     setpoint = value[0];
 }
@@ -140,7 +136,6 @@ void cOscopeusb::set_device_name(std::string name)
 
 void cOscopeusb::stop_device() {
     std::cout << "cOscopeusb->stoping...\n"; acquireloop.request_stop();
-
     Sleep(500);
     device->write(L"LOC\r\n"); // Set to value
     device->close();
