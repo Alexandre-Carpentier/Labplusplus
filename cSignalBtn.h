@@ -12,6 +12,7 @@ class wxCustomButton : public wxWindow
 {
     wxBoxSizer* h_sizer0=nullptr;
     wxBoxSizer* h_sizer1 = nullptr;
+    wxBoxSizer* h_sizer2 = nullptr;
     wxBoxSizer* h_sizer3 = nullptr;
     wxBoxSizer* h_sizer4 = nullptr;
 
