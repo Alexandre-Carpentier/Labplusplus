@@ -269,7 +269,7 @@ void cVoltage::OnVoltageEnableBtn(wxCommandEvent& evt)
 			sigt->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR))
+			if (!sigt->slot_register_range(2, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR)) // 2 slot, I+V
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -409,6 +409,10 @@ void cVoltage::EnableVoltageChannel(bool isDisplayed)
 
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
+		if (!sigt->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 1))
+		{
+			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
+		}
 		if (!sigt->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
@@ -433,7 +437,11 @@ void cVoltage::EnableVoltageChannel(bool isDisplayed)
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "2280S", instr_name, "Volt", wxColor(45, 30, 30)))
+		if (!sigt->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "2280S_A", instr_name, "Amp", wxColor(25, 200, 130)))
+		{
+			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
+		}
+		if (!sigt->sig_add(1, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "2280S_V", instr_name, "V", wxColor(200, 27, 27)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
 		}

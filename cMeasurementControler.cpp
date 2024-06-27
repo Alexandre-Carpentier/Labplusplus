@@ -348,7 +348,7 @@ void cMeasurementControler::poll()
 		}
 	}
 	// TODO:
-	// doesn't called 
+	// it doesn't called 
 	if (meas_pool.size() > 0)
 	{
 		zero_instrument(meas_pool);

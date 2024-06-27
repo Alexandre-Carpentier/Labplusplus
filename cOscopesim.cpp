@@ -28,7 +28,7 @@ size_t cOscopesim::chan_read_count()
 
 size_t cOscopesim::chan_write_count()
 {
-    size_t nb_sig = 1;
+    size_t nb_sig = 0;
     return nb_sig;
 }
 

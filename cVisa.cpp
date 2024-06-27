@@ -326,7 +326,7 @@ err_struct cVisa::read(std::wstring& scpi)
 	}
 
 	// Display viRead success
-	std::wcout << last_error.err_msg;
+	//std::wcout << last_error.err_msg;
 	
 	// Display buffer received
 	//std::wcout << "[******************BUFFER*******************]\n[";
