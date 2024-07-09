@@ -10,10 +10,10 @@ class IProtocol
 {
 public:
 	// Abstract interface
-	virtual err_struct init() = 0;
-	virtual err_struct write(std::wstring scpi) = 0;
-	virtual err_struct read(std::wstring& scpi) = 0;
-	virtual err_struct close() = 0;
+	virtual err_struct init() const noexcept = 0;
+	virtual err_struct write(std::wstring scpi) const noexcept = 0;
+	virtual err_struct read(std::wstring& scpi) const noexcept = 0;
+	virtual err_struct close() const noexcept = 0;
 
 	// Be sure to make derived class destructor callable
 	virtual ~IProtocol() {};
