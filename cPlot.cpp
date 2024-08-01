@@ -530,7 +530,7 @@ void cPlot::set_signal_name(std::string signame, int position)
 	SetSignalLabel(hGraph, signame.c_str(), position);
 }
 
-void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber)
+void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header)
 {
 	if (GetGraphState(hGraph) == FALSE)
 	{
@@ -544,7 +544,11 @@ void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber)
 		}
 
 		SetRecordingMode(hGraph, ReccordingType);
-		StartGraph(hGraph);
+		
+		if(opt_header.size()>0)
+			StartGraph(hGraph, opt_header.c_str());
+		else
+			StartGraph(hGraph, nullptr);
 	}
 }
 

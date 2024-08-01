@@ -1,4 +1,11 @@
 #include "WinGraph.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <float.h>
+
 #include "xlsx.h"
 #include "Mouse.h"
 #include "math.h"
@@ -158,7 +165,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call,
 	StartGraph: Setup a new log file and zero memory
   -------------------------------------------------------------------------*/
 
-BOOL StartGraph(HGRAPH hGraph)
+BOOL StartGraph(HGRAPH hGraph, CONST CHAR* opt_header)
 {
 	// Sanity check
 
@@ -241,6 +248,15 @@ BOOL StartGraph(HGRAPH hGraph)
 
 			// make logfile header
 
+			if (opt_header != nullptr)
+			{
+				if (strlen(opt_header) > 0)
+				{
+					fprintf(logfile, opt_header);
+					fprintf_s(logfile, "\n");
+				}
+			}
+
 			fprintf(logfile, "Time(s)");
 			for (int u = 0; u < pgraph->signalcount; u++)
 			{
@@ -248,6 +264,7 @@ BOOL StartGraph(HGRAPH hGraph)
 				fprintf_s(logfile, "\t%s", pDATA->signame);
 			}
 			fprintf_s(logfile, "\n");
+
 		}
 
 		if (pgraph->Logging == LOGGER_XLSX)

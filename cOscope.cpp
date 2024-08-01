@@ -4,6 +4,7 @@
 #include <wx/treectrl.h>
 #include <string>
 #include <wx/fileconf.h>
+#include <format>
 
 #include "enum.h"
 #include "cMeasurementmanager.h"
@@ -13,98 +14,160 @@
 #include "cOscopesim.h"
 #include "cOscopeusb.h"
 
+struct cOscope::Oscopeimpl {
+
+	Oscopeimpl(wxWindow* parent, cDeviceMonitor* devmon, std::string instrument_name)
+	{
+		Parent_ = parent;
+		devmon_ = devmon;
+		instrument_name_ = instrument_name;
+		configfile = instrument_name + ".ini";
+
+		////////////////////////////////////////////////////////////
+		// Load default labels in memory
+		////////////////////////////////////////////////////////////
+		label.device_enabled = false;
+		label.device_name.push_back("Simulated");
+		label.channel_permision.push_back(CHANWRITE);
+		label.channel_index = 0;
+
+		////////////////////////////////////////////////////////////
+		// Load default configuration in memory
+		////////////////////////////////////////////////////////////
+		config.device_enabled = false;
+		config.device_name = wxT("Simulated");
+
+		////////////////////////////////////////////////////////////
+		wxBitmap bmp = wxBitmap("DCOSCOPE", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
+		oscope_instrument_img = bmp.ConvertToImage();								// Convert bmp to image to scale purpose
+
+		oscope_instrument_rightpanel_ = new wxPanel(parent, IDC_OSCOPERIGHT_PAN, wxDefaultPosition, parent->FromDIP(wxSize(600, 600)));
+		oscope_instrument_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165));		// Make inside group box dark grey
+		oscope_instrument_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cOscope::OnPaint));
+
+		////////////////////////////////////////////////////////////
+
+		wxStaticText* dummy = new wxStaticText(oscope_instrument_rightpanel_, wxID_ANY, "", wxDefaultPosition, parent->FromDIP(wxSize(0, 400)));
+
+		////////////////////////////////////////////////////////////
+
+		wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 20);
+
+		////////////////////////////////////////////////////////////
+
+		wxStaticBox* device_group = new wxStaticBox(oscope_instrument_rightpanel_, wxID_ANY, "Oscope controler", wxDefaultPosition, parent->FromDIP(wxDefaultSize));
+		device_group_sizer = new wxStaticBoxSizer(device_group, wxVERTICAL);
+
+		////////////////////////////////////////////////////////////
+		wxStaticText* enableoscope = new wxStaticText(device_group, IDCSTATICENABLEDAQ, L"DC DSOX1202G:", wxDefaultPosition, parent->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+		enableoscope->SetFont(enableoscope->GetFont().Scale(text_size));
+		enableoscope->SetBackgroundColour(*bgcolor);
+		enableoscope->Hide(); // Just use enabledaq to fill the flex sizer -> hide it after creating
+
+		////////////////////////////////////////////////////////////
+
+		oscope_controler_activate = new wxButton(device_group, IDCOSCOPEACTIVATE, L"OFF", wxDefaultPosition, parent->FromDIP(wxSize(50, 25)), wxSUNKEN_BORDER);
+		parent->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cOscope::Oscopeimpl::OnOscopeEnableBtn, this, IDCOSCOPEACTIVATE);
+		oscope_controler_activate->SetFont(oscope_controler_activate->GetFont().Scale(text_size));
+		oscope_controler_activate->SetBackgroundColour(wxColor(250, 120, 120));
+
+		////////////////////////////////////////////////////////////
+
+		wxStaticText* staticaddr = new wxStaticText(device_group, IDCSTATICADDR, L"Device list:", wxDefaultPosition, parent->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+		staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
+
+		////////////////////////////////////////////////////////////
+
+		addr_ctrl = new wxComboBox(device_group, IDCOSCOPEADDR, label.device_name[0], wxDefaultPosition, parent->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+		parent->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cOscope::Oscopeimpl::OnOscopeAddrSelBtn, this, IDCOSCOPEADDR);
+		addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
+		RefreshPort();
+		addr_ctrl->Disable();
+
+		flexsizer->Add(enableoscope);
+		flexsizer->Add(oscope_controler_activate);
+		flexsizer->Add(staticaddr);
+		flexsizer->Add(addr_ctrl);
+		device_group_sizer->Add(flexsizer);
+
+		wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
+		v_sizer->Add(dummy); // Space for daq img
+		v_sizer->Add(device_group_sizer, 0, wxALIGN_CENTER, parent->FromDIP(10));
+		oscope_instrument_rightpanel_->SetSizerAndFit(v_sizer);
+	};
+
+	~Oscopeimpl()
+	{
+		// not called...
+		//save_table_values();
+	}
+
+	wxWindow* Parent_ = nullptr; // ref to parent object
+	//wxWindow* inst_;
+	cMeasurement* m_oscope_ = nullptr;
+	
+	// Save table config
+	// C:\Users\The Hive\AppData\Roaming
+	std::string instrument_name_;
+	std::string configfile = "";
+	wxFileConfig* cfg = nullptr;
+
+	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
+	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
+	// Signal color map
+	float COLORS[3] =
+	{
+		0.1f, 0.0f, 0.8f
+	};
+
+	cDeviceMonitor* devmon_ = nullptr;
+	cTable* m_table_ = nullptr;
+	wxStaticBoxSizer* device_group_sizer;
+	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
+
+	bool enable_pan = false;
+	wxButton* oscope_controler_activate;
+
+	wxComboBox* addr_ctrl = nullptr;
+
+	// Style
+	const float text_size = 1;
+	const int STATIC_CTRL_STYLE = wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL;
+	const wxSize static_ctrl_size = wxSize(120, 20);
+	const int TEXT_CTRL_STYLE = wxSUNKEN_BORDER;
+	const wxSize text_ctrl_size = wxSize(120, 24);
+	wxColor* bgcolor = new wxColor(245, 245, 248);
+
+	void OnOscopeAddrSelBtn(wxCommandEvent& evt);
+	void OnOscopeEnableBtn(wxCommandEvent& evt);
+	void DestroySubsystem();
+	void EnableOscopeChannel(bool isDisplayed);
+	void RefreshPort();
+	void UpdateChannelTable(bool isDisplayed);
+	void load_table_values(void);
+	void save_table_values(void);
+	void load_current_device_config(int channel_index);
+	void load_combobox(wxComboBox* combo, wxString str);
+	void load_combobox(wxComboBox* combo, double floating);
+};
+
 cOscope::cOscope(wxWindow* inst, cDeviceMonitor* devmon)
 {
-	std::cout << "cOscope ctor...\n";
-	inst_ = inst;
-	devmon_ = devmon;
-
-	////////////////////////////////////////////////////////////
-	// Load default labels in memory
-	////////////////////////////////////////////////////////////
-	label.device_enabled = false;
-	label.device_name.push_back("Simulated");
-	label.channel_permision.push_back(CHANWRITE);
-
-	////////////////////////////////////////////////////////////
-	// Load default configuration in memory
-	////////////////////////////////////////////////////////////
-	config.device_enabled = false;
-	config.device_name = wxT("Simulated");
-
-	////////////////////////////////////////////////////////////
-
-	//::wxInitAllImageHandlers();
-	wxBitmap bmp = wxBitmap("DCOSCOPE", wxBITMAP_TYPE_PNG_RESOURCE);			// Load bmp from ressources
-	oscope_instrument_img = bmp.ConvertToImage();								// Convert bmp to image to scale purpose
-
-	oscope_instrument_rightpanel_ = new wxPanel(inst, IDC_OSCOPERIGHT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
-	oscope_instrument_rightpanel_->SetBackgroundColour(wxColor(165, 165, 165));		// Make inside group box dark grey
-	oscope_instrument_rightpanel_->Connect(wxEVT_PAINT, wxPaintEventHandler(cOscope::OnPaint));
-
-	////////////////////////////////////////////////////////////
-
-	wxStaticText* dummy = new wxStaticText(oscope_instrument_rightpanel_, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(wxSize(0, 400)));
-
-	////////////////////////////////////////////////////////////
-
-	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 20);
-
-	////////////////////////////////////////////////////////////
-
-	wxStaticBox* device_group = new wxStaticBox(oscope_instrument_rightpanel_, wxID_ANY, "Oscope controler", wxDefaultPosition, inst->FromDIP(wxDefaultSize));
-	device_group_sizer = new wxStaticBoxSizer(device_group, wxVERTICAL);
-
-	////////////////////////////////////////////////////////////
-	wxStaticText* enableoscope = new wxStaticText(device_group, IDCSTATICENABLEDAQ, L"DC DSOX1202G:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
-	enableoscope->SetFont(enableoscope->GetFont().Scale(text_size));
-	enableoscope->SetBackgroundColour(*bgcolor);
-	enableoscope->Hide(); // Just use enabledaq to fill the flex sizer -> hide it after creating
-
-	////////////////////////////////////////////////////////////
-
-	oscope_controler_activate = new wxButton(device_group, IDCOSCOPEACTIVATE, L"OFF", wxDefaultPosition, inst->FromDIP(wxSize(50, 25)), wxSUNKEN_BORDER);
-	inst_->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cOscope::OnOscopeEnableBtn, this, IDCOSCOPEACTIVATE);
-	oscope_controler_activate->SetFont(oscope_controler_activate->GetFont().Scale(text_size));
-	oscope_controler_activate->SetBackgroundColour(wxColor(250, 120, 120));
-
-	////////////////////////////////////////////////////////////
-
-	wxStaticText* staticaddr = new wxStaticText(device_group, IDCSTATICADDR, L"Device list:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
-	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
-	//staticaddr->SetBackgroundColour(*bgcolor);
-
-	////////////////////////////////////////////////////////////
-
-	addr_ctrl = new wxComboBox(device_group, IDCOSCOPEADDR, label.device_name[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
-	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cOscope::OnOscopeAddrSelBtn, this, IDCOSCOPEADDR);
-	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
-	RefreshPort();
-	addr_ctrl->Disable();
-
-	flexsizer->Add(enableoscope);
-	flexsizer->Add(oscope_controler_activate);
-	flexsizer->Add(staticaddr);
-	flexsizer->Add(addr_ctrl);
-	device_group_sizer->Add(flexsizer);
-
-	wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
-	v_sizer->Add(dummy); // Space for daq img
-	v_sizer->Add(device_group_sizer, 0, wxALIGN_CENTER, inst->FromDIP(10));
-	oscope_instrument_rightpanel_->SetSizerAndFit(v_sizer);
-
-	//wxCommandEvent evt0 = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDcOscopeACTIVATE);
-	//wxPostEvent(inst_, evt0);
+	std::cout << "[*] cOscope ctor...\n";
+	pimpl = std::make_unique<Oscopeimpl>(inst, devmon, "DSOX1202G");
+	std::cout << "[*] Oscopeimpl created...\n";
 }
 
 cOscope::~cOscope()
 {
-	// Free memory on heap
+	std::cout << "[*] cOscope dtor...\n";
+
 	cMeasurementmanager* meas_manager = meas_manager->getInstance();
 	meas_manager->destroy_subsystem(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
+	pimpl->save_table_values();
 }
 
-void cOscope::RefreshPort()
+void cOscope::Oscopeimpl::RefreshPort()
 {
 	std::wcout << L"[*] Refresh port called\n";
 
@@ -114,11 +177,7 @@ void cOscope::RefreshPort()
 
 	for (auto& dev : dev_list)
 	{
-		//std::wstring wname = dev.get_name();
-		//if (wname.compare(L"Unknown") != 0)
-		//{
 		addr_ctrl->Append(dev.get_addr());
-		//}
 	}
 	addr_ctrl->Append("Simulated");
 	addr_ctrl->SetSelection(0);
@@ -132,25 +191,28 @@ void cOscope::save_current_device_config(int channel_index)
 	std::cout << "[*] Saving device GUI field in memory at channel " << channel_index << ".\n";
 
 	// Device enable
-	config.device_enabled = false;
-	if (oscope_controler_activate->GetLabelText().compare("ON") == 0)
+	pimpl->config.device_enabled = false;
+	if (pimpl->oscope_controler_activate->GetLabelText().compare("ON") == 0)
 	{
-		config.device_enabled = true;
+		pimpl->config.device_enabled = true;
 	}
 
 	// Device name
-	//int iSelection = addr_ctrl->GetCurrentSelection();
-	//config.device_name = label.device_name[iSelection];
-	config.device_name = "DSOX1202G";
-	config.device_addr = addr_ctrl->GetValue();
+	pimpl->config.device_name = "DSOX1202G";
+	pimpl->config.device_addr = pimpl->addr_ctrl->GetValue();
 
 	return;
 }
 
+void cOscope::lockBtn(bool lock) 
+{ 
+	pimpl->device_group_sizer->GetStaticBox()->Enable(lock);
+};
+
 // Reccord device info selected in GUI field 
 // and save it to an CURRENT_DEVICE_STRUCT witch hold the datas
 // happen each time previous or next is pressed
-void cOscope::load_current_device_config(int channel_index)
+void cOscope::Oscopeimpl::load_current_device_config(int channel_index)
 {
 	std::cout << "[*] Loading device configuration from memory in GUI at channel " << channel_index << ".\n";
 
@@ -168,7 +230,7 @@ void cOscope::load_current_device_config(int channel_index)
 	return;
 }
 
-void cOscope::load_combobox(wxComboBox* combo, wxString str)
+void cOscope::Oscopeimpl::load_combobox(wxComboBox* combo, wxString str)
 {
 	wxString wxStr = str;
 	int iTotalItem = combo->GetCount();
@@ -181,7 +243,7 @@ void cOscope::load_combobox(wxComboBox* combo, wxString str)
 	}
 }
 
-void cOscope::load_combobox(wxComboBox* combo, double floating)
+void cOscope::Oscopeimpl::load_combobox(wxComboBox* combo, double floating)
 {
 	wxString wxFloating = wxString::Format(wxT("%lf"), floating);
 	int iTotalItem = combo->GetCount();
@@ -194,7 +256,7 @@ void cOscope::load_combobox(wxComboBox* combo, double floating)
 	}
 }
 
-void cOscope::DestroySubsystem()
+void cOscope::Oscopeimpl::DestroySubsystem()
 {
 	// Destroy and release previous ressource
 
@@ -215,13 +277,21 @@ void cOscope::DestroySubsystem()
 void cOscope::set_table(cTable* m_table)
 {
 	assert(m_table != nullptr);
-	m_table_ = m_table; // Save cTable to add or remove colomn afterward
+	pimpl->m_table_ = m_table; // Save cTable to add or remove colomn afterward
+
+	////////////////////////////////////////////////////////////
+	// Load string in cTable at startup
+	////////////////////////////////////////////////////////////
+	pimpl->load_table_values();
 }
 
-void cOscope::UpdateChannelTable(bool isDisplayed)
+void cOscope::Oscopeimpl::UpdateChannelTable(bool isDisplayed)
 {
 	assert(m_table_ != nullptr);
 	assert(label.channel_permision.size() > 0);
+	assert(label.channel_index >= 0);
+	assert(label.channel_index < 64);
+
 	if (m_table_)
 	{
 		// ex: DSOX_0(Volt)
@@ -242,31 +312,81 @@ void cOscope::UpdateChannelTable(bool isDisplayed)
 	}
 }
 
-void cOscope::OnOscopeEnableBtn(wxCommandEvent& evt)
+void cOscope::Oscopeimpl::load_table_values(void)
+{
+	std::cout << "[*] cInicfg::read_table start...\n";
+
+	// Save in : // C:\Users\The Hive\AppData\Roaming
+
+	wxString str;
+
+	// Scan until the MAX_TABLE_LINE !
+	const int MAX_TABLE_LINE = 200;
+
+	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
+	cfg->SetPath(wxT("TABLE"));
+
+	for (int line = 0; line < MAX_TABLE_LINE; line++)
+	{
+		int col_count = m_table_->grid->GetNumberCols();
+		for (int col = 0; col < col_count; col++)
+		{
+			std::string col_name = m_table_->grid->GetColLabelValue(col).ToStdString();
+			if (col_name.find(instrument_name_) != std::string::npos)
+			{
+				std::string col_name_position = std::format("{}_{}", col_name, line);
+				if (cfg->Read(col_name_position, &str)) { m_table_->grid->SetCellValue(line, col, str); }
+			}
+		}
+	}
+	delete cfg;
+}
+
+void cOscope::Oscopeimpl::save_table_values(void)
+{
+	std::cout << "[*] cInicfg:save_table start...\n";
+	int row_count = m_table_->get_last_active_line();
+
+	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
+	cfg->SetPath(wxT("TABLE"));
+
+	wxString str;
+	for (int line = 0; line < row_count; line++)
+	{
+		int col_count = m_table_->grid->GetNumberCols();
+		for (int col = 0; col < col_count; col++)
+		{
+			std::string col_name = m_table_->grid->GetColLabelValue(col).ToStdString();
+			size_t exist = col_name.find(instrument_name_);
+			if (exist != std::string::npos)
+			{
+				std::string value = m_table_->grid->GetCellValue(line, col).ToStdString();
+				if (value.size() > 0)
+				{
+					std::string col_name_position = std::format("{}_{}", col_name, line);
+					cfg->Write(col_name_position, std::stof(value));
+				}
+			}
+		}
+	}
+	delete cfg;
+}
+
+void cOscope::Oscopeimpl::OnOscopeEnableBtn(wxCommandEvent& evt)
 {
 	// Enable/disable controls
 	enable_pan = !enable_pan;
 	if (oscope_controler_activate)
 	{
-		/*
-		//If cPlot legend active remove it
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		size_t element_nb = m_plot->get_chan_number_to_gui();
-		*/
-
 		UpdateChannelTable(enable_pan);
-
 		if (enable_pan)
 		{
 			RefreshPort();
 
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_COMBOBOX_SELECTED, IDCOSCOPEADDR);
-			wxPostEvent(inst_, evt);
+			wxPostEvent(Parent_, evt);
 
 			// Add a channel for oscope at the end
-			//m_plot->resize_chan_number_to_gui(element_nb+1);
 
 			cSignalTable* sigt = sigt->getInstance();
 
@@ -279,19 +399,16 @@ void cOscope::OnOscopeEnableBtn(wxCommandEvent& evt)
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
 
-			this->oscope_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
-			this->oscope_controler_activate->SetLabel("ON");
+			oscope_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
+			oscope_controler_activate->SetLabel("ON");
 
 			addr_ctrl->Enable(true);
 			EnableOscopeChannel(true);
 		}
 		else
 		{
-
-			//m_plot->resize_chan_number_to_gui(element_nb - 1);
-
-			this->oscope_controler_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
-			this->oscope_controler_activate->SetLabel("OFF");
+			oscope_controler_activate->SetBackgroundColour(wxColor(250, 120, 120)); // RED
+			oscope_controler_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
 
@@ -301,7 +418,7 @@ void cOscope::OnOscopeEnableBtn(wxCommandEvent& evt)
 	evt.Skip();
 }
 
-void cOscope::OnOscopeAddrSelBtn(wxCommandEvent& evt)
+void cOscope::Oscopeimpl::OnOscopeAddrSelBtn(wxCommandEvent& evt)
 {
 	// Destroy and release previous ressource
 
@@ -312,7 +429,7 @@ void cOscope::OnOscopeAddrSelBtn(wxCommandEvent& evt)
 	cMeasurementmanager* meas_manager = meas_manager->getInstance();
 
 	// Read the new sub system name selected
-	wxString current_device = this->addr_ctrl->GetValue();
+	wxString current_device = addr_ctrl->GetValue();
 	std::string current = current_device.ToStdString();
 	constexpr size_t bufferSize = 1000;
 	char buffer[bufferSize] = {};
@@ -396,20 +513,12 @@ void cOscope::OnPaint(wxPaintEvent& event)
 	event.Skip();
 }
 
-void cOscope::EnableOscopeChannel(bool isDisplayed)
+void cOscope::Oscopeimpl::EnableOscopeChannel(bool isDisplayed)
 {
 	if (!isDisplayed)
 	{
-		/*
-		//If cPlot legend active remove it
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		m_plot->remove_chan_to_gui(m_plot->gui_get_last_active_channel_number()); // BUG // remove last
-		*/
 
 		// Kill instance
-
 		DestroySubsystem();
 
 		std::cout << "cSignalTable->getInstance()\n";
@@ -427,14 +536,6 @@ void cOscope::EnableOscopeChannel(bool isDisplayed)
 	}
 	else
 	{
-		/*
-		//Update cPlot gui with the chan name and color
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		m_plot->add_chan_to_gui("Pace 6000 simulated", "Simulated", "Bar", wxColor(45, 30, 30), m_plot->gui_get_last_active_channel_number()); // add last
-		*/
-
 		std::cout << "cSignalTable->getInstance()\n";
 		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
@@ -451,7 +552,6 @@ void cOscope::EnableOscopeChannel(bool isDisplayed)
 	}
 }
 
-
 wxPanel* cOscope::get_right_panel()
 {
 	return oscope_instrument_rightpanel_;
@@ -459,9 +559,17 @@ wxPanel* cOscope::get_right_panel()
 
 CURRENT_DEVICE_CONFIG_STRUCT cOscope::GetOscopeConfigStruct()
 {
-	return config;
+	return pimpl->config;
 }
 
+size_t cOscope::launch_device()
+{
+	if (pimpl->m_oscope_ == nullptr)
+	{
+		return -1;
+	}
+	return pimpl->m_oscope_->launch_device(pimpl->config);
+}
 
 
 

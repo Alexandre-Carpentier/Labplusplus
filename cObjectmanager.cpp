@@ -27,7 +27,7 @@ void cObjectmanager::set_voltagedevice(cVoltage* m_voltage)
 	m_voltage_ = m_voltage;
 }
 
-void cObjectmanager::set_oscopedevice(cOscope* m_oscope)
+void cObjectmanager::set_oscope_gui(cOscope* m_oscope)
 {
 	m_oscope_ = m_oscope;
 }
@@ -77,7 +77,7 @@ cVoltage* cObjectmanager::get_voltagedevice()
 	return m_voltage_;
 }
 
-cOscope* cObjectmanager::get_oscopedevice()
+cOscope* cObjectmanager::get_oscope_gui()
 {
 	return m_oscope_;
 }

@@ -8,6 +8,7 @@
 #include "cMain.h"
 #include "cGnuplot.h"
 #include "cDeviceMonitor.h"
+#include "cDeviceIDSaver.h"
 
 cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config, cDeviceMonitor* devmon)
 {
@@ -201,21 +202,23 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		// Launch Oscope System
 		//
 		//
-		cOscope* oscopeconfig = obj_manager->get_oscopedevice();
-		if (oscopeconfig->m_oscope_ != nullptr)
+		cOscope* oscope_gui = obj_manager->get_oscope_gui();
+		if (oscope_gui == nullptr)
 		{
-			oscopeconfig->save_current_device_config(0);
-			CURRENT_DEVICE_CONFIG_STRUCT config = oscopeconfig->GetOscopeConfigStruct();
-
-			if (oscopeconfig->m_oscope_->launch_device(config) < 0)
-			{
-				evt.Skip();
-				return;
-			}
-
-			// Lock oscope controler interface
-			oscopeconfig->device_group_sizer->GetStaticBox()->Enable(false);
+			std::cout << "[!] obj_manager->get_oscopedevice() return nullptr. Exiting.\n";
+			evt.Skip();
+			return;
 		}
+		oscope_gui->save_current_device_config(0);
+		if (oscope_gui->launch_device() < 0)
+		{
+			std::cout << "[!] oscope_gui->launch_device() return < 0. Exiting.\n";
+			evt.Skip();
+			return;
+		}
+		oscope_gui->lockBtn(false);
+		std::cout << "[*] OSCOPE	[RUNNING]\n";
+
 
 		/////////////////////////////////////////////////////////
 		int iRec = this->combo2->GetCurrentSelection();
@@ -264,10 +267,19 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		std::cout << "Launching Measurement controler\n";
 		meas_controler = make_shared<cMeasurementControler>(cycle_controler);
 		meas_manager->set_measurement_controler(meas_controler);
-		meas_controler->start();
-
+		
 		size_t sizesig = meas_manager->get_measurement_total_channel_number();
-		m_plot_->start_graph(Rec, sizesig);
+		std::string head;
+		cDeviceIDSaver cDeviceIDSaverDlg(sizesig, this->inst_, IDCDEVICEIDSAVERDLG, "Reccord your instrument ID?");
+		cDeviceIDSaverDlg.Centre();
+		int ret = cDeviceIDSaverDlg.ShowModal();
+		if (ret == wxID_OK)
+		{
+			head = cDeviceIDSaverDlg.get_header();
+		}
+
+		meas_controler->start();
+		m_plot_->start_graph(Rec, sizesig, head);
 
 		startbtn->SetBackgroundColour(wxColor(250, 80, 90));
 		startbtn->SetLabelText(L"Stop");		
@@ -287,10 +299,9 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
 		cVoltage* voltageconfig = obj_manager->get_voltagedevice();
-		cOscope* oscopeconfig = obj_manager->get_oscopedevice();
+		cOscope* oscope_gui = obj_manager->get_oscope_gui();
 
-
-		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) && (voltageconfig == nullptr) && (oscopeconfig == nullptr))
+		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) && (voltageconfig == nullptr) && (oscope_gui == nullptr))
 		{
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_SETTINGS);
 			wxPostEvent(inst_, evt);
@@ -315,7 +326,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			// Unlock pressure controler interface
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(true);
 			voltageconfig->device_group_sizer->GetStaticBox()->Enable(true);
-			oscopeconfig->device_group_sizer->GetStaticBox()->Enable(true);
+			//oscopeconfig->device_group_sizer->GetStaticBox()->Enable(true);
+			oscope_gui->lockBtn(true);
 		}
 
 		meas_manager->stop_all_devices();

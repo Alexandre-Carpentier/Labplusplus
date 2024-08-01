@@ -37,7 +37,7 @@ public:
 	void set_daqmx(cDaqmx* m_daq);
 	void set_pressuredevice(cPressure* m_pressure);
 	void set_voltagedevice(cVoltage* m_voltage);
-	void set_oscopedevice(cOscope* m_oscope);
+	void set_oscope_gui(cOscope* m_oscope);
 	void set_table(cTable* m_table);
 	void set_plot(cPlot* m_plot);
 	void set_render(cRender* m_render);
@@ -48,7 +48,7 @@ public:
 	cDaqmx* get_daqmx();
 	cPressure* get_pressuredevice();
 	cVoltage* get_voltagedevice();
-	cOscope* get_oscopedevice();
+	cOscope* get_oscope_gui();
 	cTable* get_table();
 	cPlot* get_plot();
 	cRender* get_render();

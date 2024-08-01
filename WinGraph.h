@@ -2,11 +2,6 @@
 #define _GRAPH_H_
 
 #include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <float.h>
 
 enum FILTER_M {
 	FILTER_NONE = 100,
@@ -27,7 +22,7 @@ typedef VOID* HGRAPH;
 #ifdef __cplusplus
 extern "C" {
 #endif
-	__declspec(dllexport)BOOL StartGraph(HGRAPH hGraph);
+	__declspec(dllexport)BOOL StartGraph(HGRAPH hGraph, CONST CHAR* opt_header);
 	__declspec(dllexport)VOID StopGraph(HGRAPH hGraph);
 	__declspec(dllexport)VOID FreeGraph(HGRAPH* hGraph);
 	__declspec(dllexport)HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize);

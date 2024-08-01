@@ -93,6 +93,9 @@
     <Filter Include="Fichiers sources\Measurement\Protocol\NATIVERS232">
       <UniqueIdentifier>{eacb1972-3055-4e50-8dd1-d9a737c18872}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\generic">
+      <UniqueIdentifier>{9fc174c9-a1d5-444d-871b-d44be4a55dd0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp">
@@ -256,6 +259,15 @@
     </ClCompile>
     <ClCompile Include="cSingletonSafe.cpp">
       <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="IInstrument.cpp">
+      <Filter>Fichiers sources\MainWindow\config\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="Instrumentimpl.cpp">
+      <Filter>Fichiers sources\MainWindow\config\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="cDeviceIDSaver.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -430,6 +442,15 @@
     </ClInclude>
     <ClInclude Include="cSingletonSafe.h">
       <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="IInstrument.h">
+      <Filter>Fichiers sources\MainWindow\config\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="instrumentimpl.h">
+      <Filter>Fichiers sources\MainWindow\config\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="cDeviceIDSaver.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
