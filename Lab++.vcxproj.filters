@@ -463,4 +463,7 @@
       <Filter>Fichiers sources\Measurement\Protocol\NATIVEUSB</Filter>
     </MASM>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
 </Project>
