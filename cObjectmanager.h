@@ -8,6 +8,7 @@ class cRender;
 #include "cTable.h"
 #include "cDaqmx.h"
 #include "cVoltage.h"
+#include "cVoltageRs.h"
 #include "cPressure.h"
 #include "cOscope.h"
 #include "cConfig.h"
@@ -25,6 +26,7 @@ private:
 	cDaqmx* m_daq_ = nullptr;
 	cPressure* m_pressure_ = nullptr;
 	cVoltage* m_voltage_ = nullptr;
+	cVoltageRs* m_voltagers_ = nullptr;
 	cOscope* m_oscope_ = nullptr;
 	cTable* m_table_ = nullptr;
 	cPlot* m_plot_ = nullptr;
@@ -37,6 +39,7 @@ public:
 	void set_daqmx(cDaqmx* m_daq);
 	void set_pressuredevice(cPressure* m_pressure);
 	void set_voltagedevice(cVoltage* m_voltage);
+	void set_voltagersdevice(cVoltageRs* m_voltagers);
 	void set_oscopedevice(cOscope* m_oscope);
 	void set_table(cTable* m_table);
 	void set_plot(cPlot* m_plot);
@@ -48,6 +51,7 @@ public:
 	cDaqmx* get_daqmx();
 	cPressure* get_pressuredevice();
 	cVoltage* get_voltagedevice();
+	cVoltageRs* get_voltagersdevice();
 	cOscope* get_oscopedevice();
 	cTable* get_table();
 	cPlot* get_plot();

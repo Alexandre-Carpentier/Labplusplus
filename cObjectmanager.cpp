@@ -27,6 +27,11 @@ void cObjectmanager::set_voltagedevice(cVoltage* m_voltage)
 	m_voltage_ = m_voltage;
 }
 
+void cObjectmanager::set_voltagersdevice(cVoltageRs* m_voltagers)
+{
+	m_voltagers_ = m_voltagers;
+}
+
 void cObjectmanager::set_oscopedevice(cOscope* m_oscope)
 {
 	m_oscope_ = m_oscope;
@@ -75,6 +80,11 @@ cPressure* cObjectmanager::get_pressuredevice()
 cVoltage* cObjectmanager::get_voltagedevice()
 {
 	return m_voltage_;
+}
+
+cVoltageRs* cObjectmanager::get_voltagersdevice()
+{
+	return m_voltagers_;
 }
 
 cOscope* cObjectmanager::get_oscopedevice()

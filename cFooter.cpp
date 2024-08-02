@@ -198,6 +198,25 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			voltageconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
+		// Launch Voltage System
+//
+//
+		cVoltageRs* voltagersconfig = obj_manager->get_voltagersdevice();
+		if (voltagersconfig->m_voltage_ != nullptr)
+		{
+			voltagersconfig->save_current_device_config(0);
+			CURRENT_DEVICE_CONFIG_STRUCT config = voltagersconfig->GetVoltageConfigStruct();
+
+			if (voltagersconfig->m_voltage_->launch_device(config) < 0)
+			{
+				evt.Skip();
+				return;
+			}
+
+			// Lock pressure controler interface
+			voltagersconfig->device_group_sizer->GetStaticBox()->Enable(false);
+		}
+
 		// Launch Oscope System
 		//
 		//
@@ -419,9 +438,9 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				fprintf(f, "set xlabel \"T(s)\"\n");
 				fprintf(f, "set ylabel \"Amplitude\"\n");
 				
-				int j = 1;
+				size_t j = 1;
 				fprintf(f, "plot \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(0).c_str());
-				for (int i=j; i< signals_vec.size(); i++)
+				for (size_t i=j; i< signals_vec.size(); i++)
 				{
 					j++;
 					fprintf(f, ", \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(i).c_str());

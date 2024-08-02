@@ -18,7 +18,7 @@ public:
 	err_struct init() override;
 	err_struct write(std::wstring scpi);
 	err_struct read(std::wstring& scpi);
-	err_struct close() override;
+	err_struct close()override;
 
 	err_struct last_error;
 

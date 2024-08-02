@@ -19,6 +19,7 @@
 #include "cDeviceMonitor.h"
 #include "cPressure.h"
 #include "cVoltage.h"
+#include "cVoltageRs.h"
 #include "cOscope.h"
 
 /*---------------- - Duplication-------------------------------- -
@@ -178,6 +179,26 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon)
 	Voltage_struct.PStop = nullptr;
 	plugin_vec.push_back(Voltage_struct);
 
+	// Add cVoltage to plugin vec
+	m_voltage_rs = new cVoltageRs(book, devmon_);
+	cDevice* m_voltage_rs_dev = new cDevice();
+	m_voltage_rs_dev->set_access_type(ALL);
+	m_voltage_rs_dev->set_device_name("RS6005P");
+	m_voltage_rs_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA VoltageRs_struct;
+	VoltageRs_struct.name = L"RS6005P.dll";
+	VoltageRs_struct.input_count = 1;
+	VoltageRs_struct.outputcount = 1;
+	VoltageRs_struct.signal_count = VoltageRs_struct.input_count + VoltageRs_struct.outputcount;
+	VoltageRs_struct.panel = m_voltage_rs->get_right_panel();
+	VoltageRs_struct.hInst = nullptr;
+	VoltageRs_struct.device = m_voltage_rs_dev;
+	VoltageRs_struct.Attach = nullptr;
+	VoltageRs_struct.Dettach = nullptr;
+	VoltageRs_struct.PStart = nullptr;
+	VoltageRs_struct.PStop = nullptr;
+	plugin_vec.push_back(VoltageRs_struct);
+
 	// Add cOscope to plugin vec
 	m_oscope = new cOscope(book, devmon_);
 	cDevice* m_oscope_dev = new cDevice();
@@ -216,6 +237,7 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon)
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
 	manager->set_voltagedevice(m_voltage); // Singleton saver...bad
+	manager->set_voltagersdevice(m_voltage_rs); // Singleton saver...bad
 	manager->set_oscopedevice(m_oscope); // Singleton saver...bad
 
 	/////////////////////////////////////////////////////
@@ -284,9 +306,11 @@ cConfig::~cConfig()
 	delete m_pressure;
 	//delete m_pressure_dev;
 	delete m_voltage;
+	delete m_voltage_rs;
 	m_daqmx = nullptr;
 	m_pressure = nullptr;
 	m_voltage = nullptr;
+	m_voltage_rs = nullptr;
 }
 
 void cConfig::unload_plugins()
@@ -522,6 +546,7 @@ void cConfig::set_table(cTable* m_table)
 	m_daqmx->set_table(m_table_);
 	m_pressure->set_table(m_table_);
 	m_voltage->set_table(m_table_);
+	m_voltage_rs->set_table(m_table_);
 	m_oscope->set_table(m_table_);
 }
 

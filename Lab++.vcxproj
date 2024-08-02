@@ -198,6 +198,8 @@
     <ClCompile Include="cGraphrender.cpp" />
     <ClCompile Include="cScaleBtn.cpp" />
     <ClCompile Include="cSingletonSafe.cpp" />
+    <ClCompile Include="cSupplyrssim.cpp" />
+    <ClCompile Include="cSupplyrsusb.cpp" />
     <ClCompile Include="cVisaserial.cpp" />
     <ClCompile Include="cSignalBtn.cpp" />
     <ClCompile Include="cSignalTable.cpp" />
@@ -212,6 +214,7 @@
     <ClCompile Include="cTick.cpp" />
     <ClCompile Include="cUSB6001.cpp" />
     <ClCompile Include="cVisa.cpp" />
+    <ClCompile Include="cVoltageRs.cpp" />
     <ClCompile Include="encoding.cpp" />
     <ClCompile Include="ListUsbDevice.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
@@ -254,6 +257,8 @@
     <ClInclude Include="cGraphrender.h" />
     <ClInclude Include="cScaleBtn.h" />
     <ClInclude Include="cSingletonSafe.h" />
+    <ClInclude Include="cSupplyrssim.h" />
+    <ClInclude Include="cSupplyrsusb.h" />
     <ClInclude Include="cVisaserial.h" />
     <ClInclude Include="cSignalBtn.h" />
     <ClInclude Include="cSignalTable.h" />
@@ -269,6 +274,7 @@
     <ClInclude Include="cTick.h" />
     <ClInclude Include="cUSB6001.h" />
     <ClInclude Include="cVisa.h" />
+    <ClInclude Include="cVoltageRs.h" />
     <ClInclude Include="data_types.h" />
     <ClInclude Include="encoding.h" />
     <ClInclude Include="enum.h" />

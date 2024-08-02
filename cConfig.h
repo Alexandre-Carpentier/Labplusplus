@@ -8,6 +8,7 @@ class cDaqmx;
 class cDevice;
 class cPressure;
 class cVoltage;
+class cVoltageRs;
 class cOscope;
 class cDeviceMonitor;
 
@@ -31,6 +32,7 @@ private:
 	cDevice* m_daq_dev = nullptr;
 	cPressure* m_pressure = nullptr;
 	cVoltage* m_voltage = nullptr;
+	cVoltageRs* m_voltage_rs = nullptr;
 	cOscope* m_oscope = nullptr;
 
 	typedef cDevice* (*PLUGIN_ATTACH)(wxWindow*);
