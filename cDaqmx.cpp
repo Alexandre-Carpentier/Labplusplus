@@ -1385,7 +1385,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			label.chan_number = channels.size();
 
 			// fill btn with A/D label
-			for (int i = 0; i < channels.size(); i++)
+			for (size_t i = 0; i < channels.size(); i++)
 			{
 				set_chan_mode(config.channel_mode[i], i);
 			}
@@ -1677,7 +1677,7 @@ void cDaqmx::OnDaqScaleSelBtn(wxCommandEvent& evt)
 			// Set selection on last selected
 			wxString filled = config.channel_linearize[config.channel_index];
 			wxArrayString combo_item = LoadScalePresetArray(scale_file_name);
-			for (int i = 0; i < combo_item.size(); i++)
+			for (size_t i = 0; i < combo_item.size(); i++)
 			{
 				if (filled.compare(combo_item[i]) == 0)
 				{

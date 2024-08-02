@@ -105,7 +105,7 @@ void cMeasurementControler::poll()
 
 				// Read data from instrument
 				val = meas->read();
-				for (int c = buffer_index; c < val.buffer_size; c++)
+				for (size_t c = buffer_index; c < val.buffer_size; c++)
 				{
 					Y[c] = val.buffer[c];
 
@@ -214,7 +214,7 @@ void cMeasurementControler::poll()
 								// unprotect
 								m_cyclecontroler_->cycle_mutex.unlock();
 								int mod = 0;
-								for (int i = 0; i < read; i++)
+								for (size_t i = 0; i < read; i++)
 								{
 									if (old_value[i] != value[i])
 									{
