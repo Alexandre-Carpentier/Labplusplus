@@ -221,7 +221,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		// Launch Oscope System
 		//
 		//
-		cOscope* oscope_gui = obj_manager->get_oscope_gui();
+		cOscope* oscope_gui = obj_manager->get_oscopedevice();
 		if (oscope_gui == nullptr)
 		{
 			std::cout << "[!] obj_manager->get_oscopedevice() return nullptr. Exiting.\n";
@@ -318,7 +318,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
 		cVoltage* voltageconfig = obj_manager->get_voltagedevice();
-		cOscope* oscope_gui = obj_manager->get_oscope_gui();
+		cOscope* oscope_gui = obj_manager->get_oscopedevice();
 
 		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) && (voltageconfig == nullptr) && (oscope_gui == nullptr))
 		{
