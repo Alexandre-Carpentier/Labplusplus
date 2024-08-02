@@ -219,25 +219,10 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon)
 	Oscope_struct.PStop = nullptr;
 	plugin_vec.push_back(Oscope_struct);
 
-	// Add cTension to plugin vec
-	/*
-	m_tension = new cTension(book);
-	PLUGIN_DATA Tension_struct;
-	Tension_struct.name = L"Keitley 2280S.dll";
-	Tension_struct.panel = m_tension->get_right_panel();
-	Tension_struct.hInst = nullptr;
-	Tension_struct.device = nullptr;
-	Tension_struct.Attach = nullptr;
-	Daqmx_struct.Dettach = nullptr;
-	Daqmx_struct.PStart = nullptr;
-	Daqmx_struct.PStop = nullptr;
-	plugin_vec.push_back(Tension_struct);
-	*/
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
 	manager->set_voltagedevice(m_voltage); // Singleton saver...bad
-	manager->set_voltagersdevice(m_voltage_rs); // Singleton saver...bad
 	manager->set_oscopedevice(m_oscope); // Singleton saver...bad
 
 	/////////////////////////////////////////////////////
@@ -304,6 +289,7 @@ cConfig::~cConfig()
 	delete m_daqmx;
 	delete m_daq_dev;
 	delete m_pressure;
+	delete m_oscope;
 	//delete m_pressure_dev;
 	delete m_voltage;
 	delete m_voltage_rs;
