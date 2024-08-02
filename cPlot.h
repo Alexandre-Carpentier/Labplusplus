@@ -88,7 +88,7 @@ public:
 	void set_signal_filter_threshold(float intensity, int position);
 	void set_signal_name(std::string signame, int position);  // change the signal name in the WinGraph module
 	void show_all_signals(bool isDisplayed);
-	void start_graph(LOGGER_M ReccordingType, int SignalNumber);
+	void start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header);
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);
 

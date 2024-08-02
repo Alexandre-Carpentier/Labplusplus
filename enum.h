@@ -262,6 +262,9 @@ enum {
 	IDCSCALESLIDER,
 
 	// cGnuplot
-	IDCGNUPLOTDLG
+	IDCGNUPLOTDLG,
+
+	// cDeviceIDSaver
+	IDCDEVICEIDSAVERDLG
 };
 

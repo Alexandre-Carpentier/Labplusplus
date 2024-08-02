@@ -172,6 +172,7 @@
     <ClCompile Include="cDaqmx.cpp" />
     <ClCompile Include="cDaqmxScaleDlg.cpp" />
     <ClCompile Include="cDaqsim.cpp" />
+    <ClCompile Include="cDeviceIDSaver.cpp" />
     <ClCompile Include="cDeviceMonitor.cpp" />
     <ClCompile Include="cDropper.cpp" />
     <ClCompile Include="cFilter.cpp" />
@@ -179,6 +180,7 @@
     <ClCompile Include="cGnuplot.cpp" />
     <ClCompile Include="cImagePanel.cpp" />
     <ClCompile Include="cInicfg.cpp" />
+    <ClCompile Include="IInstrument.cpp" />
     <ClCompile Include="cMain.cpp" />
     <ClCompile Include="cMeasurement.cpp" />
     <ClCompile Include="cMeasurementControler.cpp" />
@@ -216,6 +218,7 @@
     <ClCompile Include="cVisa.cpp" />
     <ClCompile Include="cVoltageRs.cpp" />
     <ClCompile Include="encoding.cpp" />
+    <ClCompile Include="Instrumentimpl.cpp" />
     <ClCompile Include="ListUsbDevice.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
     <ClCompile Include="Plugin\cDevice.cpp" />
@@ -231,6 +234,7 @@
     <ClInclude Include="cDaqmx.h" />
     <ClInclude Include="cDaqmxScaleDlg.h" />
     <ClInclude Include="cDaqsim.h" />
+    <ClInclude Include="cDeviceIDSaver.h" />
     <ClInclude Include="cDeviceMonitor.h" />
     <ClInclude Include="cDropper.h" />
     <ClInclude Include="cFilter.h" />
@@ -238,6 +242,7 @@
     <ClInclude Include="cGnuplot.h" />
     <ClInclude Include="cImagePanel.h" />
     <ClInclude Include="cInicfg.h" />
+    <ClInclude Include="IInstrument.h" />
     <ClInclude Include="cMain.h" />
     <ClInclude Include="cMeasurement.h" />
     <ClInclude Include="cMeasurementControler.h" />
@@ -278,6 +283,7 @@
     <ClInclude Include="data_types.h" />
     <ClInclude Include="encoding.h" />
     <ClInclude Include="enum.h" />
+    <ClInclude Include="instrumentimpl.h" />
     <ClInclude Include="ListUsbDevice.h" />
     <ClInclude Include="LoadBitmapFromRessource.h" />
     <ClInclude Include="Plugin\cDevice.h" />

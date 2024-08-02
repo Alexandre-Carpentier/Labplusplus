@@ -41,11 +41,13 @@ public:
 	cDeviceMonitor()
 	{
 		//Start(refresh_rate);
+		
 	}
 	virtual ~cDeviceMonitor() {}
 
 	void Notify();
 	std::vector<cDev> get_device_vec();
+	std::wstring get_first_available() { return dev_list.at(0).get_addr(); };
 	void lookup_start();
 	void lookup_stop();
 
