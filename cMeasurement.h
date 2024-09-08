@@ -43,7 +43,9 @@ private:
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 public:
 	cMeasurement();
-	virtual int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
+
+	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
+	virtual int launch_device();
 
 	virtual std::string device_name();
 	virtual MEAS_TYPE device_type();
@@ -54,7 +56,7 @@ public:
 	virtual DATAS read();
 	virtual void set(double *value, size_t length);
 
-	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
+	
 	virtual void set_device_name(std::string name);
 	virtual void set_device_addr(std::string addr);
 

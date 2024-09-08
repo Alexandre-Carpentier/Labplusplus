@@ -34,9 +34,8 @@ size_t cPacesim::chan_write_count()
     return nb_sig;
 }
 
-int cPacesim::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+int cPacesim::launch_device()
 {
-    config_struct_ = config_struct;
     return 0;
 }
 

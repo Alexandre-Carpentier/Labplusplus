@@ -25,7 +25,7 @@ private:
 	wxBoxSizer* config_panel_sizer = nullptr;
 	wxPanel* config_panel = nullptr;
 
-	cDeviceMonitor* devmon_ = nullptr;
+	std::shared_ptr <cDeviceMonitor> devmon_ = nullptr;
 	cTable* m_table_ = nullptr;
 	cPlot* m_plot_ = nullptr;
 	cDaqmx* m_daqmx = nullptr;
@@ -64,7 +64,7 @@ private:
 	std::vector<PLUGIN_DATA> plugin_vec;
 
 public:
-	cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon);
+	cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
 	~cConfig();
 	void OnClickdrop(wxMouseEvent& evt);
 	void StopTest(bool stop);

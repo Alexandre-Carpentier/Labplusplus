@@ -35,9 +35,8 @@ size_t cSupplyrsusb::chan_write_count()
     return nb_sig;
 }
 
-int cSupplyrsusb::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+int cSupplyrsusb::launch_device()
 {
-    config_struct_ = config_struct;
     ZeroMemory(readpoint, sizeof(readpoint));
     setpoint = 0.0;
 

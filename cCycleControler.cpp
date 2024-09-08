@@ -148,6 +148,7 @@ void cCycleControler::start()
 
 void cCycleControler::stop()
 {
+	m_table_->stop_statistic();
 	thread.request_stop();
 	//thread.join();
 	m_cycle->clear_cycles();

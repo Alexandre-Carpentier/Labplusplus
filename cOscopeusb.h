@@ -32,7 +32,7 @@ public:
 	size_t chan_read_count() override;
 	size_t chan_write_count() override;
 
-	int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
+	int launch_device() override;
 
 	void acquire();
 	DATAS read() override;

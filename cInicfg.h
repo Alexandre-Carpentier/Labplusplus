@@ -9,7 +9,7 @@ class cInicfg
 {
 private:
 	// C:\Users\The Hive\AppData\Roaming
-	std::string configfile = "Lab++MeasurementConfig.ini";
+	std::string configfile = "Lab++TableConfig.ini";
 	wxFileConfig* cfg = nullptr;
 	void load_table(void);
 	void save_table(void);

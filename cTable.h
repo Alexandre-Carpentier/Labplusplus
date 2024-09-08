@@ -63,7 +63,7 @@ private:
 
 	cDurationStatisticCtrl* stat = nullptr;
 
-	cConfig* m_config_ = nullptr;
+	cConfig *m_config_ = nullptr;
 	cCycle* m_cycle_ = nullptr;
 
 	wxTextCtrl* loop = nullptr;
@@ -79,6 +79,7 @@ public:
 	void start(std::shared_ptr<cCycle>  m_cycle);
 	void stop();
 	void reset();
+	bool isTick();
 
 
 	void paintEvent(wxPaintEvent& evt);

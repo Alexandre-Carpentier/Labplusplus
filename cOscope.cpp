@@ -16,7 +16,7 @@
 
 struct cOscope::Oscopeimpl {
 
-	Oscopeimpl(wxWindow* parent, cDeviceMonitor* devmon, std::string instrument_name)
+	Oscopeimpl(wxWindow* parent, std::shared_ptr <cDeviceMonitor> devmon, std::string instrument_name)
 	{
 		Parent_ = parent;
 		devmon_ = devmon;
@@ -120,7 +120,7 @@ struct cOscope::Oscopeimpl {
 		0.1f, 0.0f, 0.8f
 	};
 
-	cDeviceMonitor* devmon_ = nullptr;
+	std::shared_ptr <cDeviceMonitor> devmon_ = nullptr;
 	cTable* m_table_ = nullptr;
 	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
@@ -151,7 +151,7 @@ struct cOscope::Oscopeimpl {
 	void load_combobox(wxComboBox* combo, double floating);
 };
 
-cOscope::cOscope(wxWindow* inst, cDeviceMonitor* devmon)
+cOscope::cOscope(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	std::cout << "[*] cOscope ctor...\n";
 	pimpl = std::make_unique<Oscopeimpl>(inst, devmon, "DSOX1202G");
@@ -348,6 +348,7 @@ void cOscope::Oscopeimpl::save_table_values(void)
 	int row_count = m_table_->get_last_active_line();
 
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
+	cfg->DeleteAll();
 	cfg->SetPath(wxT("TABLE"));
 
 	wxString str;
@@ -568,7 +569,8 @@ size_t cOscope::launch_device()
 	{
 		return -1;
 	}
-	return pimpl->m_oscope_->launch_device(pimpl->config);
+	//pimpl->config
+	return pimpl->m_oscope_->launch_device();
 }
 
 

@@ -7,7 +7,7 @@
 #include "cSupplyrssim.h"
 #include "cSupplyrsusb.h"
 
-cVoltageRs::cVoltageRs(wxWindow* inst, cDeviceMonitor* devmon)
+cVoltageRs::cVoltageRs(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	std::cout << "cVoltageRs ctor...\n";
 	inst_ = inst;
@@ -207,7 +207,7 @@ void cVoltageRs::DestroySubsystem()
 	return;
 }
 
-void cVoltageRs::set_table(cTable* m_table)
+void cVoltageRs::set_table(cTable *m_table)
 {
 	assert(m_table != nullptr);
 	m_table_ = m_table; // Save cTable to add or remove colomn afterward

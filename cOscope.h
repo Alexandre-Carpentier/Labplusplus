@@ -5,8 +5,6 @@
 #include <memory>
 
 class cTable;
-//class cMeasurementmanager;
-//class cMeasurement;
 class cDeviceMonitor;
 
 static wxImage oscope_instrument_img;
@@ -15,7 +13,7 @@ static wxPanel* oscope_instrument_rightpanel_ = nullptr;
 class cOscope : public wxFrame
 {
 public:
-	cOscope(wxWindow* inst, cDeviceMonitor* devmon);
+	cOscope(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
 	~cOscope();
 
 	size_t launch_device(); // Start device with current config

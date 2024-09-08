@@ -61,11 +61,19 @@ size_t cUsb6001::chan_write_count()
     return nb_sig;
 }
 
-int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cUsb6001::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+{
+    config_struct_ = config_struct;
+}
+
+int cUsb6001::launch_device()
 {
     std::cout << "[*] cUsb6001->launching...\n";
-    config_struct_ = config_struct;
-
+    if (config_struct_.device_name.size() == 0)
+    {
+        std::cout << "[!] launch_device() failed. Error configuration structure empty...\n";
+        return -1;
+    }
     // Setup DAQmx
 
     if (0 != DAQmxSelfTestDevice(config_struct_.device_name))

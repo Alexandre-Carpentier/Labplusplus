@@ -251,6 +251,30 @@
     <ClCompile Include="cSingletonSafe.cpp">
       <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
+    <ClCompile Include="cDeviceIDSaver.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplyrssim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplyrsusb.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplysim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplyusb.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="IInstrument.cpp">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClCompile>
+    <ClCompile Include="Instrumentimpl.cpp">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClCompile>
+    <ClCompile Include="cVoltageRs.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -418,6 +442,28 @@
     </ClInclude>
     <ClInclude Include="cSingletonSafe.h">
       <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cDeviceIDSaver.h" />
+    <ClInclude Include="cSupplyrssim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cSupplyrsusb.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cSupplysim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cSupplyusb.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="IInstrument.h">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="instrumentimpl.h">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="cVoltageRs.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

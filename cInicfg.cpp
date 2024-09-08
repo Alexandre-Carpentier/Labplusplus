@@ -95,6 +95,8 @@ void cInicfg::save_table(void)
 	int row_count = m_table->get_last_active_line();
 
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
+	cfg->DeleteGroup("TABLE");
+	cfg->DeleteAll();
 	cfg->SetPath(wxT("TABLE"));
 	//cfg->DeleteGroup("TABLE");
 	//cfg->DeleteAll();

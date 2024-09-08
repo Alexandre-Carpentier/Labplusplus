@@ -10,7 +10,7 @@
 #include "cDeviceMonitor.h"
 #include "cDeviceIDSaver.h"
 
-cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config, cDeviceMonitor* devmon)
+cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	cycle_controler = std::make_shared<cCycleControler>(m_table, inst);
 
@@ -110,6 +110,12 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			return;
 		}
 
+			// configure each device
+			
+
+		// Load DAQ System
+		//
+		//
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		if (daqconfig->m_daq_ != nullptr)
 		{
@@ -138,30 +144,11 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				c++;
 			}
 
-			// Launch DAQ System
-			//
-			//
-
-			if (daqconfig->m_daq_->launch_device(config) < 0)
-			{
-				evt.Skip();
-				return;
-			}
-
-			// Lock daq interface when running	
-			daqconfig->previous_chan->Enable(false);
-			daqconfig->next_chan->Enable(false);
-			for (auto& ch_btn : daqconfig->chanbtn)
-			{
-				ch_btn->Enable(false);
-			}	
-			daqconfig->device_group_sizer->GetStaticBox()->Enable(false);
-			daqconfig->channel_group_sizer->GetStaticBox()->Enable(false);
-			daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(false);
-			daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(false);
+			// Load config in DAQ
+			daqconfig->m_daq_->set_configuration_struct(config);
 		}
 
-		// Launch Pressure System
+		// Load Pressure System
 		//
 		//
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
@@ -170,17 +157,11 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			pressureconfig->save_current_device_config(0);
 			CURRENT_DEVICE_CONFIG_STRUCT config = pressureconfig->GetPressureConfigStruct();
 
-			if(pressureconfig->m_pressure_->launch_device(config)<0)
-			{
-				evt.Skip();
-				return;
-			}
+			pressureconfig->m_pressure_->set_configuration_struct(config);
 
-			// Lock pressure controler interface
-			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
-		// Launch Voltage System
+		// Load Voltage System 1
 		//
 		//
 		cVoltage* voltageconfig = obj_manager->get_voltagedevice();
@@ -189,36 +170,23 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			voltageconfig->save_current_device_config(0);
 			CURRENT_DEVICE_CONFIG_STRUCT config = voltageconfig->GetVoltageConfigStruct();
 
-			if (voltageconfig->m_voltage_->launch_device(config) < 0)
-			{
-				evt.Skip();
-				return;
-			}
+			voltageconfig->m_voltage_->set_configuration_struct(config);
 
-			// Lock pressure controler interface
-			voltageconfig->device_group_sizer->GetStaticBox()->Enable(false);
 		}
 
-		// Launch Voltage System
-//
-//
+		// Load Voltage System 2
+		//
+		//
 		cVoltageRs* voltagersconfig = obj_manager->get_voltagersdevice();
 		if (voltagersconfig->m_voltage_ != nullptr)
 		{
 			voltagersconfig->save_current_device_config(0);
 			CURRENT_DEVICE_CONFIG_STRUCT config = voltagersconfig->GetVoltageConfigStruct();
 
-			if (voltagersconfig->m_voltage_->launch_device(config) < 0)
-			{
-				evt.Skip();
-				return;
-			}
-
-			// Lock pressure controler interface
-			voltagersconfig->device_group_sizer->GetStaticBox()->Enable(false);
+			voltagersconfig->m_voltage_->set_configuration_struct(config);
 		}
 
-		// Launch Oscope System
+		// Load Oscope System
 		//
 		//
 		cOscope* oscope_gui = obj_manager->get_oscopedevice();
@@ -229,15 +197,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			return;
 		}
 		oscope_gui->save_current_device_config(0);
-		if (oscope_gui->launch_device() < 0)
-		{
-			std::cout << "[!] oscope_gui->launch_device() return < 0. Exiting.\n";
-			evt.Skip();
-			return;
-		}
-		oscope_gui->lockBtn(false);
-		std::cout << "[*] OSCOPE	[RUNNING]\n";
-
 
 		/////////////////////////////////////////////////////////
 		int iRec = this->combo2->GetCurrentSelection();
@@ -269,6 +228,105 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		//if (m_main)
 			//m_main->StopDiscoverDeviceTimer();
 
+
+
+
+
+		////////////////////////////////////////////////////////////////////////////////
+		// SAVE INSTRUMENT ID TO LOGFILE
+		////////////////////////////////////////////////////////////////////////////////
+		size_t sizesig = meas_manager->get_measurement_total_channel_number();
+		std::string head;
+		cDeviceIDSaver cDeviceIDSaverDlg(sizesig, this->inst_, IDCDEVICEIDSAVERDLG, "Reccord your instrument ID?");
+		cDeviceIDSaverDlg.Centre();
+		int ret = cDeviceIDSaverDlg.ShowModal();
+		if (ret == wxID_OK)
+		{
+			head = cDeviceIDSaverDlg.get_header();// save instrument ID in header
+		}
+		else
+		{
+			head = " No instrument ID saved by the user";
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+		// START DAQ CTRL
+		////////////////////////////////////////////////////////////////////////////////
+		if (daqconfig->m_daq_->launch_device() < 0)
+		{
+			evt.Skip();
+			return;
+		}
+
+		// Lock daq interface when running	
+		daqconfig->previous_chan->Enable(false);
+		daqconfig->next_chan->Enable(false);
+		for (auto& ch_btn : daqconfig->chanbtn)
+		{
+			ch_btn->Enable(false);
+		}
+		daqconfig->device_group_sizer->GetStaticBox()->Enable(false);
+		daqconfig->channel_group_sizer->GetStaticBox()->Enable(false);
+		daqconfig->channel_linearize_group_sizer->GetStaticBox()->Enable(false);
+		daqconfig->channel_signal_group_sizer->GetStaticBox()->Enable(false);
+
+		////////////////////////////////////////////////////////////////////////////////
+		// START PRESSURE CTRL
+		////////////////////////////////////////////////////////////////////////////////
+		if (pressureconfig->m_pressure_ != nullptr)
+		{
+			if (pressureconfig->m_pressure_->launch_device() < 0)
+			{
+				evt.Skip();
+				return;
+			}
+			// Lock pressure controler interface
+			pressureconfig->device_group_sizer->GetStaticBox()->Enable(false);
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+		// START VOLTAGE CTRL 1
+		////////////////////////////////////////////////////////////////////////////////
+		if (voltageconfig->m_voltage_ != nullptr)
+		{
+			if (voltageconfig->m_voltage_->launch_device() < 0)
+			{
+				evt.Skip();
+				return;
+			}
+			// Lock pressure controler interface
+			voltageconfig->device_group_sizer->GetStaticBox()->Enable(false);
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
+		// START VOLTAGE CTRL 2
+		////////////////////////////////////////////////////////////////////////////////
+		if (voltagersconfig->m_voltage_ != nullptr)
+		{
+			if (voltagersconfig->m_voltage_->launch_device() < 0)
+			{
+				evt.Skip();
+				return;
+			}
+
+			// Lock pressure controler interface
+			voltagersconfig->device_group_sizer->GetStaticBox()->Enable(false);
+		}
+		////////////////////////////////////////////////////////////////////////////////
+		// START OSCOPE CTRL 
+		////////////////////////////////////////////////////////////////////////////////
+		if (oscope_gui != nullptr)
+		{
+			if (oscope_gui->launch_device() < 0)
+			{
+				std::cout << "[!] oscope_gui->launch_device() return < 0. Exiting.\n";
+				evt.Skip();
+				return;
+			}
+			oscope_gui->lockBtn(false);
+			std::cout << "[*] OSCOPE	[RUNNING]\n";
+		}
+
 		////////////////////////////////////////////////////////////////////////////////
 		// CYCLE CONTROLER
 		////////////////////////////////////////////////////////////////////////////////
@@ -287,15 +345,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		meas_controler = make_shared<cMeasurementControler>(cycle_controler);
 		meas_manager->set_measurement_controler(meas_controler);
 		
-		size_t sizesig = meas_manager->get_measurement_total_channel_number();
-		std::string head;
-		cDeviceIDSaver cDeviceIDSaverDlg(sizesig, this->inst_, IDCDEVICEIDSAVERDLG, "Reccord your instrument ID?");
-		cDeviceIDSaverDlg.Centre();
-		int ret = cDeviceIDSaverDlg.ShowModal();
-		if (ret == wxID_OK)
-		{
-			head = cDeviceIDSaverDlg.get_header();
-		}
+
 
 		meas_controler->start();
 		m_plot_->start_graph(Rec, sizesig, head);
@@ -375,7 +425,9 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 			// read header to build the script accordingly
 			std::ifstream file(new_name);
+			std::string instrID;
 			std::string header;
+			std::getline(file, instrID);// 1st line is equipment ID
 			std::getline(file, header);
 
 			// Count every collomn and add to vector for legend
@@ -436,7 +488,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				fprintf(f, "set output \"%s\"\n", pdf_file.c_str());
 				fprintf(f, "set encoding utf8\n");
 				fprintf(f, "#set xrange [0.0:600.0]\n");
-				fprintf(f, "#set xrange [0.0:20.0]\n");
+				fprintf(f, "#set yrange [0.0:20.0]\n");
 	
 				fprintf(f, "set key outside\n");
 				
@@ -451,11 +503,11 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 				fprintf(f, "set ylabel \"Amplitude\"\n");
 				
 				size_t j = 1;
-				fprintf(f, "plot \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(0).c_str());
+				fprintf(f, "plot \"%s\" every ::1 using 1:%zu w l linestyle %zu title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(0).c_str());
 				for (size_t i=j; i< signals_vec.size(); i++)
 				{
 					j++;
-					fprintf(f, ", \"%s\" using 1:%i w l linestyle %i title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(i).c_str());
+					fprintf(f, ", \"%s\" using 1:%zu w l linestyle %zu title \"%s\"", new_name.c_str(),j+1, j, signals_vec.at(i).c_str());
 				}
 				fprintf(f, "\n");
 

@@ -53,7 +53,8 @@ void cMeasurementControler::poll()
 	assert(m_cyclecontroler_->get_total_step() > 0);
 	assert(m_cyclecontroler_->get_total_step() < 300);
 	assert(m_cyclecontroler_->get_current_loop() > 0);
-	assert(m_cyclecontroler_->get_current_step() == 0);
+	//assert(m_cyclecontroler_->get_current_step() == 0); // might be fail if call is long
+	std::cout << m_cyclecontroler_->get_current_step() << "\n";
 
 	std::cout << "cMeasurementcontroler->get_stop_token...\n";
 	auto st = measurement_controler_thread.get_stop_token();

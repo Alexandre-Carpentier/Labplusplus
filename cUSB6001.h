@@ -40,7 +40,8 @@ public:
 	size_t chan_read_count() override;
 	size_t chan_write_count() override;
 
-	int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
+	void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
+	int launch_device() override;
 
 	DATAS read() override;
 	void set(double* value, size_t length) override;
