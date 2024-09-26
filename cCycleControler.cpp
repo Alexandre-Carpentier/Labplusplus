@@ -18,21 +18,25 @@
 
 int cCycleControler::get_current_step()
 {
+	assert(m_cycle != nullptr);
 	return m_cycle->get_current_step();
 }
 
 int cCycleControler::get_current_loop()
 {
+	assert(m_cycle != nullptr);
 	return m_cycle->get_current_loop();
 }
 
 int cCycleControler::get_total_step()
 {
+	assert(m_cycle != nullptr);
 	return m_cycle->get_total_step_number();
 }
 
 int cCycleControler::get_total_loop()
 {
+	assert(m_cycle != nullptr);
 	return m_cycle->get_total_loop_number();
 }
 
@@ -99,15 +103,17 @@ void cCycleControler::poll()
 				// Send virtual click on STOP btn
 				wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDC_STARTBTN);
 				wxPostEvent(inst_, evt);
+				cycle_mutex.unlock();
+				goto kill;
 
-				MessageBox(GetFocus(), L"End of cycle", L"Success", MB_OK);
-				break;
 			}
 		}
 		// unprotect
 		cycle_mutex.unlock();
 	}
 kill:
+
+	//MessageBox(GetFocus(), L"End of cycle", L"Success", MB_OK);
 
 	std::cout << "[*] Cycle controler exitting daemon\n";
 	//MessageBox(GetFocus(), L"Exit control daemon", L"Success", MB_OK);
@@ -118,16 +124,19 @@ kill:
 cCycleControler::cCycleControler(cTable* m_table, wxWindow* inst)
 {
 	std::cout << "cCycleControler ctor...\n";
+	assert(m_table != nullptr);
 	m_table_ = m_table;
 	inst_ = inst;
 }
 
 void cCycleControler::start()
 {
-	std::cout << "[*] cCycleControler start requested\n";
+	std::cout << "[*] cCycleControler start called\n";
 
 		// build a new cycle based on cTable
 
+	assert(m_cycle != nullptr);
+	assert(m_table_ != nullptr);
 	m_cycle->clear_cycles();
 	m_cycle->set_current_step(0);
 	m_cycle->set_current_loop(m_table_->get_loop_number());
@@ -144,15 +153,19 @@ void cCycleControler::start()
 
 	//assert(!thread.joinable()); // Thread must be stopped 
 	thread = std::jthread(&cCycleControler::poll, this);
+	std::cout << "[*] cCycleControler start success\n";
 }
 
 void cCycleControler::stop()
 {
+	assert(m_cycle != nullptr);
+	assert(m_table_ != nullptr);
+	std::cout << "[*] cCycleControler stop called\n";
 	m_table_->stop_statistic();
 	thread.request_stop();
 	//thread.join();
 	m_cycle->clear_cycles();
-	std::cout << "[*] cCycleControler stop requested\n";
+	std::cout << "[*] cCycleControler stopped\n";
 }
 
 inline long long cCycleControler::PerformanceFrequency()
@@ -171,7 +184,6 @@ inline long long cCycleControler::PerformanceCounter()
 
 cCycleControler::~cCycleControler()
 {
-
 	assert(m_table_ != nullptr);
 	std::cout << "cCycleControler dtor...\n";
 }

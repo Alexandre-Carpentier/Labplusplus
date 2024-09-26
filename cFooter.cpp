@@ -246,7 +246,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 		else
 		{
-			head = " No instrument ID saved by the user";
+			head = " No instruments ID/SN saved by the user";
 		}
 
 		////////////////////////////////////////////////////////////////////////////////

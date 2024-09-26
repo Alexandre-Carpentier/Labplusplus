@@ -14,6 +14,7 @@
 bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
 {
 	std::string dev_name = meas->device_name();
+	assert(dev_name.size() > 0);
 	int i = 0;
 
 	for (auto& controler : step.controler_vec)
@@ -159,7 +160,8 @@ void cMeasurementControler::poll()
 				if (m_plot_->get_graph_state() == false)
 				{					
 					// ---------------
-					std::cout << "cMeasurementcontroler->program break \n";
+					std::cout << "[!] m_plot_->get_graph_state() == false \n";
+					std::cout << "[!] cMeasurementcontroler->program break \n";
 					break;
 				}
 			}
@@ -242,105 +244,15 @@ void cMeasurementControler::poll()
 
 							break;
 						}
-						/*
-						// WRITE
-						//
-						//
-						case MEAS_TYPE::FLOW_CONTROLER_INSTR:
-						case MEAS_TYPE::VALVE_CONTROLER_INSTR:
-						{
-							static double old_pressure = 0.0;
-							// protect
-							m_cyclecontroler_->cycle_mutex.lock();
-
-							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-							value = get_instr_setpoint((meas, step, value, length, &read);
-
-							// unprotect
-							m_cyclecontroler_->cycle_mutex.unlock();
-
-							if (old_pressure != value)
-							{
-								old_pressure = value; // save old value
-							}
-							break;
-						}
-						// READ
-						//
-						//
-						case MEAS_TYPE::FLOW_METER_INSTR:
-						{
-							// Read data from instrument
-							val = meas->read();
-
-							// Add vector to store points
-							for (int i = 0; i < val.buffer_size; i++)
-							{
-								read_pool.push_back(val.buffer[i]);
-							}
-							val.buffer_size = 0;
-							break;
-						}
-						*/
 
 						}
 						
-
-						/*
-						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
-						{					
-							static double old_pressure=0.0;
-							// protect
-							m_cyclecontroler_->cycle_mutex.lock();
-
-							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-							value = get_instr_setpoint(meas, step);
-
-							// unprotect
-							m_cyclecontroler_->cycle_mutex.unlock();
-
-							if(old_pressure == value)
-							{			
-								goto read;
-							}
-							old_pressure = value; // save old value
-							break;
-						}
-						default:
-							value = 0.0;
-							goto read;
-						}
-						meas->set(value);				
-			read:
-					// Read data from instrument
-					val = meas->read();
-
-					// Add vector to store points
-					for (int i = 0; i < val.buffer_size; i++)
-					{
-						read_pool.push_back(val.buffer[i]);
-					}
-					val.buffer_size = 0;
-					*/
 				}
 
 				assert(read_pool.size() > 0);
 				m_plot_->graph_addpoint(read_pool.size(), &read_pool.at(0));
 				//memset(Y, 0, sizeof(Y));
 
-					/*
-					for (int c = buffer_index; c < val.buffer_size; c++)
-					{
-						Y[c] = val.buffer[c];
-						buffer_index++;
-						std::cout << "buffer_index" << buffer_index << "\n";
-					}
-					val.buffer_size = 0;
-				}
-
-				m_plot_->graph_addpoint(buffer_index, Y);
-				memset(Y, 0, sizeof(Y));
-				*/
 
 				// Update acquire rate
 				m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));
@@ -362,12 +274,11 @@ void cMeasurementControler::poll()
 
 void cMeasurementControler::start()
 {
+	std::cout << "[*] cMeasurementcontroler->starting called\n";
 	obj_manager = obj_manager->getInstance();
 	m_plot_ = obj_manager->get_plot();
 	m_footer_ = obj_manager->get_footer();
 	meas_manager = meas_manager->getInstance();
-
-	std::cout << "cMeasurementcontroler->starting...\n";
 
 	//meas_pool = meas_manager->get_measurement_pool();
 
@@ -378,9 +289,8 @@ void cMeasurementControler::start()
 	//control_thread.detach();
 	//cMeasurementControler::control_thread = std::thread(&cMeasurementControler::poll, this);
 
-	measurement_controler_thread = std::jthread(&cMeasurementControler::poll, this);
-	
-
+	measurement_controler_thread = std::jthread(&cMeasurementControler::poll, this);	
+	std::cout << "[*] cMeasurementcontroler->started\n";
 }
 
 void cMeasurementControler::stop()

@@ -261,7 +261,7 @@ cMain::~cMain()
 	delete m_statrender;
 	delete m_footer;
 	delete devmon;
-	devmon = nullptr;
+	delete m_config;
 
 	cfg_saver = nullptr; 
 	m_config = nullptr;
@@ -269,7 +269,7 @@ cMain::~cMain()
 	m_graphrender = nullptr;
 	m_statrender = nullptr;
 	m_footer = nullptr;
-
+	devmon = nullptr;
 	// destroy singleton
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* manager = manager->getInstance();
