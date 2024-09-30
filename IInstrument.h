@@ -9,8 +9,8 @@
 #include "data_types.h"
 #include "enum.h"
 #include "cMeasurementmanager.h"
-//#include "..\Lab++\Plugin\cDevice.h"
-#include "..\Lab\Plugin\cDevice.h"
+#include "..\Lab++\Plugin\cDevice.h"
+//#include "..\Lab\Plugin\cDevice.h"
 
 #include "cDeviceMonitor.h";
 
@@ -49,7 +49,7 @@ public:
 	size_t getOutputCount() { return outputcount_; }
 	size_t getSignalCount() { return signal_count_; }
 
-	wxBookCtrl* getPage() { if (page_) { return (wxBookCtrl*)page_; } }
+	wxBookCtrl* getPage() { if (page_) { return (wxBookCtrl*)page_; } return nullptr; }
 	wxPanel* getPanel() { if (panel_) { return (wxPanel*)panel_; } }
 	std::shared_ptr<cDeviceMonitor> getDeviceMonitor() { return std::move(devmon_); }
 	std::string getDeviceName() { return instrument_name_; }
