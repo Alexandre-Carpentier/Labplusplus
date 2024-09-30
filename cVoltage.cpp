@@ -7,7 +7,7 @@
 #include "cSupplysim.h"
 #include "cSupplyusb.h"
 
-cVoltage::cVoltage(wxWindow* inst, cDeviceMonitor* devmon)
+cVoltage::cVoltage(wxWindow* inst, std::shared_ptr<cDeviceMonitor> devmon)
 {
 	std::cout << "cVoltage ctor...\n";
 	inst_ = inst;

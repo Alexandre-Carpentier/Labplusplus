@@ -38,9 +38,8 @@ size_t cOscopeusb::chan_write_count()
     return nb_sig;
 }
 
-int cOscopeusb::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+int cOscopeusb::launch_device()
 {
-    config_struct_ = config_struct;
     readpoint = 0.0;
     setpoint = 0.0;
 

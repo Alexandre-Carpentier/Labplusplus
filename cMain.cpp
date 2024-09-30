@@ -45,7 +45,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	//	Launch the device monitor tool
 	//
 
-	devmon = new cDeviceMonitor;
+	std::shared_ptr<cDeviceMonitor> devmon = std::make_shared<cDeviceMonitor>();
 	devmon->Notify();
 
 	std::cout << "Current scale factor: " << this->GetDPIScaleFactor() << "\n";
@@ -156,7 +156,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	// CONFIG WND
 	////////////////////////////////////////////////////////////////////////////////
 
-	m_config = new cConfig(this, m_table, devmon);
+	m_config = new cConfig(this, devmon);
 	manager->set_config(m_config);
 	config_leftpanel = m_config->Getleftpan();
 	config_rightpanel = m_config->Getrightpan();
@@ -170,7 +170,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// EDIT WND
 	////////////////////////////////////////////////////////////////////////////////
-	m_table = new cTable(this, m_config);
+	m_table = new cTable (this, m_config);
 	manager->set_table(m_table);
 	table_leftpanel = m_table->Getleftpan();
 	table_rightpanel = m_table->Getrightpan();
@@ -256,23 +256,20 @@ cMain::~cMain()
 {
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
 	delete cfg_saver; //save before destroying objects
-	delete m_table;
-	delete m_config;
 	delete m_plot;
 	delete m_graphrender;
 	delete m_statrender;
 	delete m_footer;
 	delete devmon;
-	devmon = nullptr;
+	delete m_config;
 
 	cfg_saver = nullptr; 
-	m_table = nullptr;
 	m_config = nullptr;
 	m_plot = nullptr;
 	m_graphrender = nullptr;
 	m_statrender = nullptr;
 	m_footer = nullptr;
-
+	devmon = nullptr;
 	// destroy singleton
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* manager = manager->getInstance();

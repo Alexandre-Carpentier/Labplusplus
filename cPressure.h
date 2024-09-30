@@ -25,7 +25,7 @@ public:
 
 
 	wxWindow* inst_ = nullptr;
-	cDeviceMonitor* devmon_ = nullptr;
+	std::shared_ptr <cDeviceMonitor> devmon_ = nullptr;
 	cTable* m_table_ = nullptr;
 	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
@@ -44,7 +44,7 @@ public:
 	const wxSize text_ctrl_size = wxSize(120, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
-	cPressure(wxWindow* inst, cDeviceMonitor* devmon);
+	cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
 	~cPressure();
 
 	void RefreshPort();

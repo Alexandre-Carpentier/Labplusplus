@@ -15,7 +15,7 @@ cMeasurement::cMeasurement()
 	
 }
 
-int cMeasurement::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) { return -1; }
+int cMeasurement::launch_device() { return -1; }
 
 std::string cMeasurement::device_name() { return std::string("Measurement super class"); };
 MEAS_TYPE cMeasurement::device_type() { return SUPER_INSTR; }

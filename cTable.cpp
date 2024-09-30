@@ -6,9 +6,7 @@
 #include <format>
 #include <vector>
 
-
-
-cTable::cTable(wxWindow* inst, cConfig* m_config)
+cTable::cTable(wxWindow* inst, cConfig *m_config)
 {
 	std::cout << "cTable ctor...\n";
 	inst_ = inst;
@@ -129,7 +127,8 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 cTable::~cTable()
 {
 	std::cout << "cTable dtor...\n";
-	delete stat;
+	delete stat; // TODO wxwidget delete stat automatically ?
+	stat = nullptr;
 	// Save current row values
 }
 
@@ -220,6 +219,12 @@ std::vector<STEPSTRUCT> cTable::get_step_table()
 
 void cTable::start_statistic(std::shared_ptr<cCycle> m_cycle)
 {
+	// if stat already created, reset it
+	if (stat->isTick())
+	{
+		stat->reset();
+	}
+
 	stat->start(m_cycle);
 }
 
@@ -424,7 +429,7 @@ void cDurationStatisticCtrl::start(std::shared_ptr<cCycle> m_cycle)
 	wxString futur_timestamp = "End at: " + add_to_current_timestamp(duration_s);
 	end->SetLabelText(futur_timestamp);
 
-	wxString elapsed_timestamp = "Elapsed: " + add_to_current_timestamp(0);
+	wxString elapsed_timestamp = "Elapsed: 0.0 s";// +add_to_current_timestamp(0.0);
 	elapsed->SetLabelText(elapsed_timestamp);
 
 	saved_total_cycle = m_cycle->get_current_loop();
@@ -455,7 +460,22 @@ void cDurationStatisticCtrl::reset()
 	elapsed->SetLabelText("Elapsed: /");
 
 	cycle_step_state->SetLabelText("Performed: / cyles");
+
+	assert(tick != nullptr);
 	tick->reset_tick();
+
+	savedst = { 0 };
+	savedft = { 0 };
+	saved_total_cycle = 0;
+	saved_total_step = 0;
+}
+
+bool cDurationStatisticCtrl::isTick()
+{
+	if (tick)
+		return true;
+	else
+		return false;
 }
 
 
@@ -595,12 +615,15 @@ void cDurationStatisticCtrl::Notify()
 	// Compute number of cycle performed
 	size_t current_cycle = m_cycle_->get_total_loop_number()- (m_cycle_->get_current_loop());
 	size_t total_cycle = saved_total_cycle;
-	wxString performed = wxString::Format("Performed: %Iu/%Iu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
+
+	// zu or Iu to print size_t integer value -> after MSVC2013 we can use zu, before it was not ANSI compatible and is %Iu formater.
+	//wxString performed = wxString::Format("Performed: %Iu/%Iu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
+	wxString performed = wxString::Format("Performed: %zu/%zu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
 	cycle_step_state->SetLabelText(performed);
 
 	// Update % in status bar
 	cObjectmanager* object_manager = object_manager->getInstance();
 	wxStatusBar* statusbar = object_manager->get_status_bar();
-	wxString statusstr = wxString::Format("%Ii %% performed...", (current_cycle * 100) / total_cycle);
+	wxString statusstr = wxString::Format("%zu %% performed...", (current_cycle * 100) / total_cycle);
 	statusbar->SetLabelText(statusstr);
 }

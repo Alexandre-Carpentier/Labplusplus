@@ -7,7 +7,7 @@
 #include "cPacesim.h"
 #include "cPacecom.h"
 
-cPressure::cPressure(wxWindow* inst, cDeviceMonitor* devmon)
+cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	std::cout << "cPressure ctor...\n";
 	inst_ = inst;

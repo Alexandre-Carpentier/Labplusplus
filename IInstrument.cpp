@@ -533,7 +533,8 @@ IInstrument::~IInstrument()
 
 size_t IInstrument::launch_device()
 {
-	return pimpl->m_instr->launch_device(pimpl->config);
+	//pimpl->config
+	return pimpl->m_instr->launch_device();
 }
 
 wxPanel* IInstrument::get_right_panel()

@@ -9,8 +9,11 @@
 #include "data_types.h"
 #include "enum.h"
 #include "cMeasurementmanager.h"
-#include "..\Lab++\Plugin\cDevice.h"
+//#include "..\Lab++\Plugin\cDevice.h"
+#include "..\Lab\Plugin\cDevice.h"
+
 #include "cDeviceMonitor.h";
+
 #include "cTable.h"
 
 class cInstrumentparam

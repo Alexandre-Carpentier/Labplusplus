@@ -73,7 +73,7 @@ public:
 	cMeasurementmanager* meas_manager = nullptr;
 
 
-	cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config, cDeviceMonitor* devmon);
+	cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_config, std::shared_ptr <cDeviceMonitor> devmon);
 
 	wxBoxSizer* GetSizer();
 

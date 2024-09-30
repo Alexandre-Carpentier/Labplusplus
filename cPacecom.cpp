@@ -35,9 +35,8 @@ size_t cPacecom::chan_write_count()
     return nb_sig;
 }
 
-int cPacecom::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+int cPacecom::launch_device()
 {
-    config_struct_ = config_struct;
     readpoint = 0.0;
     setpoint = 0.0;
 

@@ -10,8 +10,8 @@
 
 
 //#pragma comment (lib, "Plugin.lib")
-//#include "..\Lab\Plugin\cDevice.h"
-#include "..\Lab++\Plugin\cDevice.h"
+#include "..\Lab\Plugin\cDevice.h"
+//#include "..\Lab++\Plugin\cDevice.h"
 
 #include "cTable.h"
 #include "cPlot.h"
@@ -88,7 +88,7 @@ void cDevice::OnPaint()
 }
 -----------------Duplication---------------------------------*/
 
-cConfig::cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon)
+cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	inst_ = inst; // wxFrame is the parent
 	devmon_ = devmon;
@@ -223,6 +223,7 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table, cDeviceMonitor* devmon)
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
 	manager->set_voltagedevice(m_voltage); // Singleton saver...bad
+	manager->set_voltagersdevice(m_voltage_rs); // Singleton saver...bad
 	manager->set_oscopedevice(m_oscope); // Singleton saver...bad
 
 	/////////////////////////////////////////////////////
