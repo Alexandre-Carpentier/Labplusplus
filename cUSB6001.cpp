@@ -638,9 +638,11 @@ void cUsb6001::stop_device()
         std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
         analog_taskHandle = nullptr;
     }
-    if (digital_taskHandle != nullptr)
+    //if (digital_taskHandle != nullptr)
+    //{
+    for (auto& task : digital_taskHandle)
     {
-        for (auto& task : digital_taskHandle)
+        if (task != nullptr)
         {
             DAQmxStopTask(task);
             DAQmxClearTask(task);
@@ -648,8 +650,8 @@ void cUsb6001::stop_device()
             std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
             task = nullptr;
         }
-
     }
+    //}
 }
 
 cUsb6001::~cUsb6001()
@@ -671,7 +673,6 @@ cUsb6001::~cUsb6001()
             DAQmxClearTask(task);
             task = nullptr;
         }
-
     }
 };
 
