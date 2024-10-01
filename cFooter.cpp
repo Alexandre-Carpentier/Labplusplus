@@ -252,10 +252,13 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		////////////////////////////////////////////////////////////////////////////////
 		// START DAQ CTRL
 		////////////////////////////////////////////////////////////////////////////////
-		if (daqconfig->m_daq_->launch_device() < 0)
+		if (daqconfig->m_daq_ != nullptr)
 		{
-			evt.Skip();
-			return;
+			if (daqconfig->m_daq_->launch_device() < 0)
+			{
+				evt.Skip();
+				return;
+			}
 		}
 
 		// Lock daq interface when running	
@@ -368,6 +371,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		cDaqmx* daqconfig = obj_manager->get_daqmx();
 		cPressure* pressureconfig = obj_manager->get_pressuredevice();
 		cVoltage* voltageconfig = obj_manager->get_voltagedevice();
+		cVoltageRs* voltagersconfig = obj_manager->get_voltagersdevice();
 		cOscope* oscope_gui = obj_manager->get_oscopedevice();
 
 		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) && (voltageconfig == nullptr) && (oscope_gui == nullptr))
@@ -395,6 +399,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			// Unlock pressure controler interface
 			pressureconfig->device_group_sizer->GetStaticBox()->Enable(true);
 			voltageconfig->device_group_sizer->GetStaticBox()->Enable(true);
+			voltagersconfig->device_group_sizer->GetStaticBox()->Enable(true);
 			//oscopeconfig->device_group_sizer->GetStaticBox()->Enable(true);
 			oscope_gui->lockBtn(true);
 		}
