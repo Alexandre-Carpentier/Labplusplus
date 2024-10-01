@@ -63,13 +63,13 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	wxMenu* menu = new wxMenu();
 
 	this->Bind(wxEVT_MENU, &cMain::settingsButtonClicked, this,
-		menu->Append(wxID_ANY, "&Instruments configuration\t1")->GetId());
+		menu->Append(wxID_ANY, "&Instruments configuration\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::editButtonClicked, this,
-		menu->Append(wxID_ANY, "&Cycle configuration\t2")->GetId());
+		menu->Append(wxID_ANY, "&Cycle configuration\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::plotButtonClicked, this,
-		menu->Append(wxID_ANY, "&Graph window\t3")->GetId());
+		menu->Append(wxID_ANY, "&Graph window\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::MeasurementFolderButtonClicked, this,
-		menu->Append(wxID_ANY, "&Open measurement folder\t4")->GetId());
+		menu->Append(wxID_ANY, "&Open measurement folder\t")->GetId());
 	menu->AppendSeparator();
 	this->Bind(wxEVT_MENU, &cMain::exitButtonClicked, this,
 		menu->Append(wxID_ANY, "&Exit\tESC")->GetId());
