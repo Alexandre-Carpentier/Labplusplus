@@ -252,10 +252,13 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		////////////////////////////////////////////////////////////////////////////////
 		// START DAQ CTRL
 		////////////////////////////////////////////////////////////////////////////////
-		if (daqconfig->m_daq_->launch_device() < 0)
+		if (daqconfig->m_daq_ != nullptr)
 		{
-			evt.Skip();
-			return;
+			if (daqconfig->m_daq_->launch_device() < 0)
+			{
+				evt.Skip();
+				return;
+			}
 		}
 
 		// Lock daq interface when running	

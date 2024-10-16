@@ -58,7 +58,7 @@
 
 	std::vector<STEPSTRUCT> cCycle::get_step_table()
 	{
-		assert(cycle->step_table.size() > 0);
+		//assert(cycle->step_table.size() > 0);
 		const std::lock_guard<std::mutex> lock(step_mutex);
 		return cycle->step_table;
 	}

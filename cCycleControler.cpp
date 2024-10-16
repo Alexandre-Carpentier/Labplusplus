@@ -44,7 +44,11 @@ STEPSTRUCT cCycleControler::get_current_step_param()
 {
 	std::atomic <int> step = m_cycle->get_current_step();
 	std::vector<STEPSTRUCT> step_struct_vec = m_cycle->get_step_table();
-	assert(step_struct_vec.size() > 0);
+	//assert(step_struct_vec.size() > 0);
+	if (step_struct_vec.size() == 0)
+	{
+		std::cout << "[!] Error in cCycleControler: std::vector<STEPSTRUCT> step_struct_vec = m_cycle->get_step_table() return 0\n"; 
+	}
 	return step_struct_vec[step];
 }
 
