@@ -143,12 +143,14 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
-	static double old_pressure[MAX_CHAN];
-
+	//static double old_pressure[MAX_CHAN];
+	static double old_value[MAX_CHAN] = { 0 };
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
-		old_pressure[0] = 0.0;
+		//old_pressure[0] = 0.0;
+		memset(old_value ,0, sizeof(old_value)/sizeof(double));
+
 		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();
@@ -188,7 +190,7 @@ void cMeasurementControler::poll()
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						case MEAS_TYPE::DAQ_INSTR:
 						{
-							static double old_value[MAX_CHAN];
+							
 
 							if (meas->chan_write_count() > 0)
 							{
@@ -232,7 +234,9 @@ void cMeasurementControler::poll()
 
 								// call if modified
 								if (mod > 0)
+								{
 									meas->set(old_value, read);
+								}
 
 
 							}
@@ -245,10 +249,8 @@ void cMeasurementControler::poll()
 								read_pool.push_back(val.buffer[i]);
 							}
 							val.buffer_size = 0;
-
 							break;
 						}
-
 						}
 						
 				}

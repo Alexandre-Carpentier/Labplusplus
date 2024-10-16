@@ -339,7 +339,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 			m_pressure_ = new cPacesim;
 			meas_manager->set_measurement(m_pressure_);
 			m_pressure_->set_device_addr("Simulated");
-			m_pressure_->set_device_name("PACE60006000");
+			m_pressure_->set_device_name("PACE6000");
 		}
 		evt.Skip();
 		return;
