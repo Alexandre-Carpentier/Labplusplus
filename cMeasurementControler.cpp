@@ -64,6 +64,7 @@ void cMeasurementControler::poll()
 	std::cout << "cMeasurementcontroler->polling...\n";
 
 	DATAS val;
+	CHUNKS chunks;
 	double Y[80]; memset(Y, 0, sizeof(Y));
 	cTick tick;
 	double time = 0.0;
@@ -100,10 +101,9 @@ void cMeasurementControler::poll()
 			if (meas->chan_write_count() > 0)
 			{
 				size_t length = meas->chan_write_count();
-				double* values = new double();
-				memset(values, 0.0, length);
+				double* values = new double[length];
+				memset(values, 0.0, length*sizeof(double));
 				meas->set(values, length);
-				delete(values);
 
 				// Read data from instrument
 				val = meas->read();
@@ -190,8 +190,6 @@ void cMeasurementControler::poll()
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						case MEAS_TYPE::DAQ_INSTR:
 						{
-							
-
 							if (meas->chan_write_count() > 0)
 							{
 								double value[MAX_CHAN];
@@ -233,14 +231,12 @@ void cMeasurementControler::poll()
 								{
 									meas->set(old_value, read);
 								}
-
-
 							}
 							// Read data from instrument
 							val = meas->read();
 
 							// Add vector to store points
-							for (int i = 0; i < val.buffer_size; i++)
+							for (size_t i = 0; i < val.buffer_size; i++)
 							{
 								read_pool.push_back(val.buffer[i]);
 							}

@@ -9,13 +9,14 @@ function lua_entrypoint(wxInst)
 	-- 	return a builder instance
 	builder1 = builder()
 
-	builder1:ProduceIdentity("DAQ6510",2, "Voltage","Volt")
 	-- ProduceIdentity("name", PLUGIN_ACCESS, "meas unit", "unit")
 	-- 	Set the device name, access mode needed to be handled by core software, also add the measurement unit here.
 	-- 	arg1: Name of the equipment
 	-- 	arg2: PLUGIN_ACCESS READ=0 , WRITE=1, ALL=2
 	-- 	arg3: type of measurements ex: voltage
 	-- 	arg4: unit to attribute ex: Volt
+	builder1:ProduceIdentity("DAQ6510",2, "Voltage","Volt")
+
 
 	builder1:ProduceProtocol(4)
 	

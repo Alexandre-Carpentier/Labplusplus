@@ -393,6 +393,16 @@ void cPlot::graph_addpoint(const int signb, double val[])
 	AddPoints(hGraph, val, signb);
 }
 
+void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
+{
+	if (hGraph == nullptr)
+	{
+		std::cout << "cPlot::graph_addpoint() -> hGraph is null\n";
+		return;
+	}
+	AddMultiplePoints(hGraph, val, signb, chunk_size);
+}
+
 double cPlot::get_signal_min_value(MEAS_TYPE type, int SignalNumber)
 {
 	cSignalTable* sigt = sigt->getInstance();

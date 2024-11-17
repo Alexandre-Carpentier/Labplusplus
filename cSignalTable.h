@@ -23,8 +23,12 @@ public:
 			std::cout << "creating cSignalTable singleton.\n";
 			// Create a signal table
 			// to share between components
-			cSignalTable* sigt = sigt->getInstance();
-			sigt->create_signal_table(64);
+			
+			//cSignalTable* sigt = sigt->getInstance(); 
+			//sigt->create_signal_table(64);
+
+			singleton_->create_signal_table(64);
+
 			std::cout << "add 64 signals to cSignalTable.\n";
 		}
 		else

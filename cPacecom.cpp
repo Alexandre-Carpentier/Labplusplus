@@ -60,7 +60,7 @@ int cPacecom::launch_device()
     device->write(L"*RST\n");
 
     // init PACE6000 specific command
-    device->write(L"SOUR:PRES 0\n"); // Set to 1 bar
+    device->write(L"SOUR:PRES 0\n"); // Set to 1 bar abs
 
     device->write(L":UNIT BAR\n");
     device->write(L":SOUR:SLEW:MODE max\n");

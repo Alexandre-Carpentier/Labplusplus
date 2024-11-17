@@ -103,7 +103,7 @@ public:
 
 	cFooter* m_footer = nullptr;
 
-	cInicfg* cfg_saver = nullptr;
+	std::unique_ptr<cInicfg> cfg_saver;
 
 	wxBoxSizer* main_vsizer = nullptr;
 

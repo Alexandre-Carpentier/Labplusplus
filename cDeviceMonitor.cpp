@@ -50,8 +50,13 @@ void cDeviceMonitor::Notify()
 
 		std::wstring instr_name = L"";
 		device->init();
-		device->write(L"*IDN?\r");
+		device->write(L"*IDN?\n");
 		device->read(instr_name);
+		if (instr_name.compare(L"") != 0)
+		{
+			device->write(L"*IDN?\r");
+			device->read(instr_name);
+		}
 		device->close();
 
 		cDev dev;	
@@ -97,9 +102,17 @@ void cDeviceMonitor::Notify()
 		std::unique_ptr<IProtocol> device = factory.make(PROTOCOLENUM::VISAUSB, usbaddr.c_str());
 
 		std::wstring instr_name = L"";
-		if (device->init().err_code < 0) { continue; }
+		if (device->init().err_code < 0) 
+		{ 
+			continue; 
+		}
 		device->write(L"*IDN?\n");
 		device->read(instr_name);
+		if (instr_name.compare(L"") == 0)
+		{
+			device->write(L"*IDN?\r");
+			device->read(instr_name);
+		}
 		device->close();
 
 		cDev dev;

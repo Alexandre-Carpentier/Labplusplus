@@ -26,6 +26,10 @@ class cTable
 {
 public:
 	wxGrid* grid = nullptr;
+
+	void serialize(std::string config_name);
+	void deserialize(std::string config_name);
+
 	cTable(wxWindow* inst, cConfig* m_config);
 	int get_step_number();
 	int get_loop_number();

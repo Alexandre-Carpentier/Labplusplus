@@ -109,11 +109,14 @@ void cVoltage::RefreshPort()
 
 	for (auto& dev : dev_list)
 	{
-		//std::wstring wname = dev.get_name();
-		//if (wname.compare(L"Unknown") != 0)
-		//{
-		addr_ctrl->Append(dev.get_addr());
-		//}
+		std::wstring full_name = dev.get_addr();
+		full_name.append(L"::");
+		full_name.append(dev.get_name());
+		full_name.append(L"::");
+		full_name.append(dev.get_type());
+
+		label.device_name.push_back(full_name);
+		addr_ctrl->Append(full_name);
 	}
 	addr_ctrl->Append("Simulated");
 	addr_ctrl->SetSelection(0);

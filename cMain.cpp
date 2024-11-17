@@ -231,7 +231,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 
 	// must load generic row in the table
-	cfg_saver = new cInicfg;
+	cfg_saver = std::make_unique<cInicfg>();
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -255,7 +255,7 @@ void cMain::OnCloseWindow(wxCloseEvent& event)
 cMain::~cMain()
 {
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
-	delete cfg_saver; //save before destroying objects
+	delete m_table;
 	delete m_plot;
 	delete m_graphrender;
 	delete m_statrender;

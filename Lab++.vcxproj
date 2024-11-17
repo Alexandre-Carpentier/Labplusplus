@@ -180,6 +180,7 @@
     <ClCompile Include="cGnuplot.cpp" />
     <ClCompile Include="cImagePanel.cpp" />
     <ClCompile Include="cInicfg.cpp" />
+    <ClCompile Include="cSerialize.cpp" />
     <ClCompile Include="IInstrument.cpp" />
     <ClCompile Include="cMain.cpp" />
     <ClCompile Include="cMeasurement.cpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="cGnuplot.h" />
     <ClInclude Include="cImagePanel.h" />
     <ClInclude Include="cInicfg.h" />
+    <ClInclude Include="cSerialize.h" />
     <ClInclude Include="IInstrument.h" />
     <ClInclude Include="cMain.h" />
     <ClInclude Include="cMeasurement.h" />

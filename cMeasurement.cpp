@@ -10,11 +10,6 @@ void cCommon::remove_value() {
 	ring_buffer.X.pop_front(); ring_buffer.Y.pop_front();
 }
 
-cMeasurement::cMeasurement()
-{
-	
-}
-
 int cMeasurement::launch_device() { return -1; }
 
 std::string cMeasurement::device_name() { return std::string("Measurement super class"); };

@@ -19,6 +19,13 @@ struct DATAS
 	std::string unit;
 };
 
+struct CHUNKS
+{
+	size_t buffer_size;
+	double *buffer[MAX_CHAN];
+	std::string unit;
+};
+
 class cCommon : public cTick
 {
 private:
@@ -40,29 +47,29 @@ public:
 class cMeasurement : public cCommon {
 private:
 	DATAS result_struct;
+	CHUNKS chunks_struct;
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 public:
-	cMeasurement();
 
-	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
-	virtual int launch_device();
+	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct) = 0;
+	virtual int launch_device() = 0;
 
-	virtual std::string device_name();
-	virtual MEAS_TYPE device_type();
-	virtual size_t chan_count();
-	virtual size_t chan_read_count();
-	virtual size_t chan_write_count();
+	virtual std::string device_name() = 0;
+	virtual MEAS_TYPE device_type() = 0;
+	virtual size_t chan_count() = 0;
+	virtual size_t chan_read_count() = 0;
+	virtual size_t chan_write_count() = 0;
 
-	virtual DATAS read();
-	virtual void set(double *value, size_t length);
+	virtual DATAS read() = 0;
+	//virtual CHUNKS read_chunks();
+	virtual void set(double *value, size_t length) = 0;
 
 	
 	virtual void set_device_name(std::string name);
 	virtual void set_device_addr(std::string addr);
 
 	void start_device();
-	virtual void stop_device();
-	virtual ~cMeasurement() = default;
+	virtual void stop_device() = 0;
 };
 
 

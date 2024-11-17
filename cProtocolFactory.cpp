@@ -49,5 +49,5 @@ std::unique_ptr<IProtocol> cProtocolFactory::make(PROTOCOLENUM type, std::wstrin
 		}
 		protocol_obj = std::make_unique<cTcp>(addr);
 	}
-	return protocol_obj;
+	return std::move(protocol_obj);
 }

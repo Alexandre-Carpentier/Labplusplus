@@ -73,6 +73,10 @@ public:
 	wxButton* daq_activate;
 
 	wxComboBox* addr_ctrl = nullptr;
+
+	wxStaticText* static_device_sn = nullptr;
+	wxComboBox* device_sn = nullptr;
+
 	//wxComboBox* max_ctrl = nullptr;
 	//wxComboBox* min_ctrl = nullptr;
 	//wxComboBox* mode_ctrl = nullptr;
@@ -148,6 +152,8 @@ public:
 	wxStaticText* static_chan_unit;
 	std::string str_unit;
 	wxTextCtrl* chan_unit;
+	wxStaticText* static_channel_sn = nullptr;
+	wxComboBox* channel_sn = nullptr;
 
 	wxStaticText* static_chan_filter;
 	std::string str_filter;
@@ -185,6 +191,9 @@ public:
 	const int TEXT_CTRL_STYLE = wxSUNKEN_BORDER;
 	const wxSize text_ctrl_size = wxSize(110, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
+
+	void serialize(std::string device);
+	void deserialize(std::string device);
 
 	cDaqmx(wxWindow* inst);
 	~cDaqmx();
@@ -224,9 +233,10 @@ public:
 	void OnChannelBtnNumberCliqued(wxCommandEvent& evt);
 	bool isDeviceMeasurable(std::string dev_name);
 
+	void DoChannelUpdate(bool isDisplayed);
 	void SwitchChannelON(bool isDisplayed);
-
 	void UpdateChannelSig(bool isDisplayed);
+	void AddControlColomnTable(bool isDisplayed);
 	void UpdateChannelTable(bool isDisplayed);
 
 	void EnableChannelItems(bool isDisplayed);
@@ -242,6 +252,5 @@ public:
 	int GetChannelNumber();
 	std::vector <bool> GetChannelEnabledVector();
 	CURRENT_DEVICE_CONFIG_STRUCT GetDaqConfigStruct();
-
 };
 

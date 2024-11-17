@@ -65,6 +65,10 @@ err_struct cVisausb::init()
 	status = viOpen(ressource_manager, (ViRsrc)device_utf8.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
+		if (status == -1073807343) 
+		{
+			std::cout << "Les informations concernant la position sont insuffisantes ou bien soit le périphérique soit la ressource n'est pas présent dans le système.\n";
+		}
 		return { std::wstring(L"[!] viOpen() failled."), -4 };
 	}
 
