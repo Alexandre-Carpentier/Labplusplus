@@ -144,12 +144,12 @@ void cMeasurementControler::poll()
 	tick.start_tick();
 
 	//static double old_pressure[MAX_CHAN];
-	static double old_value[MAX_CHAN] = { 0 };
+	static volatile double old_value[MAX_CHAN] = { 0 };
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
 		//old_pressure[0] = 0.0;
-		memset(old_value ,0, sizeof(old_value)/sizeof(double));
+		//memset(old_value ,0, sizeof(old_value)/sizeof(double));
 
 		if (!st.stop_requested())
 		{
@@ -220,6 +220,10 @@ void cMeasurementControler::poll()
 
 								// unprotect
 								m_cyclecontroler_->cycle_mutex.unlock();
+
+								std::cout << "Value: " << value[0] << "\n";
+								std::cout << "Old Value: " << old_value[0] << "\n";
+
 								int mod = 0;
 								for (size_t i = 0; i < read; i++)
 								{
@@ -233,7 +237,8 @@ void cMeasurementControler::poll()
 								// call if modified
 								if (mod > 0)
 								{
-									meas->set(old_value, read);
+									meas->set(value, read);
+									mod = 0;
 								}
 							}
 							// Read data from instrument
