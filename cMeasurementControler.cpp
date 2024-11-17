@@ -198,6 +198,10 @@ void cMeasurementControler::poll()
 								// protect
 								m_cyclecontroler_->cycle_mutex.lock();
 
+								if (m_cyclecontroler_->get_total_loop() == 0)
+								{
+									break;
+								}
 								STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
 								size_t length = meas->chan_write_count(); 
 								size_t read = 0;
