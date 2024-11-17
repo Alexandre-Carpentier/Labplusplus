@@ -221,12 +221,13 @@ void cMeasurementControler::poll()
 								// unprotect
 								m_cyclecontroler_->cycle_mutex.unlock();
 
-								std::cout << "Value: " << value[0] << "\n";
-								std::cout << "Old Value: " << old_value[0] << "\n";
+								//std::cout << "Value: " << value[0] << "\n";
+								//std::cout << "Old Value: " << old_value[0] << "\n";
 
 								int mod = 0;
 								for (size_t i = 0; i < read; i++)
 								{
+									// Add keyword volatile to prevent compiler optimizing on old_value
 									if (old_value[i] != value[i])
 									{
 										mod++;
