@@ -91,6 +91,7 @@ public:
 	void start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header);
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);
+	void graph_addpoints(const int signb, double* val[], int chunk_size);
 
 	double get_signal_min_value(MEAS_TYPE type, int SignalNumber);
 	double get_signal_average_value(int SignalNumber);

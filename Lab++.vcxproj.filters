@@ -93,6 +93,9 @@
     <Filter Include="Fichiers sources\Measurement\Protocol\NATIVERS232">
       <UniqueIdentifier>{eacb1972-3055-4e50-8dd1-d9a737c18872}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\tools\serialize">
+      <UniqueIdentifier>{dbb84f71-567c-4354-8bbd-9055727dada4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cApp.cpp">
@@ -144,9 +147,6 @@
       <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
     <ClCompile Include="cImagePanel.cpp">
-      <Filter>Fichiers sources\tools</Filter>
-    </ClCompile>
-    <ClCompile Include="cInicfg.cpp">
       <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
     <ClCompile Include="cMeasurementmanager.cpp">
@@ -275,6 +275,12 @@
     <ClCompile Include="cVoltageRs.cpp">
       <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
     </ClCompile>
+    <ClCompile Include="cInicfg.cpp">
+      <Filter>Fichiers sources\tools\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="cSerialize.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -329,9 +335,6 @@
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
     <ClInclude Include="cImagePanel.h">
-      <Filter>Fichiers sources\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="cInicfg.h">
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
     <ClInclude Include="cMeasurementmanager.h">
@@ -464,6 +467,12 @@
     </ClInclude>
     <ClInclude Include="cVoltageRs.h">
       <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cInicfg.h">
+      <Filter>Fichiers sources\tools\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="cSerialize.h">
+      <Filter>Fichiers sources\tools\serialize</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

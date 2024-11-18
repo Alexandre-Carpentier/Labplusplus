@@ -7,6 +7,7 @@
 #include "cPacesim.h"
 #include "cPacecom.h"
 
+
 cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	std::cout << "cPressure ctor...\n";
@@ -24,6 +25,11 @@ cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	for (auto device : dev_list)
 	{
 		std::wstring full_name = device.get_addr();
+		full_name.append(L"::");
+		full_name.append(device.get_name());
+		full_name.append(L"::");
+		full_name.append(device.get_type());
+
 		label.device_name.push_back(full_name);
 	}
 	label.device_name.push_back("Simulated");
@@ -99,9 +105,6 @@ cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	v_sizer->Add(dummy); // Space for daq img
 	v_sizer->Add(device_group_sizer, 0, wxALIGN_CENTER, inst->FromDIP(10));
 	pace_rightpanel_->SetSizerAndFit(v_sizer);
-
-	//wxCommandEvent evt0 = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCPRESSUREACTIVATE);
-	//wxPostEvent(inst_, evt0);
 }
 
 cPressure::~cPressure()

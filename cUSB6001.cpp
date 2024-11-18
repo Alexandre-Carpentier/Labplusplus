@@ -12,6 +12,7 @@ cUsb6001::cUsb6001()
 
     result.buffer;
     result.buffer_size = 0;
+    DAQret = 0;
 };
 
 std::string cUsb6001::device_name() { return std::string("NI-DAQ"); }
@@ -63,6 +64,10 @@ size_t cUsb6001::chan_write_count()
 
 void cUsb6001::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 {
+    assert(config_struct.channel_enabled.size() <= 48);
+    assert(config_struct.channel_index <= 48);
+    assert(config_struct.chan_number <= 48);
+
     config_struct_ = config_struct;
 }
 
@@ -74,6 +79,7 @@ int cUsb6001::launch_device()
         std::cout << "[!] launch_device() failed. Error configuration structure empty...\n";
         return -1;
     }
+
     // Setup DAQmx
 
     if (0 != DAQmxSelfTestDevice(config_struct_.device_name))
@@ -580,7 +586,7 @@ void cUsb6001::set(double* value, size_t length)
     for (uInt8 i = 0; i < length; i ++)
     {
         std::cout << "[*] length: " << length << "\n";
-        std::cout << "[*] double[0][1][2][3]: " << *value << *(value+1) << *(value+2) << *(value+3) << "\n";
+        std::cout << "[*] double[0][1][2][3]: " << *value << " " << *(value + 1) << " " << *(value + 2) << " " << *(value + 3) << "\n";
         
         if (*(value + i) > 0.0)
         {

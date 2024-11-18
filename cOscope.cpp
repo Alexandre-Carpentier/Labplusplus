@@ -177,7 +177,14 @@ void cOscope::Oscopeimpl::RefreshPort()
 
 	for (auto& dev : dev_list)
 	{
-		addr_ctrl->Append(dev.get_addr());
+		std::wstring full_name = dev.get_addr();
+		full_name.append(L"::");
+		full_name.append(dev.get_name());
+		full_name.append(L"::");
+		full_name.append(dev.get_type());
+
+		label.device_name.push_back(full_name);
+		addr_ctrl->Append(full_name);
 	}
 	addr_ctrl->Append("Simulated");
 	addr_ctrl->SetSelection(0);
@@ -569,7 +576,17 @@ size_t cOscope::launch_device()
 	{
 		return -1;
 	}
-	//pimpl->config
+
+	// Clean address
+	std::size_t pos = 0;
+	for (size_t i = 0; i < 4; i++)
+	{
+		pos += pimpl->config.device_addr.find("::", pos); // Find end of correct addr
+	}	
+	pimpl->config.device_addr = pimpl->config.device_addr.substr(0, pos-1); // resize
+
+
+	pimpl->m_oscope_->set_configuration_struct(pimpl->config);
 	return pimpl->m_oscope_->launch_device();
 }
 

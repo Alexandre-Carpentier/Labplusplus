@@ -64,8 +64,8 @@ err_struct cUsb::init()
 	}
 
 	// CANCELIO
-	OVERLAPPED overlapped;
-	ZeroMemory(&overlapped, sizeof(OVERLAPPED));
+	OVERLAPPED overlapped = { 0 };
+	//ZeroMemory(&overlapped, sizeof(OVERLAPPED));
 	overlapped.hEvent = CreateEvent(NULL, false, false, NULL);
 
 	USBTMC_PIPE_TYPE pipeType = USBTMC_ALL_PIPES;
@@ -95,7 +95,7 @@ err_struct cUsb::init()
 	CloseHandle(overlapped.hEvent);
 
 	// RESETPIPE
-	overlapped;
+	//overlapped;
 	ZeroMemory(&overlapped, sizeof(OVERLAPPED));
 	overlapped.hEvent = CreateEvent(NULL, false, false, NULL);
 
@@ -126,7 +126,7 @@ err_struct cUsb::init()
 	CloseHandle(overlapped.hEvent);
 
 	// GETINFO
-	overlapped;
+	//overlapped;
 	ZeroMemory(&overlapped, sizeof(OVERLAPPED));
 	overlapped.hEvent = CreateEvent(NULL, false, false, NULL);
 
@@ -150,7 +150,7 @@ err_struct cUsb::init()
 	CloseHandle(overlapped.hEvent);
 
 	// SENDREQUEST
-	overlapped;
+	//overlapped;
 	ZeroMemory(&overlapped, sizeof(OVERLAPPED));
 	overlapped.hEvent = CreateEvent(NULL, false, false, NULL);
 
@@ -230,7 +230,10 @@ err_struct cUsb::init()
 			return last_error;
 		}			
 	}
-	CloseHandle(overlapped.hEvent);
+	if (overlapped.hEvent != 0)
+	{
+		CloseHandle(overlapped.hEvent);
+	}
 
 	// READ
 	overlapped;
@@ -275,8 +278,10 @@ err_struct cUsb::init()
 		last_error.err_code = -14;
 		return last_error;
 	}
-	CloseHandle(overlapped.hEvent);
-
+	if (overlapped.hEvent != 0)
+	{
+		CloseHandle(overlapped.hEvent);
+	}
 	// WinUsb_Initialize
 	/*
 	WINUSB_INTERFACE_HANDLE usb_interface = INVALID_HANDLE_VALUE;

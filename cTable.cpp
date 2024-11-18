@@ -6,6 +6,66 @@
 #include <format>
 #include <vector>
 
+#include <filesystem>
+#include "cSerialize.h"
+
+void cTable::serialize(std::string config_name)
+{
+	size_t col = 0;
+	for (auto enable : col_enable)
+	{
+		if (enable)
+		{
+			wxString col_name = grid->GetColLabelValue(col);
+			std::string fullpath = "Lab++Table";
+			fullpath.append(col_name);
+			fullpath.append(".ini");
+			cSerialize configsaver(fullpath);
+			
+			for (size_t i = 0; i < LINE_NB; i++)
+			{
+				wxString row_value = grid->GetCellValue(i, col);
+				if (row_value.size() > 0)
+				{
+					serialize_item(configsaver, std::to_string(i), row_value);
+				}
+			}
+		}
+		col++;
+	}
+}
+
+void cTable::deserialize(std::string config_name)
+{
+	size_t col_num = grid->GetNumberCols();
+	for (size_t col = 0; col < col_num; col++)
+	{
+		wxString col_name = grid->GetColLabelValue(col);
+		std::string filename = "Lab++Table";
+		filename.append(col_name);
+		filename.append(".ini");
+
+		auto path = std::filesystem::temp_directory_path().parent_path().parent_path().parent_path();
+		path /= "Roaming\\";
+		path += filename;
+
+		if (std::filesystem::exists(path))
+		{
+			cSerialize configsaver(filename);
+
+			for (size_t i = 0; i < LINE_NB; i++)
+			{
+				wxString value;
+				deserialize_item(configsaver, std::to_string(i), value);
+				if (value.size() > 0)
+				{
+					grid->SetCellValue(i, col, value);
+				}
+			}
+		}
+	}
+}
+
 cTable::cTable(wxWindow* inst, cConfig *m_config)
 {
 	std::cout << "cTable ctor...\n";
@@ -62,7 +122,9 @@ cTable::cTable(wxWindow* inst, cConfig *m_config)
 		
 		for (int n = 0; n < output; n++) // Add each output from output_vec
 		{			
-			grid->SetColLabelValue(pos, name + std::format("_{}", n) + std::string("(") + unit + std::string(")"));
+			std::string col_name = name + std::format("_{}", n) + std::string("(") + unit + std::string(")");
+			
+			grid->SetColLabelValue(pos, col_name);
 			grid->SetColSize(pos, 0); // Hide it
 			col_enable.push_back(false);
 			pos++; // col index
@@ -122,11 +184,25 @@ cTable::cTable(wxWindow* inst, cConfig *m_config)
 	//set_line_highlight(2);
 
 	m_config_->set_table(this); // share cTable with plugin
+
+	// Deserialize
+	for (auto name : name_vec)
+	{
+		deserialize(name);
+	}
 }
 
 cTable::~cTable()
 {
 	std::cout << "cTable dtor...\n";
+
+	// Serialize
+	std::vector<std::string>name_vec = m_config_->get_plugin_name_vec();
+	for (auto name : name_vec)
+	{
+		serialize(name);
+	}
+
 	delete stat; // TODO wxwidget delete stat automatically ?
 	stat = nullptr;
 	// Save current row values

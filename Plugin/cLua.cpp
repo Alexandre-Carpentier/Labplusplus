@@ -100,6 +100,7 @@ void lua_display_stack(lua_State* L)
 	str = str + "\n";
 	std::cout << str;
 }
+
 //////////////////////////////////////////////////////////////
 // LUA VM
 // -----------------------------------------------------------
@@ -150,11 +151,12 @@ cDevice* lua_start_vm(void* wxInst)
 
 			if (lua_isuserdata(L, -1))
 			{
-				// TODO: mauvais index builder corompu
 				lua_display_stack(L);
 
 				builder = (DeviceBuilder1*) lua_touserdata(L, -1);
+				assert(builder != nullptr);
 				dev = builder->GetProduct();
+				assert(dev != nullptr);
 				dev->set_lua_state_ptr(L);
 
 				// Size properly items inside the sizer

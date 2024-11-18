@@ -1532,9 +1532,10 @@ VOID SignalResetStatisticValue(HGRAPH hGraph, INT SIGNB)
 	}
 	LeaveCriticalSection(&cs);
 }
-
-
-VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
+/*-------------------------------------------------------------------------
+	AddPoints: Add a one point for every signal
+  -------------------------------------------------------------------------*/
+VOID AddPoints(HGRAPH hGraph, DOUBLE* y, INT SignalCount)
 {
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
@@ -1565,7 +1566,7 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 	// TODO: Check if signalcount = length of y!
 
-	if (pgraph->signalcount != PointsCount)
+	if (pgraph->signalcount != SignalCount)
 	{
 		printf("[!] Error at AddPoints() signalcount not egual to y length\n");
 		return;
@@ -1754,7 +1755,139 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 	LeaveCriticalSection(&cs);
 }
+/*-------------------------------------------------------------------------
+	AddMultiplePoints: Add a chunk of data in the graph buffer for each signal count
+  -------------------------------------------------------------------------*/
+VOID AddMultiplePoints(HGRAPH hGraph, DOUBLE** Chunks, INT SignalCount, INT BufferLength)
+{
+	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
+	// Sanity check
+
+	if (NULL == pgraph)
+	{
+		printf("[!] Error at AddPoints() graph handle is null\n");
+		return;
+	}
+
+	DATA* pDATA = NULL;
+	/*
+	if (cs.DebugInfo == NULL)
+	{
+		printf("[!] Error at AddPoints() critical section not available\n");
+		return;
+	}
+	*/
+
+	// Sanity check
+
+	if (FALSE == pgraph->bRunning)
+	{
+		printf("[!] Error at AddPoints() graph not strated\n");
+		return;
+	}
+
+	// TODO: Check if signalcount = length of y!
+
+	if (pgraph->signalcount != SignalCount)
+	{
+		printf("[!] Error at AddPoints() signalcount not egual to y length\n");
+		return;
+	}
+
+	EnterCriticalSection(&cs);
+
+	// If the maximum points are reached 
+	// in the buffer, shift left the array and
+	// dec the current number of points
+
+	size_t graph_overflow = pgraph->BufferSize - (pgraph->cur_nbpoints + BufferLength);
+	if (graph_overflow <= 0)
+	{
+		graph_overflow = abs((int)graph_overflow);															//Absolute value
+
+		for (int index = 0; index < pgraph->signalcount; index++)
+		{
+			pDATA = pgraph->signal[index];
+
+			for (int j = 0; j < pgraph->BufferSize - graph_overflow; j++)
+			{
+				pDATA->X[j] = pDATA->X[j + graph_overflow];																// Shift left X
+				pDATA->Y[j] = pDATA->Y[j + graph_overflow];																// Shift left Y
+			}
+		}
+		pgraph->cur_nbpoints = pgraph->BufferSize - graph_overflow;
+	}
+	LeaveCriticalSection(&cs);
+
+	// Save the actual timestamp
+
+	if (pgraph->cur_nbpoints == 0)
+	{
+		finish = start;
+	}
+	else
+	{
+		finish = PerformanceCounter();
+	}
+
+	EnterCriticalSection(&cs);
+	for (int index = 0; index < pgraph->signalcount; index++)
+	{
+		pDATA = pgraph->signal[index];
+		if (NULL == pDATA)
+		{
+			LeaveCriticalSection(&cs);
+			printf("[!] Error at AddPoints() data buffer is null\n");
+			return;
+		}
+
+		// Add points to the selected buffer	
+		double x_step = ((double)((finish - start)) / frequency) / BufferLength;
+		for (size_t i = 0; i < BufferLength; i++)
+		{
+			pDATA->X[pgraph->cur_nbpoints + i] = x_step * i;												// Save in X the elapsed time from start
+		}
+						
+		for (size_t i = 0; i < BufferLength; i++)
+		{
+			pDATA->Y[pgraph->cur_nbpoints+i] = Chunks[index][i];													// Save Y										
+		}
+														
+
+		// Perform some statistics
+
+		// period
+		pDATA->stat.period_s = pDATA->X[pgraph->cur_nbpoints] - pDATA->X[0];								// Update current period
+
+		//min
+		if (pDATA->Y[pgraph->cur_nbpoints] < pDATA->stat.min_value)
+		{
+			pDATA->stat.min_value = pDATA->Y[pgraph->cur_nbpoints];											// Update current min value displayed
+		}
+
+		//average
+		if (pgraph->cur_nbpoints > 0)
+		{
+			pDATA->stat.average_value_accumulator += pDATA->Y[pgraph->cur_nbpoints];
+			pDATA->stat.average_value_counter++;
+
+			pDATA->stat.average_value = pDATA->stat.average_value_accumulator / pDATA->stat.average_value_counter;
+		}
+
+		//max
+		if (pDATA->Y[pgraph->cur_nbpoints] > pDATA->stat.max_value)
+		{
+			pDATA->stat.max_value = pDATA->Y[pgraph->cur_nbpoints];											// Update current max value displayed
+		}
+	}
+
+	// Inc the number of points
+
+	pgraph->cur_nbpoints = pgraph->cur_nbpoints + BufferLength;
+
+	LeaveCriticalSection(&cs);
+}
 /*-------------------------------------------------------------------------
 	Render: Analyze the data buffers and print waves to the
 	OpenGL device context

@@ -129,6 +129,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 			CURRENT_DEVICE_CONFIG_STRUCT config = daqconfig->GetDaqConfigStruct();
 
+			daqconfig->serialize(config.device_name.ToStdString());
+
 			int i = 0;
 			int c = 0;
 			std::vector <bool> bChannels = daqconfig->GetChannelEnabledVector();
@@ -235,6 +237,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		////////////////////////////////////////////////////////////////////////////////
 		// SAVE INSTRUMENT ID TO LOGFILE
 		////////////////////////////////////////////////////////////////////////////////
+
+		/*
 		size_t sizesig = meas_manager->get_measurement_total_channel_number();
 		std::string head;
 		cDeviceIDSaver cDeviceIDSaverDlg(sizesig, this->inst_, IDCDEVICEIDSAVERDLG, "Reccord your instrument ID?");
@@ -247,6 +251,17 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		else
 		{
 			head = " No instruments ID/SN saved by the user";
+		}
+		*/
+		size_t pos = 0;
+		std::string head;
+		auto daq_config = daqconfig->GetDaqConfigStruct();	
+		for (auto is_enable : daq_config.channel_enabled)
+		{
+			if (is_enable)
+			{
+				head.append(std::format("{}::{}\t", daq_config.device_serial_number[pos].ToStdString(), daq_config.channel_serial_number[pos].ToStdString())); pos++;
+			}
 		}
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -347,14 +362,13 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		std::cout << "Launching Measurement controler\n";
 		meas_controler = make_shared<cMeasurementControler>(cycle_controler);
 		meas_manager->set_measurement_controler(meas_controler);
-		
-
-
+	
+		size_t sizesig = meas_manager->get_measurement_total_channel_number();
 		meas_controler->start();
 		m_plot_->start_graph(Rec, sizesig, head);
 
 		startbtn->SetBackgroundColour(wxColor(250, 80, 90));
-		startbtn->SetLabelText(L"Stop");		
+		startbtn->SetLabelText(L"Stop");	
 	}
 	else
 	{

@@ -64,6 +64,7 @@ void cMeasurementControler::poll()
 	std::cout << "cMeasurementcontroler->polling...\n";
 
 	DATAS val;
+	CHUNKS chunks;
 	double Y[80]; memset(Y, 0, sizeof(Y));
 	cTick tick;
 	double time = 0.0;
@@ -100,10 +101,9 @@ void cMeasurementControler::poll()
 			if (meas->chan_write_count() > 0)
 			{
 				size_t length = meas->chan_write_count();
-				double* values = new double();
-				memset(values, 0.0, length);
+				double* values = new double[length];
+				memset(values, 0.0, length*sizeof(double));
 				meas->set(values, length);
-				delete(values);
 
 				// Read data from instrument
 				val = meas->read();
@@ -144,12 +144,12 @@ void cMeasurementControler::poll()
 	tick.start_tick();
 
 	//static double old_pressure[MAX_CHAN];
-	static double old_value[MAX_CHAN] = { 0 };
+	static volatile double old_value[MAX_CHAN] = { 0 };
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
 		//old_pressure[0] = 0.0;
-		memset(old_value ,0, sizeof(old_value)/sizeof(double));
+		//memset(old_value ,0, sizeof(old_value)/sizeof(double));
 
 		if (!st.stop_requested())
 		{
@@ -190,8 +190,6 @@ void cMeasurementControler::poll()
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						case MEAS_TYPE::DAQ_INSTR:
 						{
-							
-
 							if (meas->chan_write_count() > 0)
 							{
 								double value[MAX_CHAN];
@@ -222,6 +220,10 @@ void cMeasurementControler::poll()
 
 								// unprotect
 								m_cyclecontroler_->cycle_mutex.unlock();
+
+								//std::cout << "Value: " << value[0] << "\n";
+								//std::cout << "Old Value: " << old_value[0] << "\n";
+
 								int mod = 0;
 
 								std::cout << value[0] << " " << value[1] << "\n";
@@ -229,6 +231,7 @@ void cMeasurementControler::poll()
 
 								for (size_t i = 0; i < read; i++)
 								{
+									// Add keyword volatile to prevent compiler optimizing on old_value
 									if (old_value[i] != value[i])
 									{
 										mod++;
@@ -240,16 +243,15 @@ void cMeasurementControler::poll()
 								// call if modified
 								if (mod > 0)
 								{
-									meas->set(old_value, read);
+									meas->set(value, read);
+									mod = 0;
 								}
-
-
 							}
 							// Read data from instrument
 							val = meas->read();
 
 							// Add vector to store points
-							for (int i = 0; i < val.buffer_size; i++)
+							for (size_t i = 0; i < val.buffer_size; i++)
 							{
 								read_pool.push_back(val.buffer[i]);
 							}

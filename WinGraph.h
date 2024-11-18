@@ -55,7 +55,8 @@ extern "C" {
 	__declspec(dllexport)double GetSignalMaxValue(HGRAPH hGraph, INT SIGNB);
 	__declspec(dllexport)VOID SignalResetStatisticValue(HGRAPH hGraph, INT SIGNB);
 
-	__declspec(dllexport)VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount);
+	__declspec(dllexport)VOID AddPoints(HGRAPH hGraph, DOUBLE* y, INT SignalCount);
+	__declspec(dllexport)VOID AddMultiplePoints(HGRAPH hGraph, DOUBLE** Chunks, INT SignalCount, INT BufferLength);
 	__declspec(dllexport)BOOL Render(HGRAPH hGraph);
 	__declspec(dllexport)VOID ReshapeGraph(HGRAPH hGraph, int left, int top, int right, int bottom);
 #ifdef __cplusplus
