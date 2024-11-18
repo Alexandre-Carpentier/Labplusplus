@@ -223,6 +223,10 @@ void cMeasurementControler::poll()
 								// unprotect
 								m_cyclecontroler_->cycle_mutex.unlock();
 								int mod = 0;
+
+								std::cout << value[0] << " " << value[1] << "\n";
+								std::cout << old_value[0] << " " << old_value[1] << "\n";
+
 								for (size_t i = 0; i < read; i++)
 								{
 									if (old_value[i] != value[i])
@@ -230,6 +234,7 @@ void cMeasurementControler::poll()
 										mod++;
 										old_value[i] = value[i]; // save old value
 									}
+									std::cout << mod << "\n";
 								}
 
 								// call if modified
