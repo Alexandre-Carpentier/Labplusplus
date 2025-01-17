@@ -63,17 +63,11 @@
     <Filter Include="Fichiers sources\Measurement\Protocol\VISA\Derived">
       <UniqueIdentifier>{e53440b3-bd52-48b3-acf8-7adfd440a1c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers sources\MainWindow\config\voltage\NI DAQmx">
-      <UniqueIdentifier>{7d9796a8-bbe6-405a-9f08-09a7168d2e25}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fichiers sources\MainWindow\config\voltage\DC supply">
       <UniqueIdentifier>{564cc757-5af4-4ecd-89c9-4b521fa2b7dd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Fichiers sources\Measurement\Type\voltage\DC supply">
       <UniqueIdentifier>{55f02436-c915-48f6-8e82-7bc4ac695f33}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers sources\Measurement\Type\voltage\NI DAQmx">
-      <UniqueIdentifier>{c494382d-47ea-4bd1-a87f-9d3799a41134}</UniqueIdentifier>
     </Filter>
     <Filter Include="Fichiers sources\tools\Device monitor">
       <UniqueIdentifier>{25c2df21-5279-47bf-9193-857639e23778}</UniqueIdentifier>
@@ -95,6 +89,24 @@
     </Filter>
     <Filter Include="Fichiers sources\tools\serialize">
       <UniqueIdentifier>{dbb84f71-567c-4354-8bbd-9055727dada4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\DAQ">
+      <UniqueIdentifier>{ed6546c9-fb13-4c19-9c29-54987536cce4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\DAQ\NI DAQmx">
+      <UniqueIdentifier>{7d9796a8-bbe6-405a-9f08-09a7168d2e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\DAQ\Keithley DAQ6510">
+      <UniqueIdentifier>{48ef58b0-07c3-4ef1-be25-dd6ed1c4c5a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\DAQ">
+      <UniqueIdentifier>{de9c6bfb-ac06-454e-883b-babe5c0fd725}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\DAQ\NI DAQmx">
+      <UniqueIdentifier>{c494382d-47ea-4bd1-a87f-9d3799a41134}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\DAQ\Keithley Daq6510">
+      <UniqueIdentifier>{ba39ab6e-60c5-4336-9e63-8388c87a6d50}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -213,19 +225,19 @@
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
     <ClCompile Include="cDaqmxScaleDlg.cpp">
-      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\MainWindow\config\DAQ\NI DAQmx</Filter>
     </ClCompile>
     <ClCompile Include="cDaqmx.cpp">
-      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\MainWindow\config\DAQ\NI DAQmx</Filter>
     </ClCompile>
     <ClCompile Include="cVoltage.cpp">
       <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
     </ClCompile>
     <ClCompile Include="cDaqsim.cpp">
-      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\Measurement\Type\DAQ\NI DAQmx</Filter>
     </ClCompile>
     <ClCompile Include="cUSB6001.cpp">
-      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\Measurement\Type\DAQ\NI DAQmx</Filter>
     </ClCompile>
     <ClCompile Include="cUsb.cpp">
       <Filter>Fichiers sources\Measurement\Protocol\NATIVEUSB</Filter>
@@ -280,6 +292,15 @@
     </ClCompile>
     <ClCompile Include="cSerialize.cpp">
       <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="c6510ui.cpp">
+      <Filter>Fichiers sources\MainWindow\config\DAQ\Keithley DAQ6510</Filter>
+    </ClCompile>
+    <ClCompile Include="c6510sim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\DAQ\Keithley Daq6510</Filter>
+    </ClCompile>
+    <ClCompile Include="c6510usb.cpp">
+      <Filter>Fichiers sources\Measurement\Type\DAQ\Keithley Daq6510</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -408,19 +429,19 @@
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
     <ClInclude Include="cDaqmxScaleDlg.h">
-      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\MainWindow\config\DAQ\NI DAQmx</Filter>
     </ClInclude>
     <ClInclude Include="cDaqmx.h">
-      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\MainWindow\config\DAQ\NI DAQmx</Filter>
     </ClInclude>
     <ClInclude Include="cVoltage.h">
       <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
     </ClInclude>
     <ClInclude Include="cDaqsim.h">
-      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\Measurement\Type\DAQ\NI DAQmx</Filter>
     </ClInclude>
     <ClInclude Include="cUSB6001.h">
-      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+      <Filter>Fichiers sources\Measurement\Type\DAQ\NI DAQmx</Filter>
     </ClInclude>
     <ClInclude Include="cUsb.h">
       <Filter>Fichiers sources\Measurement\Protocol\NATIVEUSB</Filter>
@@ -473,6 +494,15 @@
     </ClInclude>
     <ClInclude Include="cSerialize.h">
       <Filter>Fichiers sources\tools\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="c6510ui.h">
+      <Filter>Fichiers sources\MainWindow\config\DAQ\Keithley DAQ6510</Filter>
+    </ClInclude>
+    <ClInclude Include="c6510sim.h">
+      <Filter>Fichiers sources\Measurement\Type\DAQ\Keithley Daq6510</Filter>
+    </ClInclude>
+    <ClInclude Include="c6510usb.h">
+      <Filter>Fichiers sources\Measurement\Type\DAQ\Keithley Daq6510</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
