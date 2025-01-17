@@ -41,9 +41,13 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 		if (length > 0)
 		{
 			double* values = new double(length);
-			memset(values, 0.0, length);
-			meas->set(values, length);
-			delete(values);
+			assert(values != nullptr);
+			if (values != nullptr)
+			{
+				memset(values, 0.0, sizeof(double) * length);
+				meas->set(values, length);
+				delete(values);
+			}
 		}
 	}
 }
@@ -144,7 +148,8 @@ void cMeasurementControler::poll()
 	tick.start_tick();
 
 	//static double old_pressure[MAX_CHAN];
-	static volatile double old_value[MAX_CHAN] = { 0 };
+	static double old_value[MAX_CHAN] = { 0 };
+	memset(old_value, 0, sizeof(old_value) / sizeof(double));
 	while (1)
 	{
 		//std::cout << "bRunning: "<< bRunning <<"\n";
