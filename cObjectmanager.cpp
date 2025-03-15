@@ -44,6 +44,11 @@ void cObjectmanager::set_oscopedevice(cOscope* m_oscope)
 	m_oscope_ = m_oscope;
 }
 
+void cObjectmanager::set_daq6510device(c6510ui* m_6510)
+{
+	m_6510_ = m_6510;
+}
+
 void cObjectmanager::set_table(cTable* m_table)
 {
 	m_table_ = m_table;
@@ -97,6 +102,11 @@ cVoltageRs* cObjectmanager::get_voltagersdevice()
 cOscope* cObjectmanager::get_oscopedevice()
 {
 	return m_oscope_;
+}
+
+c6510ui* cObjectmanager::get_6510device()
+{
+	return m_6510_;
 }
 
 cTable* cObjectmanager::get_table()

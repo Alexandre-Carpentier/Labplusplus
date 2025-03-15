@@ -44,8 +44,8 @@ size_t cPacecom::chan_write_count()
 
 int cPacecom::launch_device()
 {
-    readpoint = 0.0;
-    setpoint = 0.0;
+    //readpoint = 0.0;
+    //setpoint = 0.0;
 
     // Create the proper implementation of cProtocol with a factory method
     //std::unique_ptr<cProtocol> device = factory.make(PROTOCOLENUM::VISATCP, L"TCPIP0::169.254.254.001::inst0::INSTR");

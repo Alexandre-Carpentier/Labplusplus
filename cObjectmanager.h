@@ -18,6 +18,7 @@ class cRender;
 #include "cVoltageRs.h"
 #include "cPressure.h"
 #include "cOscope.h"
+#include "c6510ui.h"
 #include "cConfig.h"
 #include "cMeasurementControler.h"
 
@@ -35,6 +36,7 @@ private:
 	cVoltage* m_voltage_ = nullptr;
 	cVoltageRs* m_voltagers_ = nullptr;
 	cOscope* m_oscope_ = nullptr;
+	c6510ui* m_6510_ = nullptr;
 	cTable* m_table_ = nullptr;
 	cPlot* m_plot_ = nullptr;
 	cRender* m_render_ = nullptr;
@@ -48,6 +50,7 @@ public:
 	void set_voltagedevice(cVoltage* m_voltage);
 	void set_voltagersdevice(cVoltageRs* m_voltagers);
 	void set_oscopedevice(cOscope* m_oscope);
+	void set_daq6510device(c6510ui* m_6510);
 	void set_table(cTable* m_table);
 	void set_plot(cPlot* m_plot);
 	void set_render(cRender* m_render);
@@ -60,6 +63,7 @@ public:
 	cVoltage* get_voltagedevice();
 	cVoltageRs* get_voltagersdevice();
 	cOscope* get_oscopedevice();
+	c6510ui* get_6510device();
 	cTable* get_table();
 	cPlot* get_plot();
 	cRender* get_render();

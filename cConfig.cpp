@@ -28,6 +28,7 @@
 #include "cVoltage.h"
 #include "cVoltageRs.h"
 #include "cOscope.h"
+#include "c6510ui.h"
 
 /*---------------- - Duplication-------------------------------- -
 void cDevice::DisplayConfiguration()
@@ -226,12 +227,33 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	Oscope_struct.PStop = nullptr;
 	plugin_vec.push_back(Oscope_struct);
 
+	// Add cOscope to plugin vec
+	m_6510ui = new c6510ui(book, devmon_);
+	cDevice* m_6510_dev = new cDevice();
+	m_6510_dev->set_access_type(READ);
+	m_6510_dev->set_device_name("DAQ6510");
+	m_6510_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA daq6510_struct;
+	daq6510_struct.name = L"DAQ6510.dll";
+	daq6510_struct.input_count = 1;
+	daq6510_struct.outputcount = 1;
+	daq6510_struct.signal_count = daq6510_struct.input_count + daq6510_struct.outputcount;
+	daq6510_struct.panel = m_6510ui->get_right_panel();
+	daq6510_struct.hInst = nullptr;
+	daq6510_struct.device = m_6510_dev;
+	daq6510_struct.Attach = nullptr;
+	daq6510_struct.Dettach = nullptr;
+	daq6510_struct.PStart = nullptr;
+	daq6510_struct.PStop = nullptr;
+	plugin_vec.push_back(daq6510_struct);
+
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
 	manager->set_voltagedevice(m_voltage); // Singleton saver...bad
 	manager->set_voltagersdevice(m_voltage_rs); // Singleton saver...bad
 	manager->set_oscopedevice(m_oscope); // Singleton saver...bad
+	manager->set_daq6510device(m_6510ui); // Singleton saver...bad
 
 	/////////////////////////////////////////////////////
 	// load and add dll instrument to plugin vec
@@ -530,6 +552,11 @@ cOscope* cConfig::get_oscopedevice()
 	return m_oscope;
 }
 
+c6510ui* cConfig::get_daq6510device()
+{
+	return m_6510ui;
+}
+
 void cConfig::set_graph(cPlot* m_plot)
 {
 	m_plot_ = m_plot;
@@ -544,6 +571,7 @@ void cConfig::set_table(cTable* m_table)
 	m_voltage->set_table(m_table_);
 	m_voltage_rs->set_table(m_table_);
 	m_oscope->set_table(m_table_);
+	m_6510ui->set_table(m_table_);
 }
 
 

@@ -301,6 +301,9 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		label.channel_serial_number[i].push_back("LE141");
 		label.channel_serial_number[i].push_back("Y112");
 		label.channel_serial_number[i].push_back("Y113");
+		label.channel_serial_number[i].push_back("LE111");
+		label.channel_serial_number[i].push_back("Burkert");
+		label.channel_serial_number[i].push_back("JPFluidControl");
 
 		label.channel_type[i].push_back("Voltage");
 		label.channel_type[i].push_back("Thermocouple");

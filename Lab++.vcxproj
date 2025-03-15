@@ -164,6 +164,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="c6510sim.cpp" />
+    <ClCompile Include="c6510ui.cpp" />
+    <ClCompile Include="c6510usb.cpp" />
     <ClCompile Include="cApp.cpp" />
     <ClCompile Include="cCom.cpp" />
     <ClCompile Include="cConfig.cpp" />
@@ -229,6 +232,9 @@
     <ClCompile Include="xlsx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="c6510sim.h" />
+    <ClInclude Include="c6510ui.h" />
+    <ClInclude Include="c6510usb.h" />
     <ClInclude Include="cApp.h" />
     <ClInclude Include="cCom.h" />
     <ClInclude Include="cConfig.h" />

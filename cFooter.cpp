@@ -207,6 +207,18 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 		oscope_gui->save_current_device_config(0);
 
+		// Load Daq6510 System
+		//
+		//
+		c6510ui* c6510ui_gui = obj_manager->get_6510device();
+		if (c6510ui_gui == nullptr)
+		{
+			std::cout << "[!] obj_manager->get_6510device() return nullptr. Exiting.\n";
+			evt.Skip();
+			return;
+		}
+		c6510ui_gui->save_current_device_config(0);
+
 		/////////////////////////////////////////////////////////
 		int iRec = this->combo2->GetCurrentSelection();
 		LOGGER_M Rec = LOGGER_NONE;
@@ -353,6 +365,21 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 
 		////////////////////////////////////////////////////////////////////////////////
+		// START 6510 CTRL 
+		////////////////////////////////////////////////////////////////////////////////
+		if (c6510ui_gui != nullptr)
+		{
+			if (c6510ui_gui->launch_device() < 0)
+			{
+				std::cout << "[!] c6510ui_gui->launch_device() return < 0. Exiting.\n";
+				evt.Skip();
+				return;
+			}
+			c6510ui_gui->lockBtn(false);
+			std::cout << "[*] 6510	[RUNNING]\n";
+		}
+
+		////////////////////////////////////////////////////////////////////////////////
 		// CYCLE CONTROLER
 		////////////////////////////////////////////////////////////////////////////////
 		std::cout << "[*] Starting cycle controler.\n";
@@ -395,6 +422,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		cVoltage* voltageconfig = obj_manager->get_voltagedevice();
 		cVoltageRs* voltagersconfig = obj_manager->get_voltagersdevice();
 		cOscope* oscope_gui = obj_manager->get_oscopedevice();
+		c6510ui* c6510ui_gui = obj_manager->get_6510device();
 
 		if ( (daqconfig->m_daq_ == nullptr) && (pressureconfig == nullptr) && (voltageconfig == nullptr) && (oscope_gui == nullptr))
 		{
@@ -424,6 +452,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			voltagersconfig->device_group_sizer->GetStaticBox()->Enable(true);
 			//oscopeconfig->device_group_sizer->GetStaticBox()->Enable(true);
 			oscope_gui->lockBtn(true);
+			c6510ui_gui->lockBtn(true);
 		}
 
 		meas_manager->stop_all_devices();

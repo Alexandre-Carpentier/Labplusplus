@@ -63,7 +63,7 @@ err_struct cSerial::init()
 
 	}
 	assert(device_utf8.size() > 0 );
-	assert(device_utf8.size() <  20 );
+	assert(device_utf8.size() <  64 );
 
 	//status = viOpen(ressource_manager, (ViConstRsrc)this->device_name_.c_str(), VI_NO_LOCK, 0, &device_);
 	/*
