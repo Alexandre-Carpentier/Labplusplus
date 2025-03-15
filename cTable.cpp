@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cTable.h"
 
 #include <Windows.h>
@@ -8,6 +15,7 @@
 
 #include <filesystem>
 #include "cSerialize.h"
+#include "cSignalDisplay.h"
 
 void cTable::serialize(std::string config_name)
 {
@@ -66,6 +74,23 @@ void cTable::deserialize(std::string config_name)
 	}
 }
 
+void cTable::update(void* arg)
+{
+	CURRENT_VALUE_STRUCT *res = (CURRENT_VALUE_STRUCT*)arg;
+	size_t c = 0;
+	for (auto name : res->names_vec)
+	{		
+		indicator_vec1[c]->SetLabelText(name);
+		indicator_vec2[c]->SetLabelText(std::to_string(res->values_vec.at(c)));
+		c++;
+	}
+	for (size_t j=c;j++;j<max_chan_number)
+	{
+		indicator_vec1[c]->Hide();
+		indicator_vec2[c]->Hide();
+	}
+}
+
 cTable::cTable(wxWindow* inst, cConfig *m_config)
 {
 	std::cout << "cTable ctor...\n";
@@ -79,8 +104,8 @@ cTable::cTable(wxWindow* inst, cConfig *m_config)
 	inst->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cTable::clearButtonClicked, this, IDCTABLEBTNRESET);
 
 	wxBoxSizer* vleftsizer = new wxBoxSizer(wxVERTICAL);
-
 	vleftsizer->Add(resetbtn, 1, wxALL | wxEXPAND, inst->FromDIP(4));
+
 
 	table_rightpanel_ = new wxPanel(inst, IDCTABLEPANELRIGHT, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
 	table_rightpanel_->SetBackgroundColour(wxColor(240, 240, 240));
@@ -164,14 +189,36 @@ cTable::cTable(wxWindow* inst, cConfig *m_config)
 	flexsizer->Add(loop);
 	flexsizer->Add(stat);
 
+	///////////////////////////////////////////////////////
+	// Create indicators
+	///////////////////////////////////////////////////////
+	for (size_t i = 0; i < max_chan_number; i ++ )
+	{
+		indicator_vec1[i] = new wxStaticText(table_rightpanel_, IDCINDICATORNAME0+i, L"Measurement:");
+		indicator_vec1[i]->SetFont(indicator_vec1[i]->GetFont().Scale(1.5));
+		indicator_vec1[i]->SetBackgroundColour(wxColor(112, 112, 111));
+		//indicator_vec1[i]->Hide();
+		indicator_vec2[i] = new wxStaticText(table_rightpanel_, IDCINDICATORVALUE0 +i, L"00.00");
+		indicator_vec2[i]->SetFont(indicator_vec2[i]->GetFont().Scale(1.5));
+		indicator_vec2[i]->SetBackgroundColour(wxColor(112, 112, 111));
+		//indicator_vec2[i]->Hide();
+	}
+	wxBoxSizer* h_indicators_sizer = new wxBoxSizer(wxHORIZONTAL);
+	for (size_t i = 0; i < max_chan_number; i++)
+	{
+		h_indicators_sizer->Add(indicator_vec1[i], 0, wxALL, inst->FromDIP(10));
+		h_indicators_sizer->Add(indicator_vec2[i], 0, wxALL, inst->FromDIP(10));
+	}
+
 
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-
 	hbox->Add(flexsizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));
 
 	wxBoxSizer* grid_vsizer = new wxBoxSizer(wxVERTICAL);
+	grid_vsizer->Add(h_indicators_sizer, 0, wxEXPAND);
 	grid_vsizer->Add(grid, 1, wxEXPAND);
 	grid_vsizer->Add(hbox, 0, wxCENTER);
+
 
 	table_leftpanel_->SetSizerAndFit(vleftsizer);
 	table_rightpanel_->SetSizerAndFit(grid_vsizer);

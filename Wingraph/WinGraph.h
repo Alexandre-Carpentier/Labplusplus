@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
@@ -55,7 +62,7 @@ extern "C" {
 	__declspec(dllexport)double GetSignalMaxValue(HGRAPH hGraph, CONST INT SIGNB);
 	__declspec(dllexport)VOID SignalResetStatisticValue(HGRAPH hGraph, CONST INT SIGNB);
 
-	__declspec(dllexport)VOID AddPoints(HGRAPH hGraph, DOUBLE* y, CONST INT SignalCount);
+	__declspec(dllexport)VOID AddPoint(HGRAPH hGraph, DOUBLE* y, CONST INT SignalCount);
 	__declspec(dllexport)VOID AddMultiplePoints(HGRAPH hGraph, DOUBLE** Chunks, CONST INT SignalCount, CONST INT BufferLength);
 	__declspec(dllexport)BOOL Render(HGRAPH hGraph);
 	__declspec(dllexport)VOID ReshapeGraph(HGRAPH hGraph, int left, int top, int right, int bottom);

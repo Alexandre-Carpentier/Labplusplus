@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cDeviceMonitor.h"
 
 std::vector<int> get_rs232port_list()
@@ -17,6 +24,7 @@ std::vector<int> get_rs232port_list()
 		hCom = CreateFile(comaddr.c_str(), GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_EXISTING, NULL, NULL);
 		if (hCom != INVALID_HANDLE_VALUE && hCom != NULL)
 		{
+			std::cout << "[*] - Opening success :" << comaddr << " with CreateFile() \n";
 			com_list.push_back(iComNb);
 			CloseHandle(hCom);
 		}
@@ -50,10 +58,14 @@ void cDeviceMonitor::Notify()
 
 		std::wstring instr_name = L"";
 		device->init();
+		//device->write(L"*CLS\n");
+		//device->write(L"*RST\n");
 		device->write(L"*IDN?\n");
 		device->read(instr_name);
 		if (instr_name.compare(L"") != 0)
 		{
+			device->write(L"*CLS\r");
+			device->write(L"*RST\r");
 			device->write(L"*IDN?\r");
 			device->read(instr_name);
 		}

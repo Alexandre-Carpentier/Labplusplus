@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cMeasurementControler.h"
 
 #include "cCycleControler.h"
@@ -10,6 +17,8 @@
 #include <wx/app.h> 
 
 #include <Windows.h>
+
+
 
 bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
 {
@@ -54,7 +63,7 @@ void cMeasurementControler::poll()
 	assert(m_cyclecontroler_->get_total_step() > 0);
 	assert(m_cyclecontroler_->get_total_step() < 300);
 	assert(m_cyclecontroler_->get_current_loop() > 0);
-	//assert(m_cyclecontroler_->get_current_step() == 0); // might be fail if call is long
+	//assert(m_cyclecontroler_->get_current_step() == 0); // might fail if call is long...
 	std::cout << m_cyclecontroler_->get_current_step() << "\n";
 
 	std::cout << "cMeasurementcontroler->get_stop_token...\n";
@@ -104,17 +113,22 @@ void cMeasurementControler::poll()
 				double* values = new double[length];
 				memset(values, 0.0, length*sizeof(double));
 				meas->set(values, length);
+			}
+			// Read data from instrument
+			val = meas->read();
+			for (size_t c = buffer_index; c < val.buffer_size; c++)
+			{
+				Y[c] = val.buffer[c];
 
-				// Read data from instrument
-				val = meas->read();
-				for (size_t c = buffer_index; c < val.buffer_size; c++)
-				{
-					Y[c] = val.buffer[c];
+				// prepare send to observers
+				currentValues.add_values(meas->device_name(), Y[c]);
 
-					buffer_index++;
-				}
+				buffer_index++;
 			}
 		}
+
+		this->notify(static_cast<void*>(&currentValues));
+		currentValues.clear();
 
 		// Add the first point to update min avg max value in indicator
 		m_plot_->graph_addpoint(buffer_index, Y);
@@ -143,14 +157,9 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
-	//static double old_pressure[MAX_CHAN];
-	static volatile double old_value[MAX_CHAN] = { 0 };
+	static volatile double old_value[MAX_CHAN] = { 0 }; // no optimization : volatile
 	while (1)
 	{
-		//std::cout << "bRunning: "<< bRunning <<"\n";
-		//old_pressure[0] = 0.0;
-		//memset(old_value ,0, sizeof(old_value)/sizeof(double));
-
 		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();
@@ -168,7 +177,7 @@ void cMeasurementControler::poll()
 				}
 			}
 			time = tick.get_tick();
-			if (time > (this->freq_s_ / 1000))
+			if (time > (freq_s_ / 1000))
 			{
 				tick.start_tick();
 				int buffer_index = 0;
@@ -248,6 +257,9 @@ void cMeasurementControler::poll()
 							// Add vector to store points
 							for (size_t i = 0; i < val.buffer_size; i++)
 							{
+								// prepare send to observers
+								currentValues.add_values(meas->device_name(), val.buffer[i]);
+
 								read_pool.push_back(val.buffer[i]);
 							}
 							val.buffer_size = 0;
@@ -256,6 +268,9 @@ void cMeasurementControler::poll()
 						}
 						
 				}
+
+				this->notify(static_cast<void*>(&currentValues));
+				currentValues.clear();
 
 				assert(read_pool.size() > 0);
 				m_plot_->graph_addpoint(read_pool.size(), &read_pool.at(0));

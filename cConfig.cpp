@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cConfig.h"
 
 //#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
@@ -243,6 +250,8 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	// Populate tree ctrl with 
 	// loaded plugin
 	//
+
+	wxImageList image_list;  
 	config_tree_ctrl = new wxTreeCtrl(config_leftpanel_, IDCCONFIGTREE, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)), wxBORDER_DOUBLE);
 	config_tree_ctrl->Bind(wxEVT_LEFT_DOWN, &cConfig::OnClickdrop, this, IDCCONFIGTREE);
 	config_tree_ctrl->SetBackgroundColour(wxColor(210, 210, 212));
@@ -286,7 +295,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 cConfig::~cConfig()
 {
 	std::cout << "cConfig dtor...\n";
-	//unload_plugins(); // Error occured when wxWidget use the garbage collector after
+	unload_plugins(); 
 	delete m_daqmx;
 	delete m_daq_dev;
 	delete m_pressure;
@@ -307,7 +316,7 @@ void cConfig::unload_plugins()
 		if (plugin.hInst != nullptr)
 		{
 			plugin.Dettach();
-			FreeLibrary(plugin.hInst);
+			//FreeLibrary(plugin.hInst);// Error occured when wxWidget use the garbage collector after
 			plugin.hInst = nullptr;
 		}
 	}

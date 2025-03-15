@@ -281,6 +281,12 @@
     <ClCompile Include="cSerialize.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="cSignalDisplay.cpp">
+      <Filter>Fichiers sources\MainWindow\table</Filter>
+    </ClCompile>
+    <ClCompile Include="cObserver.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -473,6 +479,12 @@
     </ClInclude>
     <ClInclude Include="cSerialize.h">
       <Filter>Fichiers sources\tools\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="cSignalDisplay.h">
+      <Filter>Fichiers sources\MainWindow\table</Filter>
+    </ClInclude>
+    <ClInclude Include="cObserver.h">
+      <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

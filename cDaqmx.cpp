@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cDaqmx.h"
 #include <winsock2.h> 
 #include <wx/wx.h>
@@ -81,6 +88,7 @@ void cDaqmx::serialize(std::string device)
 	serialize_item(configsaver, "channel_mode", config.channel_mode);
 	serialize_item(configsaver, "channel_permision", config.channel_permision);
 	serialize_item(configsaver, "channel_physical_name", config.channel_physical_name, max_chan_number);
+	serialize_item(configsaver, "channel_physical_unit", config.channel_physical_unit, max_chan_number);
 	serialize_item(configsaver, "channel_serial_number", config.channel_serial_number, max_chan_number);
 	serialize_item(configsaver, "channel_type", config.channel_type, max_chan_number);
 	serialize_item(configsaver, "channel_max", config.channel_max, max_chan_number);
@@ -195,6 +203,7 @@ void cDaqmx::deserialize(std::string device)
 	deserialize_item(configsaver, "channel_mode", config.channel_mode);
 	deserialize_item(configsaver, "channel_permision", config.channel_permision);
 	deserialize_item(configsaver, "channel_physical_name", config.channel_physical_name, max_chan_number);
+	deserialize_item(configsaver, "channel_physical_unit", config.channel_physical_unit, max_chan_number);
 	deserialize_item(configsaver, "channel_serial_number", config.channel_serial_number, max_chan_number);
 	deserialize_item(configsaver, "channel_type", config.channel_type, max_chan_number);
 	deserialize_item(configsaver, "channel_max", config.channel_max, max_chan_number);
@@ -279,6 +288,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		for (int j = 0; j < max_chan_number; j++)
 		{
 			label.channel_physical_name[i].push_back("/ai" + std::to_string(j));
+			label.channel_physical_unit[i].push_back("Volt");
 		}
 
 		label.device_serial_number[i].push_back("LE107");
@@ -373,6 +383,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 			config.channel_name.at(i).append(std::to_string(i));
 
 			config.channel_physical_name[i] = "/ai" + std::to_string(i);
+			config.channel_physical_unit[i] = "Volt";
 
 			config.device_serial_number[i] = "LE107";
 			config.channel_serial_number[i] = "LE140";
@@ -1169,13 +1180,6 @@ void cDaqmx::load_current_device_config(int channel_index)
 {
 	std::cout << "[*] Loading device configuration from memory in GUI at channel " << channel_index << ".\n";
 
-	// Device enable
-	//config.device_enabled = false;
-	//if (daq_activate->GetLabelText().compare("ON"))
-	//{
-	//	config.device_enabled = true;
-	//}
-
 	// Device name
 	int iTotalItem = addr_ctrl->GetCount();
 	for (int i = 0; i < iTotalItem; i++)
@@ -1187,6 +1191,23 @@ void cDaqmx::load_current_device_config(int channel_index)
 			std::cout << "[*] Found device in configuration memory struct. Set appropriate address name.\n";
 		}
 	}
+
+	// Device serial number
+	bool alreadyExist = false;
+	wxArrayString items = device_sn->GetStrings();
+	for (auto item : items)
+	{
+		if (item.compare(config.device_serial_number[channel_index]) == 0)
+		{
+			alreadyExist = true;
+		}
+		alreadyExist = false;
+	}
+	if (!alreadyExist)
+	{
+		items.push_back(config.device_serial_number[channel_index]);
+	}
+	device_sn->SetValue(config.device_serial_number[channel_index]);
 
 	return;
 }
@@ -1324,6 +1345,20 @@ void cDaqmx::load_current_chan_config(int channel_index)
 	device_sn->SetValue(config.device_serial_number[channel_index]);
 
 	// Channel serial number
+	bool alreadyExist = false;
+	wxArrayString items = channel_sn->GetStrings();
+	for (auto item : items)
+	{
+		if (item.compare(config.channel_serial_number[channel_index]) == 0)
+		{
+			alreadyExist = true;
+		}
+		alreadyExist = false;
+	}
+	if (!alreadyExist)
+	{
+		items.push_back(config.channel_serial_number[channel_index]);
+	}
 	channel_sn->SetValue(config.channel_serial_number[channel_index]);
 
 	// Channel physical name
@@ -1765,6 +1800,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			this->daq_activate->SetLabel("ON");
 
 			addr_ctrl->Enable(true);
+			device_sn->Enable(true);
 			checkchan->Enable(true);
 			
 			previous_chan->Enable(true);
@@ -1788,7 +1824,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 			// Enable/disable controls
 			if (checkchan->GetLabel().compare("OFF"))
-			{
+			{		
 				EnableChannelItems(!enable_pan);
 			}
 
@@ -1796,6 +1832,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			daq_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
+			device_sn->Enable(false);
 			checkchan->Enable(false);
 
 			previous_chan->Enable(false);
@@ -2535,7 +2572,6 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		// Disallow editing
 		chan_name->Enable(false);
 		chan_addr_ctrl->Enable(false);
-		device_sn->Enable(false);
 		meas_type_ctrl->Enable(false);
 		chan_max_input_range->Enable(false);
 		chan_min_input_range->Enable(false);
@@ -2593,7 +2629,6 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		// Allow editing
 		chan_name->Enable(true);
 		chan_addr_ctrl->Enable(true);
-		device_sn->Enable(true);
 		meas_type_ctrl->Enable(true);
 		chan_max_input_range->Enable(true);
 		chan_min_input_range->Enable(true);

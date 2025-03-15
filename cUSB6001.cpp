@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cUSB6001.h"
 
 #include "cMeasurement.h"
@@ -433,9 +440,25 @@ DATAS cUsb6001::read()
     {
         //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
 
-        std::vector<std::string> channel_task_name;
+        
         DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 512);// "Digital0" 
 
+        // Tokenize buff
+        std::vector<std::string> channel_task_name;
+        std::string string_task = buff; 
+        string_task.append(",");
+        size_t pos = string_task.find(",");
+        while (pos != std::string::npos and pos>0)
+        {
+            if (pos > 0)
+            {
+                channel_task_name.push_back(string_task.substr(0, pos));            
+            }
+            string_task.erase(0, pos);
+            pos = string_task.find(",");
+        }
+       
+        /*
         strcat(buff, ",");
         const char* separator = ",";
         char* strToken = strtok(buff, separator);
@@ -453,7 +476,9 @@ DATAS cUsb6001::read()
                 channel_task_name.push_back(tok);
             }               
         }
+        */
 
+        assert(channel_task_name.size() > 0);
         for (auto& token : channel_task_name)
         {
             DAQret = DAQmxGetAIMeasType(analog_taskHandle, token.c_str(), &chan_type);

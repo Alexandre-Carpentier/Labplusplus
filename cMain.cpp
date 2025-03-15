@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cMain.h"
 #include <wx/wx.h>
 #include <wx/treectrl.h>
@@ -32,6 +39,11 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 #ifdef _DEBUG
 	//_crtBreakAlloc = 248;	
 #endif
+	if (this->GetHWND())
+	{
+		ShutdownBlockReasonCreate(this->GetHWND(), L"Do not stop before end of recording.");
+	}
+
 
 	/////////////////////////////////////////////////////////////
 	//
@@ -230,7 +242,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	// INI CONFIG LOADER
 	////////////////////////////////////////////////////////////////////////////////
 
-	// must load generic row in the table
+	// must load row in the table
 	cfg_saver = std::make_unique<cInicfg>();
 
 
@@ -254,6 +266,11 @@ void cMain::OnCloseWindow(wxCloseEvent& event)
 
 cMain::~cMain()
 {
+	if (this->GetHWND())
+	{
+		ShutdownBlockReasonDestroy(this->GetHWND());
+	}
+
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
 	delete m_table;
 	delete m_plot;
