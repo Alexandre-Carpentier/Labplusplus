@@ -147,15 +147,10 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
-	//static double old_pressure[MAX_CHAN];
 	static double old_value[MAX_CHAN] = { 0 };
 	memset(old_value, 0, sizeof(old_value) / sizeof(double));
 	while (1)
 	{
-		//std::cout << "bRunning: "<< bRunning <<"\n";
-		//old_pressure[0] = 0.0;
-		//memset(old_value ,0, sizeof(old_value)/sizeof(double));
-
 		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();
@@ -279,12 +274,11 @@ void cMeasurementControler::poll()
 		}
 	}
 	// TODO:
-	// it doesn't called 
+	// it is not called 
 	if (meas_pool.size() > 0)
 	{
 		zero_instrument(meas_pool);
 	}
-
 
 	std::cout << "cMeasurementcontroler->exiting thread... \n";
 	return;
