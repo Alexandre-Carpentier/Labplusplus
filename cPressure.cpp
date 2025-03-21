@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cPressure.h"
 #include <wx/dcbuffer.h>
 #include "enum.h"
@@ -35,6 +42,12 @@ cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	label.device_name.push_back("Simulated");
 	label.channel_permision.push_back(CHANWRITE);
 
+	label.channel_type[0].push_back("A");
+	label.channel_type[0].push_back("B");
+
+	label.channel_physical_unit[0].push_back("Bar rel");
+	label.channel_physical_unit[0].push_back("Bar abs");
+
 	////////////////////////////////////////////////////////////
 	// Load default configuration in memory
 	////////////////////////////////////////////////////////////
@@ -42,8 +55,9 @@ cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	config.device_name.clear();
 
 	config.device_name = label.device_name[0];
-	//config.device_name = wxT("Simulated");
-
+	config.channel_permision.push_back(CHANWRITE);
+	config.channel_type[0].append("A");
+	config.channel_physical_unit[0].append("Bar rel");
 	////////////////////////////////////////////////////////////
 
 	::wxInitAllImageHandlers();
@@ -60,7 +74,7 @@ cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 
 	////////////////////////////////////////////////////////////
 
-	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 20);
+	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(4, 4, 10, 20);
 
 	////////////////////////////////////////////////////////////
 
@@ -84,21 +98,44 @@ cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 
 	wxStaticText* staticaddr = new wxStaticText(device_group, IDCSTATICADDR, L"Device list:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
 	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
-	//staticaddr->SetBackgroundColour(*bgcolor);
 
-	////////////////////////////////////////////////////////////
 
 	addr_ctrl = new wxComboBox(device_group, IDCPRESSUREADDR, label.device_name[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
 	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
-	//RefreshPort();
 	addr_ctrl->Disable();
+
 	
-	
+	////////////////////////////////////////////////////////////
+
+	wxStaticText* staticmodule = new wxStaticText(device_group, IDCSTATICMODULE, L"Module:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
+
+
+	module_ctrl = new wxComboBox(device_group, IDCPRESSUREMODULE, label.channel_type[0][0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.channel_type[0], wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	//inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
+	module_ctrl->SetFont(module_ctrl->GetFont().Scale(text_size));
+	module_ctrl->Disable();
+
+	////////////////////////////////////////////////////////////
+
+	wxStaticText* staticunit = new wxStaticText(device_group, IDCSTATICUNIT, L"Unit:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
+
+
+	unit_ctrl = new wxComboBox(device_group, IDCPRESSUREUNIT, label.channel_physical_unit[0][0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.channel_physical_unit[0], wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	//inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
+	unit_ctrl->SetFont(unit_ctrl->GetFont().Scale(text_size));
+	unit_ctrl->Disable();
+
 	flexsizer->Add(enablepressure);
 	flexsizer->Add(pressure_controler_activate);
 	flexsizer->Add(staticaddr);
 	flexsizer->Add(addr_ctrl);
+	flexsizer->Add(staticmodule);
+	flexsizer->Add(module_ctrl);
+	flexsizer->Add(staticunit);
+	flexsizer->Add(unit_ctrl);
 	device_group_sizer->Add(flexsizer);
 
 	wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
@@ -292,7 +329,9 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			this->pressure_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
 			this->pressure_controler_activate->SetLabel("ON");
 
-			addr_ctrl->Enable(true);			
+			addr_ctrl->Enable(true);		
+			module_ctrl->Enable(true);
+			unit_ctrl->Enable(true);
 			EnablePressureChannel(true);
 		}
 		else
@@ -304,7 +343,8 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			this->pressure_controler_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
-
+			module_ctrl->Enable(false);
+			unit_ctrl->Enable(false);
 			EnablePressureChannel(false);
 		}
 	}

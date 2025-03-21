@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _PRESSURE_H_
 #define _PRESSURE_H_
 #include <wx/wx.h>
@@ -36,6 +43,9 @@ public:
 
 	wxComboBox* addr_ctrl = nullptr;
 
+	wxComboBox* module_ctrl = nullptr;
+	wxComboBox* unit_ctrl = nullptr;
+	
 	// Style
 	const float text_size = 1;
 	const int STATIC_CTRL_STYLE = wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL;

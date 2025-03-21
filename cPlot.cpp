@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cPlot.h"
 
 cPlot::cPlot(wxWindow* inst, int nbPoints)
@@ -390,7 +397,7 @@ void cPlot::graph_addpoint(const int signb, double val[])
 		std::cout << "cPlot::graph_addpoint() -> hGraph is null\n";
 		return;
 	}
-	AddPoints(hGraph, val, signb);
+	AddPoint(hGraph, val, signb);
 }
 
 void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
@@ -400,7 +407,8 @@ void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
 		std::cout << "cPlot::graph_addpoint() -> hGraph is null\n";
 		return;
 	}
-	AddMultiplePoints(hGraph, val, signb, chunk_size);
+	MessageBox(0, L"Procedure graph_addpoints() not implemented.", L"Fail", S_OK);
+	//AddMultiplePoints(hGraph, val, signb, chunk_size);
 }
 
 double cPlot::get_signal_min_value(MEAS_TYPE type, int SignalNumber)

@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "encoding.h"
 
 std::string ConvertWideToANSI(const std::wstring& wstr)
@@ -28,6 +35,6 @@ std::wstring ConvertUtf8ToWide(const std::string& str)
 {
     int count = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
     std::wstring wstr(count, 0);
-    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &wstr[0], count);
+    MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.length(), &wstr[0], count);
     return wstr;
 }

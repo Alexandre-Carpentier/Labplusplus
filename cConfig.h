@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <wx/wx.h>
 #include <wx/simplebook.h>
@@ -11,6 +18,7 @@ class cVoltage;
 class cVoltageRs;
 class cOscope;
 class cDeviceMonitor;
+class c6510ui;
 
 class cConfig : public wxFrame
 {
@@ -34,6 +42,7 @@ private:
 	cVoltage* m_voltage = nullptr;
 	cVoltageRs* m_voltage_rs = nullptr;
 	cOscope* m_oscope = nullptr;
+	c6510ui* m_6510ui = nullptr;
 
 	typedef cDevice* (*PLUGIN_ATTACH)(wxWindow*);
 	PLUGIN_ATTACH Attach = nullptr;
@@ -78,6 +87,7 @@ public:
 	cPressure* get_pressuredevice();
 	cVoltage* get_voltagedevice();
 	cOscope* get_oscopedevice();
+	c6510ui* get_daq6510device();
 	cDaqmx* get_nidaq();
 
 	std::vector<cDevice*> get_device_vec();

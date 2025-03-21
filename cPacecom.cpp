@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cPacecom.h"
 #include "cMeasurement.h"
 #include <string>
@@ -56,6 +63,46 @@ int cPacecom::launch_device()
         MessageBox(GetFocus(), L"Failed to launch cPacecom at init()", L"FAIL", S_OK);
         return -1;
     }
+
+    // Convert module ID letter to number
+    size_t module_id = 1;
+    if (config_struct_.channel_type->compare("B") == 0)
+    {
+        module_id = 2;
+    }
+
+
+
+    // Reset the device
+    std::wstring cmd;
+    cmd = std::format(L"*RST{}\n", module_id);
+    device->write(cmd);
+
+    // init PACE6000 specific command
+    cmd = std::format(L"SOUR{}:PRES 0\n", module_id);
+    device->write(cmd);
+
+    if (config_struct_.channel_physical_unit->compare("Bar rel") == 0)
+    {
+        cmd = std::format(L"SOUR{}:PRES:RANGE \"20.00barg\"\n", module_id);
+    }
+    else
+    {
+        cmd = std::format(L"SOUR{}:PRES:RANGE \"21.00bara\"\n", module_id);
+    }
+    device->write(cmd);
+
+    cmd = std::format(L":UNIT{} BAR\n", module_id);
+    device->write(cmd);
+
+    cmd = std::format(L":SOUR{}:SLEW:MODE max\n", module_id);
+    device->write(cmd);
+
+    cmd = std::format(L":OUTP{} 1\n", module_id);
+    device->write(cmd);
+
+
+    /*
     // Reset the device
     device->write(L"*RST\n");
 
@@ -65,6 +112,7 @@ int cPacecom::launch_device()
     device->write(L":UNIT BAR\n");
     device->write(L":SOUR:SLEW:MODE max\n");
     device->write(L":OUTP 1\n");
+    */
 
     // acquizition loop
     acquireloop = std::jthread(&cPacecom::acquire, this);

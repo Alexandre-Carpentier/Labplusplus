@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cObjectmanager.h"
 
 class cRender;
@@ -35,6 +42,11 @@ void cObjectmanager::set_voltagersdevice(cVoltageRs* m_voltagers)
 void cObjectmanager::set_oscopedevice(cOscope* m_oscope)
 {
 	m_oscope_ = m_oscope;
+}
+
+void cObjectmanager::set_daq6510device(c6510ui* m_6510)
+{
+	m_6510_ = m_6510;
 }
 
 void cObjectmanager::set_table(cTable* m_table)
@@ -90,6 +102,11 @@ cVoltageRs* cObjectmanager::get_voltagersdevice()
 cOscope* cObjectmanager::get_oscopedevice()
 {
 	return m_oscope_;
+}
+
+c6510ui* cObjectmanager::get_6510device()
+{
+	return m_6510_;
 }
 
 cTable* cObjectmanager::get_table()

@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _INSTRUMENT_H_
 #define _INSTRUMENT_H_
 #include <wx/wx.h>
@@ -9,8 +16,8 @@
 #include "data_types.h"
 #include "enum.h"
 #include "cMeasurementmanager.h"
-//#include "..\Lab++\Plugin\cDevice.h"
-#include "..\Lab\Plugin\cDevice.h"
+#include "..\Lab++\Plugin\cDevice.h"
+//#include "..\Lab\Plugin\cDevice.h"
 
 #include "cDeviceMonitor.h";
 

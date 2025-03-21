@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cConfig.h"
 
 //#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
@@ -10,8 +17,8 @@
 
 
 //#pragma comment (lib, "Plugin.lib")
-#include "..\Lab\Plugin\cDevice.h"
-//#include "..\Lab++\Plugin\cDevice.h"
+//#include "..\Lab\Plugin\cDevice.h"
+#include "..\Lab++\Plugin\cDevice.h"
 
 #include "cTable.h"
 #include "cPlot.h"
@@ -21,6 +28,7 @@
 #include "cVoltage.h"
 #include "cVoltageRs.h"
 #include "cOscope.h"
+#include "c6510ui.h"
 
 /*---------------- - Duplication-------------------------------- -
 void cDevice::DisplayConfiguration()
@@ -219,12 +227,33 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	Oscope_struct.PStop = nullptr;
 	plugin_vec.push_back(Oscope_struct);
 
+	// Add cOscope to plugin vec
+	m_6510ui = new c6510ui(book, devmon_);
+	cDevice* m_6510_dev = new cDevice();
+	m_6510_dev->set_access_type(READ);
+	m_6510_dev->set_device_name("DAQ6510");
+	m_6510_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA daq6510_struct;
+	daq6510_struct.name = L"DAQ6510.dll";
+	daq6510_struct.input_count = 1;
+	daq6510_struct.outputcount = 1;
+	daq6510_struct.signal_count = daq6510_struct.input_count + daq6510_struct.outputcount;
+	daq6510_struct.panel = m_6510ui->get_right_panel();
+	daq6510_struct.hInst = nullptr;
+	daq6510_struct.device = m_6510_dev;
+	daq6510_struct.Attach = nullptr;
+	daq6510_struct.Dettach = nullptr;
+	daq6510_struct.PStart = nullptr;
+	daq6510_struct.PStop = nullptr;
+	plugin_vec.push_back(daq6510_struct);
+
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
 	manager->set_voltagedevice(m_voltage); // Singleton saver...bad
 	manager->set_voltagersdevice(m_voltage_rs); // Singleton saver...bad
 	manager->set_oscopedevice(m_oscope); // Singleton saver...bad
+	manager->set_daq6510device(m_6510ui); // Singleton saver...bad
 
 	/////////////////////////////////////////////////////
 	// load and add dll instrument to plugin vec
@@ -243,6 +272,8 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	// Populate tree ctrl with 
 	// loaded plugin
 	//
+
+	wxImageList image_list;  
 	config_tree_ctrl = new wxTreeCtrl(config_leftpanel_, IDCCONFIGTREE, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)), wxBORDER_DOUBLE);
 	config_tree_ctrl->Bind(wxEVT_LEFT_DOWN, &cConfig::OnClickdrop, this, IDCCONFIGTREE);
 	config_tree_ctrl->SetBackgroundColour(wxColor(210, 210, 212));
@@ -286,7 +317,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 cConfig::~cConfig()
 {
 	std::cout << "cConfig dtor...\n";
-	//unload_plugins(); // Error occured when wxWidget use the garbage collector after
+	unload_plugins(); 
 	delete m_daqmx;
 	delete m_daq_dev;
 	delete m_pressure;
@@ -307,7 +338,7 @@ void cConfig::unload_plugins()
 		if (plugin.hInst != nullptr)
 		{
 			plugin.Dettach();
-			FreeLibrary(plugin.hInst);
+			//FreeLibrary(plugin.hInst);// Error occured when wxWidget use the garbage collector after
 			plugin.hInst = nullptr;
 		}
 	}
@@ -521,6 +552,11 @@ cOscope* cConfig::get_oscopedevice()
 	return m_oscope;
 }
 
+c6510ui* cConfig::get_daq6510device()
+{
+	return m_6510ui;
+}
+
 void cConfig::set_graph(cPlot* m_plot)
 {
 	m_plot_ = m_plot;
@@ -535,6 +571,7 @@ void cConfig::set_table(cTable* m_table)
 	m_voltage->set_table(m_table_);
 	m_voltage_rs->set_table(m_table_);
 	m_oscope->set_table(m_table_);
+	m_6510ui->set_table(m_table_);
 }
 
 
