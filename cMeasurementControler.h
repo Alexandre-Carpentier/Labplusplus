@@ -1,41 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
-
-#include <wx/wx.h>
 #include <thread>
-#include <Windows.h>
-#include <mutex>
-#include <memory>
 #include <vector>
+#include <iostream>
+#include "cObserver.h"
 
-#include "cCycle.h"
-#include "cCycleControler.h"
-#include "cPlot.h"
-#include "cFooter.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
-#include "cUSB6001.h"
-#include "cMeasurement.h"
-#include "cTick.h"
-//#include "cSingleton.h"
-/*
-class cCycle;
-class cCycleControler;
-class cPlot;
-class cFooter;
 class cObjectmanager;
 class cMeasurementmanager;
-class cUSB6001;
+class cPlot;
+class cFooter;
 class cMeasurement;
-class cTick;
-*/
-
 class cCycleControler;
 
-
-class cMeasurementControler
+class cMeasurementControler : public currentValueObserved
 {
 private:
 	std::jthread measurement_controler_thread;
+	CURRENT_VALUE_STRUCT currentValues;
 public:
 	std::shared_ptr<cCycleControler> m_cyclecontroler_;
 

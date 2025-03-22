@@ -1,17 +1,28 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <wx/wx.h>
 #include <wx/timer.h>
 
 #include <vector>
 #include <string>
+#include <format>
 
-#include "cSingleton.h"
+#include "encoding.h"
+//#include "cSingleton.h"
+#include "cSingletonSafe.h"
 #include "cVisa.h"
-#include "cTcp.h"
-#include "cSerial.h"
+#include "cVisatcp.h"
+#include "cVisaserial.h"
 #include "cProtocolFactory.h"
+#include "ListUsbDevice.h"
 
-const int refresh_rate = 30000;
+const int refresh_rate = 10000;
 
 class cDev
 {
@@ -30,27 +41,24 @@ private:
 	std::wstring name_;
 };
 
-class cDeviceMonitor : public wxTimer, public cSingleton<cDeviceMonitor>
+class cDeviceMonitor /*: public wxTimer, public cSingletonSafe*/
 {
+
 public:
 	cDeviceMonitor()
 	{
-		Start(refresh_rate);
+		//Start(refresh_rate);
+		
 	}
+	virtual ~cDeviceMonitor() {}
 
 	void Notify();
 	std::vector<cDev> get_device_vec();
+	std::wstring get_first_available() { return dev_list.at(0).get_addr(); };
 	void lookup_start();
 	void lookup_stop();
 
-	virtual ~cDeviceMonitor()
-	{
-
-	}
-
 private:
-
 	std::vector<cDev> dev_list;
 };
-
 

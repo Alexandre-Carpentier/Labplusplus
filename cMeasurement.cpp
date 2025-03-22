@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cMeasurement.h"
 #include "cTick.h"
 
@@ -10,12 +17,7 @@ void cCommon::remove_value() {
 	ring_buffer.X.pop_front(); ring_buffer.Y.pop_front();
 }
 
-cMeasurement::cMeasurement()
-{
-	
-}
-
-int cMeasurement::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) { return -1; }
+int cMeasurement::launch_device() { return -1; }
 
 std::string cMeasurement::device_name() { return std::string("Measurement super class"); };
 MEAS_TYPE cMeasurement::device_type() { return SUPER_INSTR; }

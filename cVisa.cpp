@@ -1,8 +1,15 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cVisa.h"
 
 cVisa::cVisa()
 {
-	std::wcout << "[*] cVisa default constructor called\n";
+	//std::wcout << "[*] cVisa default constructor called\n";
 	device_name_ = L"magic";
 
 	if (viOpenDefaultRM(&ressource_manager) != VI_SUCCESS)
@@ -20,7 +27,7 @@ cVisa::cVisa()
 
 err_struct cVisa::init()
 {
-	std::wcout << L"[*] cVisa init() called\n";
+	//std::wcout << L"[*] cVisa init() called\n";
 
 	assert(device_name_.size() < 15);
 	assert(ressource_manager > 0);
@@ -156,6 +163,8 @@ err_struct cVisa::read(std::wstring& scpi)
 #define BUFFER_SIZE 512
 	unsigned char msg[BUFFER_SIZE]= "";
 	ViUInt32 iRead = 0;
+
+	ZeroMemory(msg, sizeof(msg));
 	ViStatus res = viRead(device_, msg, BUFFER_SIZE, &iRead);
 	last_error.err_code = res;
 
@@ -324,7 +333,7 @@ err_struct cVisa::read(std::wstring& scpi)
 	}
 
 	// Display viRead success
-	std::wcout << last_error.err_msg;
+	//std::wcout << last_error.err_msg;
 	
 	// Display buffer received
 	//std::wcout << "[******************BUFFER*******************]\n[";
@@ -336,7 +345,7 @@ err_struct cVisa::read(std::wstring& scpi)
 
 err_struct cVisa::close()
 {
-	std::wcout << L"[*] cVisa close() called\n";
+	//std::wcout << L"[*] cVisa close() called\n";
 	viClear(device_);
 	viClose(device_);
 	last_error.err_msg = std::wstring(L"OK\n");

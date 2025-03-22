@@ -1,3 +1,11 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
+
 #include "cCycle.h"
 
 	cCycle::cCycle()
@@ -25,7 +33,7 @@
 		cycle->total_step = 0;
 		cycle->current_loop = 0;
 		cycle->total_loop = 0;
-		for (int x = 0; x < cycle->step_table.size(); x++)
+		for (size_t x = 0; x < cycle->step_table.size(); x++)
 		{
 			cycle->step_table[x].controler_vec.clear();
 		}
@@ -49,7 +57,7 @@
 
 	std::vector<STEPSTRUCT> cCycle::get_step_table()
 	{
-		assert(cycle->step_table.size() > 0);
+		//assert(cycle->step_table.size() > 0);
 		const std::lock_guard<std::mutex> lock(step_mutex);
 		return cycle->step_table;
 	}

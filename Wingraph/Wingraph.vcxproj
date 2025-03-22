@@ -79,7 +79,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>G:\CODE\VS_PROJET\Lab++\c_dll_tdm\dev\include;$(IncludePath)</IncludePath>
-    <LibraryPath>G:\CODE\VS_PROJET\Lab++\c_dll_tdm\dev\lib\32-bit\msvc;$(LibraryPath)</LibraryPath>
+    <LibraryPath>G:\CODE\VS_PROJET\Lab++\c_dll_tdm\dev\lib\32-bit\msvc;C:\DEV\03-Sources\Lab++\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

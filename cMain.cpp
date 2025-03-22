@@ -1,4 +1,23 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cMain.h"
+#include <wx/wx.h>
+#include <wx/treectrl.h>
+#include <wx/grid.h>
+#include <wx/dcbuffer.h>
+#include <vector>
+#include <memory>
+
+#include "cDeviceMonitor.h"
+#include "cConfig.h"
+#include "cTable.h"
+
+#include "resource.h"
 
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 EVT_TOOL(IDTOOL_OPENBTN, cMain::openButtonClicked)
@@ -15,12 +34,16 @@ EVT_SIZING(cMain::Moveevt)
 EVT_MAXIMIZE(cMain::Maximizeevt)
 wxEND_EVENT_TABLE()
 
-
 cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1200, 600))
 {
 #ifdef _DEBUG
 	//_crtBreakAlloc = 248;	
 #endif
+	if (this->GetHWND())
+	{
+		ShutdownBlockReasonCreate(this->GetHWND(), L"Do not stop before end of recording.");
+	}
+
 
 	/////////////////////////////////////////////////////////////
 	//
@@ -34,7 +57,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	//	Launch the device monitor tool
 	//
 
-	devmon = std::make_unique<cDeviceMonitor>();
+	std::shared_ptr<cDeviceMonitor> devmon = std::make_shared<cDeviceMonitor>();
 	devmon->Notify();
 
 	std::cout << "Current scale factor: " << this->GetDPIScaleFactor() << "\n";
@@ -52,13 +75,13 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	wxMenu* menu = new wxMenu();
 
 	this->Bind(wxEVT_MENU, &cMain::settingsButtonClicked, this,
-		menu->Append(wxID_ANY, "&Instruments configuration\t1")->GetId());
+		menu->Append(wxID_ANY, "&Instruments configuration\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::editButtonClicked, this,
-		menu->Append(wxID_ANY, "&Cycle configuration\t2")->GetId());
+		menu->Append(wxID_ANY, "&Cycle configuration\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::plotButtonClicked, this,
-		menu->Append(wxID_ANY, "&Graph window\t3")->GetId());
+		menu->Append(wxID_ANY, "&Graph window\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::MeasurementFolderButtonClicked, this,
-		menu->Append(wxID_ANY, "&Open measurement folder\t4")->GetId());
+		menu->Append(wxID_ANY, "&Open measurement folder\t")->GetId());
 	menu->AppendSeparator();
 	this->Bind(wxEVT_MENU, &cMain::exitButtonClicked, this,
 		menu->Append(wxID_ANY, "&Exit\tESC")->GetId());
@@ -145,7 +168,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	// CONFIG WND
 	////////////////////////////////////////////////////////////////////////////////
 
-	m_config = new cConfig(this, m_table);
+	m_config = new cConfig(this, devmon);
 	manager->set_config(m_config);
 	config_leftpanel = m_config->Getleftpan();
 	config_rightpanel = m_config->Getrightpan();
@@ -159,7 +182,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// EDIT WND
 	////////////////////////////////////////////////////////////////////////////////
-	m_table = new cTable(this, m_config);
+	m_table = new cTable (this, m_config);
 	manager->set_table(m_table);
 	table_leftpanel = m_table->Getleftpan();
 	table_rightpanel = m_table->Getrightpan();
@@ -208,7 +231,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// FOOTER
 	////////////////////////////////////////////////////////////////////////////////
-	m_footer = new cFooter(this, m_plot, m_table, m_config);
+	m_footer = new cFooter(this, m_plot, m_table, m_config, devmon);
 	manager->set_footer(m_footer);
 	wxBoxSizer* hfootersier = m_footer->GetSizer();
 
@@ -218,7 +241,9 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// INI CONFIG LOADER
 	////////////////////////////////////////////////////////////////////////////////
-	cfg_saver = new cInicfg;
+
+	// must load row in the table
+	cfg_saver = std::make_unique<cInicfg>();
 
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -241,23 +266,27 @@ void cMain::OnCloseWindow(wxCloseEvent& event)
 
 cMain::~cMain()
 {
+	if (this->GetHWND())
+	{
+		ShutdownBlockReasonDestroy(this->GetHWND());
+	}
+
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
-	delete cfg_saver; //save before destroying objects
 	delete m_table;
-	delete m_config;
 	delete m_plot;
 	delete m_graphrender;
 	delete m_statrender;
 	delete m_footer;
+	delete devmon;
+	delete m_config;
 
 	cfg_saver = nullptr; 
-	m_table = nullptr;
 	m_config = nullptr;
 	m_plot = nullptr;
 	m_graphrender = nullptr;
 	m_statrender = nullptr;
 	m_footer = nullptr;
-
+	devmon = nullptr;
 	// destroy singleton
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* manager = manager->getInstance();

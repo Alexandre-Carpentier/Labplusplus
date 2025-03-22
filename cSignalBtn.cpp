@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cSignalBtn.h"
 
 BEGIN_EVENT_TABLE(wxCustomButton, wxPanel)
@@ -46,9 +53,9 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     h_sizer0->Add(show, 0, wxEXPAND|wxALL, 5);
     h_sizer0->Add(sinebtn, 0, wxEXPAND);
     h_sizer0->Add(txt, 0, wxALIGN_CENTER_VERTICAL);
-    h_sizer0->AddStretchSpacer();
-    h_sizer0->Add(picker, 0, wxALIGN_CENTER_VERTICAL);
-    h_sizer0->AddStretchSpacer();
+    //h_sizer0->AddStretchSpacer();
+    //h_sizer0->Add(picker, 0, wxALIGN_CENTER_VERTICAL);
+    //h_sizer0->AddStretchSpacer();
 
     h_sizer1 = new wxBoxSizer(wxHORIZONTAL);
 
@@ -73,10 +80,14 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
 
     h_sizer1->Add(staticaddr, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
     h_sizer1->Add(addr, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
-    h_sizer1->Add(staticunit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
-    h_sizer1->Add(unit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
+    //h_sizer1->Add(staticunit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
+    //h_sizer1->Add(unit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
 
-
+    h_sizer2 = new wxBoxSizer(wxHORIZONTAL);
+    h_sizer2->Add(staticunit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL | wxLEFT, this->FromDIP(10));
+    h_sizer2->Add(unit, 0, wxALIGN_CENTER_VERTICAL | wxALIGN_CENTER_HORIZONTAL);
+    h_sizer2->AddStretchSpacer();
+    h_sizer2->Add(picker, 0, wxALIGN_CENTER_VERTICAL);
 
     h_sizer3 = new wxBoxSizer(wxHORIZONTAL);
     min = new wxStaticText(this, wxID_ANY, "Min: 0", wxDefaultPosition, this->FromDIP(wxSize(20, 15)), wxTE_CENTRE | wxNO_BORDER);
@@ -139,7 +150,7 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     v_sizer->Add(h_sizer0, 1, wxEXPAND);
    
     v_sizer->Add(h_sizer1, 1, wxEXPAND);
-    //v_sizer->Add(h_sizer2, 1, wxEXPAND);
+    v_sizer->Add(h_sizer2, 1, wxEXPAND);
     v_sizer->Add(h_sizer3, 1, wxEXPAND);
     //v_sizer->Add(separator0, 1, wxEXPAND);
     v_sizer->Add(h_sizer4, 1, wxEXPAND);

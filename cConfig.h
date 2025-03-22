@@ -1,29 +1,24 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
-
-//#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-//#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
-
-#include <wx/dcbuffer.h>
 #include <wx/wx.h>
-#include <wx/combobox.h>
-#include <wx/treectrl.h>
 #include <wx/simplebook.h>
 
-#include <locale>
-#include <codecvt>
-#include <map>
-
-#include "cPlot.h"
-#include "cCycle.h"
-#include "cDaqmx.h"
-#include "cPressure.h"
-#include "cTension.h"
-#include "cObjectmanager.h"
-#include "cMeasurementControler.h"
-
-//#pragma comment (lib, "Plugin.lib")
-//#include "..\Lab\Plugin\cDevice.h"
-#include "..\Lab++\Plugin\cDevice.h"
+class cTable;
+class cPlot;
+class cDaqmx;
+class cDevice;
+class cPressure;
+class cVoltage;
+class cVoltageRs;
+class cOscope;
+class cDeviceMonitor;
+class c6510ui;
 
 class cConfig : public wxFrame
 {
@@ -38,13 +33,16 @@ private:
 	wxBoxSizer* config_panel_sizer = nullptr;
 	wxPanel* config_panel = nullptr;
 
+	std::shared_ptr <cDeviceMonitor> devmon_ = nullptr;
 	cTable* m_table_ = nullptr;
 	cPlot* m_plot_ = nullptr;
 	cDaqmx* m_daqmx = nullptr;
 	cDevice* m_daq_dev = nullptr;
 	cPressure* m_pressure = nullptr;
-	cDevice* m_pressure_dev = nullptr;
-	cTension* m_tension = nullptr;
+	cVoltage* m_voltage = nullptr;
+	cVoltageRs* m_voltage_rs = nullptr;
+	cOscope* m_oscope = nullptr;
+	c6510ui* m_6510ui = nullptr;
 
 	typedef cDevice* (*PLUGIN_ATTACH)(wxWindow*);
 	PLUGIN_ATTACH Attach = nullptr;
@@ -75,7 +73,7 @@ private:
 	std::vector<PLUGIN_DATA> plugin_vec;
 
 public:
-	cConfig(wxWindow* inst, cTable* m_table);
+	cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
 	~cConfig();
 	void OnClickdrop(wxMouseEvent& evt);
 	void StopTest(bool stop);
@@ -87,6 +85,9 @@ public:
 
 	// Plugin and device access here
 	cPressure* get_pressuredevice();
+	cVoltage* get_voltagedevice();
+	cOscope* get_oscopedevice();
+	c6510ui* get_daq6510device();
 	cDaqmx* get_nidaq();
 
 	std::vector<cDevice*> get_device_vec();

@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <wx/wx.h>
 #include <thread>
@@ -6,7 +13,7 @@
 
 #include "enum.h"
 #include "cCycle.h"
-#include "cTable.h"
+class cTable;
 
 class cCycleControler /* : public wxWindow*/
 {

@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <winsock2.h> 
 #include <vector>
@@ -5,10 +12,9 @@
 #include <cassert>
 #include <thread>
 
-
 #include "cVisa.h"
-#include "cTcp.h"
-#include "cSerial.h"
+#include "cVisatcp.h"
+#include "cVisaserial.h"
 #include "cProtocolFactory.h"
 
 #include "encoding.h"
@@ -24,7 +30,7 @@ private:
 	DATAS result;
 
 	cProtocolFactory factory;
-	std::unique_ptr<cProtocol> device;
+	std::unique_ptr<IProtocol> device;
 	err_struct err;
 
 	std::jthread acquireloop;
@@ -37,7 +43,7 @@ public:
 	size_t chan_read_count() override;
 	size_t chan_write_count() override;
 
-	int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct) override;
+	int launch_device() override;
 
 	void acquire();
 	DATAS read() override;

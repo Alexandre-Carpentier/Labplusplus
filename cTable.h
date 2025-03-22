@@ -1,27 +1,48 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <wx/wx.h>
 #include <wx/grid.h>
-#include <vector>
-#include <Windows.h>
-#include "enum.h"
-#include <string>
-#include <memory>
-#include "cObjectmanager.h"
 
-#include "cConfig.h"
-#include"cPlot.h"
 
 #include "cCycle.h"
+#include "cConfig.h"
+#include "enum.h"
+
 #include "cTick.h"
-#include <format>
+#include "cObjectmanager.h"
+#include "cObserver.h"
 
 class cDurationStatisticCtrl;
+/*
 
-class cTable
+#include"cPlot.h"
+
+
+
+
+
+
+*/
+
+class cTable : public observer
 {
+
 public:
 	wxGrid* grid = nullptr;
+
+	void serialize(std::string config_name);
+	void deserialize(std::string config_name);
+
+	virtual void update(void* arg); // Observe current result
+
 	cTable(wxWindow* inst, cConfig* m_config);
+	~cTable();
 	int get_step_number();
 	int get_loop_number();
 	double get_total_step_duration();
@@ -45,7 +66,7 @@ public:
 	wxPanel* Getrightpan();
 	wxBoxSizer* Get_hsizer();
 	void GridResize(wxGrid* grid);
-	~cTable();
+
 private:
 	wxWindow* inst_ = nullptr;
 	wxPanel* table_leftpanel_ = nullptr;
@@ -58,10 +79,13 @@ private:
 
 	cDurationStatisticCtrl* stat = nullptr;
 
-	cConfig* m_config_ = nullptr;
+	cConfig *m_config_ = nullptr;
 	cCycle* m_cycle_ = nullptr;
 
 	wxTextCtrl* loop = nullptr;
+
+	wxStaticText* indicator_vec1[max_chan_number];
+	wxStaticText* indicator_vec2[max_chan_number];
 
 	void clearButtonClicked(wxCommandEvent& evt);
 };
@@ -74,6 +98,7 @@ public:
 	void start(std::shared_ptr<cCycle>  m_cycle);
 	void stop();
 	void reset();
+	bool isTick();
 
 
 	void paintEvent(wxPaintEvent& evt);

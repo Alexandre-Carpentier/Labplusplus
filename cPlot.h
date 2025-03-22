@@ -1,27 +1,47 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <wx/scrolwin.h>
 #include <wx/wx.h>
 #include <wx/treectrl.h>
 #include <wx/grid.h>
-
 #include <wx/bannerwindow.h>
-
 
 #include <list>
 #include <vector>
 #include <Windows.h>
 #include <process.h>
+
 #include "WinGraph.h"
 #include "cSignalTable.h"
 
-static HGRAPH hGraph;
+#include "cMeasurementmanager.h"
+#include "cSignalBtn.h"
 
+static HGRAPH hGraph;
+/*
 class cMeasurementControler;
 class cObjectmanager;
 class cMeasurementmanager;
+*/
+/*
 
-#include "cSignalBtn.h"
 #include "cMeasurement.h"
+
+
+#include "cDaqmx.h"
+#include "cUSB6001.h"
+#include "enum.h"
+
+#include "cMeasurementControler.h"
+#include "cObjectmanager.h"
+
+*/
 
 class cPlot
 {
@@ -75,9 +95,10 @@ public:
 	void set_signal_filter_threshold(float intensity, int position);
 	void set_signal_name(std::string signame, int position);  // change the signal name in the WinGraph module
 	void show_all_signals(bool isDisplayed);
-	void start_graph(LOGGER_M ReccordingType, int SignalNumber);
+	void start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header);
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);
+	void graph_addpoints(const int signb, double* val[], int chunk_size);
 
 	double get_signal_min_value(MEAS_TYPE type, int SignalNumber);
 	double get_signal_average_value(int SignalNumber);

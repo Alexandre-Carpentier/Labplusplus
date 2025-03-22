@@ -1,6 +1,11 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
-
-
 #include <wx/wx.h>
 #include <wx/sizer.h>
 #include <wx/clrpicker.h>
@@ -14,6 +19,7 @@ class wxCustomButton : public wxWindow
 {
     wxBoxSizer* h_sizer0=nullptr;
     wxBoxSizer* h_sizer1 = nullptr;
+    wxBoxSizer* h_sizer2 = nullptr;
     wxBoxSizer* h_sizer3 = nullptr;
     wxBoxSizer* h_sizer4 = nullptr;
 

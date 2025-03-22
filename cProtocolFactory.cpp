@@ -1,11 +1,25 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cProtocolFactory.h"
 
-
-std::unique_ptr<cProtocol> cProtocolFactory::make(PROTOCOLENUM type, std::wstring addr)
+std::unique_ptr<IProtocol> cProtocolFactory::make(PROTOCOLENUM type, std::wstring addr)
 {
-	std::unique_ptr<cProtocol> protocol_obj = nullptr;
+	std::unique_ptr<IProtocol> protocol_obj = nullptr;
 
-
+	if (type == PROTOCOLENUM::USB)
+	{
+		if (addr.length() == 0)
+		{
+			std::wcout << L"No device adress supplied, trying to find first\n";
+			protocol_obj = std::make_unique<cUsb>();
+		}
+		protocol_obj = std::make_unique<cUsb>(addr);
+	}
 	if (type == PROTOCOLENUM::COM)
 	{
 		if (addr.length() == 0)
@@ -24,6 +38,15 @@ std::unique_ptr<cProtocol> cProtocolFactory::make(PROTOCOLENUM type, std::wstrin
 		}
 		protocol_obj = std::make_unique<cSerial>(addr);
 	}
+	if (type == PROTOCOLENUM::VISAUSB)
+	{
+		if (addr.length() == 0)
+		{
+			std::wcout << L"No device adress supplied, trying to find first\n";
+			protocol_obj = std::make_unique<cVisausb>();
+		}
+		protocol_obj = std::make_unique<cVisausb>(addr);
+	}
 	if (type == PROTOCOLENUM::VISATCP)
 	{
 		if (addr.length() == 0)
@@ -33,5 +56,5 @@ std::unique_ptr<cProtocol> cProtocolFactory::make(PROTOCOLENUM type, std::wstrin
 		}
 		protocol_obj = std::make_unique<cTcp>(addr);
 	}
-	return protocol_obj;
+	return std::move(protocol_obj);
 }

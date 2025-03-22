@@ -1,8 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <wx/wx.h>
 #include "cMain.h"
-#include <cassert>
+
 
 class cApp :public wxApp
 {

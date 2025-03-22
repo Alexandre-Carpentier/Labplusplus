@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cDaqsim.h"
 #include "cMeasurement.h"
 #include <string>
@@ -43,9 +50,14 @@ size_t cDaqsim::chan_write_count()
     return 0;
 }
 
-int cDaqsim::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cDaqsim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 {
     config_struct_ = config_struct;
+    return;
+}
+
+int cDaqsim::launch_device()
+{
     return 0;
 }
 

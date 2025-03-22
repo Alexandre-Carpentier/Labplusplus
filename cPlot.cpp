@@ -1,13 +1,11 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cPlot.h"
-#include "cSignalBtn.h"
-
-#include "cDaqmx.h"
-#include "cUSB6001.h"
-#include "enum.h"
-
-#include "cMeasurementControler.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
 
 cPlot::cPlot(wxWindow* inst, int nbPoints)
 {
@@ -84,186 +82,6 @@ cPlot::~cPlot()
 		FreeGraph(&hGraph);
 	}
 }
-
-/*
-void cPlot::init_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color)
-{
-	// Insert data structure at the end
-	chan_legend_struct_listg.push_back({chan_name, chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color });
-
-	draw_chan_to_gui();
-}
-
-// BUGGY BUGGY
-void cPlot::resize_chan_number_to_gui(size_t max_item)
-{
-	if (max_item < CURRENT_SIG)
-	{
-		// remove data structure at the end
-		for (int j = chan_legend_struct_list.size(); j > max_item; j--)
-		{
-			chan_legend_struct_list.pop_back();
-		}
-		for (int j = legend_vsizer->GetItemCount() - 1; j > max_item; j--)
-		{
-			//legend_vsizer->Remove(j);
-			// Hide custom legend in place of removing sizer ?
-		}
-
-		CURRENT_SIG = max_item; // update MAX_SIG
-	}
-	else if (max_item > CURRENT_SIG)
-	{
-		// BUGGY !!!!!!!!!!!!!!!!!!!!
-		// TODO: add new wxCustomButton as the max is 64
-		// TODO: add to sizer the new item
-		
-		// add data structure at the end
-		for (int j = CURRENT_SIG; j < max_item; j++)
-		{
-			chan_legend_struct_list.push_back({ "slot free", "/addr", "Volt", 0.0, 0.0, 0.0, wxColor(90, 90, 90) });
-		}
-	}
-
-	std::cout << "SetSignalCount is now set to " << chan_legend_struct_list.size() << "\n";
-	//SetSignalCount(hGraph, chan_legend_struct_list.size());
-	draw_chan_to_gui();
-}
-
-int cPlot::gui_get_last_active_channel_number()
-{
-	// get total element size
-	size_t index = chan_legend_struct_list.size()-1;
-
-	// point to last element
-	std::list<CHAN_LEGEND_STRUCT>::iterator it;
-	it = chan_legend_struct_list.end();// after last element do not dereference it (std::list::end)
-	it--;
-
-	//dec
-	while (index > 0)
-	{
-
-		if (it->channel_legend_name.compare("slot free") != 0)
-		{
-			return index;
-		}
-		it--;
-		index--;
-	}
-	return index;
-}
-
-int cPlot::get_chan_number_to_gui()
-{
-
-	std::cout << "Get gui channel number " << chan_legend_struct_list.size() << "\n";
-	return chan_legend_struct_list.size();
-}
-
-void cPlot::add_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color, size_t position)
-{
-
-	std::cout << "------------add_chan_to_gui--------------------\n";
-
-	std::list<CHAN_LEGEND_STRUCT>::iterator it;
-	it = chan_legend_struct_list.begin();
-
-	// Iterate until the position is reached
-	for (int i = 0; i < position; i++)
-	{
-		it++; // inc iterator until the position 
-	}
-
-	// Replace data structure
-	*it = { chan_name,  chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color };
-	//std::cout << "RGB:" << (int)chan_color.Red() << " " << (int)chan_color.Green() << " " << (int)chan_color.Blue() << "\n";
-	std::cout << "at position: " << position << "\n";
-
-	draw_chan_to_gui();
-}
-
-void cPlot::draw_chan_to_gui()
-{
-	// Wingraph
-
-	if (hGraph != nullptr)
-	{
-		// update size
-		int sig_count = 0;
-		std::list<CHAN_LEGEND_STRUCT>::iterator it;
-		it = chan_legend_struct_list.begin();
-		for (int i = 0; i < chan_legend_struct_list.size(); i++)
-		{
-			if (it->channel_legend_name.compare("slot free") != 0)
-			{
-				sig_count++;
-			}
-			it++;
-		}
-		SetSignalCount(hGraph, sig_count);
-
-		// set every valid signal in Wingraph
-		int k = 0;
-		for (auto chan : chan_legend_struct_list)
-		{
-			if (chan.channel_legend_name.compare("slot free") != 0)
-			{
-				SetSignalLabel(hGraph, chan.channel_legend_name.c_str(), k);
-				SetSignalColor(hGraph, (int)chan.channel_legend_color.Red(), (int)chan.channel_legend_color.Green(), (int)chan.channel_legend_color.Blue(), k);
-				k++;
-			}
-		}
-	}
-
-	// cPlot
-
-	size_t element = 0;
-	for (auto chan_legend_struct : chan_legend_struct_list)
-	{
-
-		if (chan_legend_struct.channel_legend_name.compare("slot free") != 0)
-		{
-			legend_vsizer->Remove(element);
-
-			chan_info_btn_pool[element]->set_name(chan_legend_struct.channel_legend_name);
-			chan_info_btn_pool[element]->set_address(chan_legend_struct.channel_legend_addr);
-			chan_info_btn_pool[element]->set_unit(chan_legend_struct.channel_legend_unit);
-			chan_info_btn_pool[element]->set_color(chan_legend_struct.channel_legend_color);
-
-			chan_info_btn_pool[element]->Show();
-
-			legend_vsizer->Insert(element, chan_info_btn_pool[element], 0, wxTOP | wxLEFT | wxRIGHT | wxEXPAND, inst_->FromDIP(3));
-		}
-
-		element++;
-	}
-
-	plot_leftpanel_->SetSizerAndFit(left_vsizer);
-}
-
-void cPlot::remove_chan_to_gui(size_t position)
-{
-	if (position > chan_legend_struct_list.size())
-	{
-		std::cout << "[!] Fatal error in cPlot::remove_chan_to_gui(size_t position)\n";
-		return;
-	}
-
-	std::list<CHAN_LEGEND_STRUCT>::iterator it;
-	it = chan_legend_struct_list.begin();
-
-	// Iterate until the position is reached
-	for (int i = 0; i < position; i++)
-		it++; // inc iterator until the position
-
-	// Replace data structure
-	*it = { "slot free", "/addr", "Volt", 0.0, 0.0, 0.0, wxColor(90, 90, 90) };
-	chan_info_btn_pool[position]->Hide();
-
-	draw_chan_to_gui();
-}
-*/
 
 void cPlot::update_gui()
 {
@@ -539,7 +357,7 @@ void cPlot::set_signal_name(std::string signame, int position)
 	SetSignalLabel(hGraph, signame.c_str(), position);
 }
 
-void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber)
+void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header)
 {
 	if (GetGraphState(hGraph) == FALSE)
 	{
@@ -553,7 +371,11 @@ void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber)
 		}
 
 		SetRecordingMode(hGraph, ReccordingType);
-		StartGraph(hGraph);
+		
+		if(opt_header.size()>0)
+			StartGraph(hGraph, opt_header.c_str());
+		else
+			StartGraph(hGraph, nullptr);
 	}
 }
 
@@ -575,7 +397,18 @@ void cPlot::graph_addpoint(const int signb, double val[])
 		std::cout << "cPlot::graph_addpoint() -> hGraph is null\n";
 		return;
 	}
-	AddPoints(hGraph, val, signb);
+	AddPoint(hGraph, val, signb);
+}
+
+void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
+{
+	if (hGraph == nullptr)
+	{
+		std::cout << "cPlot::graph_addpoint() -> hGraph is null\n";
+		return;
+	}
+	MessageBox(0, L"Procedure graph_addpoints() not implemented.", L"Fail", S_OK);
+	//AddMultiplePoints(hGraph, val, signb, chunk_size);
 }
 
 double cPlot::get_signal_min_value(MEAS_TYPE type, int SignalNumber)

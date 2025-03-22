@@ -1,11 +1,97 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cTable.h"
 
+#include <Windows.h>
+#include <string>
+#include <memory>
+#include <format>
+#include <vector>
 
+#include <filesystem>
+#include "cSerialize.h"
+#include "cSignalDisplay.h"
 
-class cConfig;
-class cDevice;
+void cTable::serialize(std::string config_name)
+{
+	size_t col = 0;
+	for (auto enable : col_enable)
+	{
+		if (enable)
+		{
+			wxString col_name = grid->GetColLabelValue(col);
+			std::string fullpath = "Lab++Table";
+			fullpath.append(col_name);
+			fullpath.append(".ini");
+			cSerialize configsaver(fullpath);
+			
+			for (size_t i = 0; i < LINE_NB; i++)
+			{
+				wxString row_value = grid->GetCellValue(i, col);
+				if (row_value.size() > 0)
+				{
+					serialize_item(configsaver, std::to_string(i), row_value);
+				}
+			}
+		}
+		col++;
+	}
+}
 
-cTable::cTable(wxWindow* inst, cConfig* m_config)
+void cTable::deserialize(std::string config_name)
+{
+	size_t col_num = grid->GetNumberCols();
+	for (size_t col = 0; col < col_num; col++)
+	{
+		wxString col_name = grid->GetColLabelValue(col);
+		std::string filename = "Lab++Table";
+		filename.append(col_name);
+		filename.append(".ini");
+
+		auto path = std::filesystem::temp_directory_path().parent_path().parent_path().parent_path();
+		path /= "Roaming\\";
+		path += filename;
+
+		if (std::filesystem::exists(path))
+		{
+			cSerialize configsaver(filename);
+
+			for (size_t i = 0; i < LINE_NB; i++)
+			{
+				wxString value;
+				deserialize_item(configsaver, std::to_string(i), value);
+				if (value.size() > 0)
+				{
+					grid->SetCellValue(i, col, value);
+				}
+			}
+		}
+	}
+}
+
+void cTable::update(void* arg)
+{
+	CURRENT_VALUE_STRUCT *res = (CURRENT_VALUE_STRUCT*)arg;
+	size_t c = 0;
+	for (auto name : res->names_vec)
+	{		
+		indicator_vec1[c]->SetLabelText(name);
+		indicator_vec2[c]->SetLabelText(std::to_string(res->values_vec.at(c)));
+		c++;
+	}
+	for (size_t j=c;j++;j<max_chan_number)
+	{
+		indicator_vec1[c]->Hide();
+		indicator_vec2[c]->Hide();
+	}
+}
+
+cTable::cTable(wxWindow* inst, cConfig *m_config)
 {
 	std::cout << "cTable ctor...\n";
 	inst_ = inst;
@@ -18,8 +104,8 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	inst->Bind(wxEVT_COMMAND_BUTTON_CLICKED, &cTable::clearButtonClicked, this, IDCTABLEBTNRESET);
 
 	wxBoxSizer* vleftsizer = new wxBoxSizer(wxVERTICAL);
-
 	vleftsizer->Add(resetbtn, 1, wxALL | wxEXPAND, inst->FromDIP(4));
+
 
 	table_rightpanel_ = new wxPanel(inst, IDCTABLEPANELRIGHT, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)), wxSUNKEN_BORDER);
 	table_rightpanel_->SetBackgroundColour(wxColor(240, 240, 240));
@@ -61,7 +147,9 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 		
 		for (int n = 0; n < output; n++) // Add each output from output_vec
 		{			
-			grid->SetColLabelValue(pos, name + std::format("_{}", n) + std::string("(") + unit + std::string(")"));
+			std::string col_name = name + std::format("_{}", n) + std::string("(") + unit + std::string(")");
+			
+			grid->SetColLabelValue(pos, col_name);
 			grid->SetColSize(pos, 0); // Hide it
 			col_enable.push_back(false);
 			pos++; // col index
@@ -101,14 +189,36 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	flexsizer->Add(loop);
 	flexsizer->Add(stat);
 
+	///////////////////////////////////////////////////////
+	// Create indicators
+	///////////////////////////////////////////////////////
+	for (size_t i = 0; i < max_chan_number; i ++ )
+	{
+		indicator_vec1[i] = new wxStaticText(table_rightpanel_, IDCINDICATORNAME0+i, L"Measurement:");
+		indicator_vec1[i]->SetFont(indicator_vec1[i]->GetFont().Scale(1.5));
+		indicator_vec1[i]->SetBackgroundColour(wxColor(112, 112, 111));
+		//indicator_vec1[i]->Hide();
+		indicator_vec2[i] = new wxStaticText(table_rightpanel_, IDCINDICATORVALUE0 +i, L"00.00");
+		indicator_vec2[i]->SetFont(indicator_vec2[i]->GetFont().Scale(1.5));
+		indicator_vec2[i]->SetBackgroundColour(wxColor(112, 112, 111));
+		//indicator_vec2[i]->Hide();
+	}
+	wxBoxSizer* h_indicators_sizer = new wxBoxSizer(wxHORIZONTAL);
+	for (size_t i = 0; i < max_chan_number; i++)
+	{
+		h_indicators_sizer->Add(indicator_vec1[i], 0, wxALL, inst->FromDIP(10));
+		h_indicators_sizer->Add(indicator_vec2[i], 0, wxALL, inst->FromDIP(10));
+	}
+
 
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
-
 	hbox->Add(flexsizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));
 
 	wxBoxSizer* grid_vsizer = new wxBoxSizer(wxVERTICAL);
+	grid_vsizer->Add(h_indicators_sizer, 0, wxEXPAND);
 	grid_vsizer->Add(grid, 1, wxEXPAND);
 	grid_vsizer->Add(hbox, 0, wxCENTER);
+
 
 	table_leftpanel_->SetSizerAndFit(vleftsizer);
 	table_rightpanel_->SetSizerAndFit(grid_vsizer);
@@ -121,12 +231,27 @@ cTable::cTable(wxWindow* inst, cConfig* m_config)
 	//set_line_highlight(2);
 
 	m_config_->set_table(this); // share cTable with plugin
+
+	// Deserialize
+	for (auto name : name_vec)
+	{
+		deserialize(name);
+	}
 }
 
 cTable::~cTable()
 {
 	std::cout << "cTable dtor...\n";
-	delete stat;
+
+	// Serialize
+	std::vector<std::string>name_vec = m_config_->get_plugin_name_vec();
+	for (auto name : name_vec)
+	{
+		serialize(name);
+	}
+
+	delete stat; // TODO wxwidget delete stat automatically ?
+	stat = nullptr;
 	// Save current row values
 }
 
@@ -217,6 +342,12 @@ std::vector<STEPSTRUCT> cTable::get_step_table()
 
 void cTable::start_statistic(std::shared_ptr<cCycle> m_cycle)
 {
+	// if stat already created, reset it
+	if (stat->isTick())
+	{
+		stat->reset();
+	}
+
 	stat->start(m_cycle);
 }
 
@@ -421,7 +552,7 @@ void cDurationStatisticCtrl::start(std::shared_ptr<cCycle> m_cycle)
 	wxString futur_timestamp = "End at: " + add_to_current_timestamp(duration_s);
 	end->SetLabelText(futur_timestamp);
 
-	wxString elapsed_timestamp = "Elapsed: " + add_to_current_timestamp(0);
+	wxString elapsed_timestamp = "Elapsed: 0.0 s";// +add_to_current_timestamp(0.0);
 	elapsed->SetLabelText(elapsed_timestamp);
 
 	saved_total_cycle = m_cycle->get_current_loop();
@@ -452,7 +583,22 @@ void cDurationStatisticCtrl::reset()
 	elapsed->SetLabelText("Elapsed: /");
 
 	cycle_step_state->SetLabelText("Performed: / cyles");
+
+	assert(tick != nullptr);
 	tick->reset_tick();
+
+	savedst = { 0 };
+	savedft = { 0 };
+	saved_total_cycle = 0;
+	saved_total_step = 0;
+}
+
+bool cDurationStatisticCtrl::isTick()
+{
+	if (tick)
+		return true;
+	else
+		return false;
 }
 
 
@@ -592,12 +738,15 @@ void cDurationStatisticCtrl::Notify()
 	// Compute number of cycle performed
 	size_t current_cycle = m_cycle_->get_total_loop_number()- (m_cycle_->get_current_loop());
 	size_t total_cycle = saved_total_cycle;
-	wxString performed = wxString::Format("Performed: %Iu/%Iu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
+
+	// zu or Iu to print size_t integer value -> after MSVC2013 we can use zu, before it was not ANSI compatible and is %Iu formater.
+	//wxString performed = wxString::Format("Performed: %Iu/%Iu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
+	wxString performed = wxString::Format("Performed: %zu/%zu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
 	cycle_step_state->SetLabelText(performed);
 
 	// Update % in status bar
 	cObjectmanager* object_manager = object_manager->getInstance();
 	wxStatusBar* statusbar = object_manager->get_status_bar();
-	wxString statusstr = wxString::Format("%Ii %% performed...", (current_cycle * 100) / total_cycle);
+	wxString statusstr = wxString::Format("%zu %% performed...", (current_cycle * 100) / total_cycle);
 	statusbar->SetLabelText(statusstr);
 }

@@ -1,45 +1,63 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cPressure.h"
-
-#include <wx/wx.h>
-#include <wx/combobox.h>
 #include <wx/dcbuffer.h>
-#include <format>
-#include <locale>
-
 #include "enum.h"
-
-#include "cMeasurementControler.h"
-#include "cMeasurement.h"
-#include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
-#include "cCycle.h"
-#include "cPlot.h"
-#include "cImagePanel.h"
-
 #include "cDeviceMonitor.h"
+#include "cTable.h"
 #include "cPacesim.h"
 #include "cPacecom.h"
 
 
-
-cPressure::cPressure(wxWindow* inst)
+cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	std::cout << "cPressure ctor...\n";
 	inst_ = inst;
+	devmon_ = devmon;
+
+	//cDeviceMonitor* devmon = devmon->getInstance();
+	std::vector<cDev> dev_list = devmon->get_device_vec();
 
 	////////////////////////////////////////////////////////////
 	// Load default labels in memory
 	////////////////////////////////////////////////////////////
 	label.device_enabled = false;	
+	label.device_name.clear();
+	for (auto device : dev_list)
+	{
+		std::wstring full_name = device.get_addr();
+		full_name.append(L"::");
+		full_name.append(device.get_name());
+		full_name.append(L"::");
+		full_name.append(device.get_type());
+
+		label.device_name.push_back(full_name);
+	}
 	label.device_name.push_back("Simulated");
 	label.channel_permision.push_back(CHANWRITE);
+
+	label.channel_type[0].push_back("A");
+	label.channel_type[0].push_back("B");
+
+	label.channel_physical_unit[0].push_back("Bar rel");
+	label.channel_physical_unit[0].push_back("Bar abs");
 
 	////////////////////////////////////////////////////////////
 	// Load default configuration in memory
 	////////////////////////////////////////////////////////////
 	config.device_enabled = false;
-	config.device_name = wxT("Simulated");
+	config.device_name.clear();
 
+	config.device_name = label.device_name[0];
+	config.channel_permision.push_back(CHANWRITE);
+	config.channel_type[0].append("A");
+	config.channel_physical_unit[0].append("Bar rel");
 	////////////////////////////////////////////////////////////
 
 	::wxInitAllImageHandlers();
@@ -56,7 +74,7 @@ cPressure::cPressure(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
-	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 20);
+	wxFlexGridSizer* flexsizer = new wxFlexGridSizer(4, 4, 10, 20);
 
 	////////////////////////////////////////////////////////////
 
@@ -80,30 +98,50 @@ cPressure::cPressure(wxWindow* inst)
 
 	wxStaticText* staticaddr = new wxStaticText(device_group, IDCSTATICADDR, L"Device list:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
 	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
-	//staticaddr->SetBackgroundColour(*bgcolor);
 
-	////////////////////////////////////////////////////////////
 
 	addr_ctrl = new wxComboBox(device_group, IDCPRESSUREADDR, label.device_name[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_name, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
 	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
-	RefreshPort();
 	addr_ctrl->Disable();
+
 	
-	
+	////////////////////////////////////////////////////////////
+
+	wxStaticText* staticmodule = new wxStaticText(device_group, IDCSTATICMODULE, L"Module:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
+
+
+	module_ctrl = new wxComboBox(device_group, IDCPRESSUREMODULE, label.channel_type[0][0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.channel_type[0], wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	//inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
+	module_ctrl->SetFont(module_ctrl->GetFont().Scale(text_size));
+	module_ctrl->Disable();
+
+	////////////////////////////////////////////////////////////
+
+	wxStaticText* staticunit = new wxStaticText(device_group, IDCSTATICUNIT, L"Unit:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+	staticaddr->SetFont(staticaddr->GetFont().Scale(text_size));
+
+
+	unit_ctrl = new wxComboBox(device_group, IDCPRESSUREUNIT, label.channel_physical_unit[0][0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.channel_physical_unit[0], wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	//inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cPressure::OnPressureAddrSelBtn, this, IDCPRESSUREADDR);
+	unit_ctrl->SetFont(unit_ctrl->GetFont().Scale(text_size));
+	unit_ctrl->Disable();
+
 	flexsizer->Add(enablepressure);
 	flexsizer->Add(pressure_controler_activate);
 	flexsizer->Add(staticaddr);
 	flexsizer->Add(addr_ctrl);
+	flexsizer->Add(staticmodule);
+	flexsizer->Add(module_ctrl);
+	flexsizer->Add(staticunit);
+	flexsizer->Add(unit_ctrl);
 	device_group_sizer->Add(flexsizer);
 
 	wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
 	v_sizer->Add(dummy); // Space for daq img
 	v_sizer->Add(device_group_sizer, 0, wxALIGN_CENTER, inst->FromDIP(10));
 	pace_rightpanel_->SetSizerAndFit(v_sizer);
-
-	//wxCommandEvent evt0 = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDCPRESSUREACTIVATE);
-	//wxPostEvent(inst_, evt0);
 }
 
 cPressure::~cPressure()
@@ -117,8 +155,8 @@ void cPressure::RefreshPort()
 {
 	std::wcout << L"[*] Refresh port called\n";
 
-	cDeviceMonitor* devmon = devmon->getInstance();
-	std::vector<cDev> dev_list = devmon->get_device_vec();
+	//cDeviceMonitor* devmon = devmon->getInstance();
+	std::vector<cDev> dev_list = devmon_->get_device_vec();
 	addr_ctrl->Clear();
 
 	for (auto& dev : dev_list)
@@ -213,7 +251,7 @@ void cPressure::DestroySubsystem()
 	// If item destroyed delete from memory
 	if (isDestroyed)
 	{
-		std::cout << "[*] [delete] m_daq in cDaqmx.cpp\n";
+		std::cout << "[*] [delete] m_pressure_ in cPressure.cpp\n";
 
 		delete m_pressure_;
 		m_pressure_ = nullptr;
@@ -269,7 +307,7 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 
 		if (enable_pan)
 		{
-			RefreshPort();
+			//RefreshPort();
 
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_COMBOBOX_SELECTED, IDCPRESSUREADDR);
 			wxPostEvent(inst_, evt);
@@ -291,7 +329,9 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			this->pressure_controler_activate->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN	
 			this->pressure_controler_activate->SetLabel("ON");
 
-			addr_ctrl->Enable(true);			
+			addr_ctrl->Enable(true);		
+			module_ctrl->Enable(true);
+			unit_ctrl->Enable(true);
 			EnablePressureChannel(true);
 		}
 		else
@@ -303,7 +343,8 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			this->pressure_controler_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
-
+			module_ctrl->Enable(false);
+			unit_ctrl->Enable(false);
 			EnablePressureChannel(false);
 		}
 	}
@@ -341,7 +382,7 @@ void cPressure::OnPressureAddrSelBtn(wxCommandEvent& evt)
 			m_pressure_ = new cPacesim;
 			meas_manager->set_measurement(m_pressure_);
 			m_pressure_->set_device_addr("Simulated");
-			m_pressure_->set_device_name("PACE60006000");
+			m_pressure_->set_device_name("PACE6000");
 		}
 		evt.Skip();
 		return;

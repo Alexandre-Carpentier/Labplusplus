@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cUSB6001.h"
 
 #include "cMeasurement.h"
@@ -7,10 +14,12 @@ cUsb6001::cUsb6001()
 {
     std::cout << "cUsb6001 ctor...\n";
     analog_taskHandle = nullptr;
-    digital_taskHandle = nullptr;
+    digital_taskHandle;
+    ZeroMemory(digital_taskHandle, MAX_CHAN);
 
     result.buffer;
     result.buffer_size = 0;
+    DAQret = 0;
 };
 
 std::string cUsb6001::device_name() { return std::string("NI-DAQ"); }
@@ -60,10 +69,23 @@ size_t cUsb6001::chan_write_count()
     return nb_sig;
 }
 
-int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cUsb6001::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+{
+    assert(config_struct.channel_enabled.size() <= 48);
+    assert(config_struct.channel_index <= 48);
+    assert(config_struct.chan_number <= 48);
+
+    config_struct_ = config_struct;
+}
+
+int cUsb6001::launch_device()
 {
     std::cout << "[*] cUsb6001->launching...\n";
-    config_struct_ = config_struct;
+    if (config_struct_.device_name.size() == 0)
+    {
+        std::cout << "[!] launch_device() failed. Error configuration structure empty...\n";
+        return -1;
+    }
 
     // Setup DAQmx
 
@@ -114,11 +136,7 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
     }
 
     int digital_count = 0;
-    DAQret = DAQmxCreateTask("", &digital_taskHandle);
-    if (0 != DAQret)
-    {
-        MessageBox(0, 0, L"DAQmxCreateTask for digital channels Failed", 0);
-    }
+
 
     for (int c = 0; c < config_struct_.chan_number; c++)
     {
@@ -264,10 +282,15 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                     }
 
                 }
-
             }
             else if (config_struct_.channel_mode.at(c) == CHANDIGITAL)
             {
+                DAQret = DAQmxCreateTask("", &digital_taskHandle[c]);
+                if (0 != DAQret)
+                {
+                    MessageBox(0, 0, L"DAQmxCreateTask for digital channels Failed", 0);
+                }
+
                 digital_count++;
                 // Digital in
                 // 
@@ -275,7 +298,7 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                 if (config_struct_.digital_channel_type[c].compare(L"Input") == 0)
                 {
                     DAQret = DAQmxCreateDIChan(
-                        digital_taskHandle,
+                        digital_taskHandle[c],
                         chan.c_str(),           // DEV1/ai0
                         name.c_str(),           // Digital 0
                         DAQmx_Val_ChanPerLine   // lineGrouping:  DAQmx_Val_ChanPerLine/ DAQmx_Val_ChanForAllLines              
@@ -284,8 +307,8 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                     if (0 != DAQret)
                     {
                         MessageBox(0, 0, L"DAQmxCreateDIChan() Failed", 0);
-                        DAQmxClearTask(digital_taskHandle);
-                        digital_taskHandle = nullptr;
+                        DAQmxClearTask(digital_taskHandle[c]);
+                        digital_taskHandle[c] = nullptr;
                         return 0;
                     }
                 }
@@ -295,17 +318,17 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
                 if (config_struct_.digital_channel_type[c].compare(L"Output") == 0)
                 {
                     DAQret = DAQmxCreateDOChan(
-                        digital_taskHandle,
+                        digital_taskHandle[c],
                         chan.c_str(),           // DEV1/ai0
                         name.c_str(),           // Digital 0
-                        DAQmx_Val_ChanPerLine   // lineGrouping:  DAQmx_Val_ChanPerLine/ DAQmx_Val_ChanForAllLines              
+                        DAQmx_Val_ChanForAllLines/* DAQmx_Val_ChanPerLine */  // lineGrouping:  DAQmx_Val_ChanPerLine/ DAQmx_Val_ChanForAllLines              
                     );
 
                     if (0 != DAQret)
                     {
                         MessageBox(0, 0, L"DAQmxCreateDOChan() Failed", 0);
-                        DAQmxClearTask(digital_taskHandle);
-                        digital_taskHandle = nullptr;
+                        DAQmxClearTask(digital_taskHandle[c]);
+                        digital_taskHandle[c] = nullptr;
                         return 0;
                     }
                 }
@@ -328,16 +351,29 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 
     if (digital_count > 0)
     {
-        DAQret = DAQmxStartTask(digital_taskHandle);
-        if (0 != DAQret)
+        for (auto& task : digital_taskHandle)
         {
-            MessageBox(0, 0, L"DAQmxStartTask Failed", 0);
-            DAQmxStopTask(digital_taskHandle);
-            DAQmxClearTask(digital_taskHandle);
-            digital_taskHandle = nullptr;
+            DAQret = DAQmxStartTask(task);
+            if (0 != DAQret)
+            {
+                DAQmxStopTask(task);
+                DAQmxClearTask(task);
+                std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
+                std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
+                task = nullptr;
+            }
         }
     }
-    else { DAQmxClearTask(digital_taskHandle); digital_taskHandle = nullptr; }
+    else 
+    {
+        for (auto& task : digital_taskHandle)
+        {
+                DAQmxStopTask(task);
+                DAQmxClearTask(task);
+                std::cout << "[*] No digital input clearing the task\n";
+                task = nullptr;
+        }
+    }
 
     size_t nb_sig = chan_count();
     std::cout << "[*] result.buffer_size set to " << nb_sig << " in Usb6001.cpp\n";
@@ -351,18 +387,34 @@ int cUsb6001::launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
 DATAS cUsb6001::read()
 { 
     int32 chan_type = 0;
-    char buff[256]=""; 
+    char buff[512]=""; 
     double timeout_s = 2.0;
 
     int position = 0;
     size_t AIO_number = 0;
+    size_t AI_number = 0;
+    size_t AO_number = 0;
+
     size_t DIO_number = 0;
+    size_t DI_number = 0;
+    size_t DO_number = 0;
+
+    std::vector<uInt8> results;
+
     for (auto type : config_struct_.channel_mode)
     {
         if (type == CHANANALOG)
         {
             if (config_struct_.channel_enabled.at(position))
             {
+                if (config_struct_.channel_permision.at(position) == CHANREAD)
+                {
+                    AI_number++;
+                }
+                else
+                {
+                    AO_number++;
+                }
                 AIO_number++;
             }      
         }
@@ -370,74 +422,174 @@ DATAS cUsb6001::read()
         {
             if (config_struct_.channel_enabled.at(position))
             {
+                if (config_struct_.channel_permision.at(position) == CHANWRITE)
+                {
+                    DO_number++;
+                }
+                else
+                {
+                    DI_number++;
+                }
                 DIO_number++;
             }
         }         
         position++;
     }
 
-    //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
-    DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 256);// "Digital0" 
-    DAQret = DAQmxGetAIMeasType(analog_taskHandle, buff, &chan_type);
-
-    if (chan_type == DAQmx_Val_Voltage)
+    if (AIO_number > 0)
     {
+        //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
+
         
-        int32 read_nb = 0;
-        DAQret = DAQmxReadAnalogF64(analog_taskHandle, sample_number, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result.buffer_size * sample_number, &read_nb, NULL); // Read multiple sample
-        if (read_nb != sample_number)
-        {
-            std::cout << "[!] DAQmxReadAnalogF64() read issue in Usb6001.cpp\n";
-        }
+        DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 512);// "Digital0" 
 
-        if (0 != DAQret)
+        // Tokenize buff
+        std::vector<std::string> channel_task_name;
+        std::string string_task = buff; 
+        string_task.append(",");
+        size_t pos = string_task.find(",");
+        while (pos != std::string::npos and pos>0)
         {
-            MessageBox(0, 0, L"DAQmxReadAnalogF64 Failed", 0);
-            DAQmxClearTask(analog_taskHandle);
-            //TODO: exit
-        }
-
-        // averaging
-        for (int k = 0; k < AIO_number; k++)
-        {
-            result.buffer[k] = 0.0;
-            for (int i = sample_number * k; i < sample_number * (k + 1); i++)
+            if (pos > 0)
             {
-                result.buffer[k] += multiple_data[i];
+                channel_task_name.push_back(string_task.substr(0, pos));            
             }
-            result.buffer[k] = result.buffer[k] / sample_number;
+            string_task.erase(0, pos);
+            pos = string_task.find(",");
+        }
+       
+        /*
+        strcat(buff, ",");
+        const char* separator = ",";
+        char* strToken = strtok(buff, separator);
+        if (strToken != NULL)
+        {
+            std::string tok = strToken;
+            channel_task_name.push_back(tok);
+        }
+        while (strToken != NULL) {
+            printf("%s\n", strToken);
+            strToken = strtok(NULL, separator);
+            if (strToken != NULL)
+            {
+                std::string tok = strToken;
+                channel_task_name.push_back(tok);
+            }               
+        }
+        */
+
+        assert(channel_task_name.size() > 0);
+        for (auto& token : channel_task_name)
+        {
+            DAQret = DAQmxGetAIMeasType(analog_taskHandle, token.c_str(), &chan_type);
         }
 
-        // scaling
-        for (int j = 0; j < AIO_number; j++)
-        {
-            double a = 0.0;
-            double b = 0.0;
-            config_struct_.channel_linearize_slope[j].ToCDouble(&a);
-            config_struct_.channel_linearize_shift[j].ToCDouble(&b);
-            result.buffer[j] = a * result.buffer[j] + b;
-        }
+        //if (chan_type == DAQmx_Val_Voltage || chan_type == DAQmx_Val_Temp_TC || chan_type == DAQmx_Val_Temp_Thrmstr)
+        //{
+
+            int32 read_nb = 0;
+            DAQret = DAQmxReadAnalogF64(analog_taskHandle, sample_number, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result.buffer_size * sample_number, &read_nb, NULL); // Read multiple sample
+            if (read_nb != sample_number)
+            {
+                std::cout << "[!] DAQmxReadAnalogF64() read issue in Usb6001.cpp\n";
+            }
+
+            if (0 != DAQret)
+            {
+                MessageBox(0, 0, L"DAQmxReadAnalogF64 Failed", 0);
+                DAQmxClearTask(analog_taskHandle);
+                //TODO: exit
+            }
+
+            // averaging
+            for (int k = 0; k < AIO_number; k++)
+            {
+                result.buffer[k] = 0.0;
+                for (int i = sample_number * k; i < sample_number * (k + 1); i++)
+                {
+                    result.buffer[k] += multiple_data[i];
+                }
+                result.buffer[k] = result.buffer[k] / sample_number;
+            }
+
+            // scaling
+            for (int j = 0; j < AIO_number; j++)
+            {
+                double a = 0.0;
+                double b = 0.0;
+                config_struct_.channel_linearize_slope[j].ToCDouble(&a);
+                config_struct_.channel_linearize_shift[j].ToCDouble(&b);
+                result.buffer[j] = a * result.buffer[j] + b;
+            }
+        //}
     }
-    
-
+    if(DIO_number>0)
     {
-
-        uInt8 read_buffer[48];
-        memset(read_buffer, 0, 48);
-        int32 sample_read = 0;
-        int32 bytes_per_samples = 0;
-
-        // Digital input
-        DAQret = DAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
-        if (DAQret != 0)
+        for (auto& task : digital_taskHandle)
         {
-            //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+            if (task)
+            {
+                char digital_chan_names[512] = "";
+                DAQret = DAQmxGetTaskChannels(digital_taskHandle, digital_chan_names, 512);// "Digital0" 
+                std::cout << "[*] Digital task channel: " << digital_chan_names << "\n";
+            }
         }
-        
-        for (int i=0; i< sample_read; i++)
+
+        if (DI_number > 0)
         {
-            std::cout << "byte: " << read_buffer[i] << "\n";
-            result.buffer[AIO_number+ i] = read_buffer[i];
+            uInt8 read_buffer[48];
+            memset(read_buffer, 0, 48);
+            int32 sample_read = 0;
+            int32 bytes_per_samples = 0;
+
+            // Digital input
+            DAQret = DAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
+            if (DAQret != 0)
+            {
+                //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+            }
+
+            for (int i = 0; i < sample_read; i++)
+            {
+                result.buffer[DI_number + i] = read_buffer[i];
+            }
+        }
+        else if (DO_number > 0)
+        {
+            uInt8 read_buffer[1];
+
+            
+            size_t total_sample_read = 0;
+            for (auto& task : digital_taskHandle)
+            {
+                if (task)
+                {
+                    int32 sample_read = 0;
+                    int32 bytes_per_samples = 0;
+
+                    uInt32 chan_number_in_task = 0;
+                    DAQmxGetTaskNumChans(task, &chan_number_in_task);
+                    std::cout << "[*] Chan number: " << chan_number_in_task << "in current task.\n";
+
+                    // Digital input
+                    DAQret = DAQmxReadDigitalLines(task, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 1, &sample_read, &bytes_per_samples, NULL);
+                    total_sample_read += sample_read;
+
+                    results.push_back(read_buffer[0]);
+
+                    if (DAQret != 0)
+                    {
+                        //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+                    }
+                    chan_number_in_task++;
+                }
+            }
+            
+            for (int i = 0; i < total_sample_read; i++)
+            {
+                result.buffer[AIO_number + i] = static_cast<double>(results[i]); // concat after Analog input
+            }
+            
         }
     }
     return result;
@@ -450,36 +602,60 @@ void cUsb6001::set(double* value, size_t length)
 
     double timeout_s = 2.0;
     bool bAutostart = true;
-    uInt8 write_buffer[4] = { 0b00000000, 0b00000000, 0b00000000, 0b00000000 };
+    uInt8 write_buffer[MAX_CHAN];
+    ZeroMemory(write_buffer, sizeof(write_buffer));
     int32 sample_written = 0;
 
     // populate write buffer 
 
     for (uInt8 i = 0; i < length; i ++)
     {
-        std::cout << "[*] write\n";
         std::cout << "[*] length: " << length << "\n";
-        std::cout << "[*] value[i]: " << value[i] << "\n";
+        std::cout << "[*] double[0][1][2][3]: " << *value << " " << *(value + 1) << " " << *(value + 2) << " " << *(value + 3) << "\n";
         
-        if (value[i] > 0.0)
+        if (*(value + i) > 0.0)
         {
             write_buffer[i] = (uInt8)1;
-            std::cout << "[*] write_buffer[i]" << std::bitset<8>(write_buffer[i]) << "\n";
-        }       
+        }     
+        else
+        {
+            write_buffer[i] = (uInt8)0;
+        }
     }
 
     // write
 
-    if (digital_taskHandle)
+   // if (digital_taskHandle)
+   // {
+    //    DAQret = DAQmxWriteDigitalLines(digital_taskHandle, 2, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, write_buffer, &sample_written, NULL);
+
+    //    if (DAQret != 0)
+     //   {
+    //        std::cout << "[!] DAQ digital write failed\n";
+    //    }
+   // }
+
+    uInt8 cmd[1];
+
+    int i = 0;
+    for (auto& task : digital_taskHandle)
     {
-        DAQret = DAQmxWriteDigitalLines(digital_taskHandle, 1, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, write_buffer, &sample_written, NULL);
-
-        if (DAQret != 0)
+        if (task != nullptr)
         {
-            std::cout << "[!] DAQ digital write failed\n";
-        }
-    }
+            if (*(value + i) > 0.0)
+                cmd[0] = 1;
+            else
+                cmd[0] = 0;
 
+            DAQret = DAQmxWriteDigitalLines(task, 1, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, cmd, &sample_written, NULL);
+            if (DAQret != 0)
+            {
+                std::cout << "[!] DAQ digital write failed\n";
+            }
+            i++;
+            std::cout << "\n";
+        }    
+    }
 }
 
 void cUsb6001::stop_device()
@@ -493,14 +669,20 @@ void cUsb6001::stop_device()
         std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
         analog_taskHandle = nullptr;
     }
-    if (digital_taskHandle != nullptr)
+    //if (digital_taskHandle != nullptr)
+    //{
+    for (auto& task : digital_taskHandle)
     {
-        DAQmxStopTask(digital_taskHandle);
-        DAQmxClearTask(digital_taskHandle);
-        std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
-        std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
-        digital_taskHandle = nullptr;
+        if (task != nullptr)
+        {
+            DAQmxStopTask(task);
+            DAQmxClearTask(task);
+            std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
+            std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
+            task = nullptr;
+        }
     }
+    //}
 }
 
 cUsb6001::~cUsb6001()
@@ -514,13 +696,14 @@ cUsb6001::~cUsb6001()
         std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
         analog_taskHandle = nullptr;
     }
-    if (digital_taskHandle != nullptr)
+    for (auto& task : digital_taskHandle)
     {
-        DAQmxStopTask(digital_taskHandle);
-        DAQmxClearTask(digital_taskHandle);
-        std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
-        std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
-        digital_taskHandle = nullptr;
+        if (task != nullptr)
+        {
+            DAQmxStopTask(task);
+            DAQmxClearTask(task);
+            task = nullptr;
+        }
     }
 };
 

@@ -1,8 +1,16 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include <wx/wx.h>
 
 #include "cIniCfg.h"
 
 #include <Windows.h>
+#include <format>
 
 #include"cObjectmanager.h"
 #include"cTable.h"
@@ -23,7 +31,6 @@ void cInicfg::load_table(void)
 	// Save in : // C:\Users\The Hive\AppData\Roaming
 
 	wxString str;
-	wxString index;
 
 	// Scan until the MAX_TABLE_LINE !
 	const int MAX_TABLE_LINE = 200;
@@ -31,13 +38,31 @@ void cInicfg::load_table(void)
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
 	cfg->SetPath(wxT("TABLE"));
 
-	for (int row = 0; row < MAX_TABLE_LINE; row++)
+	for (int line = 0; line < MAX_TABLE_LINE; line++)
 	{
 		int col_count = m_table->grid->GetNumberCols();
 		for (int col = 0; col < col_count; col++)
 		{
-			index = wxString::Format("row%icol%i", row, col);
-			if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(row, col, str); }
+			wxString col_name = m_table->grid->GetColLabelValue(col);
+			if (col_name == "Jump count (n)")
+			{
+				std::string col_name_position = std::format("{}_{}", col_name.ToStdString(), line);
+				if (cfg->Read(col_name_position, &str)) { m_table->grid->SetCellValue(line, col, str); }
+			}
+			if (col_name == "Jump to (i)")
+			{
+				std::string col_name_position = std::format("{}_{}", col_name.ToStdString(), line);
+				if (cfg->Read(col_name_position, &str)) { m_table->grid->SetCellValue(line, col, str); }
+			}
+			if (col_name == "Duration (s)")
+			{
+				std::string col_name_position = std::format("{}_{}", col_name.ToStdString(), line);
+				if (cfg->Read(col_name_position, &str)) { m_table->grid->SetCellValue(line, col, str); }		
+			}
+			/*
+			index = wxString::Format("row%icol%i", line, col);
+			if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(line, col, str); }
+			*/
 		}
 		/*index = "pressure"; index.append(wxString::Format("%i", i));
 		if (cfg->Read(index, &str)) { m_table->grid->SetCellValue(i, 0, str); }
@@ -77,24 +102,56 @@ void cInicfg::save_table(void)
 	int row_count = m_table->get_last_active_line();
 
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
+	cfg->DeleteGroup("TABLE");
+	cfg->DeleteAll();
 	cfg->SetPath(wxT("TABLE"));
 	//cfg->DeleteGroup("TABLE");
 	//cfg->DeleteAll();
 
 	wxString str;
-	for (int row = 0; row < row_count; row++)
+	for (int line = 0; line < row_count; line++)
 	{
 		int col_count = m_table->grid->GetNumberCols();
 		for (int col = 0; col < col_count; col++)
 		{
-			
+			wxString col_name = m_table->grid->GetColLabelValue(col);
+			if (col_name == "Jump count (n)" )
+			{
+				std::string value = m_table->grid->GetCellValue(line, col).ToStdString();
+				if (value.size() > 0)
+				{
+					std::string col_name_position = std::format("{}_{}", col_name.ToStdString(), line);
+					cfg->Write(col_name_position, std::stof(value));
+				}
+			}
+			if (col_name == "Jump to (i)")
+			{
+				std::string value = m_table->grid->GetCellValue(line, col).ToStdString();
+				if (value.size() > 0)
+				{
+					std::string col_name_position = std::format("{}_{}", col_name.ToStdString(), line);
+					cfg->Write(col_name_position, std::stof(value));
+				}
+			}
+			if (col_name == "Duration (s)")
+			{
+				std::string value = m_table->grid->GetCellValue(line, col).ToStdString();
+				if (value.size() > 0)
+				{
+					std::string col_name_position = std::format("{}_{}", col_name.ToStdString(), line);
+					cfg->Write(col_name_position, std::stof(value));
+				}
+			}
+
+			/*
 			str = wxString::Format("row%icol%i", row, col);
 			//crash
 			std::string value = m_table->grid->GetCellValue(row, col).ToStdString();
 			if (value.size() > 0)
 			{
 				cfg->Write(str, std::stof(value));
-			}		
+			}	
+			*/
 		}
 		/*
 		double pressure = wxAtof(m_table->grid->GetCellValue(i, 0));

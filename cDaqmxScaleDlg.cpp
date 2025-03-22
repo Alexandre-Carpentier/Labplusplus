@@ -1,6 +1,11 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cDaqmxScaleDlg.h"
-
-
 
 ScaleDialog::ScaleDialog(wxWindow* parent, wxWindowID id,
 	const wxString& title,

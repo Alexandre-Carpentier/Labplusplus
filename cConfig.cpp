@@ -1,19 +1,34 @@
-
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cConfig.h"
 
-#include "enum.h"
-#include <thread>
+//#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+//#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 
-/*
-class cPlot;
-class cCycle;
-class cDaqmx;
-class cPressure;
-class cTension;
-class cObjectmanager;
-class cMeasurementControler;
-*/
 
+#include <wx/dcbuffer.h>
+#include <wx/combobox.h>
+#include <wx/treectrl.h>
+
+
+//#pragma comment (lib, "Plugin.lib")
+//#include "..\Lab\Plugin\cDevice.h"
+#include "..\Lab++\Plugin\cDevice.h"
+
+#include "cTable.h"
+#include "cPlot.h"
+
+#include "cDeviceMonitor.h"
+#include "cPressure.h"
+#include "cVoltage.h"
+#include "cVoltageRs.h"
+#include "cOscope.h"
+#include "c6510ui.h"
 
 /*---------------- - Duplication-------------------------------- -
 void cDevice::DisplayConfiguration()
@@ -81,10 +96,10 @@ void cDevice::OnPaint()
 }
 -----------------Duplication---------------------------------*/
 
-cConfig::cConfig(wxWindow* inst, cTable* m_table)
+cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 {
 	inst_ = inst; // wxFrame is the parent
-
+	devmon_ = devmon;
 	std::cout << "cConfig ctor...\n";
 
 	config_leftpanel_ = new wxPanel(inst, IDC_CONFIG_LEFT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
@@ -133,7 +148,7 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	plugin_vec.push_back(Daqmx_struct);
 
 	// Add cPressure to plugin vec
-	m_pressure = new cPressure(book);
+	m_pressure = new cPressure(book, devmon_);
 	cDevice* m_pressure_dev = new cDevice();
 	m_pressure_dev->set_access_type(ALL);
 	m_pressure_dev->set_device_name("PACE6000");
@@ -152,23 +167,93 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	Pressure_struct.PStop = nullptr;
 	plugin_vec.push_back(Pressure_struct);
 
-	// Add cTension to plugin vec
-	/*
-	m_tension = new cTension(book);
-	PLUGIN_DATA Tension_struct;
-	Tension_struct.name = L"Keitley 2280S.dll";
-	Tension_struct.panel = m_tension->get_right_panel();
-	Tension_struct.hInst = nullptr;
-	Tension_struct.device = nullptr;
-	Tension_struct.Attach = nullptr;
-	Daqmx_struct.Dettach = nullptr;
-	Daqmx_struct.PStart = nullptr;
-	Daqmx_struct.PStop = nullptr;
-	plugin_vec.push_back(Tension_struct);
-	*/
+	// Add cVoltage to plugin vec
+	m_voltage = new cVoltage(book, devmon_);
+	cDevice* m_voltage_dev = new cDevice();
+	m_voltage_dev->set_access_type(ALL);
+	m_voltage_dev->set_device_name("2280S");
+	m_voltage_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA Voltage_struct;
+	Voltage_struct.name = L"2280S.dll";
+	Voltage_struct.input_count = 1;
+	Voltage_struct.outputcount = 1;
+	Voltage_struct.signal_count = Voltage_struct.input_count + Voltage_struct.outputcount;
+	Voltage_struct.panel = m_voltage->get_right_panel();
+	Voltage_struct.hInst = nullptr;
+	Voltage_struct.device = m_voltage_dev;
+	Voltage_struct.Attach = nullptr;
+	Voltage_struct.Dettach = nullptr;
+	Voltage_struct.PStart = nullptr;
+	Voltage_struct.PStop = nullptr;
+	plugin_vec.push_back(Voltage_struct);
+
+	// Add cVoltage to plugin vec
+	m_voltage_rs = new cVoltageRs(book, devmon_);
+	cDevice* m_voltage_rs_dev = new cDevice();
+	m_voltage_rs_dev->set_access_type(ALL);
+	m_voltage_rs_dev->set_device_name("RS6005P");
+	m_voltage_rs_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA VoltageRs_struct;
+	VoltageRs_struct.name = L"RS6005P.dll";
+	VoltageRs_struct.input_count = 1;
+	VoltageRs_struct.outputcount = 1;
+	VoltageRs_struct.signal_count = VoltageRs_struct.input_count + VoltageRs_struct.outputcount;
+	VoltageRs_struct.panel = m_voltage_rs->get_right_panel();
+	VoltageRs_struct.hInst = nullptr;
+	VoltageRs_struct.device = m_voltage_rs_dev;
+	VoltageRs_struct.Attach = nullptr;
+	VoltageRs_struct.Dettach = nullptr;
+	VoltageRs_struct.PStart = nullptr;
+	VoltageRs_struct.PStop = nullptr;
+	plugin_vec.push_back(VoltageRs_struct);
+
+	// Add cOscope to plugin vec
+	m_oscope = new cOscope(book, devmon_);
+	cDevice* m_oscope_dev = new cDevice();
+	m_oscope_dev->set_access_type(READ);
+	m_oscope_dev->set_device_name("DSOX1202G");
+	m_oscope_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA Oscope_struct;
+	Oscope_struct.name = L"DSOX1202G.dll";
+	Oscope_struct.input_count = 1;
+	Oscope_struct.outputcount = 1;
+	Oscope_struct.signal_count = Oscope_struct.input_count + Oscope_struct.outputcount;
+	Oscope_struct.panel = m_oscope->get_right_panel();
+	Oscope_struct.hInst = nullptr;
+	Oscope_struct.device = m_oscope_dev;
+	Oscope_struct.Attach = nullptr;
+	Oscope_struct.Dettach = nullptr;
+	Oscope_struct.PStart = nullptr;
+	Oscope_struct.PStop = nullptr;
+	plugin_vec.push_back(Oscope_struct);
+
+	// Add cOscope to plugin vec
+	m_6510ui = new c6510ui(book, devmon_);
+	cDevice* m_6510_dev = new cDevice();
+	m_6510_dev->set_access_type(READ);
+	m_6510_dev->set_device_name("DAQ6510");
+	m_6510_dev->set_measurement_unit("Volt");
+	PLUGIN_DATA daq6510_struct;
+	daq6510_struct.name = L"DAQ6510.dll";
+	daq6510_struct.input_count = 1;
+	daq6510_struct.outputcount = 1;
+	daq6510_struct.signal_count = daq6510_struct.input_count + daq6510_struct.outputcount;
+	daq6510_struct.panel = m_6510ui->get_right_panel();
+	daq6510_struct.hInst = nullptr;
+	daq6510_struct.device = m_6510_dev;
+	daq6510_struct.Attach = nullptr;
+	daq6510_struct.Dettach = nullptr;
+	daq6510_struct.PStart = nullptr;
+	daq6510_struct.PStop = nullptr;
+	plugin_vec.push_back(daq6510_struct);
+
 	cObjectmanager* manager = manager->getInstance();// Singleton...bad
 	manager->set_daqmx(m_daqmx); // Singleton saver...bad
 	manager->set_pressuredevice(m_pressure); // Singleton saver...bad
+	manager->set_voltagedevice(m_voltage); // Singleton saver...bad
+	manager->set_voltagersdevice(m_voltage_rs); // Singleton saver...bad
+	manager->set_oscopedevice(m_oscope); // Singleton saver...bad
+	manager->set_daq6510device(m_6510ui); // Singleton saver...bad
 
 	/////////////////////////////////////////////////////
 	// load and add dll instrument to plugin vec
@@ -187,6 +272,8 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 	// Populate tree ctrl with 
 	// loaded plugin
 	//
+
+	wxImageList image_list;  
 	config_tree_ctrl = new wxTreeCtrl(config_leftpanel_, IDCCONFIGTREE, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)), wxBORDER_DOUBLE);
 	config_tree_ctrl->Bind(wxEVT_LEFT_DOWN, &cConfig::OnClickdrop, this, IDCCONFIGTREE);
 	config_tree_ctrl->SetBackgroundColour(wxColor(210, 210, 212));
@@ -230,15 +317,18 @@ cConfig::cConfig(wxWindow* inst, cTable* m_table)
 cConfig::~cConfig()
 {
 	std::cout << "cConfig dtor...\n";
-	//unload_plugins(); // Error occured when wxWidget use the garbage collector after
+	unload_plugins(); 
 	delete m_daqmx;
 	delete m_daq_dev;
 	delete m_pressure;
-	delete m_pressure_dev;
-	delete m_tension;
+	delete m_oscope;
+	//delete m_pressure_dev;
+	delete m_voltage;
+	delete m_voltage_rs;
 	m_daqmx = nullptr;
 	m_pressure = nullptr;
-	m_tension = nullptr;
+	m_voltage = nullptr;
+	m_voltage_rs = nullptr;
 }
 
 void cConfig::unload_plugins()
@@ -248,7 +338,7 @@ void cConfig::unload_plugins()
 		if (plugin.hInst != nullptr)
 		{
 			plugin.Dettach();
-			FreeLibrary(plugin.hInst);
+			//FreeLibrary(plugin.hInst);// Error occured when wxWidget use the garbage collector after
 			plugin.hInst = nullptr;
 		}
 	}
@@ -284,7 +374,7 @@ void cConfig::load_plugins(wxWindow* parent, std::wstring folder_path)
 			filesize.HighPart = ffd.nFileSizeHigh;
 			//_tprintf(TEXT("  %s   %ld bytes\n"), ffd.cFileName, filesize.QuadPart);
 
-			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			//std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 			std::wstring dllfilepath = folder_path;
 			dllfilepath.append(L"\\");
 			dllfilepath.append(ffd.cFileName);
@@ -452,6 +542,21 @@ cPressure* cConfig::get_pressuredevice()
 	return m_pressure;
 }
 
+cVoltage* cConfig::get_voltagedevice()
+{
+	return m_voltage;
+}
+
+cOscope* cConfig::get_oscopedevice()
+{
+	return m_oscope;
+}
+
+c6510ui* cConfig::get_daq6510device()
+{
+	return m_6510ui;
+}
+
 void cConfig::set_graph(cPlot* m_plot)
 {
 	m_plot_ = m_plot;
@@ -461,8 +566,12 @@ void cConfig::set_table(cTable* m_table)
 {
 	// Save cTable to add or remove colomn afterward
 	m_table_ = m_table;
-	m_daqmx->set_table(m_table);
-	m_pressure->set_table(m_table);
+	m_daqmx->set_table(m_table_);
+	m_pressure->set_table(m_table_);
+	m_voltage->set_table(m_table_);
+	m_voltage_rs->set_table(m_table_);
+	m_oscope->set_table(m_table_);
+	m_6510ui->set_table(m_table_);
 }
 
 

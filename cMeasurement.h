@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <winsock2.h> 
 #include <string>
@@ -10,13 +17,19 @@
 #include "WinGraph.h"
 #include "data_types.h"
 
-
 #define MAX_CHAN 64
 
 struct DATAS
 {
 	size_t buffer_size;
 	double buffer[MAX_CHAN];
+	std::string unit;
+};
+
+struct CHUNKS
+{
+	size_t buffer_size;
+	double *buffer[MAX_CHAN];
 	std::string unit;
 };
 
@@ -41,27 +54,29 @@ public:
 class cMeasurement : public cCommon {
 private:
 	DATAS result_struct;
+	CHUNKS chunks_struct;
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 public:
-	cMeasurement();
-	virtual int launch_device(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
 
-	virtual std::string device_name();
-	virtual MEAS_TYPE device_type();
-	virtual size_t chan_count();
-	virtual size_t chan_read_count();
-	virtual size_t chan_write_count();
+	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct) = 0;
+	virtual int launch_device() = 0;
 
-	virtual DATAS read();
-	virtual void set(double *value, size_t length);
+	virtual std::string device_name() = 0;
+	virtual MEAS_TYPE device_type() = 0;
+	virtual size_t chan_count() = 0;
+	virtual size_t chan_read_count() = 0;
+	virtual size_t chan_write_count() = 0;
 
-	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct);
+	virtual DATAS read() = 0;
+	//virtual CHUNKS read_chunks();
+	virtual void set(double *value, size_t length) = 0;
+
+	
 	virtual void set_device_name(std::string name);
 	virtual void set_device_addr(std::string addr);
 
 	void start_device();
-	virtual void stop_device();
-	virtual ~cMeasurement() = default;
+	virtual void stop_device() = 0;
 };
 
 

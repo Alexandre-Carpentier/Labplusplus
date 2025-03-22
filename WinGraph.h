@@ -1,12 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
 #include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <float.h>
 
 enum FILTER_M {
 	FILTER_NONE = 100,
@@ -27,7 +29,7 @@ typedef VOID* HGRAPH;
 #ifdef __cplusplus
 extern "C" {
 #endif
-	__declspec(dllexport)BOOL StartGraph(HGRAPH hGraph);
+	__declspec(dllexport)BOOL StartGraph(HGRAPH hGraph, CONST CHAR* opt_header);
 	__declspec(dllexport)VOID StopGraph(HGRAPH hGraph);
 	__declspec(dllexport)VOID FreeGraph(HGRAPH* hGraph);
 	__declspec(dllexport)HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, INT SignalCount, INT BufferSize);
@@ -60,7 +62,8 @@ extern "C" {
 	__declspec(dllexport)double GetSignalMaxValue(HGRAPH hGraph, INT SIGNB);
 	__declspec(dllexport)VOID SignalResetStatisticValue(HGRAPH hGraph, INT SIGNB);
 
-	__declspec(dllexport)VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount);
+	__declspec(dllexport)VOID AddPoint(HGRAPH hGraph, DOUBLE* y, INT SignalCount);
+	__declspec(dllexport)VOID AddMultiplePoints(HGRAPH hGraph, DOUBLE** Chunks, INT SignalCount, INT BufferLength);
 	__declspec(dllexport)BOOL Render(HGRAPH hGraph);
 	__declspec(dllexport)VOID ReshapeGraph(HGRAPH hGraph, int left, int top, int right, int bottom);
 #ifdef __cplusplus

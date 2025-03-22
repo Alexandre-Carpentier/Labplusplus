@@ -63,11 +63,38 @@
     <Filter Include="Fichiers sources\Measurement\Protocol\VISA\Derived">
       <UniqueIdentifier>{e53440b3-bd52-48b3-acf8-7adfd440a1c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers sources\Measurement\Protocol\RS232">
+    <Filter Include="Fichiers sources\MainWindow\config\voltage\NI DAQmx">
+      <UniqueIdentifier>{7d9796a8-bbe6-405a-9f08-09a7168d2e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\voltage\DC supply">
+      <UniqueIdentifier>{564cc757-5af4-4ecd-89c9-4b521fa2b7dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\voltage\DC supply">
+      <UniqueIdentifier>{55f02436-c915-48f6-8e82-7bc4ac695f33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\voltage\NI DAQmx">
+      <UniqueIdentifier>{c494382d-47ea-4bd1-a87f-9d3799a41134}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\tools\Device monitor">
+      <UniqueIdentifier>{25c2df21-5279-47bf-9193-857639e23778}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\MainWindow\config\voltage\Oscope">
+      <UniqueIdentifier>{c186fff8-fa7d-413d-9580-575e7d655e96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Type\voltage\Oscilloscope">
+      <UniqueIdentifier>{4852395c-180c-4d56-9c76-3587d8756f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol\NATIVEUSB">
+      <UniqueIdentifier>{a15476e7-1163-4906-94c1-00a9c3fbc581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol\NATIVETCPIP">
+      <UniqueIdentifier>{6a4be1ee-b26b-40d8-a104-ea51c8548a73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Measurement\Protocol\NATIVERS232">
       <UniqueIdentifier>{eacb1972-3055-4e50-8dd1-d9a737c18872}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers sources\Measurement\Protocol\TCPIP">
-      <UniqueIdentifier>{6a4be1ee-b26b-40d8-a104-ea51c8548a73}</UniqueIdentifier>
+    <Filter Include="Fichiers sources\tools\serialize">
+      <UniqueIdentifier>{dbb84f71-567c-4354-8bbd-9055727dada4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -79,12 +106,6 @@
     </ClCompile>
     <ClCompile Include="cConfig.cpp">
       <Filter>Fichiers sources\MainWindow\config</Filter>
-    </ClCompile>
-    <ClCompile Include="cDaqmx.cpp">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
-    </ClCompile>
-    <ClCompile Include="cDaqmxScaleDlg.cpp">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
     </ClCompile>
     <ClCompile Include="cFooter.cpp">
       <Filter>Fichiers sources\MainWindow\footer</Filter>
@@ -113,12 +134,6 @@
     <ClCompile Include="cTable.cpp">
       <Filter>Fichiers sources\MainWindow\table</Filter>
     </ClCompile>
-    <ClCompile Include="cDaqsim.cpp">
-      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
-    </ClCompile>
-    <ClCompile Include="cUSB6001.cpp">
-      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
-    </ClCompile>
     <ClCompile Include="cFilter.cpp">
       <Filter>Fichiers sources\Measurement</Filter>
     </ClCompile>
@@ -132,9 +147,6 @@
       <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
     <ClCompile Include="cImagePanel.cpp">
-      <Filter>Fichiers sources\tools</Filter>
-    </ClCompile>
-    <ClCompile Include="cInicfg.cpp">
       <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
     <ClCompile Include="cMeasurementmanager.cpp">
@@ -161,9 +173,6 @@
     <ClCompile Include="cPressure.cpp">
       <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
     </ClCompile>
-    <ClCompile Include="cTension.cpp">
-      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
-    </ClCompile>
     <ClCompile Include="cPasesim.cpp">
       <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
     </ClCompile>
@@ -179,17 +188,14 @@
     <ClCompile Include="cVisa.cpp">
       <Filter>Fichiers sources\Measurement\Protocol\VISA</Filter>
     </ClCompile>
-    <ClCompile Include="cSerial.cpp">
+    <ClCompile Include="cVisaserial.cpp">
       <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
     </ClCompile>
-    <ClCompile Include="cTcp.cpp">
+    <ClCompile Include="cVisatcp.cpp">
       <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
     </ClCompile>
     <ClCompile Include="cCom.cpp">
-      <Filter>Fichiers sources\Measurement\Protocol\RS232</Filter>
-    </ClCompile>
-    <ClCompile Include="cDeviceMonitor.cpp">
-      <Filter>Fichiers sources\tools</Filter>
+      <Filter>Fichiers sources\Measurement\Protocol\NATIVERS232</Filter>
     </ClCompile>
     <ClCompile Include="cSignalTable.cpp">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
@@ -206,6 +212,81 @@
     <ClCompile Include="cGnuplot.cpp">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClCompile>
+    <ClCompile Include="cDaqmxScaleDlg.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClCompile>
+    <ClCompile Include="cDaqmx.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClCompile>
+    <ClCompile Include="cVoltage.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cDaqsim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+    </ClCompile>
+    <ClCompile Include="cUSB6001.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+    </ClCompile>
+    <ClCompile Include="cUsb.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol\NATIVEUSB</Filter>
+    </ClCompile>
+    <ClCompile Include="cDeviceMonitor.cpp">
+      <Filter>Fichiers sources\tools\Device monitor</Filter>
+    </ClCompile>
+    <ClCompile Include="ListUsbDevice.cpp">
+      <Filter>Fichiers sources\tools\Device monitor</Filter>
+    </ClCompile>
+    <ClCompile Include="cVisausb.cpp">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
+    </ClCompile>
+    <ClCompile Include="cOscope.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\Oscope</Filter>
+    </ClCompile>
+    <ClCompile Include="cOscopeusb.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\Oscilloscope</Filter>
+    </ClCompile>
+    <ClCompile Include="cOscopesim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\Oscilloscope</Filter>
+    </ClCompile>
+    <ClCompile Include="cSingletonSafe.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
+    <ClCompile Include="cDeviceIDSaver.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplyrssim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplyrsusb.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplysim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cSupplyusb.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="IInstrument.cpp">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClCompile>
+    <ClCompile Include="Instrumentimpl.cpp">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClCompile>
+    <ClCompile Include="cVoltageRs.cpp">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClCompile>
+    <ClCompile Include="cInicfg.cpp">
+      <Filter>Fichiers sources\tools\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="cSerialize.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="cSignalDisplay.cpp">
+      <Filter>Fichiers sources\MainWindow\table</Filter>
+    </ClCompile>
+    <ClCompile Include="cObserver.cpp">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -216,12 +297,6 @@
     </ClInclude>
     <ClInclude Include="cConfig.h">
       <Filter>Fichiers sources\MainWindow\config</Filter>
-    </ClInclude>
-    <ClInclude Include="cDaqmx.h">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
-    </ClInclude>
-    <ClInclude Include="cDaqmxScaleDlg.h">
-      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
     </ClInclude>
     <ClInclude Include="cFooter.h">
       <Filter>Fichiers sources\MainWindow\footer</Filter>
@@ -253,12 +328,6 @@
     <ClInclude Include="cTable.h">
       <Filter>Fichiers sources\MainWindow\table</Filter>
     </ClInclude>
-    <ClInclude Include="cDaqsim.h">
-      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
-    </ClInclude>
-    <ClInclude Include="cUSB6001.h">
-      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
-    </ClInclude>
     <ClInclude Include="cFilter.h">
       <Filter>Fichiers sources\Measurement</Filter>
     </ClInclude>
@@ -272,9 +341,6 @@
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
     <ClInclude Include="cImagePanel.h">
-      <Filter>Fichiers sources\tools</Filter>
-    </ClInclude>
-    <ClInclude Include="cInicfg.h">
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
     <ClInclude Include="cMeasurementmanager.h">
@@ -308,9 +374,6 @@
     <ClInclude Include="cPressure.h">
       <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
     </ClInclude>
-    <ClInclude Include="cTension.h">
-      <Filter>Fichiers sources\MainWindow\config\pressure</Filter>
-    </ClInclude>
     <ClInclude Include="cPacesim.h">
       <Filter>Fichiers sources\Measurement\Type\pressure</Filter>
     </ClInclude>
@@ -326,17 +389,14 @@
     <ClInclude Include="cVisa.h">
       <Filter>Fichiers sources\Measurement\Protocol\VISA</Filter>
     </ClInclude>
-    <ClInclude Include="cSerial.h">
+    <ClInclude Include="cVisaserial.h">
       <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
     </ClInclude>
-    <ClInclude Include="cTcp.h">
+    <ClInclude Include="cVisatcp.h">
       <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
     </ClInclude>
     <ClInclude Include="cCom.h">
-      <Filter>Fichiers sources\Measurement\Protocol\RS232</Filter>
-    </ClInclude>
-    <ClInclude Include="cDeviceMonitor.h">
-      <Filter>Fichiers sources\tools</Filter>
+      <Filter>Fichiers sources\Measurement\Protocol\NATIVERS232</Filter>
     </ClInclude>
     <ClInclude Include="cSignalTable.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
@@ -353,10 +413,91 @@
     <ClInclude Include="cGnuplot.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
+    <ClInclude Include="cDaqmxScaleDlg.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClInclude>
+    <ClInclude Include="cDaqmx.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\NI DAQmx</Filter>
+    </ClInclude>
+    <ClInclude Include="cVoltage.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cDaqsim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+    </ClInclude>
+    <ClInclude Include="cUSB6001.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+    </ClInclude>
+    <ClInclude Include="cUsb.h">
+      <Filter>Fichiers sources\Measurement\Protocol\NATIVEUSB</Filter>
+    </ClInclude>
+    <ClInclude Include="cDeviceMonitor.h">
+      <Filter>Fichiers sources\tools\Device monitor</Filter>
+    </ClInclude>
+    <ClInclude Include="ListUsbDevice.h">
+      <Filter>Fichiers sources\tools\Device monitor</Filter>
+    </ClInclude>
+    <ClInclude Include="cVisausb.h">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA\Derived</Filter>
+    </ClInclude>
+    <ClInclude Include="cOscope.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\Oscope</Filter>
+    </ClInclude>
+    <ClInclude Include="cOscopeusb.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\Oscilloscope</Filter>
+    </ClInclude>
+    <ClInclude Include="cOscopesim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\Oscilloscope</Filter>
+    </ClInclude>
+    <ClInclude Include="cSingletonSafe.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="cDeviceIDSaver.h" />
+    <ClInclude Include="cSupplyrssim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cSupplyrsusb.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cSupplysim.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cSupplyusb.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="IInstrument.h">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="instrumentimpl.h">
+      <Filter>Fichiers sources\Measurement\Type</Filter>
+    </ClInclude>
+    <ClInclude Include="cVoltageRs.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
+    </ClInclude>
+    <ClInclude Include="cInicfg.h">
+      <Filter>Fichiers sources\tools\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="cSerialize.h">
+      <Filter>Fichiers sources\tools\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="cSignalDisplay.h">
+      <Filter>Fichiers sources\MainWindow\table</Filter>
+    </ClInclude>
+    <ClInclude Include="cObserver.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Lab++.rc">
       <Filter>Fichiers de ressources</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="usb.asm">
+      <Filter>Fichiers sources\Measurement\Protocol\NATIVEUSB</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

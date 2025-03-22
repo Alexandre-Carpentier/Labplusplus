@@ -1,13 +1,29 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cMeasurementControler.h"
+
+#include "cCycleControler.h"
+#include "cMeasurement.h"
+#include "cMeasurementmanager.h"
+#include "cObjectmanager.h"
+#include "cFooter.h"
 
 #include <wx/wx.h>
 #include <wx/app.h> 
-#include <thread>
+
 #include <Windows.h>
+
+
 
 bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
 {
 	std::string dev_name = meas->device_name();
+	assert(dev_name.size() > 0);
 	int i = 0;
 
 	for (auto& controler : step.controler_vec)
@@ -30,11 +46,14 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 	for (auto meas : meas_pool)
 	{
 		// Write data to instrument (controler)
-		size_t length = meas->chan_count();
-		double* values = new double(length);
-		memset(values, 0.0, length);
-		meas->set(values, length);
-		delete(values);
+		size_t length = meas->chan_write_count();
+		if (length > 0)
+		{
+			double* values = new double(length);
+			memset(values, 0.0, length);
+			meas->set(values, length);
+			delete(values);
+		}
 	}
 }
 
@@ -44,7 +63,8 @@ void cMeasurementControler::poll()
 	assert(m_cyclecontroler_->get_total_step() > 0);
 	assert(m_cyclecontroler_->get_total_step() < 300);
 	assert(m_cyclecontroler_->get_current_loop() > 0);
-	assert(m_cyclecontroler_->get_current_step() == 0);
+	//assert(m_cyclecontroler_->get_current_step() == 0); // might fail if call is long...
+	std::cout << m_cyclecontroler_->get_current_step() << "\n";
 
 	std::cout << "cMeasurementcontroler->get_stop_token...\n";
 	auto st = measurement_controler_thread.get_stop_token();
@@ -53,6 +73,7 @@ void cMeasurementControler::poll()
 	std::cout << "cMeasurementcontroler->polling...\n";
 
 	DATAS val;
+	CHUNKS chunks;
 	double Y[80]; memset(Y, 0, sizeof(Y));
 	cTick tick;
 	double time = 0.0;
@@ -85,22 +106,29 @@ void cMeasurementControler::poll()
 		{
 			// Write data to instrument (controler)
 		
-			size_t length = meas->chan_count();
-			double* values = new double(length);
-			memset(values, 0.0, length);
-			meas->set(values, length);
-			delete(values);
-		
-
+			//size_t length = meas->chan_count();
+			if (meas->chan_write_count() > 0)
+			{
+				size_t length = meas->chan_write_count();
+				double* values = new double[length];
+				memset(values, 0.0, length*sizeof(double));
+				meas->set(values, length);
+			}
 			// Read data from instrument
 			val = meas->read();
-			for (int c = buffer_index; c < val.buffer_size; c++)
+			for (size_t c = buffer_index; c < val.buffer_size; c++)
 			{
 				Y[c] = val.buffer[c];
+
+				// prepare send to observers
+				currentValues.add_values(meas->device_name(), Y[c]);
 
 				buffer_index++;
 			}
 		}
+
+		this->notify(static_cast<void*>(&currentValues));
+		currentValues.clear();
 
 		// Add the first point to update min avg max value in indicator
 		m_plot_->graph_addpoint(buffer_index, Y);
@@ -129,12 +157,9 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
-	static double old_pressure[MAX_CHAN];
-
+	static volatile double old_value[MAX_CHAN] = { 0 }; // no optimization : volatile
 	while (1)
 	{
-		//std::cout << "bRunning: "<< bRunning <<"\n";
-		old_pressure[0] = 0.0;
 		if (!st.stop_requested())
 		{
 			wxString frequency = m_footer_->freq->GetValue();
@@ -146,12 +171,13 @@ void cMeasurementControler::poll()
 				if (m_plot_->get_graph_state() == false)
 				{					
 					// ---------------
-					std::cout << "cMeasurementcontroler->program break \n";
+					std::cout << "[!] m_plot_->get_graph_state() == false \n";
+					std::cout << "[!] cMeasurementcontroler->program break \n";
 					break;
 				}
 			}
 			time = tick.get_tick();
-			if (time > (this->freq_s_ / 1000))
+			if (time > (freq_s_ / 1000))
 			{
 				tick.start_tick();
 				int buffer_index = 0;
@@ -172,152 +198,84 @@ void cMeasurementControler::poll()
 						case MEAS_TYPE::VOLTAGE_CONTROLER_INSTR:
 						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
 						case MEAS_TYPE::DAQ_INSTR:
-						{						
-							static double old_value[MAX_CHAN];
-
-
-							double value[MAX_CHAN];
-							ZeroMemory(value, MAX_CHAN);
-
-							// protect
-							m_cyclecontroler_->cycle_mutex.lock();
-
-							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();						
-							size_t length = meas->chan_write_count();						
-							size_t read = 0;
-
-							assert(length < MAX_CHAN);
-							bool success = get_instr_setpoint(meas, step, value, length, &read);
-							assert(length == read);
-							assert(read < MAX_CHAN);
-
-							// unprotect
-							m_cyclecontroler_->cycle_mutex.unlock();
-							int mod = 0;
-							for (int i = 0; i < read; i++)
+						{
+							if (meas->chan_write_count() > 0)
 							{
-								if (old_value[i] != value[i])
+								double value[MAX_CHAN];
+								ZeroMemory(value, MAX_CHAN);
+
+								// protect
+								m_cyclecontroler_->cycle_mutex.lock();
+
+								if (m_cyclecontroler_->get_total_loop() == 0)
 								{
-									mod++;
-									old_value[i] = value[i]; // save old value
+									break;
+								}
+								STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
+								size_t length = meas->chan_write_count(); 
+								size_t read = 0;
+
+								assert(length < MAX_CHAN);
+								bool success = get_instr_setpoint(meas, step, value, length, &read);
+								//std::cout << std::format("[GET] double[]:{};{};{};{}, length:{}\n", value[0], value[1], value[2], value[3], read);
+								
+								if (length != read)
+								{
+									MessageBox(GetFocus(), L"Can't read instrument command\nExiting...", L"Fail", S_OK);
+								}
+
+								assert(length == read);
+								assert(read < MAX_CHAN);
+
+								// unprotect
+								m_cyclecontroler_->cycle_mutex.unlock();
+
+								//std::cout << "Value: " << value[0] << "\n";
+								//std::cout << "Old Value: " << old_value[0] << "\n";
+
+								int mod = 0;
+								for (size_t i = 0; i < read; i++)
+								{
+									// Add keyword volatile to prevent compiler optimizing on old_value
+									if (old_value[i] != value[i])
+									{
+										mod++;
+										old_value[i] = value[i]; // save old value
+									}
+								}
+
+								// call if modified
+								if (mod > 0)
+								{
+									meas->set(value, read);
+									mod = 0;
 								}
 							}
-
-							// call if modified
-							if (mod > 0)
-								meas->set(old_value, read);
-
 							// Read data from instrument
 							val = meas->read();
 
 							// Add vector to store points
-							for (int i = 0; i < val.buffer_size; i++)
+							for (size_t i = 0; i < val.buffer_size; i++)
 							{
-								read_pool.push_back(val.buffer[i]);
-							}
-							val.buffer_size = 0;
+								// prepare send to observers
+								currentValues.add_values(meas->device_name(), val.buffer[i]);
 
-							break;
-						}
-						/*
-						// WRITE
-						//
-						//
-						case MEAS_TYPE::FLOW_CONTROLER_INSTR:
-						case MEAS_TYPE::VALVE_CONTROLER_INSTR:
-						{
-							static double old_pressure = 0.0;
-							// protect
-							m_cyclecontroler_->cycle_mutex.lock();
-
-							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-							value = get_instr_setpoint((meas, step, value, length, &read);
-
-							// unprotect
-							m_cyclecontroler_->cycle_mutex.unlock();
-
-							if (old_pressure != value)
-							{
-								old_pressure = value; // save old value
-							}
-							break;
-						}
-						// READ
-						//
-						//
-						case MEAS_TYPE::FLOW_METER_INSTR:
-						{
-							// Read data from instrument
-							val = meas->read();
-
-							// Add vector to store points
-							for (int i = 0; i < val.buffer_size; i++)
-							{
 								read_pool.push_back(val.buffer[i]);
 							}
 							val.buffer_size = 0;
 							break;
 						}
-						*/
-
 						}
 						
-
-						/*
-						case MEAS_TYPE::PRESSURE_CONTROLER_INSTR:
-						{					
-							static double old_pressure=0.0;
-							// protect
-							m_cyclecontroler_->cycle_mutex.lock();
-
-							STEPSTRUCT step = m_cyclecontroler_->get_current_step_param();
-							value = get_instr_setpoint(meas, step);
-
-							// unprotect
-							m_cyclecontroler_->cycle_mutex.unlock();
-
-							if(old_pressure == value)
-							{			
-								goto read;
-							}
-							old_pressure = value; // save old value
-							break;
-						}
-						default:
-							value = 0.0;
-							goto read;
-						}
-						meas->set(value);				
-			read:
-					// Read data from instrument
-					val = meas->read();
-
-					// Add vector to store points
-					for (int i = 0; i < val.buffer_size; i++)
-					{
-						read_pool.push_back(val.buffer[i]);
-					}
-					val.buffer_size = 0;
-					*/
 				}
+
+				this->notify(static_cast<void*>(&currentValues));
+				currentValues.clear();
 
 				assert(read_pool.size() > 0);
 				m_plot_->graph_addpoint(read_pool.size(), &read_pool.at(0));
 				//memset(Y, 0, sizeof(Y));
 
-					/*
-					for (int c = buffer_index; c < val.buffer_size; c++)
-					{
-						Y[c] = val.buffer[c];
-						buffer_index++;
-						std::cout << "buffer_index" << buffer_index << "\n";
-					}
-					val.buffer_size = 0;
-				}
-
-				m_plot_->graph_addpoint(buffer_index, Y);
-				memset(Y, 0, sizeof(Y));
-				*/
 
 				// Update acquire rate
 				m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));
@@ -326,7 +284,7 @@ void cMeasurementControler::poll()
 		}
 	}
 	// TODO:
-	// doesn't called 
+	// it doesn't called 
 	if (meas_pool.size() > 0)
 	{
 		zero_instrument(meas_pool);
@@ -339,12 +297,11 @@ void cMeasurementControler::poll()
 
 void cMeasurementControler::start()
 {
+	std::cout << "[*] cMeasurementcontroler->starting called\n";
 	obj_manager = obj_manager->getInstance();
 	m_plot_ = obj_manager->get_plot();
 	m_footer_ = obj_manager->get_footer();
 	meas_manager = meas_manager->getInstance();
-
-	std::cout << "cMeasurementcontroler->starting...\n";
 
 	//meas_pool = meas_manager->get_measurement_pool();
 
@@ -355,9 +312,8 @@ void cMeasurementControler::start()
 	//control_thread.detach();
 	//cMeasurementControler::control_thread = std::thread(&cMeasurementControler::poll, this);
 
-	measurement_controler_thread = std::jthread(&cMeasurementControler::poll, this);
-	
-
+	measurement_controler_thread = std::jthread(&cMeasurementControler::poll, this);	
+	std::cout << "[*] cMeasurementcontroler->started\n";
 }
 
 void cMeasurementControler::stop()

@@ -1,14 +1,13 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cObjectmanager.h"
 
-#include <wx/wx.h>
-//#include "cSingleton.h"
-
-#include "cPlot.h"
-#include "cFooter.h"
-#include "cGraphrender.h"
-#include "cTable.h"
-#include "cConfig.h"
-#include "cMeasurementControler.h"
+class cRender;
 
 void cObjectmanager::set_status_bar(wxStatusBar* statusBar)
 {
@@ -28,6 +27,26 @@ void cObjectmanager::set_daqmx(cDaqmx* m_daq)
 void cObjectmanager::set_pressuredevice(cPressure* m_pressure)
 {
 	m_pressure_ = m_pressure;
+}
+
+void cObjectmanager::set_voltagedevice(cVoltage* m_voltage)
+{
+	m_voltage_ = m_voltage;
+}
+
+void cObjectmanager::set_voltagersdevice(cVoltageRs* m_voltagers)
+{
+	m_voltagers_ = m_voltagers;
+}
+
+void cObjectmanager::set_oscopedevice(cOscope* m_oscope)
+{
+	m_oscope_ = m_oscope;
+}
+
+void cObjectmanager::set_daq6510device(c6510ui* m_6510)
+{
+	m_6510_ = m_6510;
 }
 
 void cObjectmanager::set_table(cTable* m_table)
@@ -68,6 +87,26 @@ cDaqmx* cObjectmanager::get_daqmx()
 cPressure* cObjectmanager::get_pressuredevice()
 {
 	return m_pressure_;
+}
+
+cVoltage* cObjectmanager::get_voltagedevice()
+{
+	return m_voltage_;
+}
+
+cVoltageRs* cObjectmanager::get_voltagersdevice()
+{
+	return m_voltagers_;
+}
+
+cOscope* cObjectmanager::get_oscopedevice()
+{
+	return m_oscope_;
+}
+
+c6510ui* cObjectmanager::get_6510device()
+{
+	return m_6510_;
 }
 
 cTable* cObjectmanager::get_table()

@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #ifndef _COM_H__
 #define _COM_H__
 #include <Windows.h>
@@ -9,7 +16,7 @@
 #include "cProtocol.h"
 
 // A Com class is a protocol
-class cCom : public cProtocol {
+class cCom : public IProtocol {
 public:
 	cCom();
 	cCom(std::wstring addr);
@@ -25,9 +32,6 @@ private:
 	DCB dcbSerialParams;
 
 	std::string instrument_name;
-
-
-
 };
 
 #endif

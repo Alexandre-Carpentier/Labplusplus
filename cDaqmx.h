@@ -1,30 +1,24 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include <winsock2.h> 
-#include <wx/wx.h>
-#include <wx/combobox.h>
-#include <wx/treectrl.h>
-#include <wx/fileconf.h>
-#include <wx/dcbuffer.h>
-#include <string>
-#include <format>
-#include <memory>
-
-#include "enum.h"
-#include "cMeasurementControler.h"
-#include "cMeasurement.h"
-#include "cObjectmanager.h"
-#include "cMeasurementmanager.h"
-#include "cCycle.h"
-#include "cUSB6001.h"
-#include "cDaqsim.h"
-#include "cPlot.h"
-#include "cTable.h"
-#include "cDaqmxScaleDlg.h"
-#include "cImagePanel.h"
 #include "data_types.h"
-#include "cSignalTable.h"
+#include <wx/treectrl.h>
 
-
+class cImagePanel;
+class cMeasurementmanager;
+class cCycle;
+class cUsb6001;
+class cDaqsim;
+class cMeasurement;
+class cTable;
+class cPlot;
+class cImagePanel;
+class cSignalTable;
 
 static wxImage temp_img;
 
@@ -70,7 +64,6 @@ public:
 		{0.1f, 0.0f, 0.8f}
 	};
 
-
 	wxWindow* inst_ = nullptr;
 	cTable* m_table_ = nullptr;
 
@@ -87,6 +80,10 @@ public:
 	wxButton* daq_activate;
 
 	wxComboBox* addr_ctrl = nullptr;
+
+	wxStaticText* static_device_sn = nullptr;
+	wxComboBox* device_sn = nullptr;
+
 	//wxComboBox* max_ctrl = nullptr;
 	//wxComboBox* min_ctrl = nullptr;
 	//wxComboBox* mode_ctrl = nullptr;
@@ -162,6 +159,8 @@ public:
 	wxStaticText* static_chan_unit;
 	std::string str_unit;
 	wxTextCtrl* chan_unit;
+	wxStaticText* static_channel_sn = nullptr;
+	wxComboBox* channel_sn = nullptr;
 
 	wxStaticText* static_chan_filter;
 	std::string str_filter;
@@ -199,6 +198,9 @@ public:
 	const int TEXT_CTRL_STYLE = wxSUNKEN_BORDER;
 	const wxSize text_ctrl_size = wxSize(110, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
+
+	void serialize(std::string device);
+	void deserialize(std::string device);
 
 	cDaqmx(wxWindow* inst);
 	~cDaqmx();
@@ -238,9 +240,10 @@ public:
 	void OnChannelBtnNumberCliqued(wxCommandEvent& evt);
 	bool isDeviceMeasurable(std::string dev_name);
 
+	void DoChannelUpdate(bool isDisplayed);
 	void SwitchChannelON(bool isDisplayed);
-
 	void UpdateChannelSig(bool isDisplayed);
+	void AddControlColomnTable(bool isDisplayed);
 	void UpdateChannelTable(bool isDisplayed);
 
 	void EnableChannelItems(bool isDisplayed);
@@ -256,6 +259,5 @@ public:
 	int GetChannelNumber();
 	std::vector <bool> GetChannelEnabledVector();
 	CURRENT_DEVICE_CONFIG_STRUCT GetDaqConfigStruct();
-
 };
 

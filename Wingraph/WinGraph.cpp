@@ -1,4 +1,18 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "WinGraph.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <float.h>
+
 #include "xlsx.h"
 #include "Mouse.h"
 #include "math.h"
@@ -158,7 +172,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call,
 	StartGraph: Setup a new log file and zero memory
   -------------------------------------------------------------------------*/
 
-BOOL StartGraph(HGRAPH hGraph)
+BOOL StartGraph(HGRAPH hGraph, CONST CHAR* opt_header)
 {
 	// Sanity check
 
@@ -241,6 +255,15 @@ BOOL StartGraph(HGRAPH hGraph)
 
 			// make logfile header
 
+			if (opt_header != nullptr)
+			{
+				if (strlen(opt_header) > 0)
+				{
+					fprintf(logfile, opt_header);
+					fprintf_s(logfile, "\n");
+				}
+			}
+
 			fprintf(logfile, "Time(s)");
 			for (int u = 0; u < pgraph->signalcount; u++)
 			{
@@ -248,6 +271,7 @@ BOOL StartGraph(HGRAPH hGraph)
 				fprintf_s(logfile, "\t%s", pDATA->signame);
 			}
 			fprintf_s(logfile, "\n");
+
 		}
 
 		if (pgraph->Logging == LOGGER_XLSX)
@@ -1052,7 +1076,7 @@ VOID SetSignalMinValue(HGRAPH hGraph, INT SIGNB, DOUBLE val)
 {
 	if (SIGNB > MAX_SIGNAL_COUNT || SIGNB < 0)
 	{
-		printf("[!] Error at SignalResetStatisticValue() signal number not in range\n");
+		printf("[!] Error at SetSignalMinValue() signal number not in range\n");
 		return;
 	}
 
@@ -1062,14 +1086,14 @@ VOID SetSignalMinValue(HGRAPH hGraph, INT SIGNB, DOUBLE val)
 
 	if (NULL == pgraph)
 	{
-		printf("[!] Error at SignalResetStatisticValue() graph handle is null\n");
+		printf("[!] Error at SetSignalMinValue() graph handle is null\n");
 		LeaveCriticalSection(&cs);
 		return;
 	}
 
 	if (NULL == pgraph->signalcount)
 	{
-		printf("[!] Error at SignalResetStatisticValue() graph signal count is null\n");
+		printf("[!] Error at SetSignalMinValue() graph signal count is null\n");
 		LeaveCriticalSection(&cs);
 		return;
 	}
@@ -1089,7 +1113,7 @@ VOID SetSignalAverageValue(HGRAPH hGraph, INT SIGNB, DOUBLE val)
 {
 	if (SIGNB > MAX_SIGNAL_COUNT || SIGNB < 0)
 	{
-		printf("[!] Error at SignalResetStatisticValue() signal number not in range\n");
+		printf("[!] Error at SetSignalAverageValue() signal number not in range\n");
 		return;
 	}
 
@@ -1099,14 +1123,14 @@ VOID SetSignalAverageValue(HGRAPH hGraph, INT SIGNB, DOUBLE val)
 
 	if (NULL == pgraph)
 	{
-		printf("[!] Error at SignalResetStatisticValue() graph handle is null\n");
+		printf("[!] Error at SetSignalAverageValue() graph handle is null\n");
 		LeaveCriticalSection(&cs);
 		return;
 	}
 
 	if (NULL == pgraph->signalcount)
 	{
-		printf("[!] Error at SignalResetStatisticValue() graph signal count is null\n");
+		printf("[!] Error at SetSignalAverageValue() graph signal count is null\n");
 		LeaveCriticalSection(&cs);
 		return;
 	}
@@ -1127,7 +1151,7 @@ VOID SetSignalMaxValue(HGRAPH hGraph, INT SIGNB, DOUBLE val)
 {
 	if (SIGNB > MAX_SIGNAL_COUNT || SIGNB < 0)
 	{
-		printf("[!] Error at SignalResetStatisticValue() signal number not in range\n");
+		printf("[!] Error at SetSignalMaxValue() signal number not in range\n");
 		return;
 	}
 
@@ -1137,14 +1161,14 @@ VOID SetSignalMaxValue(HGRAPH hGraph, INT SIGNB, DOUBLE val)
 
 	if (NULL == pgraph)
 	{
-		printf("[!] Error at SignalResetStatisticValue() graph handle is null\n");
+		printf("[!] Error at SetSignalMaxValue() graph handle is null\n");
 		LeaveCriticalSection(&cs);
 		return;
 	}
 
 	if (NULL == pgraph->signalcount)
 	{
-		printf("[!] Error at SignalResetStatisticValue() graph signal count is null\n");
+		printf("[!] Error at SetSignalMaxValue() graph signal count is null\n");
 		LeaveCriticalSection(&cs);
 		return;
 	}
@@ -1397,7 +1421,7 @@ double GetSignalMinValue(HGRAPH hGraph, INT SIGNB)
 
 	if (SIGNB > MAX_SIGNAL_COUNT || SIGNB < 0)
 	{
-		printf("[!] Error at SignalResetStatisticValue() signal number not in range\n");
+		printf("[!] Error at GetSignalMinValue() signal number not in range\n");
 		return 0.0;
 	}
 
@@ -1430,7 +1454,7 @@ double GetSignalAverageValue(HGRAPH hGraph, INT SIGNB)
 
 	if (SIGNB > MAX_SIGNAL_COUNT || SIGNB < 0)
 	{
-		printf("[!] Error at SignalResetStatisticValue() signal number not in range\n");
+		printf("[!] Error at GetSignalAverageValue() signal number not in range\n");
 		return 0.0;
 	}
 
@@ -1463,7 +1487,7 @@ double GetSignalMaxValue(HGRAPH hGraph, INT SIGNB)
 
 	if (SIGNB > MAX_SIGNAL_COUNT || SIGNB < 0)
 	{
-		printf("[!] Error at SignalResetStatisticValue() signal number not in range\n");
+		printf("[!] Error at GetSignalMaxValue() signal number not in range\n");
 		return 0.0;
 	}
 
@@ -1515,9 +1539,10 @@ VOID SignalResetStatisticValue(HGRAPH hGraph, INT SIGNB)
 	}
 	LeaveCriticalSection(&cs);
 }
-
-
-VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
+/*-------------------------------------------------------------------------
+	AddPoint: Add one point for every signal
+  -------------------------------------------------------------------------*/
+VOID AddPoint(HGRAPH hGraph, DOUBLE* y, INT SignalCount)
 {
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
@@ -1525,7 +1550,7 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 	if (NULL == pgraph)
 	{
-		printf("[!] Error at AddPoints() graph handle is null\n");
+		printf("[!] Error at AddPoint() graph handle is null\n");
 		return;
 	}
 
@@ -1533,7 +1558,7 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 	/*
 	if (cs.DebugInfo == NULL)
 	{
-		printf("[!] Error at AddPoints() critical section not available\n");
+		printf("[!] Error at AddPoint() critical section not available\n");
 		return;
 	}
 	*/
@@ -1542,15 +1567,15 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 	if (FALSE == pgraph->bRunning)
 	{
-		printf("[!] Error at AddPoints() graph not strated\n");
+		printf("[!] Error at AddPoint() graph not strated\n");
 		return;
 	}
 
 	// TODO: Check if signalcount = length of y!
 
-	if (pgraph->signalcount != PointsCount)
+	if (pgraph->signalcount != SignalCount)
 	{
-		printf("[!] Error at AddPoints() signalcount not egual to y length\n");
+		printf("[!] Error at AddPoint() signalcount not egual to y length\n");
 		return;
 	}
 
@@ -1613,7 +1638,7 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 		if (NULL == pDATA)
 		{
 			LeaveCriticalSection(&cs);
-			printf("[!] Error at AddPoints() data buffer is null\n");
+			printf("[!] Error at AddPoint() data buffer is null\n");
 			return;
 		}
 
@@ -1737,7 +1762,139 @@ VOID AddPoints(HGRAPH hGraph, double* y, INT PointsCount)
 
 	LeaveCriticalSection(&cs);
 }
+/*-------------------------------------------------------------------------
+	AddMultiplePoints: Add a chunk of data in the graph buffer for each signal count
+  -------------------------------------------------------------------------*/
+VOID AddMultiplePoints(HGRAPH hGraph, DOUBLE** Chunks, INT SignalCount, INT BufferLength)
+{
+	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
+	// Sanity check
+
+	if (NULL == pgraph)
+	{
+		printf("[!] Error at AddMultiplePoints() graph handle is null\n");
+		return;
+	}
+
+	DATA* pDATA = NULL;
+	/*
+	if (cs.DebugInfo == NULL)
+	{
+		printf("[!] Error at AddMultiplePoints() critical section not available\n");
+		return;
+	}
+	*/
+
+	// Sanity check
+
+	if (FALSE == pgraph->bRunning)
+	{
+		printf("[!] Error at AddMultiplePoints() graph not strated\n");
+		return;
+	}
+
+	// TODO: Check if signalcount = length of y!
+
+	if (pgraph->signalcount != SignalCount)
+	{
+		printf("[!] Error at AddMultiplePoints() signalcount not egual to y length\n");
+		return;
+	}
+
+	EnterCriticalSection(&cs);
+
+	// If the maximum points are reached 
+	// in the buffer, shift left the array and
+	// dec the current number of points
+
+	size_t graph_overflow = pgraph->BufferSize - (pgraph->cur_nbpoints + BufferLength);
+	if (graph_overflow <= 0)
+	{
+		graph_overflow = abs((int)graph_overflow);															//Absolute value
+
+		for (int index = 0; index < pgraph->signalcount; index++)
+		{
+			pDATA = pgraph->signal[index];
+
+			for (int j = 0; j < pgraph->BufferSize - graph_overflow; j++)
+			{
+				pDATA->X[j] = pDATA->X[j + graph_overflow];																// Shift left X
+				pDATA->Y[j] = pDATA->Y[j + graph_overflow];																// Shift left Y
+			}
+		}
+		pgraph->cur_nbpoints = pgraph->BufferSize - graph_overflow;
+	}
+	LeaveCriticalSection(&cs);
+
+	// Save the actual timestamp
+
+	if (pgraph->cur_nbpoints == 0)
+	{
+		finish = start;
+	}
+	else
+	{
+		finish = PerformanceCounter();
+	}
+
+	EnterCriticalSection(&cs);
+	for (int index = 0; index < pgraph->signalcount; index++)
+	{
+		pDATA = pgraph->signal[index];
+		if (NULL == pDATA)
+		{
+			LeaveCriticalSection(&cs);
+			printf("[!] Error at AddMultiplePoints() data buffer is null\n");
+			return;
+		}
+
+		// Add points to the selected buffer	
+		double x_step = ((double)((finish - start)) / frequency) / BufferLength;
+		for (size_t i = 0; i < BufferLength; i++)
+		{
+			pDATA->X[pgraph->cur_nbpoints + i] = x_step * i;												// Save in X the elapsed time from start
+		}
+						
+		for (size_t i = 0; i < BufferLength; i++)
+		{
+			pDATA->Y[pgraph->cur_nbpoints+i] = Chunks[index][i];													// Save Y										
+		}
+														
+
+		// Perform some statistics
+
+		// period
+		pDATA->stat.period_s = pDATA->X[pgraph->cur_nbpoints] - pDATA->X[0];								// Update current period
+
+		//min
+		if (pDATA->Y[pgraph->cur_nbpoints] < pDATA->stat.min_value)
+		{
+			pDATA->stat.min_value = pDATA->Y[pgraph->cur_nbpoints];											// Update current min value displayed
+		}
+
+		//average
+		if (pgraph->cur_nbpoints > 0)
+		{
+			pDATA->stat.average_value_accumulator += pDATA->Y[pgraph->cur_nbpoints];
+			pDATA->stat.average_value_counter++;
+
+			pDATA->stat.average_value = pDATA->stat.average_value_accumulator / pDATA->stat.average_value_counter;
+		}
+
+		//max
+		if (pDATA->Y[pgraph->cur_nbpoints] > pDATA->stat.max_value)
+		{
+			pDATA->stat.max_value = pDATA->Y[pgraph->cur_nbpoints];											// Update current max value displayed
+		}
+	}
+
+	// Inc the number of points
+
+	pgraph->cur_nbpoints = pgraph->cur_nbpoints + BufferLength;
+
+	LeaveCriticalSection(&cs);
+}
 /*-------------------------------------------------------------------------
 	Render: Analyze the data buffers and print waves to the
 	OpenGL device context
@@ -2178,7 +2335,7 @@ BOOL FindGlobalMaxScale(HGRAPH hGraph, double& Xmin, double& Xmax, double& Ymin,
 
 		// Optimize display with rounded units
 
-		const double rangeMult[] = { /*0.1, 0.2, 0.25, 0.5, 1.0, */2.0, 2.5, 5.0 };
+		const double rangeMult[] = { /*0.1, 0.2, 0.25, 0.5, 2.5,*/10.0, 1.0, 2.0, 5.0 };
 		const int segnumber = 10;
 		double magnitude = floor(log10(Ymax - Ymin));
 

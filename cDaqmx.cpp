@@ -1,17 +1,263 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cDaqmx.h"
+#include <winsock2.h> 
+#include <wx/wx.h>
+#include <wx/dcbuffer.h>
+#include <wx/combobox.h>
+
+#include <fstream> 
+#include <iostream>
+#include <filesystem>
+
+#include <string>
+#include <wx/fileconf.h>
+
+#include "cTable.h"
+#include "cDaqmxScaleDlg.h"
+
+#include "cUSB6001.h"
+#include "cDaqsim.h"
+
+#include "cSerialize.h"
+
+static void GetAllChildren(wxWindow* inWin, wxWindowList& ioList)
+{
+
+	for (wxWindowList::iterator it = inWin->GetChildren().begin(); it != inWin->GetChildren().end(); ++it)
+	{
+		wxWindow* theChild = *it;
+		if (theChild)
+		{
+			ioList.Append(theChild);
+			GetAllChildren(theChild, ioList);
+		}
+	}
+}
+
+void cDaqmx::serialize(std::string device)
+{
+	/*
+	std::string fullpath = "Lab++LabelSerialized";
+	fullpath.append(device);
+	fullpath.append(".ini");
+	cSerialize labelsaver(fullpath);
+	serialize_item(labelsaver, "device_enabled", label.device_enabled);
+	serialize_item(labelsaver, "device_name", label.device_name);
+	serialize_item(labelsaver, "chan_number", label.chan_number);
+	serialize_item(labelsaver, "channel_index", label.channel_index);
+	serialize_item(labelsaver, "channel_enabled", label.channel_enabled);
+	serialize_item(labelsaver, "channel_name", label.channel_name);
+	serialize_item(labelsaver, "channel_mode", label.channel_mode);
+	serialize_item(labelsaver, "channel_permision", label.channel_permision);
+	serialize_item(labelsaver, "channel_physical_name", label.channel_physical_name, max_chan_number);
+	serialize_item(labelsaver, "channel_type", label.channel_type, max_chan_number);
+	serialize_item(labelsaver, "channel_max", label.channel_max, max_chan_number);
+	serialize_item(labelsaver, "channel_min", label.channel_min, max_chan_number);
+	serialize_item(labelsaver, "channel_mode_type", label.channel_mode_type, max_chan_number);
+	serialize_item(labelsaver, "channel_tc_type", label.channel_tc_type, max_chan_number);
+	serialize_item(labelsaver, "channel_tc_min", label.channel_tc_min, max_chan_number);
+	serialize_item(labelsaver, "channel_tc_max", label.channel_tc_max, max_chan_number);
+	serialize_item(labelsaver, "channel_linearize", label.channel_linearize, max_chan_number);
+	serialize_item(labelsaver, "channel_linearize_slope", label.channel_linearize_slope, max_chan_number);
+	serialize_item(labelsaver, "channel_linearize_shift", label.channel_linearize_shift, max_chan_number);
+	serialize_item(labelsaver, "channel_linearize_unit", label.channel_linearize_unit, max_chan_number);
+	serialize_item(labelsaver, "channel_filter", label.channel_filter, max_chan_number);
+	serialize_item(labelsaver, "channel_filter_intensity", label.channel_filter_intensity, max_chan_number);
+	serialize_item(labelsaver, "channel_trigger", label.channel_trigger, max_chan_number);
+	serialize_item(labelsaver, "channel_trigger_threshold", label.channel_trigger_threshold, max_chan_number);
+	serialize_item(labelsaver, "digital_channel_type", label.digital_channel_type, max_chan_number);
+	serialize_item(labelsaver, "digital_channel_mode_type", label.digital_channel_mode_type, max_chan_number);
+	*/
+	std::string fullpath = "Lab++ConfigSerialized";
+	fullpath.append(device);
+	fullpath.append(".ini");
+	cSerialize configsaver(fullpath);
+	serialize_item(configsaver, "device_enabled", config.device_enabled);
+	serialize_item(configsaver, "device_name", config.device_name);
+	serialize_item(configsaver, "device_serial_number", config.device_serial_number, max_chan_number);
+	serialize_item(configsaver, "chan_number", config.chan_number);
+	serialize_item(configsaver, "channel_index", config.channel_index);
+	serialize_item(configsaver, "channel_enabled", config.channel_enabled);
+	serialize_item(configsaver, "channel_name", config.channel_name);
+	serialize_item(configsaver, "channel_mode", config.channel_mode);
+	serialize_item(configsaver, "channel_permision", config.channel_permision);
+	serialize_item(configsaver, "channel_physical_name", config.channel_physical_name, max_chan_number);
+	serialize_item(configsaver, "channel_physical_unit", config.channel_physical_unit, max_chan_number);
+	serialize_item(configsaver, "channel_serial_number", config.channel_serial_number, max_chan_number);
+	serialize_item(configsaver, "channel_type", config.channel_type, max_chan_number);
+	serialize_item(configsaver, "channel_max", config.channel_max, max_chan_number);
+	serialize_item(configsaver, "channel_min", config.channel_min, max_chan_number);
+	serialize_item(configsaver, "channel_mode_type", config.channel_mode_type, max_chan_number);
+	serialize_item(configsaver, "channel_tc_type", config.channel_tc_type, max_chan_number);
+	serialize_item(configsaver, "channel_tc_min", config.channel_tc_min, max_chan_number);
+	serialize_item(configsaver, "channel_tc_max", config.channel_tc_max, max_chan_number);
+	serialize_item(configsaver, "channel_linearize", config.channel_linearize, max_chan_number);
+	serialize_item(configsaver, "channel_linearize_slope", config.channel_linearize_slope, max_chan_number);
+	serialize_item(configsaver, "channel_linearize_shift", config.channel_linearize_shift, max_chan_number);
+	serialize_item(configsaver, "channel_linearize_unit", config.channel_linearize_unit, max_chan_number);
+	serialize_item(configsaver, "channel_filter", config.channel_filter, max_chan_number);
+	serialize_item(configsaver, "channel_filter_intensity", config.channel_filter_intensity, max_chan_number);
+	serialize_item(configsaver, "channel_trigger", config.channel_trigger, max_chan_number);
+	serialize_item(configsaver, "channel_trigger_threshold", config.channel_trigger_threshold, max_chan_number);
+	serialize_item(configsaver, "digital_channel_type", config.digital_channel_type, max_chan_number);
+	serialize_item(configsaver, "digital_channel_mode_type", config.digital_channel_mode_type, max_chan_number);
+
+	/*
+	wxWindowList list;
+	GetAllChildren(config_rightpanel_, list);
+
+	for (wxWindowList::iterator it = list.begin();it != list.end(); it++)
+	{
+		wxTextCtrl* text = wxDynamicCast(*it, wxTextCtrl);
+		if (text) 
+		{
+			std::string value = text->GetValue().ToStdString();
+			std::cout <<"Set Text:\"" << value << "\" at "<< text->GetId()  <<"\n";
+			saver.save(std::to_string(text->GetId()), value);
+		}
+		
+		wxComboBox* combo = wxDynamicCast(*it, wxComboBox);
+		if (combo)
+		{
+			size_t numb = combo->GetSelection();
+			if (numb == wxNOT_FOUND)
+			{
+				std::cout << "[!] Error GetSelection()\n";
+			}
+			std::string value = std::to_string(numb);
+			std::cout << "Set Combo:\"" << value << "\" at " << combo->GetId() << "\n";
+			saver.save(std::to_string(combo->GetId()), value);
+		}
+	}
+	*/
+}
+
+void cDaqmx::deserialize(std::string device)
+{
+	std::string fullpath = "Lab++ConfigSerialized";
+	fullpath.append(device);
+	fullpath.append(".ini");
+
+	// Ensure a file is already serialized
+	// Be carefull if file is corrupted
+	auto path = std::filesystem::temp_directory_path().parent_path().parent_path().parent_path();
+
+	path /= "Roaming";
+	path += "\\";
+	path += fullpath;
+
+	if (!std::filesystem::exists(path))
+	{
+		std::cout << "[!] Fail to load serialized data in ROAMING.\n";
+		return;
+	}
+	std::string filename = path.filename().string();
+	if(filename.size() == 0)
+	{
+		return;
+	}
+
+	// Clean dynamic containers already loaded 
+	config.channel_enabled.clear();
+	config.channel_mode.clear();
+	config.channel_name.clear();
+	config.channel_permision.clear();
 
 
+	cSerialize configsaver(filename);
+	deserialize_item(configsaver, "device_enabled", config.device_enabled);
+	deserialize_item(configsaver, "device_name", config.device_name);
+	deserialize_item(configsaver, "device_serial_number", config.device_serial_number, max_chan_number);
+	deserialize_item(configsaver, "chan_number", config.chan_number);
+	deserialize_item(configsaver, "channel_index", config.channel_index);
+	deserialize_item(configsaver, "channel_enabled", config.channel_enabled);
+	
+	
+	// If channel was enable, restore it
+	assert(label.channel_index <= max_chan_number);
+	auto saved = label.channel_index;
+	
+	label.channel_index = 0;
+	assert(config.channel_enabled.size() <= max_chan_number);
+	for (auto chan_enable : config.channel_enabled)
+	{
+		if(chan_enable)
+		{
+			UpdateChannelSig(chan_enable);
+			AddControlColomnTable(chan_enable);
+			SwitchChannelColor(chan_enable);
+		}
+		label.channel_index++;
+	}
+	label.channel_index = saved;
+	DoChannelUpdate(config.channel_enabled.at(label.channel_index));
+	label.channel_enabled = config.channel_enabled;
 
-/*
-class cMeasurementmanager;
-class cCycle;
-class cUsb6001;
-class cDaqsim;
-class cMeasurement;
-class cPlot;
-class cImagePanel;
-class cSignalTable;
-*/
+	deserialize_item(configsaver, "channel_name", config.channel_name);
+	deserialize_item(configsaver, "channel_mode", config.channel_mode);
+	deserialize_item(configsaver, "channel_permision", config.channel_permision);
+	deserialize_item(configsaver, "channel_physical_name", config.channel_physical_name, max_chan_number);
+	deserialize_item(configsaver, "channel_physical_unit", config.channel_physical_unit, max_chan_number);
+	deserialize_item(configsaver, "channel_serial_number", config.channel_serial_number, max_chan_number);
+	deserialize_item(configsaver, "channel_type", config.channel_type, max_chan_number);
+	deserialize_item(configsaver, "channel_max", config.channel_max, max_chan_number);
+	deserialize_item(configsaver, "channel_min", config.channel_min, max_chan_number);
+	deserialize_item(configsaver, "channel_mode_type", config.channel_mode_type, max_chan_number);
+	deserialize_item(configsaver, "channel_tc_type", config.channel_tc_type, max_chan_number);
+	deserialize_item(configsaver, "channel_tc_min", config.channel_tc_min, max_chan_number);
+	deserialize_item(configsaver, "channel_tc_max", config.channel_tc_max, max_chan_number);
+	deserialize_item(configsaver, "channel_linearize", config.channel_linearize, max_chan_number);
+	deserialize_item(configsaver, "channel_linearize_slope", config.channel_linearize_slope, max_chan_number);
+	deserialize_item(configsaver, "channel_linearize_shift", config.channel_linearize_shift, max_chan_number);
+	deserialize_item(configsaver, "channel_linearize_unit", config.channel_linearize_unit, max_chan_number);
+	deserialize_item(configsaver, "channel_filter", config.channel_filter, max_chan_number);
+	deserialize_item(configsaver, "channel_filter_intensity", config.channel_filter_intensity, max_chan_number);
+	deserialize_item(configsaver, "channel_trigger", config.channel_trigger, max_chan_number);
+	deserialize_item(configsaver, "channel_trigger_threshold", config.channel_trigger_threshold, max_chan_number);
+	deserialize_item(configsaver, "digital_channel_type", config.digital_channel_type, max_chan_number);
+	deserialize_item(configsaver, "digital_channel_mode_type", config.digital_channel_mode_type, max_chan_number);
+	/*
+	std::string id = device.append("_");
+	std::string fullpath = "Lab++";
+	fullpath.append(id);
+	fullpath.append(".ini");
+	cSerialize saver(fullpath);
+
+	wxWindowList list;
+	GetAllChildren(config_rightpanel_, list);
+
+	for (wxWindowList::iterator it = list.begin(); it != list.end(); it++)
+	{
+		wxTextCtrl* text = dynamic_cast<wxTextCtrl*>(*it);
+
+		if (text)
+		{
+			std::string value;
+
+			saver.load(std::to_string(text->GetId()), value);
+			std::cout << "Load Text:\"" << value << "\" at " << text->GetId() << "\n";
+			text->SetValue(wxString(value));
+		}
+		
+		wxComboBox* combo = wxDynamicCast(*it, wxComboBox);
+		if (combo)
+		{
+			std::string value;
+
+			saver.load(std::to_string(combo->GetId()), value);
+			size_t numb = std::atoi(value.c_str());
+			std::cout << "Load Combo:\"" << value << "\" at " << combo->GetId() << "\n";
+			combo->SetSelection(numb);
+		}		
+	}
+	*/
+}
 
 cDaqmx::cDaqmx(wxWindow* inst)
 {
@@ -42,7 +288,22 @@ cDaqmx::cDaqmx(wxWindow* inst)
 		for (int j = 0; j < max_chan_number; j++)
 		{
 			label.channel_physical_name[i].push_back("/ai" + std::to_string(j));
+			label.channel_physical_unit[i].push_back("Volt");
 		}
+
+		label.device_serial_number[i].push_back("LE107");
+		label.device_serial_number[i].push_back("LE150");
+		label.device_serial_number[i].push_back("AG004");
+
+		label.channel_serial_number[i].push_back("LE099");
+		label.channel_serial_number[i].push_back("LE135");
+		label.channel_serial_number[i].push_back("LE140");
+		label.channel_serial_number[i].push_back("LE141");
+		label.channel_serial_number[i].push_back("Y112");
+		label.channel_serial_number[i].push_back("Y113");
+		label.channel_serial_number[i].push_back("LE111");
+		label.channel_serial_number[i].push_back("Burkert");
+		label.channel_serial_number[i].push_back("JPFluidControl");
 
 		label.channel_type[i].push_back("Voltage");
 		label.channel_type[i].push_back("Thermocouple");
@@ -83,63 +344,89 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 		label.channel_trigger_threshold[i] = "0";
 
-		label.digital_channel_type[i].push_back("Input");				
 		label.digital_channel_type[i].push_back("Output");
+		label.digital_channel_type[i].push_back("Input");
 
 		label.digital_channel_mode_type[i].push_back("Pullup");
 		label.digital_channel_mode_type[i].push_back("None");
 
 	}
+
 	////////////////////////////////////////////////////////////
-	// Load default configuration in memory
+	// Search for on disk configuration (roaming)
 	////////////////////////////////////////////////////////////
-	config.device_enabled = false;
-	config.device_name = wxT("Simulated");
-
-	config.channel_index = 0;
-
-	config.chan_number = max_chan_number;
-
-	for (int i = 0; i < max_chan_number; i++)
+	/*
+	auto path = std::filesystem::temp_directory_path().parent_path().parent_path().parent_path();
+	path /= "Roaming";
+	path += "\\Lab++ConfigSerializedSimulated.ini";
+	if (!std::filesystem::exists(path))
 	{
-		config.channel_enabled.push_back(false);
-		config.channel_mode.push_back(CHANANALOG);
-		config.channel_permision.push_back(CHANREAD);
+	*/
+		std::cout << "[!] First install, load default configuration for Simulated mode.\n";
 
-		config.channel_name.push_back("Analog");
-		config.channel_name.at(i).append(std::to_string(i));
 
-		config.channel_physical_name[i] = "/ai" + std::to_string(i);
+		////////////////////////////////////////////////////////////
+		// Load default configuration in memory
+		////////////////////////////////////////////////////////////
 
-		config.channel_type[i] = "Volt";
+		config.device_enabled = false;
+		config.device_name = wxT("Simulated");
 
-		config.channel_max[i] = "10";
+		config.channel_index = 0;
 
-		config.channel_min[i] = "0";
+		config.chan_number = max_chan_number;
 
-		config.channel_mode_type[i] = "Grounded";
+		for (int i = 0; i < max_chan_number; i++)
+		{
+			config.channel_enabled.push_back(false);
+			config.channel_mode.push_back(CHANANALOG);
+			config.channel_permision.push_back(CHANREAD);
 
-		config.channel_linearize[i] = "No";
+			config.channel_name.push_back("Analog");
+			config.channel_name.at(i).append(std::to_string(i));
 
-		config.channel_linearize_slope[i] = "1";
-		config.channel_linearize_shift[i] = "0";
-		config.channel_linearize_unit[i] = "Volt";
+			config.channel_physical_name[i] = "/ai" + std::to_string(i);
+			config.channel_physical_unit[i] = "Volt";
 
-		config.channel_filter[i] = "Disabled";
+			config.device_serial_number[i] = "LE107";
+			config.channel_serial_number[i] = "LE140";
 
-		config.channel_filter_intensity[i] = "0.5";
+			config.channel_type[i] = "Volt";
 
-		config.channel_trigger[i] = "Disabled";
+			config.channel_max[i] = "10";
 
-		config.channel_trigger_threshold[i] = "0";
+			config.channel_min[i] = "0";
 
-		config.digital_channel_type[i] = "Input";
-		config.digital_channel_mode_type[i] = "Pullup";
+			config.channel_mode_type[i] = "Grounded";
 
+			config.channel_linearize[i] = "No";
+
+			config.channel_linearize_slope[i] = "1";
+			config.channel_linearize_shift[i] = "0";
+			config.channel_linearize_unit[i] = "Volt";
+
+			config.channel_filter[i] = "Disabled";
+
+			config.channel_filter_intensity[i] = "0.5";
+
+			config.channel_trigger[i] = "Disabled";
+
+			config.channel_trigger_threshold[i] = "0";
+
+			config.digital_channel_type[i] = "Output";
+			config.digital_channel_mode_type[i] = "Pullup";
+
+		}
+		/*
 	}
-
-
-	////////////////////////////////////////////////////////////
+	else
+	{
+		// Config file exist on disk -> load it
+		//deserialize("Simulated");
+		//load_current_chan_config(config.channel_index);
+		//assert(config.chan_number > 0);
+	}
+	*/
 
 
 	//wxInitAllImageHandlers();
@@ -196,6 +483,20 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	inst_->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &cDaqmx::OnDaqAddrSelBtn, this, IDCADDR);
 	addr_ctrl->SetFont(addr_ctrl->GetFont().Scale(text_size));
 	addr_ctrl->Disable();
+
+	////////////////////////////////////////////////////////////
+
+	static_device_sn = new wxStaticText(device_group, IDCSTATICDEVICESN, L"S/N:", wxDefaultPosition, inst->FromDIP(wxDefaultSize), STATIC_CTRL_STYLE);
+	static_device_sn->SetFont(static_device_sn->GetFont().Scale(text_size));
+
+	////////////////////////////////////////////////////////////
+
+	device_sn = new wxComboBox(device_group, IDCDEVICESN, label.device_serial_number[0][0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.device_serial_number[0], wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	device_sn->SetFont(device_sn->GetFont().Scale(text_size));
+	device_sn->Disable();
+
+	////////////////////////////////////////////////////////////
+
 	wxSize sz = text_ctrl_size;
 	sz.x = 10;
 	wxStaticText* dummy1 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
@@ -209,12 +510,14 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	wxStaticText* dummy9 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
 	wxStaticText* dummy10 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
 	wxStaticText* dummy11 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
-	wxStaticText* dummy12 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
+	//wxStaticText* dummy12 = new wxStaticText(device_group, wxID_ANY, "", wxDefaultPosition, inst->FromDIP(sz));
 
 	flexsizer->Add(daq_activate);
 	//flexsizer->Add(enabledaq);
 	//flexsizer->Add(staticaddr);
 	flexsizer->Add(addr_ctrl);
+	flexsizer->Add(static_device_sn);
+	flexsizer->Add(device_sn);
 	flexsizer->Add(dummy1);
 	flexsizer->Add(dummy2);
 	flexsizer->Add(dummy3);
@@ -226,7 +529,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	flexsizer->Add(dummy9);
 	flexsizer->Add(dummy10);
 	flexsizer->Add(dummy11);
-	flexsizer->Add(dummy12);
+	//flexsizer->Add(dummy12);
 
 	device_group_sizer->Add(flexsizer);
 
@@ -396,6 +699,15 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 	////////////////////////////////////////////////////////////
 
+	static_channel_sn = new wxStaticText(channel_group, IDCSTATICCHANNELSN, L"S/N:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
+	static_channel_sn->SetFont(static_channel_sn->GetFont().Scale(text_size));
+
+	channel_sn = new wxComboBox(channel_group, IDCCHANNELSN, label.channel_serial_number[0][0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), label.channel_serial_number[0], wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	channel_sn->SetFont(channel_sn->GetFont().Scale(text_size));
+	channel_sn->Disable();
+
+	////////////////////////////////////////////////////////////
+
 	static_chan_input_mode_type = new wxStaticText(channel_group, IDCSTATICMODE, L"Input mode:", wxDefaultPosition, inst->FromDIP(static_ctrl_size), STATIC_CTRL_STYLE);
 	static_chan_input_mode_type->SetFont(static_chan_input_mode_type->GetFont().Scale(text_size));
 	//static_chan_input_mode_type->SetBackgroundColour(*bgcolor);
@@ -473,6 +785,9 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	flexchansizer1->Add(chan_min_input_range);
 	flexchansizer1->Add(static_chan_input_mode_type);
 	flexchansizer1->Add(chan_input_mode_type);
+
+	flexchansizer1->Add(static_channel_sn);
+	flexchansizer1->Add(channel_sn);
 
 	flexchansizer1->Add(static_chan_tc_type);
 	flexchansizer1->Add(chan_tc_type);
@@ -658,7 +973,11 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 cDaqmx::~cDaqmx()
 {
-	// Free memory on heap
+	// Serialize 
+	save_current_chan_config(config.channel_index);
+	serialize(config.device_name.ToStdString());
+
+	// Free heap memory 
 	cMeasurementmanager *meas_manager = meas_manager->getInstance();
 	bool isDestroyed = meas_manager->destroy_subsystem(MEAS_TYPE::DAQ_INSTR);
 	// If item destroyed delete from memory
@@ -841,7 +1160,7 @@ void cDaqmx::OnPreviousCliqued(wxCommandEvent& evt)
 void cDaqmx::save_current_device_config(int channel_index)
 {
 	std::cout << "[*] Saving device GUI field in memory at channel " << channel_index << ".\n";
-
+	
 	// Device enable
 	config.device_enabled = false;
 	if (daq_activate->GetLabelText().compare("ON") == 0)
@@ -864,13 +1183,6 @@ void cDaqmx::load_current_device_config(int channel_index)
 {
 	std::cout << "[*] Loading device configuration from memory in GUI at channel " << channel_index << ".\n";
 
-	// Device enable
-	//config.device_enabled = false;
-	//if (daq_activate->GetLabelText().compare("ON"))
-	//{
-	//	config.device_enabled = true;
-	//}
-
 	// Device name
 	int iTotalItem = addr_ctrl->GetCount();
 	for (int i = 0; i < iTotalItem; i++)
@@ -879,9 +1191,26 @@ void cDaqmx::load_current_device_config(int channel_index)
 		if (value.compare(config.device_name) == 0)
 		{
 			addr_ctrl->SetSelection(i);
-			std::cout << "[*] Found device in configuration memory struct.\n";
+			std::cout << "[*] Found device in configuration memory struct. Set appropriate address name.\n";
 		}
 	}
+
+	// Device serial number
+	bool alreadyExist = false;
+	wxArrayString items = device_sn->GetStrings();
+	for (auto item : items)
+	{
+		if (item.compare(config.device_serial_number[channel_index]) == 0)
+		{
+			alreadyExist = true;
+		}
+		alreadyExist = false;
+	}
+	if (!alreadyExist)
+	{
+		items.push_back(config.device_serial_number[channel_index]);
+	}
+	device_sn->SetValue(config.device_serial_number[channel_index]);
 
 	return;
 }
@@ -910,6 +1239,12 @@ void cDaqmx::save_current_chan_config(int channel_index)
 		iSelection = 0;
 		MessageBox(GetFocus(), L"Channel physical name is empty", L"[!] Warning", S_OK);
 	}
+
+	// Device & channel physical serial number
+	config.device_serial_number[channel_index] = device_sn->GetValue();
+	config.channel_serial_number[channel_index] = channel_sn->GetValue();
+
+	// Channel physical serial number
 	config.channel_physical_name[channel_index] = chan_addr_ctrl->GetValue();
 
 	// Channel physical type
@@ -923,14 +1258,17 @@ void cDaqmx::save_current_chan_config(int channel_index)
 
 	// Channel max voltage range
 	iSelection = chan_max_input_range->GetCurrentSelection();
+	if (iSelection < 0) { iSelection = 0; }
 	config.channel_max[channel_index] = label.channel_max[channel_index][iSelection];
 
 	// Channel min voltage range
 	iSelection = chan_min_input_range->GetCurrentSelection();
+	if (iSelection < 0){iSelection = 0;}
 	config.channel_min[channel_index] = label.channel_min[channel_index][iSelection];
 
 	// Channel reference mode
 	iSelection = chan_input_mode_type->GetCurrentSelection();
+	if (iSelection < 0) { iSelection = 0; }
 	config.channel_mode_type[channel_index] = label.channel_mode_type[channel_index][iSelection];
 
 	// Channel Tc type (T,K,...)
@@ -965,6 +1303,7 @@ void cDaqmx::save_current_chan_config(int channel_index)
 
 	// Channel filter 
 	iSelection = chan_filter->GetCurrentSelection();
+	if (iSelection < 0) { iSelection = 0; }
 	config.channel_filter[channel_index] = label.channel_filter[channel_index][iSelection];
 
 	// Channel filter intensity
@@ -972,6 +1311,7 @@ void cDaqmx::save_current_chan_config(int channel_index)
 
 	// Channel trigger
 	iSelection = chan_trigger->GetCurrentSelection();
+	if (iSelection < 0) { iSelection = 0; }
 	config.channel_trigger[channel_index] = label.channel_trigger[channel_index][iSelection];
 
 	// Channel threshold
@@ -1002,7 +1342,27 @@ void cDaqmx::load_current_chan_config(int channel_index)
 	}
 
 	// Channel name
-	chan_name->SetLabelText(config.channel_name[channel_index]);
+	chan_name->SetValue(config.channel_name[channel_index]);
+
+	// Device serial number
+	device_sn->SetValue(config.device_serial_number[channel_index]);
+
+	// Channel serial number
+	bool alreadyExist = false;
+	wxArrayString items = channel_sn->GetStrings();
+	for (auto item : items)
+	{
+		if (item.compare(config.channel_serial_number[channel_index]) == 0)
+		{
+			alreadyExist = true;
+		}
+		alreadyExist = false;
+	}
+	if (!alreadyExist)
+	{
+		items.push_back(config.channel_serial_number[channel_index]);
+	}
+	channel_sn->SetValue(config.channel_serial_number[channel_index]);
 
 	// Channel physical name
 	load_combobox(chan_addr_ctrl, config.channel_physical_name[channel_index]);
@@ -1168,8 +1528,13 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				EnableChannelItems(!enable_pan);
 			}
 
+			//clear first
+			config.channel_mode.clear();
+			config.channel_permision.clear();
+
 			constexpr size_t bufferSize = 1000;
 			char buffer[bufferSize] = {};
+			ZeroMemory(buffer, bufferSize);
 			if (DAQmxGetSysDevNames(buffer, bufferSize) != 0)
 			{
 				MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetSysDevNames() failed to resolve devices.\n", S_OK | MB_ICONERROR);
@@ -1220,7 +1585,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				}
 				std::cout << "Dev name: " << name << "\n";
 				std::cout << "product_type: " << product_type << "\n";
-				daq_type->SetLabel(product_type+std::string("::")+name);
+				daq_type->SetValue(product_type+std::string("::")+name);
 				addr_ctrl->Append(name);
 			}
 			// Add separator
@@ -1228,21 +1593,24 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 			// Channel specific
 
-
-		// List all channels available on each device and concat them 
+			// List all channels available on each device and concat them 
 			std::vector<std::string> channels;
+			config.channel_mode.clear();
+			config.channel_permision.clear();
+
+			label.channel_mode.clear();
+			label.channel_permision.clear();
+
 			for (auto name : names)
 			{
-				config.channel_mode.clear();
-				config.channel_permision.clear();
-
 				if (isDeviceMeasurable(name) == false)
 				{
 					std::cout << "[!] " << name << " is not measurable, skip next\n";
 					continue;
 				}
 
-				// Find anlog lines
+				// Find analog lines
+				ZeroMemory(buffer, bufferSize);
 				if (DAQmxGetDevAIPhysicalChans(name.c_str(), buffer, bufferSize) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
@@ -1250,25 +1618,35 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					return;
 				}
 
-				std::string s(buffer);
-				std::string delimiter = ", ";
-				size_t pos_start = 0, pos_end, delim_len = delimiter.length();
-				std::string token;
+				if (strlen(buffer) > 0)
+				{
+					std::cout << "[*] Found Ananlog input on " << name << "\n";
+					std::string s(buffer);
+					std::string delimiter = ", ";
+					size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+					std::string token;
 
 
-				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-					token = s.substr(pos_start, pos_end - pos_start);
-					pos_start = pos_end + delim_len;
-					channels.push_back(token);
+					while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+						token = s.substr(pos_start, pos_end - pos_start);
+						pos_start = pos_end + delim_len;
+						channels.push_back(token);
+						config.channel_mode.push_back(CHANANALOG);
+						config.channel_permision.push_back(CHANREAD); // READ ONLY
+						label.channel_mode.push_back(CHANANALOG);
+						label.channel_permision.push_back(CHANREAD); // READ ONLY
+					}
+
+					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANANALOG);
 					config.channel_permision.push_back(CHANREAD); // READ ONLY
+					label.channel_mode.push_back(CHANANALOG);
+					label.channel_permision.push_back(CHANREAD); // READ ONLY
 				}
 
-				channels.push_back(s.substr(pos_start));
-				config.channel_mode.push_back(CHANANALOG);
-				config.channel_permision.push_back(CHANREAD); // READ ONLY
 
 				// Find digital lines
+				ZeroMemory(buffer, bufferSize);
 				if (DAQmxGetDevDOLines(name.c_str(), buffer, bufferSize) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
@@ -1276,22 +1654,30 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					return;
 				}
 
-				s = buffer;
-				pos_start = 0; pos_end = 0; delim_len = delimiter.length();
-				token = "";
+				if (strlen(buffer) > 0)
+				{
+					std::cout << "[*] Found Ananlog input on " << name << "\n";
+					s = buffer;
+					pos_start = 0; pos_end = 0; delim_len = delimiter.length();
+					token = "";
 
 
-				while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-					token = s.substr(pos_start, pos_end - pos_start);
-					pos_start = pos_end + delim_len;
-					channels.push_back(token); 
+					while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
+						token = s.substr(pos_start, pos_end - pos_start);
+						pos_start = pos_end + delim_len;
+						channels.push_back(token);
+						config.channel_mode.push_back(CHANDIGITAL);
+						config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
+						label.channel_mode.push_back(CHANDIGITAL);
+						label.channel_permision.push_back(CHANWRITE); // WRITE ONLY
+					}
+
+					channels.push_back(s.substr(pos_start));
 					config.channel_mode.push_back(CHANDIGITAL);
-					config.channel_permision.push_back(CHANREAD); // WRITE ONLY
+					config.channel_permision.push_back(CHANWRITE); // WRITE ONLY
+					label.channel_mode.push_back(CHANDIGITAL);
+					label.channel_permision.push_back(CHANWRITE); // WRITE ONLY
 				}
-
-				channels.push_back(s.substr(pos_start));
-				config.channel_mode.push_back(CHANDIGITAL);
-				config.channel_permision.push_back(CHANREAD); // WRITE ONLY
 			}
 
 			if (channels.size() == 0)
@@ -1304,6 +1690,8 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					channels.push_back(fake_chan);
 					config.channel_mode.push_back(CHANANALOG);
 					config.channel_permision.push_back(CHANREAD);
+					label.channel_mode.push_back(CHANANALOG);
+					label.channel_permision.push_back(CHANREAD);
 				}
 
 			}
@@ -1326,7 +1714,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			// update name info in struct
 			int prev = -1;
 			int device_index = 0;
-			for (int i = 0; i < channels.size(); i++)
+			for (size_t i = 0; i < channels.size(); i++)
 			{
 				if (prev==-1){ prev = config.channel_mode[i];} // init previous state once
 
@@ -1358,7 +1746,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			label.chan_number = channels.size();
 
 			// fill btn with A/D label
-			for (int i = 0; i < channels.size(); i++)
+			for (size_t i = 0; i < channels.size(); i++)
 			{
 				set_chan_mode(config.channel_mode[i], i);
 			}
@@ -1415,6 +1803,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			this->daq_activate->SetLabel("ON");
 
 			addr_ctrl->Enable(true);
+			device_sn->Enable(true);
 			checkchan->Enable(true);
 			
 			previous_chan->Enable(true);
@@ -1428,6 +1817,9 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				chantype->Enable(true);
 			}
 			daqinfo_v_sizer->Fit(this);
+
+			deserialize(addr_ctrl->GetValue().ToStdString());
+			load_current_chan_config(config.channel_index);
 		}
 		else
 		{
@@ -1435,7 +1827,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 			// Enable/disable controls
 			if (checkchan->GetLabel().compare("OFF"))
-			{
+			{		
 				EnableChannelItems(!enable_pan);
 			}
 
@@ -1443,6 +1835,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			daq_activate->SetLabel("OFF");
 
 			addr_ctrl->Enable(false);
+			device_sn->Enable(false);
 			checkchan->Enable(false);
 
 			previous_chan->Enable(false);
@@ -1596,13 +1989,16 @@ void cDaqmx::OnDaqScaleSelBtn(wxCommandEvent& evt)
 	if (val.compare("No") == 0)
 	{
 		std::cout << "[*] Daq set to no scaling enabled\n";
-		chan_slope->SetLabelText("1");
+		//chan_slope->SetLabelText("1");
+		chan_slope->SetValue("1");
 		chan_slope->Enable(false);
 
-		chan_shift->SetLabelText("0");
+		//chan_shift->SetLabelText("0");
+		chan_shift->SetValue("0");
 		chan_shift->Enable(false);
 
 		chan_unit->SetLabelText("Volt");
+		chan_unit->SetValue("Volt");
 		chan_unit->Enable(false);
 	}
 	else if (val.compare("Custom scale") == 0)
@@ -1650,7 +2046,7 @@ void cDaqmx::OnDaqScaleSelBtn(wxCommandEvent& evt)
 			// Set selection on last selected
 			wxString filled = config.channel_linearize[config.channel_index];
 			wxArrayString combo_item = LoadScalePresetArray(scale_file_name);
-			for (int i = 0; i < combo_item.size(); i++)
+			for (size_t i = 0; i < combo_item.size(); i++)
 			{
 				if (filled.compare(combo_item[i]) == 0)
 				{
@@ -1693,19 +2089,19 @@ void cDaqmx::OnDaqScaleSelBtn(wxCommandEvent& evt)
 					{
 						// Slope
 						rec_scale->GetNextEntry(entry, entry_cookie);
-						chan_shift->SetLabelText(rec_scale->Read(entry));
+						chan_shift->SetValue(rec_scale->Read(entry));
 						static_chan_shift->Enable(true);
 						chan_shift->Enable(false);
 
 						// Shift
 						rec_scale->GetNextEntry(entry, entry_cookie);
-						chan_slope->SetLabelText(rec_scale->Read(entry));
+						chan_slope->SetValue(rec_scale->Read(entry));
 						static_chan_slope->Enable(true);
 						chan_slope->Enable(false);
 
 						// Unit 
 						rec_scale->GetNextEntry(entry, entry_cookie);
-						chan_unit->SetLabelText(rec_scale->Read(entry));
+						chan_unit->SetValue(rec_scale->Read(entry));
 						static_chan_unit->Enable(true);
 						chan_unit->Enable(false);
 
@@ -1837,7 +2233,10 @@ void cDaqmx::OnDaqChanNameModified(wxCommandEvent& evt)
 		cPlot* m_plot = object_manager->get_plot();
 		std::cout << chan_name->GetValue().ToStdString() << "\n";
 
-		m_plot->update_chan_name_to_gui(MEAS_TYPE::DAQ_INSTR, chan_name->GetValue().ToStdString(), label.channel_index);
+		if (m_plot != nullptr)
+		{
+			m_plot->update_chan_name_to_gui(MEAS_TYPE::DAQ_INSTR, chan_name->GetValue().ToStdString(), label.channel_index);
+		}
 		config.channel_name[label.channel_index] = chan_name->GetValue().ToStdString();
 	}
 
@@ -1924,8 +2323,8 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	{
 	case 0:
 	{
-		chanbtntype[label.channel_index]->SetLabel("A");
-		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(210, 180, 138));
+		chanbtntype[label.channel_index]->SetLabel("A"); 
+		chanbtntype[label.channel_index]->SetBackgroundColour(wxColour(92, 228, 178));
 		show_tc_param(false);
 		show_voltage_param(true);
 		wanted_type = DAQmx_Val_Voltage;
@@ -1972,9 +2371,9 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* object_manager = object_manager->getInstance();
 	cPlot* m_plot = object_manager->get_plot();
-	m_plot->update_chan_physical_unit_to_gui("°C", label.channel_index); // If temperature measurement update unit in channel listed in graph
+	m_plot->update_chan_physical_unit_to_gui("°C", label.channel_index); // If temperature measurement then update unit in channel listed in graph
 
-	//inst_->Layout();
+	Layout();
 	//Refresh();
 	channel_group_sizer->Layout();
 }
@@ -1985,98 +2384,14 @@ void cDaqmx::OnDaqChanEnableBtn(wxCommandEvent& evt)
 	label.channel_enabled[label.channel_index] = !label.channel_enabled[label.channel_index];
 
 	bool state = label.channel_enabled.at(label.channel_index);
-	SwitchChannelON(state);
-	UpdateChannelSig(state);
-	if (label.channel_permision.at(label.channel_index) == CHANWRITE)
-	{
-		UpdateChannelTable(state);
-	}
-
-	EnableChannelItems(state);
-	SwitchChannelColor(state);
-	/*
-	if (!label.channel_enabled[label.channel_index])
-	{
-		checkchan->SetBackgroundColour(wxColor(250, 120, 120)); // RED
-		checkchan->SetLabel("OFF");
-
-		//If cPlot legend active remove it
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		m_plot->remove_chan_to_gui(label.channel_index);
-
-		// Disallow editing
-		chan_name->Enable(false);
-		chan_addr_ctrl->Enable(false);
-		meas_type_ctrl->Enable(false);
-		chan_max_input_range->Enable(false);
-		chan_min_input_range->Enable(false);
-		chan_input_mode_type->Enable(false);
-		chan_scale->Enable(false);
-		chan_slope->Enable(false);
-		chan_shift->Enable(false);
-		chan_unit->Enable(false);
-		chan_filter->Enable(false);
-		chan_filter_intensity->Enable(false);
-		chan_trigger->Enable(false);
-		chan_trigger_threshold->Enable(false);
-
-		// Mark button grid item as dark
-		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(120, 140, 120));
-
-	}
-	else
-	{
-		this->checkchan->SetBackgroundColour(wxColor(160, 250, 160)); // GREEN
-		this->checkchan->SetLabel("ON");
-
-		//Update cPlot gui with the chan name and color
-		std::cout << "cObjectmanager->getInstance()\n";
-		cObjectmanager* object_manager = object_manager->getInstance();
-		cPlot* m_plot = object_manager->get_plot();
-		wxString chan_name_str = chan_name->GetValue();
-		wxString chan_physical_name = chan_addr_ctrl->GetValue();
-		wxString chan_physical_unit = meas_type_ctrl->GetValue();
-		m_plot->add_chan_to_gui(chan_name_str.ToStdString() , chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255), label.channel_index);
-
-		// Allow editing
-		chan_name->Enable(true);
-		chan_addr_ctrl->Enable(true);
-		meas_type_ctrl->Enable(true);
-		chan_max_input_range->Enable(true);
-		chan_min_input_range->Enable(true);
-		chan_input_mode_type->Enable(true);
-		chan_scale->Enable(true);
-		if (chan_scale->GetValue().compare("Custom scale") == 0)
-		{
-			chan_slope->Enable(true);
-			chan_shift->Enable(true);
-			chan_unit->Enable(true);
-		}
-		chan_filter->Enable(true);
-		if (chan_filter->GetValue().compare("Disabled") != 0)
-		{
-			chan_filter_intensity->Enable(true);
-		}
-		chan_trigger->Enable(true);
-		if (chan_trigger->GetValue().compare("Disabled") != 0)
-		{
-			chan_trigger_threshold->Enable(true);
-		}
-
-		// Mark button grid item as green
-		chanbtn[label.channel_index]->SetBackgroundColour(wxColor(160, 250, 160));
-
-	}
-	// Autosearch for channels
-	*/
+	DoChannelUpdate(state);
 	evt.Skip();
 }
 
 
 void cDaqmx::OnChannelBtnNumberCliqued(wxCommandEvent& evt)
 {
+
 	// retrieve btn clicked
 	int id = 0;
 	id = evt.GetId();
@@ -2096,6 +2411,7 @@ void cDaqmx::OnChannelBtnNumberCliqued(wxCommandEvent& evt)
 			chanbtn[label.channel_index]->SetBackgroundColour(wxColor(250, 250, 250)); // grey	
 
 		//chanbtn[label.channel_index]->SetBackgroundColour(wxColor(250, 250, 250));
+
 
 		// Set new index
 		label.channel_index = id;
@@ -2149,6 +2465,16 @@ bool cDaqmx::isDeviceMeasurable(std::string dev_name)
 		std::cout << "[*] DAQmx_Val_CSeriesModule found.\n";
 
 	return true;
+}
+
+void cDaqmx::DoChannelUpdate(bool isDisplayed)
+{
+	SwitchChannelON(isDisplayed);
+	UpdateChannelSig(isDisplayed);
+	AddControlColomnTable(isDisplayed);
+
+	EnableChannelItems(isDisplayed);
+	SwitchChannelColor(isDisplayed);
 }
 
 void cDaqmx::SwitchChannelON(bool isDisplayed)
@@ -2206,6 +2532,16 @@ void cDaqmx::UpdateChannelSig(bool isDisplayed)
 	}
 }
 
+void cDaqmx::AddControlColomnTable(bool isDisplayed)
+{
+	if (label.channel_permision.at(label.channel_index) == CHANWRITE)
+	{
+		if (digitaltype->GetValue().compare("Output") == 0)
+		{
+			UpdateChannelTable(isDisplayed);
+		}
+	}
+}
 
 void cDaqmx::UpdateChannelTable(bool isDisplayed)
 {
@@ -2247,6 +2583,7 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 		chan_slope->Enable(false);
 		chan_shift->Enable(false);
 		chan_unit->Enable(false);
+		channel_sn->Enable(false);
 		chan_filter->Enable(false);
 		chan_filter_intensity->Enable(false);
 		chan_trigger->Enable(false);
@@ -2306,6 +2643,7 @@ void cDaqmx::EnableChannelItems(bool isDisplayed)
 			chan_shift->Enable(true);
 			chan_unit->Enable(true);
 		}
+		channel_sn->Enable(true);
 		chan_filter->Enable(true);
 		if (chan_filter->GetValue().compare("Disabled") != 0)
 		{

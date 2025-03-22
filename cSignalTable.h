@@ -1,5 +1,11 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
-
 #include "data_types.h"
 
 bool is_a_number(size_t numb);
@@ -24,8 +30,12 @@ public:
 			std::cout << "creating cSignalTable singleton.\n";
 			// Create a signal table
 			// to share between components
-			cSignalTable* sigt = sigt->getInstance();
-			sigt->create_signal_table(64);
+			
+			//cSignalTable* sigt = sigt->getInstance(); 
+			//sigt->create_signal_table(64);
+
+			singleton_->create_signal_table(64);
+
 			std::cout << "add 64 signals to cSignalTable.\n";
 		}
 		else

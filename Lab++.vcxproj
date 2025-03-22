@@ -57,6 +57,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -163,6 +164,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="c6510sim.cpp" />
+    <ClCompile Include="c6510ui.cpp" />
+    <ClCompile Include="c6510usb.cpp" />
     <ClCompile Include="cApp.cpp" />
     <ClCompile Include="cCom.cpp" />
     <ClCompile Include="cConfig.cpp" />
@@ -171,6 +175,7 @@
     <ClCompile Include="cDaqmx.cpp" />
     <ClCompile Include="cDaqmxScaleDlg.cpp" />
     <ClCompile Include="cDaqsim.cpp" />
+    <ClCompile Include="cDeviceIDSaver.cpp" />
     <ClCompile Include="cDeviceMonitor.cpp" />
     <ClCompile Include="cDropper.cpp" />
     <ClCompile Include="cFilter.cpp" />
@@ -178,12 +183,19 @@
     <ClCompile Include="cGnuplot.cpp" />
     <ClCompile Include="cImagePanel.cpp" />
     <ClCompile Include="cInicfg.cpp" />
+    <ClCompile Include="cObserver.cpp" />
+    <ClCompile Include="cSerialize.cpp" />
+    <ClCompile Include="cSignalDisplay.cpp" />
+    <ClCompile Include="IInstrument.cpp" />
     <ClCompile Include="cMain.cpp" />
     <ClCompile Include="cMeasurement.cpp" />
     <ClCompile Include="cMeasurementControler.cpp" />
     <ClCompile Include="cMeasurementmanager.cpp" />
     <ClCompile Include="cObjectmanager.cpp" />
     <ClCompile Include="cOpen.cpp" />
+    <ClCompile Include="cOscope.cpp" />
+    <ClCompile Include="cOscopesim.cpp" />
+    <ClCompile Include="cOscopeusb.cpp" />
     <ClCompile Include="cPacecom.cpp" />
     <ClCompile Include="cPasesim.cpp" />
     <ClCompile Include="cPlay.cpp" />
@@ -193,23 +205,36 @@
     <ClCompile Include="cProtocolFactory.cpp" />
     <ClCompile Include="cGraphrender.cpp" />
     <ClCompile Include="cScaleBtn.cpp" />
-    <ClCompile Include="cSerial.cpp" />
+    <ClCompile Include="cSingletonSafe.cpp" />
+    <ClCompile Include="cSupplyrssim.cpp" />
+    <ClCompile Include="cSupplyrsusb.cpp" />
+    <ClCompile Include="cVisaserial.cpp" />
     <ClCompile Include="cSignalBtn.cpp" />
     <ClCompile Include="cSignalTable.cpp" />
     <ClCompile Include="cSingleton.cpp" />
+    <ClCompile Include="cSupplysim.cpp" />
+    <ClCompile Include="cSupplyusb.cpp" />
     <ClCompile Include="cTable.cpp" />
-    <ClCompile Include="cTcp.cpp" />
-    <ClCompile Include="cTension.cpp" />
+    <ClCompile Include="cVisatcp.cpp" />
+    <ClCompile Include="cUsb.cpp" />
+    <ClCompile Include="cVisausb.cpp" />
+    <ClCompile Include="cVoltage.cpp" />
     <ClCompile Include="cTick.cpp" />
     <ClCompile Include="cUSB6001.cpp" />
     <ClCompile Include="cVisa.cpp" />
+    <ClCompile Include="cVoltageRs.cpp" />
     <ClCompile Include="encoding.cpp" />
+    <ClCompile Include="Instrumentimpl.cpp" />
+    <ClCompile Include="ListUsbDevice.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
     <ClCompile Include="Plugin\cDevice.cpp" />
     <ClCompile Include="cStatrender.cpp" />
     <ClCompile Include="xlsx.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="c6510sim.h" />
+    <ClInclude Include="c6510ui.h" />
+    <ClInclude Include="c6510usb.h" />
     <ClInclude Include="cApp.h" />
     <ClInclude Include="cCom.h" />
     <ClInclude Include="cConfig.h" />
@@ -218,6 +243,7 @@
     <ClInclude Include="cDaqmx.h" />
     <ClInclude Include="cDaqmxScaleDlg.h" />
     <ClInclude Include="cDaqsim.h" />
+    <ClInclude Include="cDeviceIDSaver.h" />
     <ClInclude Include="cDeviceMonitor.h" />
     <ClInclude Include="cDropper.h" />
     <ClInclude Include="cFilter.h" />
@@ -225,12 +251,19 @@
     <ClInclude Include="cGnuplot.h" />
     <ClInclude Include="cImagePanel.h" />
     <ClInclude Include="cInicfg.h" />
+    <ClInclude Include="cObserver.h" />
+    <ClInclude Include="cSerialize.h" />
+    <ClInclude Include="cSignalDisplay.h" />
+    <ClInclude Include="IInstrument.h" />
     <ClInclude Include="cMain.h" />
     <ClInclude Include="cMeasurement.h" />
     <ClInclude Include="cMeasurementControler.h" />
     <ClInclude Include="cMeasurementmanager.h" />
     <ClInclude Include="cObjectmanager.h" />
     <ClInclude Include="cOpen.h" />
+    <ClInclude Include="cOscope.h" />
+    <ClInclude Include="cOscopesim.h" />
+    <ClInclude Include="cOscopeusb.h" />
     <ClInclude Include="cPacecom.h" />
     <ClInclude Include="cPacesim.h" />
     <ClInclude Include="cPlay.h" />
@@ -240,20 +273,30 @@
     <ClInclude Include="cProtocolFactory.h" />
     <ClInclude Include="cGraphrender.h" />
     <ClInclude Include="cScaleBtn.h" />
-    <ClInclude Include="cSerial.h" />
+    <ClInclude Include="cSingletonSafe.h" />
+    <ClInclude Include="cSupplyrssim.h" />
+    <ClInclude Include="cSupplyrsusb.h" />
+    <ClInclude Include="cVisaserial.h" />
     <ClInclude Include="cSignalBtn.h" />
     <ClInclude Include="cSignalTable.h" />
     <ClInclude Include="cSingleton.h" />
     <ClInclude Include="cStatrender.h" />
+    <ClInclude Include="cSupplysim.h" />
+    <ClInclude Include="cSupplyusb.h" />
     <ClInclude Include="cTable.h" />
-    <ClInclude Include="cTcp.h" />
-    <ClInclude Include="cTension.h" />
+    <ClInclude Include="cVisatcp.h" />
+    <ClInclude Include="cUsb.h" />
+    <ClInclude Include="cVisausb.h" />
+    <ClInclude Include="cVoltage.h" />
     <ClInclude Include="cTick.h" />
     <ClInclude Include="cUSB6001.h" />
     <ClInclude Include="cVisa.h" />
+    <ClInclude Include="cVoltageRs.h" />
     <ClInclude Include="data_types.h" />
     <ClInclude Include="encoding.h" />
     <ClInclude Include="enum.h" />
+    <ClInclude Include="instrumentimpl.h" />
+    <ClInclude Include="ListUsbDevice.h" />
     <ClInclude Include="LoadBitmapFromRessource.h" />
     <ClInclude Include="Plugin\cDevice.h" />
     <ClInclude Include="resource.h" />
@@ -263,7 +306,16 @@
   <ItemGroup>
     <ResourceCompile Include="Lab++.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <MASM Include="usb.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

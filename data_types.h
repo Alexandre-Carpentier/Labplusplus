@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include <wx/wx.h>
@@ -18,6 +25,7 @@ typedef struct {
 	// General config
 	bool device_enabled;
 	wxArrayString  device_name;
+	wxArrayString  device_serial_number[max_chan_number];
 	// Channels config
 
 	int chan_number;// = max_chan_number;										// flex sizer 1
@@ -27,6 +35,8 @@ typedef struct {
 	std::vector <int> channel_mode;												// ANALOG/DIGITAL channel
 	std::vector <int> channel_permision;										// READ/WRITE channel
 	wxArrayString channel_physical_name[max_chan_number];						// physical channel
+	wxArrayString channel_physical_unit[max_chan_number];						// physical unit
+	wxArrayString  channel_serial_number[max_chan_number];						// Connected device serial number S/N ex "LE140"
 
 	//////////////////////////////////////////////////////////
 	// ANALOG
@@ -61,8 +71,9 @@ typedef struct {
 
 	// General config
 	bool device_enabled;
-	wxString  device_name;
-	wxString  device_addr;
+	wxString  device_name;														// Device addr ex "DEV1"
+	wxString  device_addr;														// Device addr ex "USB-6001::Dev1"
+	wxString  device_serial_number[max_chan_number];							// Device serial number S/N ex "LE107"
 	// Channels config
 	
 	int chan_number;// = max_chan_number;										// flex sizer 1
@@ -72,6 +83,8 @@ typedef struct {
 	std::vector <int> channel_mode;												// ANALOG/DIGITAL channel
 	std::vector <int> channel_permision;										// READ/WRITE channel
 	wxString channel_physical_name[max_chan_number];							// physical channel
+	wxString channel_physical_unit[max_chan_number];							// physical unit
+	wxString  channel_serial_number[max_chan_number];							// Connected device serial number S/N ex "LE140"
 
 	//////////////////////////////////////////////////////////
 	// ANALOG
