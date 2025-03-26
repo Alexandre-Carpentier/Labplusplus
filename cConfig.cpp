@@ -17,8 +17,8 @@
 
 
 //#pragma comment (lib, "Plugin.lib")
-//#include "..\Lab\Plugin\cDevice.h"
-#include "..\Lab++\Plugin\cDevice.h"
+#include "..\Lab\Plugin\cDevice.h"
+//#include "..\Lab++\Plugin\cDevice.h"
 
 #include "cTable.h"
 #include "cPlot.h"
