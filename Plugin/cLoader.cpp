@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cLoader.h"
 #include "cLua.h"
 
@@ -97,6 +104,8 @@ cDevice* PLUGIN_Attach(wxWindow * inst)
     //transfert ownership to smart ptr
     //std::shared_ptr<cDevice> dev( lua_start_vm(inst));
 
+    //MessageBox(0, L"Plugin attach", L"Info", S_OK);
+
     return dev;
 }
 
@@ -105,6 +114,7 @@ bool PLUGIN_Dettach()
     // TODO:
     // Free memory
     // release ressources
+    //MessageBox(0, L"Plugin dettach", L"Info", S_OK);
     return true;
 }
 
@@ -112,7 +122,8 @@ bool PLUGIN_Start()
 {
     // TODO:
     // Start acquire loop
-    MessageBox(0, 0, 0, 0);
+
+    MessageBox(0, L"Plugin start", L"Info", S_OK);
     return true;
 }
 
@@ -120,6 +131,7 @@ bool PLUGIN_Stop()
 {
     // TODO:
     // Stop loop properly
+    MessageBox(0, L"Plugin stop", L"Info", S_OK);
     return true;
 }
 

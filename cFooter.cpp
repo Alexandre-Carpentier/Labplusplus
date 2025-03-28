@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cFooter.h"
 #include <memory>
 #include <string>
@@ -389,6 +396,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		std::cout << "Launching Measurement controler\n";
 		meas_controler = make_shared<cMeasurementControler>(cycle_controler);
 		meas_manager->set_measurement_controler(meas_controler);
+		meas_controler->subscribe(m_table_);
 	
 		size_t sizesig = meas_manager->get_measurement_total_channel_number();
 		meas_controler->start();

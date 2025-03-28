@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "cVisaserial.h"
 
 cSerial::cSerial()
@@ -184,9 +191,6 @@ err_struct cSerial::init()
 	viSetAttribute(device_, VI_ATTR_ASRL_END_IN, VI_TRUE);
 	viSetAttribute(device_, VI_ATTR_ASRL_END_OUT, VI_TRUE);
 	
-
-	// If you've setup the serial port settings in Connection Expert, you can remove this section. 
-	// Otherwise, set your connection parameters
 	viSetAttribute(device_, VI_ATTR_ASRL_BAUD, 9600);
 	
 	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_NONE);

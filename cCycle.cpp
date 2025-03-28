@@ -1,12 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        cCycle.cpp
-// Purpose:     cCycle class
 // Author:      Alexandre CARPENTIER
 // Modified by:
 // Created:     01/01/23
 // Copyright:   (c) Alexandre CARPENTIER
-// Licence:     GNU GPL
+// Licence:     LGPL-2.1-or-later
 /////////////////////////////////////////////////////////////////////////////
+
 #include "cCycle.h"
 
 	cCycle::cCycle()

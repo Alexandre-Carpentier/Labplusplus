@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <wx/wx.h>
 #include <wx/grid.h>
@@ -9,6 +16,7 @@
 
 #include "cTick.h"
 #include "cObjectmanager.h"
+#include "cObserver.h"
 
 class cDurationStatisticCtrl;
 /*
@@ -22,15 +30,20 @@ class cDurationStatisticCtrl;
 
 */
 
-class cTable
+class cTable : public observer
 {
+
 public:
+	wxBoxSizer* h_indicators_sizer = nullptr;
 	wxGrid* grid = nullptr;
 
 	void serialize(std::string config_name);
 	void deserialize(std::string config_name);
 
+	virtual void update(void* arg); // Observe current result
+
 	cTable(wxWindow* inst, cConfig* m_config);
+	~cTable();
 	int get_step_number();
 	int get_loop_number();
 	double get_total_step_duration();
@@ -54,7 +67,7 @@ public:
 	wxPanel* Getrightpan();
 	wxBoxSizer* Get_hsizer();
 	void GridResize(wxGrid* grid);
-	~cTable();
+
 private:
 	wxWindow* inst_ = nullptr;
 	wxPanel* table_leftpanel_ = nullptr;
@@ -71,6 +84,9 @@ private:
 	cCycle* m_cycle_ = nullptr;
 
 	wxTextCtrl* loop = nullptr;
+
+	wxStaticText* indicator_vec1[max_chan_number];
+	wxStaticText* indicator_vec2[max_chan_number];
 
 	void clearButtonClicked(wxCommandEvent& evt);
 };

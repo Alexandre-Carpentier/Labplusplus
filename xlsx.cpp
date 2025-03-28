@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////////////////////////
+// Author:      Alexandre CARPENTIER
+// Modified by:
+// Created:     01/01/23
+// Copyright:   (c) Alexandre CARPENTIER
+// Licence:     LGPL-2.1-or-later
+/////////////////////////////////////////////////////////////////////////////
 #include "xlsx.h"
 int create_xlsx_from_saved_data(const char* path)
 {
