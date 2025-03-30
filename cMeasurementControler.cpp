@@ -161,7 +161,7 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
-	//static double old_pressure[MAX_CHAN];
+
 	static volatile double old_value[MAX_CHAN] = { 0 };
 	while (1)
 	{

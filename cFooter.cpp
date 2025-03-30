@@ -356,12 +356,16 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		{
 			if (oscope_gui->launch_device() < 0)
 			{
-				std::cout << "[!] oscope_gui->launch_device() return < 0. Exiting.\n";
-				evt.Skip();
-				return;
+				std::cout << "[*] OSCOPE	[STOPPED]\n";
+				//std::cout << "[!] oscope_gui->launch_device() return < 0. Exiting.\n";
+				//evt.Skip();
+				//return;
+			}
+			else
+			{
+				std::cout << "[*] OSCOPE	[RUNNING]\n";
 			}
 			oscope_gui->lockBtn(false);
-			std::cout << "[*] OSCOPE	[RUNNING]\n";
 		}
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -371,12 +375,17 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		{
 			if (c6510ui_gui->launch_device() < 0)
 			{
-				std::cout << "[!] c6510ui_gui->launch_device() return < 0. Exiting.\n";
-				evt.Skip();
-				return;
+				std::cout << "[*] 6510	[STOPPED]\n";
+				//std::cout << "[!] c6510ui_gui->launch_device() return < 0. Exiting.\n";
+				//evt.Skip();
+				//return;
+			}
+			else
+			{
+				std::cout << "[*] 6510	[RUNNING]\n";
 			}
 			c6510ui_gui->lockBtn(false);
-			std::cout << "[*] 6510	[RUNNING]\n";
+			
 		}
 
 		////////////////////////////////////////////////////////////////////////////////

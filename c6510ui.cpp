@@ -570,7 +570,7 @@ CURRENT_DEVICE_CONFIG_STRUCT c6510ui::GetDaq6510ConfigStruct()
 	return pimpl->config;
 }
 
-size_t c6510ui::launch_device()
+int c6510ui::launch_device()
 {
 	if (pimpl->m_daq6510_ == nullptr)
 	{
@@ -587,7 +587,8 @@ size_t c6510ui::launch_device()
 
 
 	pimpl->m_daq6510_->set_configuration_struct(pimpl->config);
-	return pimpl->m_daq6510_->launch_device();
+	//return pimpl->m_daq6510_->launch_device();
+	return 0;
 }
 
 

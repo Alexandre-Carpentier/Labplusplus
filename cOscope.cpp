@@ -460,7 +460,7 @@ void cOscope::Oscopeimpl::OnOscopeAddrSelBtn(wxCommandEvent& evt)
 	{
 		if (m_oscope_ == nullptr)
 		{
-			std::cout << "[*] [new] Create cSupplysim\n";			
+			std::cout << "[*] [new] Create cOscopesim\n";			
 			m_oscope_ = new cOscopesim;
 			meas_manager->set_measurement(m_oscope_);
 			m_oscope_->set_device_addr("Simulated");
@@ -479,7 +479,7 @@ void cOscope::Oscopeimpl::OnOscopeAddrSelBtn(wxCommandEvent& evt)
 	}
 
 	// Then create appropriate oscope object
-	std::cout << "[*] [new] Create cSupplyusb\n";
+	std::cout << "[*] [new] Create cOscopeusb\n";
 	m_oscope_ = new cOscopeusb;
 
 	// Object failed to be created in memory
@@ -577,7 +577,7 @@ CURRENT_DEVICE_CONFIG_STRUCT cOscope::GetOscopeConfigStruct()
 	return pimpl->config;
 }
 
-size_t cOscope::launch_device()
+int cOscope::launch_device()
 {
 	if (pimpl->m_oscope_ == nullptr)
 	{
@@ -594,7 +594,8 @@ size_t cOscope::launch_device()
 
 
 	pimpl->m_oscope_->set_configuration_struct(pimpl->config);
-	return pimpl->m_oscope_->launch_device();
+	//return pimpl->m_oscope_->launch_device();
+	return 0;
 }
 
 
