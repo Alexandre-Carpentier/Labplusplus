@@ -56,6 +56,10 @@ void cDeviceMonitor::Notify()
 		// Create the proper implementation of cProtocol with a factory method
 		std::unique_ptr<IProtocol> device = factory.make(PROTOCOLENUM::VISASERIAL, comaddr.c_str());
 
+		cCom* device2 = new cCom;
+
+		device2->init();
+
 		std::wstring instr_name = L"";
 		device->init();
 		//device->write(L"*CLS\n");

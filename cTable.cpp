@@ -81,14 +81,39 @@ void cTable::update(void* arg)
 	for (auto name : res->names_vec)
 	{		
 		indicator_vec1[c]->SetLabelText(name);
-		indicator_vec2[c]->SetLabelText(std::to_string(res->values_vec.at(c)));
+		//indicator_vec2[c]->SetLabelText(std::to_string(res->values_vec.at(c)));
+		//indicator_vec2[c]->SetLabelText(std::format("{.2}",res->values_vec.at(c)));
+		char number[200];
+		std::sprintf(number, "%.2lf", res->values_vec.at(c));
+		indicator_vec2[c]->SetLabelText(number);
 		c++;
 	}
+	int pos = 0;
+	for (auto indicator1 : indicator_vec1)
+	{
+		indicator1->Show();
+		if (pos++ > res->names_vec.size()-1)
+		{
+			indicator1->Hide();
+		}
+	}
+	pos = 0;
+	for (auto indicator2 : indicator_vec2)
+	{
+		indicator2->Show();
+		if (pos++ > res->names_vec.size()-1)
+		{
+			indicator2->Hide();
+		}
+	}
+/*
 	for (size_t j=c;j++;j<max_chan_number)
 	{
-		indicator_vec1[c]->Hide();
-		indicator_vec2[c]->Hide();
+		indicator_vec1[j]->Hide();
+		indicator_vec2[j]->Hide();
 	}
+	*/
+	h_indicators_sizer->Layout();
 }
 
 cTable::cTable(wxWindow* inst, cConfig *m_config)
@@ -194,22 +219,23 @@ cTable::cTable(wxWindow* inst, cConfig *m_config)
 	///////////////////////////////////////////////////////
 	for (size_t i = 0; i < max_chan_number; i ++ )
 	{
-		indicator_vec1[i] = new wxStaticText(table_rightpanel_, IDCINDICATORNAME0+i, L"Measurement:");
-		indicator_vec1[i]->SetFont(indicator_vec1[i]->GetFont().Scale(1.5));
-		indicator_vec1[i]->SetBackgroundColour(wxColor(112, 112, 111));
+		indicator_vec1[i] = new wxStaticText(table_rightpanel_, IDCINDICATORNAME0+i, L"Signal:");
+		//indicator_vec1[i]->SetFont(indicator_vec1[i]->GetFont().Scale(1));
+		indicator_vec1[i]->SetBackgroundColour(wxColor(102, 178, 255));
 		//indicator_vec1[i]->Hide();
 		indicator_vec2[i] = new wxStaticText(table_rightpanel_, IDCINDICATORVALUE0 +i, L"00.00");
-		indicator_vec2[i]->SetFont(indicator_vec2[i]->GetFont().Scale(1.5));
-		indicator_vec2[i]->SetBackgroundColour(wxColor(112, 112, 111));
+		indicator_vec2[i]->SetFont(indicator_vec2[i]->GetFont().Scale(2));
+		//indicator_vec2[i]->SetBackgroundColour(wxColor(112, 112, 111));
 		//indicator_vec2[i]->Hide();
 	}
-	wxBoxSizer* h_indicators_sizer = new wxBoxSizer(wxHORIZONTAL);
+	h_indicators_sizer = new wxBoxSizer(wxHORIZONTAL);
 	for (size_t i = 0; i < max_chan_number; i++)
 	{
 		h_indicators_sizer->Add(indicator_vec1[i], 0, wxALL, inst->FromDIP(10));
 		h_indicators_sizer->Add(indicator_vec2[i], 0, wxALL, inst->FromDIP(10));
+		indicator_vec1[i]->Hide();
+		indicator_vec2[i]->Hide();
 	}
-
 
 	wxBoxSizer* hbox = new wxBoxSizer(wxHORIZONTAL);
 	hbox->Add(flexsizer, 0, wxALL | wxEXPAND, inst->FromDIP(10));

@@ -34,6 +34,7 @@ class cTable : public observer
 {
 
 public:
+	wxBoxSizer* h_indicators_sizer = nullptr;
 	wxGrid* grid = nullptr;
 
 	void serialize(std::string config_name);

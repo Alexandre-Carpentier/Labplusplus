@@ -104,7 +104,7 @@ cDevice* PLUGIN_Attach(wxWindow * inst)
     //transfert ownership to smart ptr
     //std::shared_ptr<cDevice> dev( lua_start_vm(inst));
 
-    MessageBox(0, L"Plugin attach", L"Info", S_OK);
+    //MessageBox(0, L"Plugin attach", L"Info", S_OK);
 
     return dev;
 }
@@ -114,7 +114,7 @@ bool PLUGIN_Dettach()
     // TODO:
     // Free memory
     // release ressources
-    MessageBox(0, L"Plugin dettach", L"Info", S_OK);
+    //MessageBox(0, L"Plugin dettach", L"Info", S_OK);
     return true;
 }
 

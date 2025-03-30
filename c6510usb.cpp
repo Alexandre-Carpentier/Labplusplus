@@ -61,7 +61,7 @@ int c6510usb::launch_device()
         return -1;
     }
     // Reset the device and configure default settings
-    err = device->write(L"SENS:FUNC \"RES\", (@101)\n");
+    err = device->write(L"SENS:FUNC \"RES\", (@121)\n");
     if (err.err_code < 0)
     {
         std::wcout << err.err_msg;
@@ -70,7 +70,7 @@ int c6510usb::launch_device()
 
     // First close the channel 1 switch to read then
 
-    err = device->write(L"ROUT:CLOS (@101)\n");
+    err = device->write(L"ROUT:CLOS (@121)\n");
     if (err.err_code < 0)
     {
         std::wcout << err.err_msg;

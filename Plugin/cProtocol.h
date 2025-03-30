@@ -36,11 +36,11 @@ public:
 // 
 class plug_cCom : public plug_cProtocol
 {
-    std::string get_type()override { return std::string("COM port"); };
-    bool open(std::string addr) override;
-    bool send(std::string cmd) override;
-    bool recv(std::string& response) override;
-    void close() override;
+    virtual std::string get_type()override { return std::string("COM port"); };
+    virtual bool open(std::string addr) override;
+    virtual bool send(std::string cmd) override;
+    virtual bool recv(std::string& response) override;
+    virtual void close() override;
 };
 //////////////////////////////////////////////////////////////
 // TCP CLASS
@@ -53,11 +53,11 @@ class plug_cCom : public plug_cProtocol
 // 
 class plug_cTcp : public plug_cProtocol
 {
-    std::string get_type()override { return std::string("TCP port"); };
-    bool open(std::string addr) override;
-    bool send(std::string cmd) override;
-    bool recv(std::string& response) override;
-    void close() override;
+    virtual std::string get_type()override { return std::string("TCP port"); };
+    virtual bool open(std::string addr) override;
+    virtual bool send(std::string cmd) override;
+    virtual bool recv(std::string& response) override;
+    virtual void close() override;
 };
 //////////////////////////////////////////////////////////////
 // USB CLASS
@@ -70,11 +70,11 @@ class plug_cTcp : public plug_cProtocol
 // 
 class plug_cUsb : public plug_cProtocol
 {
-    std::string get_type()override { return std::string("USB port"); };
-    bool open(std::string addr) override;
-    bool send(std::string cmd) override;
-    bool recv(std::string& response) override;
-    void close() override;
+    virtual std::string get_type()override { return std::string("USB port"); };
+    virtual bool open(std::string addr) override;
+    virtual bool send(std::string cmd) override;
+    virtual bool recv(std::string& response) override;
+    virtual void close() override;
 };
 //////////////////////////////////////////////////////////////
 // DAQMX CLASS
@@ -87,11 +87,11 @@ class plug_cUsb : public plug_cProtocol
 // 
 class plug_cDaq : public plug_cProtocol
 {
-    std::string get_type()override { return std::string("DAQMX"); };
-    bool open(std::string addr) override;
-    bool send(std::string cmd) override;
-    bool recv(std::string& response) override;
-    void close() override;
+    virtual std::string get_type()override { return std::string("DAQMX"); };
+    virtual bool open(std::string addr) override;
+    virtual bool send(std::string cmd) override;
+    virtual bool recv(std::string& response) override;
+    virtual void close() override;
 };
 //////////////////////////////////////////////////////////////
 // VISA CLASS
@@ -104,10 +104,10 @@ class plug_cDaq : public plug_cProtocol
 // 
 class plug_cVisa : public plug_cProtocol
 {
-    std::string get_type()override { return std::string("VISA"); };
-    bool open(std::string addr) override;
-    bool send(std::string cmd) override;
-    bool recv(std::string& response) override;
-    void close() override;
+    virtual std::string get_type()override { return std::string("VISA"); };
+    virtual bool open(std::string addr) override;
+    virtual bool send(std::string cmd) override;
+    virtual bool recv(std::string& response) override;
+    virtual void close() override;
 };
 #endif

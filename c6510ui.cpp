@@ -31,6 +31,14 @@ struct c6510ui::my_impl{
 		label.channel_permision.push_back(CHANWRITE);
 		label.channel_index = 0;
 
+		for (int i = 0; i < max_chan_number; i++)
+		{
+			for (int j = 0; j < max_chan_number; j++)
+			{
+				label.channel_physical_name[i].push_back("/ai" + std::to_string(j));
+			}
+		}
+
 		////////////////////////////////////////////////////////////
 		// Load default configuration in memory
 		////////////////////////////////////////////////////////////
@@ -51,7 +59,7 @@ struct c6510ui::my_impl{
 
 		////////////////////////////////////////////////////////////
 
-		wxFlexGridSizer* flexsizer = new wxFlexGridSizer(2, 2, 10, 20);
+		wxFlexGridSizer* flexsizer = new wxFlexGridSizer(6, 2, 10, 20);
 
 		////////////////////////////////////////////////////////////
 
@@ -84,10 +92,20 @@ struct c6510ui::my_impl{
 		RefreshPort();
 		addr_ctrl->Disable();
 
+		////////////////////////////////////////////////////////////
+		wxStaticText* static_channel = new wxStaticText(device_group, IDCSTATIC6510ADDR, L"Channel:", wxDefaultPosition, parent->FromDIP(static_ctrl_size), wxNO_BORDER | wxALIGN_CENTRE_HORIZONTAL);
+		static_channel->SetFont(static_channel->GetFont().Scale(text_size));
+
+		channel_selection = new wxComboBox(device_group, IDCDAQ6510CHANNELSELECTION, label.channel_physical_name[0].front(), wxDefaultPosition, parent->FromDIP(wxDefaultSize), label.channel_physical_name[0], wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+		parent->Bind(wxEVT_COMMAND_COMBOBOX_SELECTED, &c6510ui::my_impl::OnDaq6510ChanSelBtn, this, IDCDAQ6510CHANNELSELECTION);
+		channel_selection->SetFont(channel_selection->GetFont().Scale(text_size));
+
 		flexsizer->Add(enabledaq6510);
 		flexsizer->Add(daq6510_controler_activate);
 		flexsizer->Add(staticaddr);
 		flexsizer->Add(addr_ctrl);
+		flexsizer->Add(static_channel);
+		flexsizer->Add(channel_selection);		
 		device_group_sizer->Add(flexsizer);
 
 		wxBoxSizer* v_sizer = new wxBoxSizer(wxVERTICAL);
@@ -129,6 +147,7 @@ struct c6510ui::my_impl{
 	wxButton* daq6510_controler_activate;
 
 	wxComboBox* addr_ctrl = nullptr;
+	wxComboBox* channel_selection = nullptr;
 
 	// Style
 	const float text_size = 1;
@@ -139,6 +158,7 @@ struct c6510ui::my_impl{
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
 	void OnDaq6510AddrSelBtn(wxCommandEvent& evt);
+	void OnDaq6510ChanSelBtn(wxCommandEvent& evt);
 	void OnDaq6510EnableBtn(wxCommandEvent& evt);
 	void DestroySubsystem();
 	void EnableDaq6510Channel(bool isDisplayed);
@@ -423,6 +443,13 @@ void c6510ui::my_impl::OnDaq6510EnableBtn(wxCommandEvent& evt)
 			EnableDaq6510Channel(false);
 		}
 	}
+	evt.Skip();
+}
+
+
+void c6510ui::my_impl::OnDaq6510ChanSelBtn(wxCommandEvent& evt)
+{
+	//config.channel_physical_name = label.channel_physical_name[0];
 	evt.Skip();
 }
 

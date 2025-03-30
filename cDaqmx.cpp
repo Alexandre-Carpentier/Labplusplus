@@ -1809,7 +1809,16 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			addr_ctrl->Enable(true);
 			device_sn->Enable(true);
 			checkchan->Enable(true);
-			
+			/*
+			if (addr_ctrl->GetValue().compare("") == 0)
+			{
+				checkchan->Enable(false);
+			}
+			else
+			{
+				checkchan->Enable(true);
+			}
+				*/
 			previous_chan->Enable(true);
 			next_chan->Enable(true);
 			for (auto& chan : chanbtn)
@@ -1934,9 +1943,15 @@ void cDaqmx::OnDaqAddrSelBtn(wxCommandEvent& evt)
 
 	if (current.compare("") == 0)
 	{
+			
+		checkchan->Enable(false);
 		MessageBox(GetFocus(), L"No device selected", L"Select a device", S_OK | MB_ICONERROR);
 		evt.Skip();
 		return;
+	}
+	else
+	{
+		checkchan->Enable(true);
 	}
 
 	if (current.compare("Simulated") == 0)

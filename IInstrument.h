@@ -19,7 +19,7 @@
 #include "..\Lab++\Plugin\cDevice.h"
 //#include "..\Lab\Plugin\cDevice.h"
 
-#include "cDeviceMonitor.h";
+#include "cDeviceMonitor.h"
 
 #include "cTable.h"
 
