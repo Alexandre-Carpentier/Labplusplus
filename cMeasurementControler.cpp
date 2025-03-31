@@ -49,10 +49,14 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 		size_t length = meas->chan_write_count();
 		if (length > 0)
 		{
-			double* values = new double(length);
-			memset(values, 0.0, length);
-			meas->set(values, length);
-			delete(values);
+			double* values = new double[length];
+			assert(values != nullptr);
+			if (values != nullptr)
+			{
+				memset(values, 0.0, sizeof(double) * length);
+				meas->set(values, length);
+				delete(values);
+			}
 		}
 	}
 }
@@ -157,7 +161,8 @@ void cMeasurementControler::poll()
 	statusbar->SetLabelText("Reading/Writing instruments...");
 	tick.start_tick();
 
-	static volatile double old_value[MAX_CHAN] = { 0 }; // no optimization : volatile
+
+	static volatile double old_value[MAX_CHAN] = { 0 };
 	while (1)
 	{
 		if (!st.stop_requested())
@@ -234,6 +239,10 @@ void cMeasurementControler::poll()
 								//std::cout << "Old Value: " << old_value[0] << "\n";
 
 								int mod = 0;
+
+								std::cout << value[0] << " " << value[1] << "\n";
+								std::cout << old_value[0] << " " << old_value[1] << "\n";
+
 								for (size_t i = 0; i < read; i++)
 								{
 									// Add keyword volatile to prevent compiler optimizing on old_value
@@ -242,6 +251,7 @@ void cMeasurementControler::poll()
 										mod++;
 										old_value[i] = value[i]; // save old value
 									}
+									std::cout << mod << "\n";
 								}
 
 								// call if modified

@@ -393,6 +393,10 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 			config.channel_type[i] = "Volt";
 
+			config.channel_tc_type[i] = "T";									
+			config.channel_tc_min[i] = "-100";									
+			config.channel_tc_max[i] = "200";
+
 			config.channel_max[i] = "10";
 
 			config.channel_min[i] = "0";
@@ -2391,6 +2395,7 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 	Layout();
 	//Refresh();
 	channel_group_sizer->Layout();
+	return;
 }
 
 void cDaqmx::OnDaqChanEnableBtn(wxCommandEvent& evt)
@@ -2713,6 +2718,17 @@ void cDaqmx::show_tc_param(bool show)
 
 void cDaqmx::reload_current_channel_type()
 {
+	// Switch control between ANALOG and DIGITAL
+	if (label.channel_mode.at(label.channel_index) == CHANANALOG)
+	{
+		display_channel_as(CHANANALOG);
+	}
+	else
+	{
+		display_channel_as(CHANDIGITAL);
+	}
+
+	// Display Thermal sensor options OR Voltage options
 	int ires = meas_type_ctrl->GetSelection();
 	switch (ires)
 	{
@@ -2739,15 +2755,7 @@ void cDaqmx::reload_current_channel_type()
 		show_voltage_param(true);
 	}
 
-	// Switch control between ANALOG and DIGITAL
-	if (label.channel_mode.at(label.channel_index) == CHANANALOG)
-	{
-		display_channel_as(CHANANALOG);
-	}
-	else
-	{
-		display_channel_as(CHANDIGITAL);
-	}
+
 
 	inst_->Layout();
 	return;

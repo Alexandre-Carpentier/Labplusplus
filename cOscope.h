@@ -23,7 +23,7 @@ public:
 	cOscope(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
 	~cOscope();
 
-	size_t launch_device(); // Start device with current config
+	int launch_device(); // Start device with current config
 	wxPanel* get_right_panel();
 	CURRENT_DEVICE_CONFIG_STRUCT GetOscopeConfigStruct();
 	void set_table(cTable* m_table);

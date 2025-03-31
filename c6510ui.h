@@ -16,7 +16,7 @@ public:
 	c6510ui(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
 	~c6510ui();
 
-	size_t launch_device(); // Start device with current config
+	int launch_device(); // Start device with current config
 	wxPanel* get_right_panel();
 	CURRENT_DEVICE_CONFIG_STRUCT GetDaq6510ConfigStruct();
 	void set_table(cTable* m_table);
