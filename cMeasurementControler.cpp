@@ -279,7 +279,7 @@ void cMeasurementControler::poll()
 						
 				}
 
-				this->notify(static_cast<void*>(&currentValues));
+				//this->notify(static_cast<void*>(&currentValues));
 				currentValues.clear();
 
 				assert(read_pool.size() > 0);

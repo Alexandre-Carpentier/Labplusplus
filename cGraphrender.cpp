@@ -32,7 +32,15 @@ void cGraphrender::Notify()
 {
 
 	//m_plot_->SizeGraph();
-	m_plot_->RenderGraph();
+
+	// Issue on the renderer stack overflow when state go to false
+	// suspicious stack overflow from widget above cTable displaying current value
+	// suspicious race condition
+	//if (m_plot_->get_graph_state() == true)
+	//{
+		m_plot_->RenderGraph();
+	//}
+	
 	//m_plot_->update_chan_statistic_labels();
 
 	//printf("cGraphrender notify !\n");

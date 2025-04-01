@@ -418,7 +418,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	{
 		std::cout << "[*] Stopping cycle controler.\n";
 		cycle_controler->stop();
-		Sleep(2000);
 		m_plot_->stop_graph();
 		
 

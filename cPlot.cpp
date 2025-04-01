@@ -387,6 +387,7 @@ void cPlot::stop_graph()
 		//meas_controler = meas_manager->get_measurement_controler();
 		//meas_controler->stop();
 		StopGraph(hGraph);
+		Sleep(1000);
 	}
 }
 
@@ -480,7 +481,9 @@ void cPlot::RenderGraph()
 	std::cout << "Rendering..."<< counter <<"\n";
 	counter++;
 	*/
+
 	Render(hGraph);
+
 }
 
 wxPanel* cPlot::Getleftpan()
