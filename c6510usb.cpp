@@ -99,8 +99,8 @@ void c6510usb::acquire()
             std::cout << "[*] New set point: " << setpoint << "\n";
             std::wstring cmd;
 
-            //cmd = std::format(L"WGEN:VOLT {}\n", setpoint);
-            //device->write(cmd); // Set to value
+            cmd = std::format(L"WGEN:VOLT {}\n", setpoint);
+            device->write(cmd); // Set to value
             setpoint_saved = setpoint;
         }
 
@@ -113,8 +113,10 @@ void c6510usb::acquire()
         char* p = nullptr;
         readpoint = strtod(utf8.c_str(), &p);
         std::cout << readpoint << "\n";
-        assert(readpoint > DBL_MIN);
-        assert(readpoint < DBL_MAX);
+        assert(readpoint > -400000);
+        assert(readpoint < 400000);
+
+        Sleep(50);
     }
 }
 
@@ -147,7 +149,7 @@ void c6510usb::set_device_name(std::string name)
 void c6510usb::stop_device() {
     std::cout << "c6510usb->stoping...\n"; acquireloop.request_stop();
     Sleep(500);
-    device->write(L"LOC\n"); // Set to value
+    device->write(L"LOC\r\n"); // Set to value
     device->close();
 }
 

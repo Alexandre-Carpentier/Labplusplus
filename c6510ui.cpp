@@ -610,7 +610,7 @@ int c6510ui::launch_device()
 	{
 		pos += pimpl->config.device_addr.find("::", pos); // Find end of correct addr
 	}
-	pimpl->config.device_addr = pimpl->config.device_addr.substr(0, pos - 3); // resize
+	pimpl->config.device_addr = pimpl->config.device_addr.substr(0, pos - 1); // resize
 
 
 	pimpl->m_daq6510_->set_configuration_struct(pimpl->config);
