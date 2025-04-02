@@ -69,13 +69,13 @@ size_t cUsb6001::chan_write_count()
     return nb_sig;
 }
 
-void cUsb6001::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cUsb6001::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    assert(config_struct.channel_enabled.size() <= 48);
-    assert(config_struct.channel_index <= 48);
-    assert(config_struct.chan_number <= 48);
+    assert(config_struct->channel_enabled.size() <= 48);
+    assert(config_struct->channel_index <= 48);
+    assert(config_struct->chan_number <= 48);
 
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
 }
 
 int cUsb6001::launch_device()
@@ -230,6 +230,7 @@ int cUsb6001::launch_device()
                 // Create an appropriate chan with DAQmxCreateAIThrmcplChan()
                 if (config_struct_.channel_type[c].compare(L"Thermocouple") == 0)
                 {
+                    std::cout << "[!] TC chan: " << chan.c_str() << "name " << name.c_str() << "AnalogHandle" << analog_taskHandle << "\n";
                     DAQret = DAQmxCreateAIThrmcplChan(
                         analog_taskHandle,
                         chan.c_str(),           // DEV1/ai0

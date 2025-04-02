@@ -470,9 +470,9 @@ wxPanel* cVoltage::get_right_panel()
 	return voltage_instrument_rightpanel_;
 }
 
-CURRENT_DEVICE_CONFIG_STRUCT cVoltage::GetVoltageConfigStruct()
+CURRENT_DEVICE_CONFIG_STRUCT *cVoltage::GetVoltageConfigStruct()
 {
-	return config;
+	return &config;
 }
 
 

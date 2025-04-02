@@ -32,9 +32,9 @@ size_t c6510sim::chan_write_count()
     return nb_sig;
 }
 
-void c6510sim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void c6510sim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
 }
 
 int c6510sim::launch_device()

@@ -39,9 +39,9 @@ size_t cSupplyrssim::chan_write_count()
     return nb_sig;
 }
 
-void cSupplyrssim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cSupplyrssim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
     return;
 }
 

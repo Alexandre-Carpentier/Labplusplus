@@ -50,9 +50,9 @@ size_t cDaqsim::chan_write_count()
     return 0;
 }
 
-void cDaqsim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cDaqsim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
     return;
 }
 

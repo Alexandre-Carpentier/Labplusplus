@@ -330,7 +330,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 
 		label.channel_linearize_slope[i] = "1";
 		label.channel_linearize_shift[i] = "0";
-		label.channel_linearize_unit[i] = "Volt";
+		label.channel_linearize_unit[i] = "Voltage";
 
 		label.channel_filter[i].push_back("Disabled");
 		label.channel_filter[i].push_back("EMA");
@@ -391,7 +391,7 @@ cDaqmx::cDaqmx(wxWindow* inst)
 			config.device_serial_number[i] = "LE107";
 			config.channel_serial_number[i] = "LE140";
 
-			config.channel_type[i] = "Volt";
+			config.channel_type[i] = "Voltage";
 
 			config.channel_tc_type[i] = "T";									
 			config.channel_tc_min[i] = "-100";									
@@ -1231,95 +1231,95 @@ void cDaqmx::save_current_chan_config(int channel_index)
 	if (checkchan->GetLabelText().compare("ON") == 0)
 	{
 		config.channel_enabled[channel_index] = true;
+
+		// Channel name
+//config.channel_name[channel_index] = chan_name->GetValue();
+
+// Channel physical name
+		int iSelection = chan_addr_ctrl->GetCurrentSelection();
+		if (iSelection < 0)
+		{
+			iSelection = 0;
+			MessageBox(GetFocus(), L"Channel physical name is empty", L"[!] Warning", S_OK);
+		}
+
+		// Device & channel physical serial number
+		config.device_serial_number[channel_index] = device_sn->GetValue();
+		config.channel_serial_number[channel_index] = channel_sn->GetValue();
+
+		// Channel physical serial number
+		config.channel_physical_name[channel_index] = chan_addr_ctrl->GetValue();
+
+		// Channel physical type
+		iSelection = meas_type_ctrl->GetCurrentSelection();
+		if (iSelection < 0)
+		{
+			iSelection = 0;
+			MessageBox(GetFocus(), L"Channel physical name is empty", L"[!] Warning", S_OK);
+		}
+		config.channel_type[channel_index] = meas_type_ctrl->GetValue();
+
+		// Channel max voltage range
+		iSelection = chan_max_input_range->GetCurrentSelection();
+		if (iSelection < 0) { iSelection = 0; }
+		config.channel_max[channel_index] = label.channel_max[channel_index][iSelection];
+
+		// Channel min voltage range
+		iSelection = chan_min_input_range->GetCurrentSelection();
+		if (iSelection < 0) { iSelection = 0; }
+		config.channel_min[channel_index] = label.channel_min[channel_index][iSelection];
+
+		// Channel reference mode
+		iSelection = chan_input_mode_type->GetCurrentSelection();
+		if (iSelection < 0) { iSelection = 0; }
+		config.channel_mode_type[channel_index] = label.channel_mode_type[channel_index][iSelection];
+
+		// Channel Tc type (T,K,...)
+		config.channel_tc_type[channel_index] = chan_tc_type->GetValue();
+
+		// Channel Tc min temperature
+		config.channel_tc_min[channel_index] = chan_tc_min_range->GetValue();
+
+		// Channel Tc max temperature
+		config.channel_tc_max[channel_index] = chan_tc_max_range->GetValue();
+
+		// Digital type (input/output)
+		config.digital_channel_type[channel_index] = digitaltype->GetValue();
+
+		// Digital mode (pullup/none)
+		config.digital_channel_mode_type[channel_index] = digitalmode->GetValue();
+
+		// Channel Tc max temperature
+		config.channel_tc_max[channel_index] = chan_tc_max_range->GetValue();
+
+		// Channel linearize preset
+		config.channel_linearize[channel_index] = chan_scale->GetValue();
+
+		// Channel slope value
+		config.channel_linearize_slope[channel_index] = chan_slope->GetValue();
+
+		// Channel shift value
+		config.channel_linearize_shift[channel_index] = chan_shift->GetValue();
+
+		// Channel unit value	
+		config.channel_linearize_unit[channel_index] = chan_unit->GetValue().ToStdString();
+
+		// Channel filter 
+		iSelection = chan_filter->GetCurrentSelection();
+		if (iSelection < 0) { iSelection = 0; }
+		config.channel_filter[channel_index] = label.channel_filter[channel_index][iSelection];
+
+		// Channel filter intensity
+		config.channel_filter_intensity[channel_index] = chan_filter_intensity->GetValue();
+
+		// Channel trigger
+		iSelection = chan_trigger->GetCurrentSelection();
+		if (iSelection < 0) { iSelection = 0; }
+		config.channel_trigger[channel_index] = label.channel_trigger[channel_index][iSelection];
+
+		// Channel threshold
+		config.channel_trigger_threshold[channel_index] = chan_trigger_threshold->GetValue();
 	}
-
-	// Channel name
-	//config.channel_name[channel_index] = chan_name->GetValue();
-
-	// Channel physical name
-	int iSelection = chan_addr_ctrl->GetCurrentSelection();
-	if (iSelection < 0)
-	{
-		iSelection = 0;
-		MessageBox(GetFocus(), L"Channel physical name is empty", L"[!] Warning", S_OK);
-	}
-
-	// Device & channel physical serial number
-	config.device_serial_number[channel_index] = device_sn->GetValue();
-	config.channel_serial_number[channel_index] = channel_sn->GetValue();
-
-	// Channel physical serial number
-	config.channel_physical_name[channel_index] = chan_addr_ctrl->GetValue();
-
-	// Channel physical type
-	iSelection = meas_type_ctrl->GetCurrentSelection();
-	if (iSelection < 0)
-	{
-		iSelection = 0;
-		MessageBox(GetFocus(), L"Channel physical name is empty", L"[!] Warning", S_OK);
-	}
-	config.channel_type[channel_index] = meas_type_ctrl->GetValue();
-
-	// Channel max voltage range
-	iSelection = chan_max_input_range->GetCurrentSelection();
-	if (iSelection < 0) { iSelection = 0; }
-	config.channel_max[channel_index] = label.channel_max[channel_index][iSelection];
-
-	// Channel min voltage range
-	iSelection = chan_min_input_range->GetCurrentSelection();
-	if (iSelection < 0){iSelection = 0;}
-	config.channel_min[channel_index] = label.channel_min[channel_index][iSelection];
-
-	// Channel reference mode
-	iSelection = chan_input_mode_type->GetCurrentSelection();
-	if (iSelection < 0) { iSelection = 0; }
-	config.channel_mode_type[channel_index] = label.channel_mode_type[channel_index][iSelection];
-
-	// Channel Tc type (T,K,...)
-	config.channel_tc_type[channel_index] = chan_tc_type->GetValue();
-
-	// Channel Tc min temperature
-	config.channel_tc_min[channel_index] = chan_tc_min_range->GetValue();
-
-	// Channel Tc max temperature
-	config.channel_tc_max[channel_index] = chan_tc_max_range->GetValue();
-
-	// Digital type (input/output)
-	config.digital_channel_type[channel_index] = digitaltype->GetValue();
-
-	// Digital mode (pullup/none)
-	config.digital_channel_mode_type[channel_index] = digitalmode->GetValue();
-
-	// Channel Tc max temperature
-	config.channel_tc_max[channel_index] = chan_tc_max_range->GetValue();
-
-	// Channel linearize preset
-	config.channel_linearize[channel_index] = chan_scale->GetValue();
-
-	// Channel slope value
-	config.channel_linearize_slope[channel_index] = chan_slope->GetValue();
-
-	// Channel shift value
-	config.channel_linearize_shift[channel_index] = chan_shift->GetValue();
-
-	// Channel unit value	
-	config.channel_linearize_unit[channel_index] = chan_unit->GetValue().ToStdString();
-
-	// Channel filter 
-	iSelection = chan_filter->GetCurrentSelection();
-	if (iSelection < 0) { iSelection = 0; }
-	config.channel_filter[channel_index] = label.channel_filter[channel_index][iSelection];
-
-	// Channel filter intensity
-	config.channel_filter_intensity[channel_index] = chan_filter_intensity->GetValue();
-
-	// Channel trigger
-	iSelection = chan_trigger->GetCurrentSelection();
-	if (iSelection < 0) { iSelection = 0; }
-	config.channel_trigger[channel_index] = label.channel_trigger[channel_index][iSelection];
-
-	// Channel threshold
-	config.channel_trigger_threshold[channel_index] = chan_trigger_threshold->GetValue();
 
 	std::cout << "[*] Field " << channel_index << " saved\n";
 
@@ -1384,7 +1384,7 @@ void cDaqmx::load_current_chan_config(int channel_index)
 
 	// Channel physical type
 	load_combobox(meas_type_ctrl, config.channel_type[channel_index]);
-
+	std::cout << "[!] load config: config.channel_type[channel_index] =" << config.channel_type[channel_index] << "\n";
 	// Channel max voltage range
 	load_combobox(chan_max_input_range, config.channel_max[channel_index]);
 
@@ -2432,6 +2432,9 @@ void cDaqmx::OnChannelBtnNumberCliqued(wxCommandEvent& evt)
 	// Display the current selected channel measure type
 	reload_current_channel_type();
 
+	// Resize and replace items correctly
+	channel_group_sizer->Layout();
+
 	// If channel disabled gray it out
 	EnableChannelItems(label.channel_enabled.at(label.channel_index));
 
@@ -2803,9 +2806,9 @@ std::vector<bool> cDaqmx::GetChannelEnabledVector()
 	return label.channel_enabled;
 }
 
-CURRENT_DEVICE_CONFIG_STRUCT cDaqmx::GetDaqConfigStruct()
+CURRENT_DEVICE_CONFIG_STRUCT *cDaqmx::GetDaqConfigStruct()
 {
-	return config;
+	return &config;
 }
 
 

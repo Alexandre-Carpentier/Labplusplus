@@ -58,7 +58,7 @@ private:
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 public:
 
-	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct) = 0;
+	virtual void set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct) = 0;
 	virtual int launch_device() = 0;
 
 	virtual std::string device_name() = 0;

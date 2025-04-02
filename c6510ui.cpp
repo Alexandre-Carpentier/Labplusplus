@@ -613,7 +613,7 @@ int c6510ui::launch_device()
 	pimpl->config.device_addr = pimpl->config.device_addr.substr(0, pos - 1); // resize
 
 
-	pimpl->m_daq6510_->set_configuration_struct(pimpl->config);
+	pimpl->m_daq6510_->set_configuration_struct(&pimpl->config);
 	//return pimpl->m_daq6510_->launch_device();
 	return 0;
 }

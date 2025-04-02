@@ -60,9 +60,9 @@ void cPacesim::set(double* value, size_t length)
     current_fake_value = value[0];
 }
 
-void cPacesim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cPacesim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
 }
 
 void cPacesim::set_device_name(std::string name)

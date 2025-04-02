@@ -39,9 +39,9 @@ size_t cOscopesim::chan_write_count()
     return nb_sig;
 }
 
-void cOscopesim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cOscopesim::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
 }
 
 int cOscopesim::launch_device()

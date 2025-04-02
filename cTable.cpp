@@ -76,7 +76,6 @@ void cTable::deserialize(std::string config_name)
 
 void cTable::update(void* arg)
 {
-	/*
 	CURRENT_VALUE_STRUCT *res = (CURRENT_VALUE_STRUCT*)arg;
 	size_t c = 0;
 	for (auto name : res->names_vec)
@@ -107,8 +106,6 @@ void cTable::update(void* arg)
 			indicator2->Hide();
 		}
 	}
-	*/
-
 
 /*
 	for (size_t j=c;j++;j<max_chan_number)

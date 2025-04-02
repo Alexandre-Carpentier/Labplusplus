@@ -136,9 +136,9 @@ void c6510usb::set(double* value, size_t length)
     setpoint = value[0];
 }
 
-void c6510usb::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void c6510usb::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
 }
 
 void c6510usb::set_device_name(std::string name)
