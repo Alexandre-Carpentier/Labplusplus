@@ -1978,11 +1978,6 @@ BOOL Render(HGRAPH hGraph)
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	// Draw graph frame and grid
-	if(GetGraphState(hGraph) == false)
-	{
-		printf("Graph state false\n");
-	}
 	DrawGraphSquare();
 	DrawGridLines();
 
