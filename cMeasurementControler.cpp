@@ -125,14 +125,14 @@ void cMeasurementControler::poll()
 				Y[c] = val.buffer[c];
 
 				// prepare send to observers
-				currentValues.add_values(meas->device_name(), Y[c]);
+				//currentValues.add_values(meas->device_name(), Y[c]);
 
 				buffer_index++;
 			}
 		}
 
-		this->notify(static_cast<void*>(&currentValues));
-		currentValues.clear();
+		//this->notify(static_cast<void*>(&currentValues));
+		//currentValues.clear();
 
 		// Add the first point to update min avg max value in indicator
 		m_plot_->graph_addpoint(buffer_index, Y);
@@ -238,7 +238,7 @@ void cMeasurementControler::poll()
 								//std::cout << "Value: " << value[0] << "\n";
 								//std::cout << "Old Value: " << old_value[0] << "\n";
 
-								int mod = 0;
+								int mod = 1;
 
 								std::cout << value[0] << " " << value[1] << "\n";
 								std::cout << old_value[0] << " " << old_value[1] << "\n";
@@ -268,7 +268,7 @@ void cMeasurementControler::poll()
 							for (size_t i = 0; i < val.buffer_size; i++)
 							{
 								// prepare send to observers
-								currentValues.add_values(meas->device_name(), val.buffer[i]);
+								//currentValues.add_values(meas->device_name(), val.buffer[i]);
 
 								read_pool.push_back(val.buffer[i]);
 							}
@@ -279,8 +279,8 @@ void cMeasurementControler::poll()
 						
 				}
 
-				this->notify(static_cast<void*>(&currentValues));
-				currentValues.clear();
+				//this->notify(static_cast<void*>(&currentValues));
+				//currentValues.clear();
 
 				assert(read_pool.size() > 0);
 				m_plot_->graph_addpoint(read_pool.size(), &read_pool.at(0));

@@ -122,6 +122,11 @@ public:
 	~cMain();
 
 	void settingsButtonClicked(wxCommandEvent& evt);
+
+	void CreateDefaultScalesButtonClicked(wxCommandEvent& evt);
+	void DeleteconfigButtonClicked(wxCommandEvent& evt);
+	void OpenconfigFolderButtonClicked(wxCommandEvent& evt);
+	
 	void openButtonClicked(wxCommandEvent& evt);
 	void saveButtonClicked(wxCommandEvent& evt);
 	void editButtonClicked(wxCommandEvent& evt);

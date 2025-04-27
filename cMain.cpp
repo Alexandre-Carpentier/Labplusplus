@@ -13,6 +13,13 @@
 #include <vector>
 #include <memory>
 
+#include <shellapi.h>
+#include "Shlobj.h"
+#include "Shlobj_core.h"
+#pragma comment(lib, "shell32")
+
+#include <fstream>
+
 #include "cDeviceMonitor.h"
 #include "cConfig.h"
 #include "cTable.h"
@@ -72,21 +79,33 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	wxMenuBar* main_menu = new wxMenuBar();
 
-	wxMenu* menu = new wxMenu();
+	wxMenu* file_menu = new wxMenu();
+	wxMenu* edit_menu = new wxMenu();
 
 	this->Bind(wxEVT_MENU, &cMain::settingsButtonClicked, this,
-		menu->Append(wxID_ANY, "&Instruments configuration\t")->GetId());
+		file_menu->Append(wxID_ANY, "&Instruments configuration\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::editButtonClicked, this,
-		menu->Append(wxID_ANY, "&Cycle configuration\t")->GetId());
+		file_menu->Append(wxID_ANY, "&Cycle configuration\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::plotButtonClicked, this,
-		menu->Append(wxID_ANY, "&Graph window\t")->GetId());
+		file_menu->Append(wxID_ANY, "&Graph window\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::MeasurementFolderButtonClicked, this,
-		menu->Append(wxID_ANY, "&Open measurement folder\t")->GetId());
-	menu->AppendSeparator();
+		file_menu->Append(wxID_ANY, "&Open measurement folder\t")->GetId());
+	file_menu->AppendSeparator();
 	this->Bind(wxEVT_MENU, &cMain::exitButtonClicked, this,
-		menu->Append(wxID_ANY, "&Exit\tESC")->GetId());
+		file_menu->Append(wxID_ANY, "&Exit\tESC")->GetId());
 
-	main_menu->Append(menu, "&File");
+	main_menu->Append(file_menu, "&File");
+
+	
+		this->Bind(wxEVT_MENU, &cMain::CreateDefaultScalesButtonClicked, this,
+			edit_menu->Append(wxID_ANY, "&Create new custom scale configuration files\t")->GetId());
+	this->Bind(wxEVT_MENU, &cMain::DeleteconfigButtonClicked, this,
+		edit_menu->Append(wxID_ANY, "&Delete all configuration files\t")->GetId());
+	this->Bind(wxEVT_MENU, &cMain::OpenconfigFolderButtonClicked, this,
+		edit_menu->Append(wxID_ANY, "&Open configuration folder\t")->GetId());
+	edit_menu->AppendSeparator();
+
+	main_menu->Append(edit_menu, "&Edit");
 
 	SetMenuBar(main_menu);
 
@@ -344,6 +363,130 @@ void cMain::settingsButtonClicked(wxCommandEvent& evt)
 		config_rightpanel->Show();
 		config_hsizer->Show(true);
 		this->Layout();
+	}
+	evt.Skip();
+}
+
+void cMain::CreateDefaultScalesButtonClicked(wxCommandEvent& evt)
+{
+	TCHAR szPath[MAX_PATH];
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, szPath)))
+	{
+		wcscat_s<MAX_PATH>(szPath, L"\\Lab++ScalePreset.ini");
+		std::ifstream config_file(szPath);
+		if (!config_file.is_open())
+		{
+			std::cout << "[*] File is missing, create new...\n";
+			config_file.close();
+
+			std::ofstream config_file(szPath);
+			if (!config_file.is_open())
+			{
+				std::cout << "[!] Error creating file, something went wrong..., please verify your system right to access filesystem.\n";
+				evt.Skip();
+				return;
+			}
+			config_file << "[Citec 0-16 bar 0-10V sensor]\n";
+			config_file << "name = Citec 0-16 bar 0-10V sensor\n";
+			config_file << "slope = 1.6\n";
+			config_file << "shift = 0\n";
+			config_file << "unit = bar\n";
+			config_file << "[0-5v 10sccm]\n";
+			config_file << "name = 0-5v 10sccm\n";
+			config_file << "slope = 2\n";
+			config_file << "shift = 0\n";
+			config_file << "unit = sccm\n";
+			config_file << "[0 - 5v 1000sccm]\n";
+			config_file << "name = 0-5v 1000sccm\n";
+			config_file << "slope = 200\n";
+			config_file << "shift = 0\n";
+			config_file << "unit = sccm\n";
+
+			config_file.close();
+
+			MessageBox(0, L"Success. You must restart the software to use the new scale saved", L"Success", S_OK | MB_ICONINFORMATION);
+
+		}
+		else
+		{
+			MessageBox(0, L"Fail. File already exist, you must delete: \"Lab++ScalePreset.ini\" to write a new one.", L"Failure", S_OK| MB_ICONERROR);
+		}
+	}
+	evt.Skip();
+}
+
+bool delete_all_conf_files(wchar_t* path)
+{
+	WIN32_FIND_DATA FindFileData;
+	HANDLE hFind=0;
+
+	hFind = FindFirstFile(path, &FindFileData);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		printf("FindFirstFile failed (%d)\n", GetLastError());
+		FindClose(hFind);
+		return false;
+	}
+	else
+	{
+		if (FindFileData.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY)
+		{
+			_tprintf(TEXT("found: %s\n"),FindFileData.cFileName);
+		}
+		do
+		{
+			FindNextFile(hFind, &FindFileData);
+			if (hFind == INVALID_HANDLE_VALUE)
+			{
+				printf("FindNextFile failed (%d)\n", GetLastError());
+				FindClose(hFind);
+				return false;
+			}
+			if (FindFileData.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY)
+			{
+				_tprintf(TEXT("found: %s\n"), FindFileData.cFileName);
+				std::wstring filename = FindFileData.cFileName;
+				// Compare if it is a config file to delete
+				if (filename.compare(0,11, L"Lab++Config") == 0)
+				{
+					// build full path
+					std::wstring full_path = path;
+					size_t pos = full_path.find(L"*");
+					full_path = full_path.substr(0, pos);
+					full_path += filename;
+					std::cout << "Erasing file:" << full_path << "\n";
+					//DeleteFile
+					DeleteFile(full_path.c_str());
+				}
+
+			}
+		} while (hFind != INVALID_HANDLE_VALUE);
+		
+	}
+	FindClose(hFind);
+}
+void cMain::DeleteconfigButtonClicked(wxCommandEvent& evt)
+{
+	TCHAR szPath[MAX_PATH];
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, szPath)))
+	{
+		wcscat_s<MAX_PATH>(szPath, L"\\*");
+		if (!delete_all_conf_files(szPath))
+		{
+			MessageBox(0, L"Fail to deleteconfig files.", L"Failure", S_OK | MB_ICONERROR);
+		}
+		MessageBox(0, L"Success. All config file \"Lab++Config*.ini\" has been deleted.", L"Success", S_OK | MB_ICONINFORMATION);
+	}
+	evt.Skip();
+}
+
+void cMain::OpenconfigFolderButtonClicked(wxCommandEvent& evt)
+{
+	TCHAR szPath[MAX_PATH];
+	if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, szPath)))
+	{
+		wcscat_s<MAX_PATH>(szPath, L"\\");
+		ShellExecute(0, L"open", szPath, NULL, NULL, 1);
 	}
 	evt.Skip();
 }
