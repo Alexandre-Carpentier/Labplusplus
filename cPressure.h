@@ -77,7 +77,7 @@ public:
 
 	wxPanel* get_right_panel();
 
-	CURRENT_DEVICE_CONFIG_STRUCT GetPressureConfigStruct();
+	CURRENT_DEVICE_CONFIG_STRUCT *GetPressureConfigStruct();
 
 };
 

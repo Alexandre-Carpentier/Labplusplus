@@ -16,16 +16,10 @@
 #include <wx/treectrl.h>
 
 
-//#pragma comment (lib, "Plugin.lib")
 
-// 
-// If any error bellow select the right path to the header file
-//
-// Choose the right path
+//#pragma comment (lib, "Plugin.lib")
 //#include "..\Lab\Plugin\cDevice.h"
 #include "..\Lab++\Plugin\cDevice.h"
-// Choose the right path
-
 
 #include "cTable.h"
 #include "cPlot.h"

@@ -29,9 +29,9 @@ size_t cMeasurement::chan_write_count() { return 0; }
 DATAS cMeasurement::read() { result_struct.buffer[0] = (-12.0 + rand() % 1); result_struct.buffer_size = 1;  return result_struct; }
 void cMeasurement::set(double* value, size_t length) { std::cout << "[*] Set instrument super class to: " << value << "\n"; };
 
-void cMeasurement::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cMeasurement::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-	config_struct_ = config_struct;
+	config_struct_ = *config_struct;
 	return;
 }
 

@@ -480,7 +480,11 @@ void cPlot::RenderGraph()
 	std::cout << "Rendering..."<< counter <<"\n";
 	counter++;
 	*/
-	Render(hGraph);
+	//if (GetGraphState(hGraph) == true)
+	//{
+		Render(hGraph);
+	//}
+
 }
 
 wxPanel* cPlot::Getleftpan()

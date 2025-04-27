@@ -593,7 +593,7 @@ int cOscope::launch_device()
 	pimpl->config.device_addr = pimpl->config.device_addr.substr(0, pos-1); // resize
 
 
-	pimpl->m_oscope_->set_configuration_struct(pimpl->config);
+	pimpl->m_oscope_->set_configuration_struct(&pimpl->config);
 	//return pimpl->m_oscope_->launch_device();
 	return 0;
 }

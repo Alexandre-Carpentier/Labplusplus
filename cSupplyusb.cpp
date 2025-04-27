@@ -154,9 +154,9 @@ void cSupplyusb::set(double* value, size_t length)
     setpoint = value[0];
 }
 
-void cSupplyusb::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT config_struct)
+void cSupplyusb::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
-    config_struct_ = config_struct;
+    config_struct_ = *config_struct;
 }
 
 void cSupplyusb::set_device_name(std::string name)

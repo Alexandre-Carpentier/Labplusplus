@@ -49,7 +49,7 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 		size_t length = meas->chan_write_count();
 		if (length > 0)
 		{
-			double* values = new double[length];
+			double* values = new double(length);
 			assert(values != nullptr);
 			if (values != nullptr)
 			{

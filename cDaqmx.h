@@ -258,6 +258,6 @@ public:
 	size_t get_channel_index();
 	int GetChannelNumber();
 	std::vector <bool> GetChannelEnabledVector();
-	CURRENT_DEVICE_CONFIG_STRUCT GetDaqConfigStruct();
+	CURRENT_DEVICE_CONFIG_STRUCT *GetDaqConfigStruct();
 };
 

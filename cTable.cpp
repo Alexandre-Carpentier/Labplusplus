@@ -106,6 +106,7 @@ void cTable::update(void* arg)
 			indicator2->Hide();
 		}
 	}
+
 /*
 	for (size_t j=c;j++;j<max_chan_number)
 	{
@@ -113,7 +114,7 @@ void cTable::update(void* arg)
 		indicator_vec2[j]->Hide();
 	}
 	*/
-	h_indicators_sizer->Layout();
+	//h_indicators_sizer->Layout();
 }
 
 cTable::cTable(wxWindow* inst, cConfig *m_config)

@@ -125,7 +125,6 @@ void cCycleControler::poll()
 kill:
 
 	//MessageBox(GetFocus(), L"End of cycle", L"Success", MB_OK);
-
 	std::cout << "[*] Cycle controler exitting daemon\n";
 	//MessageBox(GetFocus(), L"Exit control daemon", L"Success", MB_OK);
 

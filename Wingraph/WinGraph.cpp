@@ -1899,6 +1899,8 @@ VOID AddMultiplePoints(HGRAPH hGraph, DOUBLE** Chunks, INT SignalCount, INT Buff
   -------------------------------------------------------------------------*/
 BOOL Render(HGRAPH hGraph)
 {
+	EnterCriticalSection(&cs);
+
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
 	// Sanity check
@@ -1906,12 +1908,14 @@ BOOL Render(HGRAPH hGraph)
 	if (NULL == pgraph)
 	{
 		printf("[!] Error at Render() graph handle is null\n");
+		LeaveCriticalSection(&cs);
 		return FALSE;
 	}
 
 	if (NULL == pgraph->hGraphWnd)
 	{
 		printf("[!] Error at Render() graph windows is null\n");
+		LeaveCriticalSection(&cs);
 		return FALSE;
 	}
 
@@ -1923,7 +1927,7 @@ BOOL Render(HGRAPH hGraph)
 	const char Xname[] = "Time (s)";
 	double reelval = SnapPlot->Ymin;
 
-	EnterCriticalSection(&cs);
+	
 
 	if (pgraph->cur_nbpoints == 0 && start == 0.0f)														// Display a void graph when app start only
 	{
@@ -1971,8 +1975,6 @@ BOOL Render(HGRAPH hGraph)
 	// Clear Color and Depth Buffers
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	// Draw graph frame and grid
 
 	DrawGraphSquare();
 	DrawGridLines();
@@ -2103,8 +2105,9 @@ BOOL Render(HGRAPH hGraph)
 			}
 		}
 	}
-	LeaveCriticalSection(&cs);
 	SwapBuffers(GetGraphDC(hGraph));
+	LeaveCriticalSection(&cs);
+
 	return TRUE;
 }
 

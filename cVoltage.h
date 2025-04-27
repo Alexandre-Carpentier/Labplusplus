@@ -72,7 +72,7 @@ public:
 
 	wxPanel* get_right_panel();
 
-	CURRENT_DEVICE_CONFIG_STRUCT GetVoltageConfigStruct();
+	CURRENT_DEVICE_CONFIG_STRUCT *GetVoltageConfigStruct();
 
 };
 

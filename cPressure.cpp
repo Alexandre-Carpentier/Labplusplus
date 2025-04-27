@@ -507,9 +507,9 @@ wxPanel* cPressure::get_right_panel()
 	return pace_rightpanel_;
 }
 
-CURRENT_DEVICE_CONFIG_STRUCT cPressure::GetPressureConfigStruct()
+CURRENT_DEVICE_CONFIG_STRUCT *cPressure::GetPressureConfigStruct()
 {
-	return config;
+	return &config;
 }
 
 

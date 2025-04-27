@@ -287,6 +287,15 @@
     <ClCompile Include="cObserver.cpp">
       <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
+    <ClCompile Include="c6510sim.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="c6510ui.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="c6510usb.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -486,6 +495,9 @@
     <ClInclude Include="cObserver.h">
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
+    <ClInclude Include="c6510sim.h" />
+    <ClInclude Include="c6510ui.h" />
+    <ClInclude Include="c6510usb.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Lab++.rc">

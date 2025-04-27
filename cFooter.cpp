@@ -134,9 +134,10 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 				// Retrieve current daq config		
 
-			CURRENT_DEVICE_CONFIG_STRUCT config = daqconfig->GetDaqConfigStruct();
+			CURRENT_DEVICE_CONFIG_STRUCT *config = nullptr;
+			config = daqconfig->GetDaqConfigStruct();
 
-			daqconfig->serialize(config.device_name.ToStdString());
+			daqconfig->serialize(config->device_name.ToStdString());
 
 			int i = 0;
 			int c = 0;
@@ -145,7 +146,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			{
 				if (chan == true)
 				{
-					m_plot_->set_signal_name(config.channel_name.at(c), i);
+					m_plot_->set_signal_name(config->channel_name.at(c), i);
 					m_plot_->set_signal_filter(FILTER_NONE, i);
 					m_plot_->set_signal_filter_threshold(0.5, i);
 					i++;
@@ -164,7 +165,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		if (pressureconfig->m_pressure_ != nullptr)
 		{
 			pressureconfig->save_current_device_config(0);
-			CURRENT_DEVICE_CONFIG_STRUCT config = pressureconfig->GetPressureConfigStruct();
+			CURRENT_DEVICE_CONFIG_STRUCT *config = pressureconfig->GetPressureConfigStruct();
 
 			pressureconfig->m_pressure_->set_configuration_struct(config);
 
@@ -177,7 +178,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		if (voltageconfig->m_voltage_ != nullptr)
 		{
 			voltageconfig->save_current_device_config(0);
-			CURRENT_DEVICE_CONFIG_STRUCT config = voltageconfig->GetVoltageConfigStruct();
+			CURRENT_DEVICE_CONFIG_STRUCT *config = voltageconfig->GetVoltageConfigStruct();
 
 			voltageconfig->m_voltage_->set_configuration_struct(config);
 
@@ -190,7 +191,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		if (voltagersconfig->m_voltage_ != nullptr)
 		{
 			voltagersconfig->save_current_device_config(0);
-			CURRENT_DEVICE_CONFIG_STRUCT config = voltagersconfig->GetVoltageConfigStruct();
+			CURRENT_DEVICE_CONFIG_STRUCT *config = voltagersconfig->GetVoltageConfigStruct();
 
 			voltagersconfig->m_voltage_->set_configuration_struct(config);
 		}
@@ -275,11 +276,11 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		size_t pos = 0;
 		std::string head;
 		auto daq_config = daqconfig->GetDaqConfigStruct();	
-		for (auto is_enable : daq_config.channel_enabled)
+		for (auto is_enable : daq_config->channel_enabled)
 		{
 			if (is_enable)
 			{
-				head.append(std::format("{}::{}\t", daq_config.device_serial_number[pos].ToStdString(), daq_config.channel_serial_number[pos].ToStdString())); pos++;
+				head.append(std::format("{}::{}\t", daq_config->device_serial_number[pos].ToStdString(), daq_config->channel_serial_number[pos].ToStdString())); pos++;
 			}
 		}
 
@@ -418,8 +419,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	{
 		std::cout << "[*] Stopping cycle controler.\n";
 		cycle_controler->stop();
-
 		m_plot_->stop_graph();
+		
 
 		std::cout << "m_table_->destroy_cycle() in Footer.cpp\n";
 
