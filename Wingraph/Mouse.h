@@ -9,6 +9,6 @@
 #include <Windows.h>
 #include "Wingraph.h"
 
-POINT GetMousePosition(VOID);
-BOOL isMouseHover(HGRAPH hGraph);
-VOID DisplayPointer(HGRAPH hGraph);
+POINT GetMousePosition(void);
+bool isMouseHover(HGRAPH hGraph);
+void DisplayPointer(HGRAPH hGraph);

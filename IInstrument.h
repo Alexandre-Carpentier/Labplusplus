@@ -26,8 +26,9 @@
 class cInstrumentparam
 {
 public:
-		cInstrumentparam(wxWindow* page, std::shared_ptr<cDeviceMonitor> devmon, std::string instrument_name) {
+		cInstrumentparam(wxWindow* page, std::shared_ptr<cDeviceMonitor> devmon, cSignalTable* signal_table, std::string instrument_name) {
 
+			signal_table_ = signal_table;
 			uniqueID = (uint32_t)(&uniqueID) + rand() % 5;
 			page_ = page;
 			// right panel is the page parent
@@ -59,6 +60,7 @@ public:
 	wxBookCtrl* getPage() { if (page_) { return (wxBookCtrl*)page_; } return nullptr; }
 	wxPanel* getPanel() { if (panel_) { return (wxPanel*)panel_; } }
 	std::shared_ptr<cDeviceMonitor> getDeviceMonitor() { return std::move(devmon_); }
+	cSignalTable* getSignalTable() { return signal_table_; }
 	std::string getDeviceName() { return instrument_name_; }
 
 	std::unique_ptr<cDevice> getDeviceStrategy() { return std::move(device_); }
@@ -85,6 +87,7 @@ private:
 	size_t signal_count_;
 	// Unique identifier to reference if using same equipement names
 	uint32_t uniqueID = 0 ;
+	cSignalTable* signal_table_ = nullptr;
 };
 
 class IInstrument : public wxFrame

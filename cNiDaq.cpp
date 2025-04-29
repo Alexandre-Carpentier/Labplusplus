@@ -5,14 +5,14 @@
 // Copyright:   (c) Alexandre CARPENTIER
 // Licence:     LGPL-2.1-or-later
 /////////////////////////////////////////////////////////////////////////////
-#include "cUSB6001.h"
+#include "cNiDaq.h"
 
 #include "cMeasurement.h"
 #include <string>
 
-cUsb6001::cUsb6001()
+cNiDaq::cNiDaq()
 {
-    std::cout << "cUsb6001 ctor...\n";
+    std::cout << "cNiDaq ctor...\n";
     analog_taskHandle = nullptr;
     digital_taskHandle;
     ZeroMemory(digital_taskHandle, MAX_CHAN);
@@ -22,9 +22,9 @@ cUsb6001::cUsb6001()
     DAQret = 0;
 };
 
-std::string cUsb6001::device_name() { return std::string("NI-DAQ"); }
-MEAS_TYPE cUsb6001::device_type() { return DAQ_INSTR; };
-size_t cUsb6001::chan_count()
+std::string cNiDaq::device_name() { return std::string("NI-DAQ"); }
+MEAS_TYPE cNiDaq::device_type() { return DAQ_INSTR; };
+size_t cNiDaq::chan_count()
 {
     size_t nb_sig = 0;
     for (auto enable : config_struct_.channel_enabled)
@@ -37,7 +37,7 @@ size_t cUsb6001::chan_count()
     return nb_sig;
 }
 
-size_t cUsb6001::chan_read_count()
+size_t cNiDaq::chan_read_count()
 {
     size_t nb_sig = 0;
     int index = 0;
@@ -53,7 +53,7 @@ size_t cUsb6001::chan_read_count()
     return nb_sig;
 }
 
-size_t cUsb6001::chan_write_count()
+size_t cNiDaq::chan_write_count()
 {
     size_t nb_sig = 0;
     int index = 0;
@@ -69,7 +69,7 @@ size_t cUsb6001::chan_write_count()
     return nb_sig;
 }
 
-void cUsb6001::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
+void cNiDaq::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_struct)
 {
     assert(config_struct->channel_enabled.size() <= 48);
     assert(config_struct->channel_index <= 48);
@@ -78,9 +78,9 @@ void cUsb6001::set_configuration_struct(CURRENT_DEVICE_CONFIG_STRUCT *config_str
     config_struct_ = *config_struct;
 }
 
-int cUsb6001::launch_device()
+int cNiDaq::launch_device()
 {
-    std::cout << "[*] cUsb6001->launching...\n";
+    std::cout << "[*] cNiDaq->launching...\n";
     if (config_struct_.device_name.size() == 0)
     {
         std::cout << "[!] launch_device() failed. Error configuration structure empty...\n";
@@ -385,7 +385,7 @@ int cUsb6001::launch_device()
     return 0;
 }
 
-DATAS cUsb6001::read()
+DATAS cNiDaq::read()
 { 
     int32 chan_type = 0;
     char buff[512]=""; 
@@ -596,7 +596,7 @@ DATAS cUsb6001::read()
     return result;
 }
 
-void cUsb6001::set(double* value, size_t length)
+void cNiDaq::set(double* value, size_t length)
 {
     assert(length < MAX_CHAN);
     assert(value != nullptr);
@@ -659,9 +659,9 @@ void cUsb6001::set(double* value, size_t length)
     }
 }
 
-void cUsb6001::stop_device()
+void cNiDaq::stop_device()
 {
-    std::cout << "cUsb6001->stoping...\n";
+    std::cout << "cNiDaq->stoping...\n";
     if (analog_taskHandle != nullptr)
     {
         DAQmxStopTask(analog_taskHandle);
@@ -686,9 +686,9 @@ void cUsb6001::stop_device()
     //}
 }
 
-cUsb6001::~cUsb6001()
+cNiDaq::~cNiDaq()
 {
-    std::cout << "cUsb6001 dtor...\n";
+    std::cout << "cNiDaq dtor...\n";
     if (analog_taskHandle != nullptr)
     {
         DAQmxStopTask(analog_taskHandle);

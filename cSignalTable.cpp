@@ -17,12 +17,52 @@ bool is_a_number(size_t numb)
 	return true;
 }
 
-size_t cSignalTable::get_slot_signal_count(MEAS_TYPE type)
+cSignalTable::cSignalTable()
+{
+	std::cout << "[*] cSignalTable ctor called.\n";
+	create_signal_table(64);
+};
+
+cSignalTable::~cSignalTable() 
+{ 
+	std::cout << "[*] cSignalTable dtor called.\n"; 
+};
+
+bool cSignalTable::create_signal_table(size_t sig_count) {
+	if (!is_a_number(sig_count))
+	{
+		std::cout << "[!] Error at create_signal_table(). sig_count is not a number\n";
+		return false;
+	}
+
+	std::cout << "[*] Allocate " << sig_count << " signals in create_signal_table().\n";
+
+	// allocate all slot
+	for (size_t i = 0; i < sig_count; i++)
+	{
+		chan_list.push_back({ 0, "slot free", "/voidaddr", "MyUnit", 0.0, 0.0, 0.0, wxColor(90, 90, 90) });
+		sig_count_++;
+	}
+
+	std::cout << "[*] Allocate success.\n";
+	return true;
+};
+
+void cSignalTable::set_signal_table(std::list<CHAN_LEGEND_STRUCT> list)
+{
+	chan_list = list;
+};
+
+std::list<CHAN_LEGEND_STRUCT> cSignalTable::get_signal_table() {
+	return chan_list;
+};
+
+size_t cSignalTable::get_slot_signal_count(size_t id)
 {
 	size_t count = 0;
 	for (auto& chan : chan_list)
 	{
-		if (chan.type == type)
+		if (chan.id == id)
 		{
 			count++;
 		}
@@ -30,20 +70,20 @@ size_t cSignalTable::get_slot_signal_count(MEAS_TYPE type)
 	return count;
 }
 
-bool cSignalTable::slot_register_range(int length, MEAS_TYPE type)
+bool cSignalTable::slot_register_range(int length, size_t id)
 {
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_list.begin();
 
 	size_t counter = 0;
-	while (it->type != MEAS_TYPE::VOID_INSTR)
+	while (it->id != MEAS_TYPE::VOID_INSTR)
 	{
 		if (counter == sig_count_)
 		{
 			std::cout << "[!] Error at slot_register_range() max signal is reached\n";
 			return false;
 		}
-		if (it->type == type) // count only 
+		if (it->id == id) // count only 
 		{
 			counter++;
 		}
@@ -60,11 +100,11 @@ bool cSignalTable::slot_register_range(int length, MEAS_TYPE type)
 	// Reserve sig space here
 	for (auto& chan : chan_list)
 	{
-		if (chan.type == MEAS_TYPE::VOID_INSTR)
+		if (chan.id == MEAS_TYPE::VOID_INSTR)
 		{
 			if (length > 0)
 			{
-				chan.type = type;
+				chan.id = id;
 				chan.channel_legend_addr = std::string("slot free");
 				chan.channel_legend_addr = "/addr";
 				chan.channel_legend_unit = "Volt";
@@ -86,14 +126,14 @@ bool cSignalTable::slot_register_range(int length, MEAS_TYPE type)
 	return true;
 }
 
-bool cSignalTable::slot_remove_range(MEAS_TYPE type)
+bool cSignalTable::slot_remove_range(size_t id)
 {
 	
 	for (auto& chan : chan_list)
 	{
-		if (chan.type == type)
+		if (chan.id == id)
 		{
-			chan.type = MEAS_TYPE::VOID_INSTR;
+			chan.id = MEAS_TYPE::VOID_INSTR;
 			chan.channel_legend_addr = std::string("slot free");
 			chan.channel_legend_addr = "/addr";
 			chan.channel_legend_unit = "Volt";
@@ -106,14 +146,14 @@ bool cSignalTable::slot_remove_range(MEAS_TYPE type)
 	return true;
 }
 
-bool cSignalTable::slot_register(MEAS_TYPE type)
+bool cSignalTable::slot_register(size_t id)
 {
 	for (auto& chan : chan_list)
 	{
-		if (chan.type == MEAS_TYPE::VOID_INSTR)
+		if (chan.id == MEAS_TYPE::VOID_INSTR)
 		{
 			// register the new signal
-			chan.type = type;
+			chan.id = id;
 			chan.channel_legend_addr = std::string("slot free");
 			chan.channel_legend_addr = "/addr";
 			chan.channel_legend_unit = "Volt";
@@ -150,16 +190,16 @@ bool cSignalTable::slot_register(MEAS_TYPE type)
 	*/
 }
 
-bool cSignalTable::slot_remove(MEAS_TYPE type, size_t pos)
+bool cSignalTable::slot_remove(size_t id, size_t pos)
 {
 	int currentpos = 0;
 	for (auto& chan : chan_list)
 	{
-		if (chan.type == type)
+		if (chan.id == id)
 		{
 			if (currentpos = pos)
 			{
-				chan.type = MEAS_TYPE::VOID_INSTR;
+				chan.id = MEAS_TYPE::VOID_INSTR;
 				chan.channel_legend_addr = std::string("slot free");
 				chan.channel_legend_addr = "/addr";
 				chan.channel_legend_unit = "Volt";
@@ -173,7 +213,7 @@ bool cSignalTable::slot_remove(MEAS_TYPE type, size_t pos)
 	return true;
 }
 
-bool cSignalTable::sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color)
+bool cSignalTable::sig_add(size_t pos, size_t id, std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color)
 {
 	for (auto&& chan : chan_list)
 	{
@@ -184,7 +224,7 @@ bool cSignalTable::sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, st
 	it = chan_list.begin();
 
 	size_t counter = 0;
-	while (it->type != type)
+	while (it->id != id)
 	{
 		if (counter == sig_count_-1)
 		{
@@ -196,11 +236,11 @@ bool cSignalTable::sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, st
 	}
 
 	size_t item = 0;
-	while (it->type == type)
+	while (it->id == id)
 	{
 		if (item == pos)
 		{
-			*it = { type, chan_name, chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color };
+			*it = { id, chan_name, chan_addr, chan_unit, 0.0, 0.0, 0.0, chan_color };
 			break;
 		}
 		if (counter == sig_count_-1)
@@ -214,7 +254,7 @@ bool cSignalTable::sig_add(size_t pos, MEAS_TYPE type, std::string chan_name, st
 	return true;
 }
 
-bool cSignalTable::sig_remove(MEAS_TYPE type, size_t pos)
+bool cSignalTable::sig_remove(size_t id, size_t pos)
 {
 	
 		// iterate until type is found
@@ -224,7 +264,7 @@ bool cSignalTable::sig_remove(MEAS_TYPE type, size_t pos)
 
 	for (auto& chan : chan_list)
 	{
-		if (chan.type != type) // Count dead signals
+		if (chan.id != id) // Count dead signals
 		{
 			if (counter == sig_count_)
 			{
@@ -233,7 +273,7 @@ bool cSignalTable::sig_remove(MEAS_TYPE type, size_t pos)
 			}
 			counter++;
 		}
-		if (chan.type == type) // Signal type found
+		if (chan.id == id) // Signal type found
 		{
 			if (item == pos)
 			{
@@ -288,14 +328,14 @@ bool cSignalTable::sig_remove(MEAS_TYPE type, size_t pos)
 	return true;
 }
 
-bool cSignalTable::sig_read(MEAS_TYPE type, size_t pos, CHAN_LEGEND_STRUCT &read_value)
+bool cSignalTable::sig_read(size_t id, size_t pos, CHAN_LEGEND_STRUCT &read_value)
 {
 	size_t counter = 0;
 	size_t item = 0;
 
 	for (auto& chan : chan_list)
 	{
-		if (chan.type != type)
+		if (chan.id != id)
 		{
 			if (counter == sig_count_)
 			{
@@ -304,7 +344,7 @@ bool cSignalTable::sig_read(MEAS_TYPE type, size_t pos, CHAN_LEGEND_STRUCT &read
 			}
 			counter++;
 		}
-		if(chan.type == type)
+		if(chan.id == id)
 		{
 			if (counter == sig_count_)
 			{

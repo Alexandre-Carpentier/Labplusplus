@@ -6,10 +6,12 @@
 // Licence:     LGPL-2.1-or-later
 /////////////////////////////////////////////////////////////////////////////
 #include "cPlot.h"
+#include "cSignalTable.h"
 
-cPlot::cPlot(wxWindow* inst, int nbPoints)
+cPlot::cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table)
 {
 	inst_ = inst;
+	sig_ = signal_table;
 	std::cout << "cPlot ctor...\n";
 
 	std::cout << "cMeasurementmanager->getInstance()\n";
@@ -85,8 +87,7 @@ cPlot::~cPlot()
 
 void cPlot::update_gui()
 {
-	cSignalTable* sigt = sigt->getInstance();
-	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sig_->get_signal_table();
 
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_legend_struct_list.begin();
@@ -105,7 +106,7 @@ void cPlot::update_gui()
 		int sig_count = 0;
 		for (auto &chan : chan_legend_struct_list)
 		{
-			if (chan.type != MEAS_TYPE::VOID_INSTR)
+			if (chan.id != MEAS_TYPE::VOID_INSTR)
 			{
 				if (chan.channel_legend_name.compare("slot free") != 0)
 				{
@@ -119,7 +120,7 @@ void cPlot::update_gui()
 		int k = 0;
 		for (auto &chan : chan_legend_struct_list)
 		{
-			if (chan.type != MEAS_TYPE::VOID_INSTR)
+			if (chan.id != MEAS_TYPE::VOID_INSTR)
 			{
 				if (chan.channel_legend_name.compare("slot free") != 0)
 				{
@@ -167,15 +168,14 @@ void cPlot::update_chan_name_to_gui(MEAS_TYPE type, std::string name, size_t pos
 	//
 
 	// Open
-	cSignalTable* sigt = sigt->getInstance();
-	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sig_->get_signal_table();
 
 	// iterate until finding item
 	int pos = 0;
 	for (auto &chan : chan_legend_struct_list)
 	{
 		
-		if (chan.type == type)
+		if (chan.id == type)
 		{
 			if (pos == position)
 			{
@@ -184,7 +184,7 @@ void cPlot::update_chan_name_to_gui(MEAS_TYPE type, std::string name, size_t pos
 					// update
 					chan.channel_legend_name = name;
 					std::cout << "update_chan_name_to_gui->name: " << chan.channel_legend_name << "\n";
-					sigt->set_signal_table(chan_legend_struct_list);
+					sig_->set_signal_table(chan_legend_struct_list);
 					break;
 				}
 			}
@@ -209,8 +209,7 @@ void cPlot::update_chan_physical_unit_to_gui(std::string unit, size_t position)
 
 void cPlot::update_chan_statistic_labels()
 {
-	cSignalTable* sigt = sigt->getInstance();
-	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sig_->get_signal_table();
 
 	std::list<CHAN_LEGEND_STRUCT>::iterator it;
 	it = chan_legend_struct_list.begin();
@@ -219,11 +218,11 @@ void cPlot::update_chan_statistic_labels()
 	int index = 0;
 	for (size_t i = 0; i < chan_legend_struct_list.size(); i++)
 	{
-		if (it->type != MEAS_TYPE::VOID_INSTR)
+		if (it->id != MEAS_TYPE::VOID_INSTR)
 		{
 			if (it->channel_legend_name.compare("slot free") != 0)
 			{
-				chan_info_btn_pool[index]->set_min(get_signal_min_value(it->type, index));
+				chan_info_btn_pool[index]->set_min(get_signal_min_value(it->id, index));
 				chan_info_btn_pool[index]->set_average(get_signal_average_value(index));
 				chan_info_btn_pool[index]->set_max(get_signal_max_value(index));
 				index++;
@@ -244,13 +243,12 @@ int cPlot::GuiPositionToWingraphPosition(wxWindowID id)
 		return -1;
 	}
 
-	cSignalTable* sigt = sigt->getInstance();
-	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sigt->get_signal_table();
+	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sig_->get_signal_table();
 
 	int struct_pos = 0;
 	for (auto&& chan : chan_legend_struct_list)
 	{
-		if (chan.type != MEAS_TYPE::VOID_INSTR)
+		if (chan.id != MEAS_TYPE::VOID_INSTR)
 		{
 			if (chan.channel_legend_name.compare("slot free") != 0)
 			{
@@ -411,10 +409,9 @@ void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
 	//AddMultiplePoints(hGraph, val, signb, chunk_size);
 }
 
-double cPlot::get_signal_min_value(MEAS_TYPE type, int SignalNumber)
+double cPlot::get_signal_min_value(size_t id, int SignalNumber)
 {
-	cSignalTable* sigt = sigt->getInstance();
-	std::list<CHAN_LEGEND_STRUCT> list = sigt->get_signal_table();
+	std::list<CHAN_LEGEND_STRUCT> list = sig_->get_signal_table();
 
 	for (auto& chan : list)
 	{
@@ -436,6 +433,8 @@ double cPlot::get_signal_max_value(int SignalNumber)
 void cPlot::set_signal_visible(bool bShow, int SignalNumber)
 {
 	int index = GuiPositionToWingraphPosition(SignalNumber);
+	assert(index >= 0);
+	assert(index < MAX_SIG);
 	SetSignalVisible(hGraph, bShow, index);
 }
 

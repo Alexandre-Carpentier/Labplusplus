@@ -19,10 +19,11 @@
 #include <wx/fileconf.h>
 
 #include "cTable.h"
+#include "cSignalTable.h"
 #include "cDaqmxScaleDlg.h"
 
-#include "cUSB6001.h"
-#include "cDaqsim.h"
+#include "cNiDaq.h"
+#include "cNiDaqsim.h"
 
 #include "cSerialize.h"
 
@@ -185,19 +186,7 @@ void cDaqmx::deserialize(std::string device)
 	
 	label.channel_index = 0;
 	assert(config.channel_enabled.size() <= max_chan_number);
-	for (auto chan_enable : config.channel_enabled)
-	{
-		if(chan_enable)
-		{
-			UpdateChannelSig(chan_enable);
-			AddControlColomnTable(chan_enable);
-			SwitchChannelColor(chan_enable);
-		}
-		label.channel_index++;
-	}
-	label.channel_index = saved;
-	DoChannelUpdate(config.channel_enabled.at(label.channel_index));
-	label.channel_enabled = config.channel_enabled;
+	assert(config.channel_enabled.size() >=0);
 
 	deserialize_item(configsaver, "channel_name", config.channel_name);
 	deserialize_item(configsaver, "channel_mode", config.channel_mode);
@@ -222,6 +211,21 @@ void cDaqmx::deserialize(std::string device)
 	deserialize_item(configsaver, "channel_trigger_threshold", config.channel_trigger_threshold, max_chan_number);
 	deserialize_item(configsaver, "digital_channel_type", config.digital_channel_type, max_chan_number);
 	deserialize_item(configsaver, "digital_channel_mode_type", config.digital_channel_mode_type, max_chan_number);
+
+	for (auto chan_enable : config.channel_enabled)
+	{
+		if (chan_enable)
+		{
+			UpdateChannelSig(chan_enable);
+			AddControlColomnTable(chan_enable);
+			SwitchChannelColor(chan_enable);
+		}
+		label.channel_index++;
+	}
+	label.channel_index = saved;
+	DoChannelUpdate(config.channel_enabled.at(label.channel_index));
+	label.channel_enabled = config.channel_enabled;
+
 	/*
 	std::string id = device.append("_");
 	std::string fullpath = "Lab++";
@@ -259,10 +263,12 @@ void cDaqmx::deserialize(std::string device)
 	*/
 }
 
-cDaqmx::cDaqmx(wxWindow* inst)
+cDaqmx::cDaqmx(wxWindow* inst, cPlot* cplot, cSignalTable* signal_table)
 {
 	std::cout << "cDaqmx ctor...\n";
 	inst_ = inst;
+	cplot_ = cplot;
+	signal_table_ = signal_table;
 
 	////////////////////////////////////////////////////////////
 	// Load default labels in memory
@@ -562,8 +568,6 @@ cDaqmx::cDaqmx(wxWindow* inst)
 	// Draw btn with channel numbers 0 1 2 3 4 5 ...
 
 	chan_grid = new  wxGridSizer(max_chan_number, 0, 0);
-	
-
 	
 	daqinfo_v_sizer = new wxBoxSizer(wxVERTICAL);
 
@@ -978,12 +982,13 @@ cDaqmx::cDaqmx(wxWindow* inst)
 cDaqmx::~cDaqmx()
 {
 	// Serialize 
-	save_current_chan_config(config.channel_index);
+	save_current_chan_config(label.channel_index);
 	serialize(config.device_name.ToStdString());
 
 	// Free heap memory 
 	cMeasurementmanager *meas_manager = meas_manager->getInstance();
 	bool isDestroyed = meas_manager->destroy_subsystem(MEAS_TYPE::DAQ_INSTR);
+
 	// If item destroyed delete from memory
 	if (isDestroyed)
 	{
@@ -1517,6 +1522,7 @@ void cDaqmx::EnableChanProperties()
 
 }
 */
+
 void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 {
 	enable_pan = !enable_pan;
@@ -1529,7 +1535,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			// Enable/disable controls
 			if (checkchan->GetLabel().compare("ON") == 0)
 			{
-				EnableChannelItems(!enable_pan);
+				EnableChannelItems(true);
 			}
 
 			//clear first
@@ -1553,7 +1559,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			// Global to device
 
 			std::string s(buffer);
-			std::string delimiter = ",";
+			std::string delimiter = ", ";
 
 			size_t pos_start = 0, pos_end, delim_len = delimiter.length();
 			std::string token;
@@ -1566,6 +1572,8 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			}
 
 			names.push_back(s.substr(pos_start));
+
+			s.clear();
 
 			addr_ctrl->Clear();
 
@@ -1620,13 +1628,12 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
 					evt.Skip();
 					return;
-				}
-
+				}				
+				
 				if (strlen(buffer) > 0)
 				{
-					std::cout << "[*] Found Ananlog input on " << name << "\n";
-					std::string s(buffer);
-					std::string delimiter = ", ";
+					s = buffer;
+					std::cout << "[*] Found Analog input on " << name << "\n";
 					size_t pos_start = 0, pos_end, delim_len = delimiter.length();
 					std::string token;
 
@@ -1647,7 +1654,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 					label.channel_mode.push_back(CHANANALOG);
 					label.channel_permision.push_back(CHANREAD); // READ ONLY
 				}
-
+				s.clear();
 
 				// Find digital lines
 				ZeroMemory(buffer, bufferSize);
@@ -1660,8 +1667,8 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 				if (strlen(buffer) > 0)
 				{
-					std::cout << "[*] Found Ananlog input on " << name << "\n";
 					s = buffer;
+					std::cout << "[*] Found Digital output on " << name << "\n";				
 					pos_start = 0; pos_end = 0; delim_len = delimiter.length();
 					token = "";
 
@@ -1765,22 +1772,11 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				display_channel_as(CHANDIGITAL);
 			}
 
-
-			/*
-			// Update channels legend numbers
-			std::cout << "cObjectmanager->getInstance()\n";
-			cObjectmanager* object_manager = object_manager->getInstance();
-			cPlot* m_plot = object_manager->get_plot();
-			m_plot->resize_chan_number_to_gui(channels.size());
-			*/
-			std::cout << "cSignalTable->getInstance()\n";
-			cSignalTable* sigt = sigt->getInstance();
-
 			// Remove old range
-			sigt->slot_remove_range(MEAS_TYPE::DAQ_INSTR);
+			signal_table_->slot_remove_range(MEAS_TYPE::DAQ_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register_range(channels.size(), MEAS_TYPE::DAQ_INSTR))
+			if (!signal_table_->slot_register_range(channels.size(), MEAS_TYPE::DAQ_INSTR))
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -1823,6 +1819,10 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			daqinfo_v_sizer->Fit(this);
 
 			deserialize(addr_ctrl->GetValue().ToStdString());
+
+
+			//update_graph_names();
+
 			load_current_chan_config(config.channel_index);
 		}
 		else
@@ -1855,6 +1855,25 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 		}
 	}
 	evt.Skip();
+}
+
+void cDaqmx::update_graph_names()
+{
+	for (size_t chan_ind = 0; chan_ind < config.chan_number; chan_ind++)
+	{
+		if (config.channel_enabled[chan_ind])
+		{
+			std::cout << "cObjectmanager->getInstance()\n";
+			cObjectmanager* object_manager = object_manager->getInstance();
+			cPlot* m_plot = object_manager->get_plot();
+			std::cout << "update_graph_names" << config.channel_name.at(chan_ind) << "\n";
+
+			if (m_plot != nullptr)
+			{
+				m_plot->update_chan_name_to_gui(MEAS_TYPE::DAQ_INSTR, config.channel_name.at(chan_ind), chan_ind);
+			}
+		}
+	}
 }
 
 wxArrayString cDaqmx::LoadScalePresetArray(wxString filename)
@@ -1943,8 +1962,8 @@ void cDaqmx::OnDaqAddrSelBtn(wxCommandEvent& evt)
 	{
 		if (m_daq_ == nullptr)
 		{
-			std::cout << "[*] [new] Create cDaqsim\n";
-			m_daq_ = new(cDaqsim);
+			std::cout << "[*] [new] Create cNiDaqsim\n";
+			m_daq_ = new(cNiDaqsim);
 			meas_manager->set_measurement(m_daq_);
 		}
 		evt.Skip();
@@ -1968,8 +1987,8 @@ void cDaqmx::OnDaqAddrSelBtn(wxCommandEvent& evt)
 	}
 
 	// Then create appropriate DAQ object
-	std::cout << "[*] [new] Create cUsb6001\n";
-	m_daq_ = new(cUsb6001);
+	std::cout << "[*] [new] Create cNiDaq\n";
+	m_daq_ = new(cNiDaq);
 
 	// Object failed to create in memory
 	if (m_daq_ == nullptr)
@@ -2504,8 +2523,7 @@ void cDaqmx::UpdateChannelSig(bool isDisplayed)
 	if (!isDisplayed)
 	{
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_remove(MEAS_TYPE::DAQ_INSTR, label.channel_index))
+		if (!signal_table_->sig_remove(MEAS_TYPE::DAQ_INSTR, label.channel_index))
 		{
 			MessageBox(nullptr, L"Critical error at sig_remove in cSignalTable, cannot delete the signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -2526,8 +2544,7 @@ void cDaqmx::UpdateChannelSig(bool isDisplayed)
 
 		//m_plot->add_chan_to_gui(chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255), label.channel_index);
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_add(label.channel_index, MEAS_TYPE::DAQ_INSTR, chan_name_str.ToStdString(), chan_physical_name.ToStdString(), chan_physical_unit.ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255)))
+		if (!signal_table_->sig_add(label.channel_index, MEAS_TYPE::DAQ_INSTR, config.channel_name[label.channel_index], config.channel_physical_name[label.channel_index].ToStdString(), config.channel_physical_unit[label.channel_index].ToStdString(), wxColor(COLORS[label.channel_index][0] * 255, COLORS[label.channel_index][1] * 255, COLORS[label.channel_index][2] * 255)))
 		{
 			MessageBox(nullptr, L"Critical error at sig_add in cSignalTable, cannot add the signal.", L"[!] Critical failure.", S_OK);
 		}

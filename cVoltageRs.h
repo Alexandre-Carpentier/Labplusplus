@@ -11,6 +11,7 @@
 #include "data_types.h"
 
 class cTable;
+class cSignalTable;
 class cMeasurementmanager;
 class cMeasurement;
 class cDeviceMonitor;
@@ -23,6 +24,7 @@ class cVoltageRs : public wxFrame
 private:
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
+	cSignalTable* signal_table_ = nullptr;
 public:
 	// Signal color map
 	float COLORS[3] =
@@ -50,7 +52,7 @@ public:
 	const wxSize text_ctrl_size = wxSize(120, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
-	cVoltageRs(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
+	cVoltageRs(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table);
 	~cVoltageRs();
 
 	void RefreshPort();

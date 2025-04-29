@@ -12,8 +12,8 @@
 class cImagePanel;
 class cMeasurementmanager;
 class cCycle;
-class cUsb6001;
-class cDaqsim;
+class cNiDaq;
+class cNiDaqsim;
 class cMeasurement;
 class cTable;
 class cPlot;
@@ -28,7 +28,8 @@ static wxTreeCtrl* config_tree_ctrl = nullptr;
 class cDaqmx : public wxFrame
 {
 private:
-	
+	cPlot* cplot_ = nullptr;
+	cSignalTable* signal_table_ = nullptr;
 	cImagePanel* InstrImg = nullptr;
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
@@ -202,7 +203,7 @@ public:
 	void serialize(std::string device);
 	void deserialize(std::string device);
 
-	cDaqmx(wxWindow* inst);
+	cDaqmx(wxWindow* inst, cPlot* cplot, cSignalTable* signal_table);
 	~cDaqmx();
 
 	void OnPaint(wxPaintEvent& event);
@@ -222,6 +223,8 @@ public:
 
 	void load_combobox(wxComboBox* combo, wxString str);
 	void load_combobox(wxComboBox* combo, double floating);
+
+	void update_graph_names();
 
 	wxArrayString LoadScalePresetArray(wxString filename);
 	//void EnableChanProperties();

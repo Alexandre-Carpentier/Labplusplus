@@ -11,14 +11,16 @@
 #include "cMeasurementmanager.h"
 #include "cDeviceMonitor.h"
 #include "cTable.h"
+#include "cSignalTable.h"
 #include "cPacesim.h"
 #include "cPacecom.h"
 
 
-cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
+cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table)
 {
 	std::cout << "cPressure ctor...\n";
 	inst_ = inst;
+	signal_table_ = signal_table;
 	devmon_ = devmon;
 
 	//cDeviceMonitor* devmon = devmon->getInstance();
@@ -315,13 +317,11 @@ void cPressure::OnPressureEnableBtn(wxCommandEvent& evt)
 			// Add a channel for pressure at the end
 			//m_plot->resize_chan_number_to_gui(element_nb+1);
 
-			cSignalTable* sigt = sigt->getInstance();
-
 			// Remove old range
-			sigt->slot_remove_range(MEAS_TYPE::PRESSURE_CONTROLER_INSTR);
+			signal_table_->slot_remove_range(MEAS_TYPE::PRESSURE_CONTROLER_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register(MEAS_TYPE::PRESSURE_CONTROLER_INSTR))
+			if (!signal_table_->slot_register(MEAS_TYPE::PRESSURE_CONTROLER_INSTR))
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -462,9 +462,7 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 
 		DestroySubsystem();
 
-		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_remove(MEAS_TYPE::PRESSURE_CONTROLER_INSTR, 0))
+		if (!signal_table_->sig_remove(MEAS_TYPE::PRESSURE_CONTROLER_INSTR, 0))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -485,10 +483,8 @@ void cPressure::EnablePressureChannel(bool isDisplayed)
 		m_plot->add_chan_to_gui("Pace 6000 simulated", "Simulated", "Bar", wxColor(45, 30, 30), m_plot->gui_get_last_active_channel_number()); // add last
 		*/
 		
-		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::PRESSURE_CONTROLER_INSTR, "PACE6000", instr_name, "Bar", wxColor(45, 30, 30)))
+		if (!signal_table_->sig_add(0, MEAS_TYPE::PRESSURE_CONTROLER_INSTR, "PACE6000", instr_name, "Bar", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register pressure signal.", L"[!] Critical failure.", S_OK);
 		}

@@ -168,7 +168,6 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			CURRENT_DEVICE_CONFIG_STRUCT *config = pressureconfig->GetPressureConfigStruct();
 
 			pressureconfig->m_pressure_->set_configuration_struct(config);
-
 		}
 
 		// Load Voltage System 1
@@ -297,8 +296,8 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		}
 
 		// Lock daq interface when running	
-		daqconfig->previous_chan->Enable(false);
-		daqconfig->next_chan->Enable(false);
+		//daqconfig->previous_chan->Enable(false);
+		//daqconfig->next_chan->Enable(false);
 		for (auto& ch_btn : daqconfig->chanbtn)
 		{
 			ch_btn->Enable(false);

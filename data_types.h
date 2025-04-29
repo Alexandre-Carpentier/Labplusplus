@@ -130,7 +130,7 @@ enum MEAS_TYPE
 
 typedef struct
 {
-	MEAS_TYPE type;
+	size_t id;
 	std::string  channel_legend_name;
 	std::string  channel_legend_addr;
 	std::string  channel_legend_unit;

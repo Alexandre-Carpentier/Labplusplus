@@ -10,16 +10,19 @@
 #include "cMeasurementmanager.h"
 #include "cDeviceMonitor.h"
 #include "cTable.h"
+#include "cSignalTable.h"
 
 #include "c6510sim.h"
 #include "c6510usb.h"
 
 struct c6510ui::my_impl{
 
-	my_impl(wxWindow* parent, std::shared_ptr <cDeviceMonitor> devmon, std::string instrument_name)
+	my_impl(wxWindow* parent, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table, std::string instrument_name)
 	{
 		Parent_ = parent;
 		devmon_ = devmon;
+		signal_table_ = signal_table;
+
 		instrument_name_ = instrument_name;
 		configfile = instrument_name + ".ini";
 
@@ -139,6 +142,7 @@ struct c6510ui::my_impl{
 	};
 
 	std::shared_ptr <cDeviceMonitor> devmon_ = nullptr;
+	cSignalTable* signal_table_ = nullptr;
 	cTable* m_table_ = nullptr;
 	wxStaticBoxSizer* device_group_sizer;
 	cMeasurementmanager* meas_manager = nullptr; // Measurement manager singleton
@@ -171,10 +175,10 @@ struct c6510ui::my_impl{
 	void load_combobox(wxComboBox* combo, double floating);
 };
 
-c6510ui::c6510ui(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
+c6510ui::c6510ui(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table)
 {
 	std::cout << "[*] c6510ui ctor...\n";
-	pimpl = std::make_unique<my_impl>(inst, devmon, "DAQ6510");
+	pimpl = std::make_unique<my_impl>(inst, devmon, signal_table, "DAQ6510");
 	std::cout << "[*] my_impl created...\n";
 }
 
@@ -416,13 +420,11 @@ void c6510ui::my_impl::OnDaq6510EnableBtn(wxCommandEvent& evt)
 
 			// Add a channel for daq6510 at the end
 
-			cSignalTable* sigt = sigt->getInstance();
-
 			// Remove old range
-			sigt->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
+			signal_table_->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR))
+			if (!signal_table_->slot_register(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR))
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -557,8 +559,8 @@ void c6510ui::my_impl::EnableDaq6510Channel(bool isDisplayed)
 		DestroySubsystem();
 
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
+
+		if (!signal_table_->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register daq6510 signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -572,9 +574,8 @@ void c6510ui::my_impl::EnableDaq6510Channel(bool isDisplayed)
 	else
 	{
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "DAQ6510", instr_name, "Volt", wxColor(45, 30, 30)))
+		if (!signal_table_->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "DAQ6510", instr_name, "Volt", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register daq6510 signal.", L"[!] Critical failure.", S_OK);
 		}

@@ -144,12 +144,10 @@
   <ItemGroup>
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="WinGraph.cpp" />
-    <ClCompile Include="xlsx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="WinGraph.h" />
-    <ClInclude Include="xlsx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

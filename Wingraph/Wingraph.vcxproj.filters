@@ -17,18 +17,12 @@
     <ClCompile Include="Mouse.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="xlsx.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WinGraph.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
     <ClInclude Include="Mouse.h">
-      <Filter>Fichiers sources</Filter>
-    </ClInclude>
-    <ClInclude Include="xlsx.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
   </ItemGroup>

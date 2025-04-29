@@ -6,6 +6,7 @@
 // Licence:     LGPL-2.1-or-later
 /////////////////////////////////////////////////////////////////////////////
 #include "IInstrument.h"
+#include "cSignalTable.h"
 
 #include <wx/dcbuffer.h>
 #include <wx/combobox.h>
@@ -27,6 +28,7 @@ static wxImage img;
 struct IInstrument::Instrumentimpl {
 
 	wxWindow* Parent_ = nullptr; // ref to parent object
+	cSignalTable* signal_table_ = nullptr;
 	//wxWindow* inst_;
 	// 
 	// ptr to right panel
@@ -65,7 +67,7 @@ struct IInstrument::Instrumentimpl {
 	const wxSize text_ctrl_size = wxSize(120, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
-	Instrumentimpl(wxWindow* parent, std::shared_ptr<cDeviceMonitor> devmon, std::string instrument_name)
+	Instrumentimpl(wxWindow* parent, std::shared_ptr<cDeviceMonitor> devmon, cSignalTable* signal_table, std::string instrument_name)
 	{
 		Parent_ = parent;
 		devmon_ = devmon;
@@ -348,13 +350,11 @@ void IInstrument::Instrumentimpl::OnOscopeEnableBtn(wxCommandEvent& evt)
 
 			// Add a channel for oscope at the end
 
-			cSignalTable* sigt = sigt->getInstance();
-
 			// Remove old range
-			sigt->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
+			signal_table_->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR))
+			if (!signal_table_->slot_register(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR))
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -481,9 +481,8 @@ void IInstrument::Instrumentimpl::EnableOscopeChannel(bool isDisplayed)
 		// Kill instance
 		DestroySubsystem();
 
-		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
+
+		if (!signal_table_->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register oscope signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -496,10 +495,8 @@ void IInstrument::Instrumentimpl::EnableOscopeChannel(bool isDisplayed)
 	}
 	else
 	{
-		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "DSOX1202G", instr_name, "Volt", wxColor(45, 30, 30)))
+		if (!signal_table_->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "DSOX1202G", instr_name, "Volt", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register oscope signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -521,7 +518,7 @@ void IInstrument::Instrumentimpl::EnableOscopeChannel(bool isDisplayed)
 IInstrument::IInstrument(cInstrumentparam& param) :param_(param)
 {
 	std::cout << "[*] IInstrument ctor...\n";
-	pimpl = std::make_unique<Instrumentimpl>(param.getPage(), param.getDeviceMonitor(), param.getDeviceName());
+	pimpl = std::make_unique<Instrumentimpl>(param.getPage(), param.getDeviceMonitor(), param.getSignalTable(), param.getDeviceName());
 	std::cout << "[*] Instrumentimpl created...\n";
 }
 

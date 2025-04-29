@@ -9,6 +9,7 @@
 #include <wx/wx.h>
 #include <wx/simplebook.h>
 
+class cSignalTable;
 class cTable;
 class cPlot;
 class cDaqmx;
@@ -73,7 +74,7 @@ private:
 	std::vector<PLUGIN_DATA> plugin_vec;
 
 public:
-	cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
+	cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table);
 	~cConfig();
 	void OnClickdrop(wxMouseEvent& evt);
 	void StopTest(bool stop);

@@ -11,13 +11,15 @@
 #include "cMeasurementmanager.h"
 #include "cDeviceMonitor.h"
 #include "cTable.h"
+#include "cSignalTable.h"
 #include "cSupplyrssim.h"
 #include "cSupplyrsusb.h"
 
-cVoltageRs::cVoltageRs(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
+cVoltageRs::cVoltageRs(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table)
 {
 	std::cout << "cVoltageRs ctor...\n";
 	inst_ = inst;
+	signal_table_ = signal_table;
 	devmon_ = devmon;
 
 	////////////////////////////////////////////////////////////
@@ -273,13 +275,11 @@ void cVoltageRs::OnVoltageEnableBtn(wxCommandEvent& evt)
 			// Add a channel for voltage at the end
 			//m_plot->resize_chan_number_to_gui(element_nb+1);
 
-			cSignalTable* sigt = sigt->getInstance();
-
 			// Remove old range
-			sigt->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
+			signal_table_->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register_range(2, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR)) // 2 slot, I+V
+			if (!signal_table_->slot_register_range(2, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR)) // 2 slot, I+V
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -418,12 +418,11 @@ void cVoltageRs::EnableVoltageChannel(bool isDisplayed)
 		DestroySubsystem();
 
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 1))
+		if (!signal_table_->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 1))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
 		}
-		if (!sigt->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
+		if (!signal_table_->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -445,13 +444,12 @@ void cVoltageRs::EnableVoltageChannel(bool isDisplayed)
 		*/
 
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "RS6005P_A", instr_name, "Amp", wxColor(25, 200, 130)))
+		if (!signal_table_->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "RS6005P_A", instr_name, "Amp", wxColor(25, 200, 130)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
 		}
-		if (!sigt->sig_add(1, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "RS6005P_V", instr_name, "V", wxColor(200, 27, 27)))
+		if (!signal_table_->sig_add(1, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "RS6005P_V", instr_name, "V", wxColor(200, 27, 27)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register voltage signal.", L"[!] Critical failure.", S_OK);
 		}

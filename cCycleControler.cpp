@@ -19,7 +19,7 @@
 #include "cFooter.h"
 #include "cObjectmanager.h"
 #include "cMeasurementmanager.h"
-#include "cUSB6001.h"
+#include "cNiDaq.h"
 #include "cMeasurement.h"
 #include "cTick.h"
 

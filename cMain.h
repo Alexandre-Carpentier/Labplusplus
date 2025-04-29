@@ -28,6 +28,7 @@ class cDeviceMonitor;
 #include"cGraphrender.h"
 #include"cStatrender.h"
 #include"cInicfg.h"
+#include "cSignalTable.h"
 
 /*
 #ifdef _DEBUG
@@ -71,7 +72,14 @@ public:
 	enum { DISP_FREQ = 16 };						// ms to draw
 	enum { GRAPH_NBPOINTS = 10000 };				// pts
 
-	cDeviceMonitor* devmon;
+	////////////////////////////////////////////////////////////////////////////////
+	// DEV MONITOR
+	////////////////////////////////////////////////////////////////////////////////
+	std::shared_ptr<cDeviceMonitor> devmon = std::make_shared<cDeviceMonitor>();
+	////////////////////////////////////////////////////////////////////////////////
+	// SIGNAL TABLE
+	////////////////////////////////////////////////////////////////////////////////
+	cSignalTable signal_table;
 
 	wxStatusBar* statusBar = nullptr;
 	wxToolBar* toolbar = nullptr;
@@ -105,8 +113,8 @@ public:
 	wxPanel* plot_rightpanel = nullptr;
 	wxBoxSizer* plot_hsizer = nullptr;
 
-	cGraphrender* m_graphrender = nullptr;
-	cStatrender* m_statrender = nullptr;
+	std::unique_ptr<cGraphrender> m_graphrender;
+	std::unique_ptr <cStatrender> m_statrender;
 
 	cFooter* m_footer = nullptr;
 

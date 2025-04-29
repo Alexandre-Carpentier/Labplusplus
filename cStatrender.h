@@ -14,6 +14,7 @@
 
 #include "cPlot.h"
 #include "cFooter.h"
+class cSignalTable;
 /*
 class cPlot;
 class cFooter;
@@ -21,12 +22,12 @@ class cFooter;
 
 class cStatrender : public wxTimer
 {
+private:
+	cPlot* m_plot_;
+	cSignalTable* signal_table_;
+	cFooter* m_footer_;
 public:
-
-	cPlot* m_plot_ = nullptr;
-	cFooter* m_footer_ = nullptr;
-
-	cStatrender(cPlot* m_plot, const short disp_freq);
+	cStatrender(cPlot* m_plot, const short disp_freq, cSignalTable* signal_table);
 
 	void add_freq_footer(cFooter* m_footer);
 

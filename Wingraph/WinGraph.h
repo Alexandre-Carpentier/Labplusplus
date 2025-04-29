@@ -25,47 +25,47 @@ enum LOGGER_M {
 };
 
 // Public declaration goes here
-typedef VOID* HGRAPH;
+typedef void* HGRAPH;
 #ifdef __cplusplus
 extern "C" {
 #endif
-	__declspec(dllexport)BOOL StartGraph(HGRAPH hGraph, CONST CHAR* opt_header);
-	__declspec(dllexport)VOID StopGraph(HGRAPH hGraph);
-	__declspec(dllexport)VOID FreeGraph(HGRAPH* hGraph);
-	__declspec(dllexport)HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, CONST INT SignalCount, CONST INT BufferSize);
-	__declspec(dllexport)BOOL SetSignalCount(HGRAPH hGraph, CONST INT iSignalNumber);
-	__declspec(dllexport)VOID SetSignalLabel(HGRAPH hGraph, CONST CHAR szLabel[260], CONST INT iSignalNumber);
-	__declspec(dllexport)VOID SetSignalColor(HGRAPH hGraph, CONST INT R, CONST INT G, CONST INT B, CONST INT iSignalNumber);
-	__declspec(dllexport)VOID SetSignalVisible(HGRAPH hGraph, BOOL bDisplay, CONST INT iSignalNumber);
-	__declspec(dllexport)VOID SetRecordingMode(HGRAPH hGraph, LOGGER_M logging);
-	__declspec(dllexport)VOID SetAutoscaleMode(HGRAPH hGraph, BOOL mode);
-	__declspec(dllexport)VOID SetDisplayCursor(HGRAPH hGraph, BOOL isActive);
-	__declspec(dllexport)VOID SetYminVal(HGRAPH hGraph, double ymin); // Set the Y min axe value of the graph, autoscale clear this value when enable
-	__declspec(dllexport)VOID SetYmaxVal(HGRAPH hGraph, double ymax); // Set the Y max axe value of the graph, autoscale clear this value when enable
-	__declspec(dllexport)VOID SetZoomFactor(HGRAPH hGraph, int zoom); // Set the X scale factor value of the graph
-	__declspec(dllexport)VOID SetFilteringMode(HGRAPH hGraph, FILTER_M filtering, CONST INT iSignalNumber);
-	__declspec(dllexport)VOID SetFilteringThreshold(HGRAPH hGraph, CONST FLOAT intensity , CONST INT iSignalNumber);
-	__declspec(dllexport)VOID SetSignalMinValue(HGRAPH hGraph, CONST INT SIGNB, DOUBLE val);
-	__declspec(dllexport)VOID SetSignalAverageValue(HGRAPH hGraph, CONST INT SIGNB, DOUBLE val);
-	__declspec(dllexport)VOID SetSignalMaxValue(HGRAPH hGraph, CONST INT SIGNB, DOUBLE val);
-	__declspec(dllexport)BOOL GetGraphState(HGRAPH hGraph);
+	__declspec(dllexport)bool StartGraph(HGRAPH hGraph, const char* opt_header);
+	__declspec(dllexport)void StopGraph(HGRAPH hGraph);
+	__declspec(dllexport)void FreeGraph(HGRAPH* hGraph);
+	__declspec(dllexport)HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, const int SignalCount, const int BufferSize);
+	__declspec(dllexport)bool SetSignalCount(HGRAPH hGraph, const int iSignalNumber);
+	__declspec(dllexport)void SetSignalLabel(HGRAPH hGraph, const char szLabel[260], const int iSignalNumber);
+	__declspec(dllexport)void SetSignalColor(HGRAPH hGraph, const int R, const int G, const int B, const int iSignalNumber);
+	__declspec(dllexport)void SetSignalVisible(HGRAPH hGraph, bool bDisplay, const int iSignalNumber);
+	__declspec(dllexport)void SetRecordingMode(HGRAPH hGraph, LOGGER_M logging);
+	__declspec(dllexport)void SetAutoscaleMode(HGRAPH hGraph, bool mode);
+	__declspec(dllexport)void SetDisplayCursor(HGRAPH hGraph, bool isActive);
+	__declspec(dllexport)void SetYminVal(HGRAPH hGraph, double ymin); // Set the Y min axe value of the graph, autoscale clear this value when enable
+	__declspec(dllexport)void SetYmaxVal(HGRAPH hGraph, double ymax); // Set the Y max axe value of the graph, autoscale clear this value when enable
+	__declspec(dllexport)void SetZoomFactor(HGRAPH hGraph, int zoom); // Set the X scale factor value of the graph
+	__declspec(dllexport)void SetFilteringMode(HGRAPH hGraph, FILTER_M filtering, const int iSignalNumber);
+	__declspec(dllexport)void SetFilteringThreshold(HGRAPH hGraph, const float intensity , const int iSignalNumber);
+	__declspec(dllexport)void SetSignalMinValue(HGRAPH hGraph, const int SIGNB, double val);
+	__declspec(dllexport)void SetSignalAverageValue(HGRAPH hGraph, const int SIGNB, double val);
+	__declspec(dllexport)void SetSignalMaxValue(HGRAPH hGraph, const int SIGNB, double val);
+	__declspec(dllexport)bool GetGraphState(HGRAPH hGraph);
 	__declspec(dllexport)char* GetGraphFilename(HGRAPH hGraph);
 	__declspec(dllexport)HGLRC GetGraphRC(HGRAPH);
 	__declspec(dllexport)HDC GetGraphDC(HGRAPH);
 	__declspec(dllexport)HWND GetGraphParentWnd(HGRAPH);
 	__declspec(dllexport)HWND GetGraphWnd(HGRAPH hGraph);
-	__declspec(dllexport)INT GetGraphSignalCount(HGRAPH hGraph);
-	__declspec(dllexport)INT GetZoomFactor(HGRAPH hGraph);
-	__declspec(dllexport)double GetGraphLastSignalValue(HGRAPH hGraph, CONST INT SIGNB);
-	__declspec(dllexport)double GetSignalMinValue(HGRAPH hGraph, CONST INT SIGNB);
-	__declspec(dllexport)double GetSignalAverageValue(HGRAPH hGraph, CONST INT SIGNB);
-	__declspec(dllexport)double GetSignalMaxValue(HGRAPH hGraph, CONST INT SIGNB);
-	__declspec(dllexport)VOID SignalResetStatisticValue(HGRAPH hGraph, CONST INT SIGNB);
+	__declspec(dllexport)int GetGraphSignalCount(HGRAPH hGraph);
+	__declspec(dllexport)int GetZoomFactor(HGRAPH hGraph);
+	__declspec(dllexport)double GetGraphLastSignalValue(HGRAPH hGraph, const int SIGNB);
+	__declspec(dllexport)double GetSignalMinValue(HGRAPH hGraph, const int SIGNB);
+	__declspec(dllexport)double GetSignalAverageValue(HGRAPH hGraph, const int SIGNB);
+	__declspec(dllexport)double GetSignalMaxValue(HGRAPH hGraph, const int SIGNB);
+	__declspec(dllexport)void SignalResetStatisticValue(HGRAPH hGraph, const int SIGNB);
 
-	__declspec(dllexport)VOID AddPoint(HGRAPH hGraph, DOUBLE* y, CONST INT SignalCount);
-	__declspec(dllexport)VOID AddMultiplePoints(HGRAPH hGraph, DOUBLE** Chunks, CONST INT SignalCount, CONST INT BufferLength);
-	__declspec(dllexport)BOOL Render(HGRAPH hGraph);
-	__declspec(dllexport)VOID ReshapeGraph(HGRAPH hGraph, int left, int top, int right, int bottom);
+	__declspec(dllexport)void AddPoint(HGRAPH hGraph, double* y, const int SignalCount);
+	__declspec(dllexport)void AddMultiplePoints(HGRAPH hGraph, double** Chunks, const int SignalCount, const int BufferLength);
+	__declspec(dllexport)bool Render(HGRAPH hGraph);
+	__declspec(dllexport)void ReshapeGraph(HGRAPH hGraph, int left, int top, int right, int bottom);
 #ifdef __cplusplus
 }
 #endif

@@ -13,6 +13,7 @@
 
 class cTable;
 class cDeviceMonitor;
+class cSignalTable;
 
 static wxImage oscope_instrument_img;
 static wxPanel* oscope_instrument_rightpanel_ = nullptr;
@@ -20,7 +21,7 @@ static wxPanel* oscope_instrument_rightpanel_ = nullptr;
 class cOscope : public wxFrame
 {
 public:
-	cOscope(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
+	cOscope(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table);
 	~cOscope();
 
 	int launch_device(); // Start device with current config

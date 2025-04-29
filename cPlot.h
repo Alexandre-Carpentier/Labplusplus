@@ -18,7 +18,7 @@
 #include <process.h>
 
 #include "WinGraph.h"
-#include "cSignalTable.h"
+
 
 #include "cMeasurementmanager.h"
 #include "cSignalBtn.h"
@@ -42,6 +42,7 @@ class cMeasurementmanager;
 #include "cObjectmanager.h"
 
 */
+class cSignalTable;
 
 class cPlot
 {
@@ -61,11 +62,11 @@ private:
 	int CURRENT_SIG;
 	wxBoxSizer* legend_vsizer = nullptr;
 
-	//std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list;
 	wxCustomButton* chan_info_btn_pool[MAX_SIG];
+	cSignalTable* sig_ = nullptr;
 
 public:
-	cPlot(wxWindow* inst, int nbPoints);
+	cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table);
 	~cPlot();
 
 	void update_gui();
@@ -100,7 +101,7 @@ public:
 	void graph_addpoint(const int signb, double val[]);
 	void graph_addpoints(const int signb, double* val[], int chunk_size);
 
-	double get_signal_min_value(MEAS_TYPE type, int SignalNumber);
+	double get_signal_min_value(size_t id, int SignalNumber);
 	double get_signal_average_value(int SignalNumber);
 	double get_signal_max_value(int SignalNumber);
 	void set_signal_visible(bool bShow, int SignalNumber);

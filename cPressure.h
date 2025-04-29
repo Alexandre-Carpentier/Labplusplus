@@ -10,6 +10,7 @@
 #include <wx/wx.h>
 #include "data_types.h"
 class cTable;
+class cSignalTable;
 class cMeasurementmanager;
 class cMeasurement;
 class cDeviceMonitor;
@@ -22,6 +23,7 @@ class cPressure : public wxFrame
 private:
 	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
+	cSignalTable* signal_table_ = nullptr;
 
 public:
 	// Signal color map
@@ -54,7 +56,7 @@ public:
 	const wxSize text_ctrl_size = wxSize(120, 24);
 	wxColor* bgcolor = new wxColor(245, 245, 248);
 
-	cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
+	cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table);
 	~cPressure();
 
 	void RefreshPort();

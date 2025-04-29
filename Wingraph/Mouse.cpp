@@ -8,19 +8,19 @@
 #include "Mouse.h"
 #include "WinGraph.h"
 
-POINT GetMousePosition(VOID)
+POINT GetMousePosition(void)
 {
-	POINT Point;
-	if (GetCursorPos(&Point) == FALSE)
+	POINT POINT;
+	if (GetCursorPos(&POINT) == FALSE)
 		return { 0, 0 };
 
-	return Point;
+	return POINT;
 }
 
-BOOL isMouseHover(HGRAPH hGraph)
+bool isMouseHover(HGRAPH hGraph)
 {
-	POINT Point;
-	if (GetCursorPos(&Point) == FALSE)
+	POINT POINT;
+	if (GetCursorPos(&POINT) == FALSE)
 		return FALSE;
 
 	RECT client;
@@ -32,8 +32,8 @@ BOOL isMouseHover(HGRAPH hGraph)
 		{
 			if (GetWindowRect(hwndGraph, &client))
 			{
-				//printf("\t%i>%i--%i<%i--%i<%i--%i>%i--\n", Point.x, client.left, Point.x, client.right, Point.y, client.bottom, Point.y, client.top);
-				if (((Point.x > client.left) && (Point.x < client.right)) && ((Point.y < client.bottom) && (Point.y > client.top)))
+				//printf("\t%i>%i--%i<%i--%i<%i--%i>%i--\n", POINT.x, client.left, POINT.x, client.right, POINT.y, client.bottom, POINT.y, client.top);
+				if (((POINT.x > client.left) && (POINT.x < client.right)) && ((POINT.y < client.bottom) && (POINT.y > client.top)))
 				{
 					//printf("Hoover\n");
 					return TRUE;
@@ -44,7 +44,7 @@ BOOL isMouseHover(HGRAPH hGraph)
 	return FALSE;
 }
 
-VOID DisplayPointer(HGRAPH hGraph)
+void DisplayPointer(HGRAPH hGraph)
 {
 	if (isMouseHover(hGraph))
 	{

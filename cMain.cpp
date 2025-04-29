@@ -24,6 +24,7 @@
 #include "cConfig.h"
 #include "cTable.h"
 
+
 #include "resource.h"
 
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
@@ -63,8 +64,6 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	//
 	//	Launch the device monitor tool
 	//
-
-	std::shared_ptr<cDeviceMonitor> devmon = std::make_shared<cDeviceMonitor>();
 	devmon->Notify();
 
 	std::cout << "Current scale factor: " << this->GetDPIScaleFactor() << "\n";
@@ -96,16 +95,16 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 
 	main_menu->Append(file_menu, "&File");
 
-	
-		this->Bind(wxEVT_MENU, &cMain::CreateDefaultScalesButtonClicked, this,
-			edit_menu->Append(wxID_ANY, "&Create new custom scale configuration files\t")->GetId());
-	this->Bind(wxEVT_MENU, &cMain::DeleteconfigButtonClicked, this,
-		edit_menu->Append(wxID_ANY, "&Delete all configuration files\t")->GetId());
 	this->Bind(wxEVT_MENU, &cMain::OpenconfigFolderButtonClicked, this,
 		edit_menu->Append(wxID_ANY, "&Open configuration folder\t")->GetId());
+		this->Bind(wxEVT_MENU, &cMain::CreateDefaultScalesButtonClicked, this,
+			edit_menu->Append(wxID_ANY, "&Reset custom scale to default\t")->GetId());
+	this->Bind(wxEVT_MENU, &cMain::DeleteconfigButtonClicked, this,
+		edit_menu->Append(wxID_ANY, "&Reset serializer (delete files)\t")->GetId());
+
 	edit_menu->AppendSeparator();
 
-	main_menu->Append(edit_menu, "&Edit");
+	main_menu->Append(edit_menu, "&Configuration");
 
 	SetMenuBar(main_menu);
 
@@ -183,11 +182,15 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	main_vsizer->Add(save_hsizer, 1, wxEXPAND);
 	save_hsizer->Show(false);
 	*/
+
+
+
+
 	////////////////////////////////////////////////////////////////////////////////
 	// CONFIG WND
 	////////////////////////////////////////////////////////////////////////////////
 
-	m_config = new cConfig(this, devmon);
+	m_config = new cConfig(this, devmon, &signal_table);
 	manager->set_config(m_config);
 	config_leftpanel = m_config->Getleftpan();
 	config_rightpanel = m_config->Getrightpan();
@@ -216,7 +219,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// PLOT WND
 	////////////////////////////////////////////////////////////////////////////////
-	m_plot = new cPlot(this, GRAPH_NBPOINTS);
+	m_plot = new cPlot(this, GRAPH_NBPOINTS, &signal_table);
 	manager->set_plot(m_plot);
 	m_config->set_graph(m_plot);
 
@@ -228,8 +231,8 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	plot_hsizer->Show(false);
 
 	main_vsizer->Add(plot_hsizer, 1, wxEXPAND);
-	m_graphrender = new cGraphrender(m_plot, DISP_FREQ);
-	m_statrender = new cStatrender(m_plot, 1000);
+	m_graphrender = std::make_unique<cGraphrender>(m_plot, DISP_FREQ);
+	m_statrender = std::make_unique<cStatrender>(m_plot, 1000, &signal_table);
 
 	////////////////////////////////////////////////////////////////////////////////
 	// PLAY WND
@@ -293,28 +296,18 @@ cMain::~cMain()
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
 	delete m_table;
 	delete m_plot;
-	delete m_graphrender;
-	delete m_statrender;
 	delete m_footer;
-	delete devmon;
 	delete m_config;
 
 	cfg_saver = nullptr; 
 	m_config = nullptr;
 	m_plot = nullptr;
-	m_graphrender = nullptr;
-	m_statrender = nullptr;
 	m_footer = nullptr;
-	devmon = nullptr;
+
 	// destroy singleton
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* manager = manager->getInstance();
 	manager->kill();
-
-	std::cout << "cSignalTable->getInstance()\n";
-	cSignalTable* sigt = sigt->getInstance();
-	sigt->kill();
-
 #ifdef _DEBUG
 	//_CrtDumpMemoryLeaks();
 #endif
@@ -464,6 +457,7 @@ bool delete_all_conf_files(wchar_t* path)
 		
 	}
 	FindClose(hFind);
+	return true;
 }
 void cMain::DeleteconfigButtonClicked(wxCommandEvent& evt)
 {

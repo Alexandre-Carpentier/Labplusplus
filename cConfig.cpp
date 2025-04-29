@@ -18,8 +18,8 @@
 
 
 //#pragma comment (lib, "Plugin.lib")
-#include "..\Lab\Plugin\cDevice.h"
-//#include "..\Lab++\Plugin\cDevice.h"
+//#include "..\Lab\Plugin\cDevice.h"
+#include "..\Lab++\Plugin\cDevice.h"
 
 #include "cTable.h"
 #include "cPlot.h"
@@ -97,11 +97,12 @@ void cDevice::OnPaint()
 }
 -----------------Duplication---------------------------------*/
 
-cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
+cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table)
 {
+	std::cout << "cConfig ctor...\n"; 
 	inst_ = inst; // wxFrame is the parent
 	devmon_ = devmon;
-	std::cout << "cConfig ctor...\n";
+	
 
 	config_leftpanel_ = new wxPanel(inst, IDC_CONFIG_LEFT_PAN, wxDefaultPosition, inst->FromDIP(wxSize(300, 600)));
 	config_leftpanel_->SetBackgroundColour(wxColor(220, 220, 225));
@@ -129,7 +130,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	//
 
 	// Add cDaqmx to plugin vec
-	m_daqmx = new cDaqmx(book);
+	m_daqmx = new cDaqmx(book, m_plot_, signal_table);
 	m_daq_dev = new cDevice();
 	m_daq_dev->set_access_type(ALL);
 	m_daq_dev->set_device_name("NI-DAQ");
@@ -149,7 +150,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	plugin_vec.push_back(Daqmx_struct);
 
 	// Add cPressure to plugin vec
-	m_pressure = new cPressure(book, devmon_);
+	m_pressure = new cPressure(book, devmon_, signal_table);
 	cDevice* m_pressure_dev = new cDevice();
 	m_pressure_dev->set_access_type(ALL);
 	m_pressure_dev->set_device_name("PACE6000");
@@ -169,7 +170,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	plugin_vec.push_back(Pressure_struct);
 
 	// Add cVoltage to plugin vec
-	m_voltage = new cVoltage(book, devmon_);
+	m_voltage = new cVoltage(book, devmon_, signal_table);
 	cDevice* m_voltage_dev = new cDevice();
 	m_voltage_dev->set_access_type(ALL);
 	m_voltage_dev->set_device_name("2280S");
@@ -189,7 +190,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	plugin_vec.push_back(Voltage_struct);
 
 	// Add cVoltage to plugin vec
-	m_voltage_rs = new cVoltageRs(book, devmon_);
+	m_voltage_rs = new cVoltageRs(book, devmon_, signal_table);
 	cDevice* m_voltage_rs_dev = new cDevice();
 	m_voltage_rs_dev->set_access_type(ALL);
 	m_voltage_rs_dev->set_device_name("RS6005P");
@@ -209,7 +210,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	plugin_vec.push_back(VoltageRs_struct);
 
 	// Add cOscope to plugin vec
-	m_oscope = new cOscope(book, devmon_);
+	m_oscope = new cOscope(book, devmon_, signal_table);
 	cDevice* m_oscope_dev = new cDevice();
 	m_oscope_dev->set_access_type(READ);
 	m_oscope_dev->set_device_name("DSOX1202G");
@@ -229,7 +230,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
 	plugin_vec.push_back(Oscope_struct);
 
 	// Add cOscope to plugin vec
-	m_6510ui = new c6510ui(book, devmon_);
+	m_6510ui = new c6510ui(book, devmon_, signal_table);
 	cDevice* m_6510_dev = new cDevice();
 	m_6510_dev->set_access_type(READ);
 	m_6510_dev->set_device_name("DAQ6510");

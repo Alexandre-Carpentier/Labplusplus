@@ -17,13 +17,14 @@
 #include "cMeasurementmanager.h"
 #include "cDeviceMonitor.h"
 #include "cTable.h"
+#include "cSignalTable.h"
 
 #include "cOscopesim.h"
 #include "cOscopeusb.h"
 
 struct cOscope::Oscopeimpl {
 
-	Oscopeimpl(wxWindow* parent, std::shared_ptr <cDeviceMonitor> devmon, std::string instrument_name)
+	Oscopeimpl(wxWindow* parent, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table, std::string instrument_name)
 	{
 		Parent_ = parent;
 		devmon_ = devmon;
@@ -110,6 +111,7 @@ struct cOscope::Oscopeimpl {
 	}
 
 	wxWindow* Parent_ = nullptr; // ref to parent object
+	cSignalTable* signal_table_ = nullptr;
 	//wxWindow* inst_;
 	cMeasurement* m_oscope_ = nullptr;
 	
@@ -158,10 +160,10 @@ struct cOscope::Oscopeimpl {
 	void load_combobox(wxComboBox* combo, double floating);
 };
 
-cOscope::cOscope(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon)
+cOscope::cOscope(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table)
 {
 	std::cout << "[*] cOscope ctor...\n";
-	pimpl = std::make_unique<Oscopeimpl>(inst, devmon, "DSOX1202G");
+	pimpl = std::make_unique<Oscopeimpl>(inst, devmon, signal_table, "DSOX1202G");
 	std::cout << "[*] Oscopeimpl created...\n";
 }
 
@@ -403,13 +405,12 @@ void cOscope::Oscopeimpl::OnOscopeEnableBtn(wxCommandEvent& evt)
 
 			// Add a channel for oscope at the end
 
-			cSignalTable* sigt = sigt->getInstance();
 
 			// Remove old range
-			sigt->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
+			signal_table_->slot_remove_range(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR);
 
 			// Add a new range
-			if (!sigt->slot_register(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR))
+			if (!signal_table_->slot_register(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR))
 			{
 				MessageBox(nullptr, L"Critical error in cSignalTable, cannot register new signal range.", L"[!] Critical failure.", S_OK);
 			}
@@ -537,8 +538,7 @@ void cOscope::Oscopeimpl::EnableOscopeChannel(bool isDisplayed)
 		DestroySubsystem();
 
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
-		if (!sigt->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
+		if (!signal_table_->sig_remove(MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, 0))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register oscope signal.", L"[!] Critical failure.", S_OK);
 		}
@@ -552,9 +552,9 @@ void cOscope::Oscopeimpl::EnableOscopeChannel(bool isDisplayed)
 	else
 	{
 		std::cout << "cSignalTable->getInstance()\n";
-		cSignalTable* sigt = sigt->getInstance();
+
 		std::string instr_name = addr_ctrl->GetValue().ToStdString();
-		if (!sigt->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "DSOX1202G", instr_name, "Volt", wxColor(45, 30, 30)))
+		if (!signal_table_->sig_add(0, MEAS_TYPE::VOLTAGE_CONTROLER_INSTR, "DSOX1202G", instr_name, "Volt", wxColor(45, 30, 30)))
 		{
 			MessageBox(nullptr, L"Critical error at slot_register in cSignalTable, cannot register oscope signal.", L"[!] Critical failure.", S_OK);
 		}

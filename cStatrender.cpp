@@ -6,8 +6,9 @@
 // Licence:     LGPL-2.1-or-later
 /////////////////////////////////////////////////////////////////////////////
 #include "cStatrender.h"
+#include "cSignalTable.h"
 
-cStatrender::cStatrender(cPlot* m_plot, const short disp_freq) : wxTimer()
+cStatrender::cStatrender(cPlot* m_plot, const short disp_freq, cSignalTable* signal_table) : wxTimer()
 {
 	std::cout << "cStatrender ctor...\n";
 	m_plot_ = m_plot;

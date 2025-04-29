@@ -221,10 +221,10 @@
     <ClCompile Include="cVoltage.cpp">
       <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
     </ClCompile>
-    <ClCompile Include="cDaqsim.cpp">
+    <ClCompile Include="cNiDaqsim.cpp">
       <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
     </ClCompile>
-    <ClCompile Include="cUSB6001.cpp">
+    <ClCompile Include="cNiDaq.cpp">
       <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
     </ClCompile>
     <ClCompile Include="cUsb.cpp">
@@ -287,14 +287,14 @@
     <ClCompile Include="cObserver.cpp">
       <Filter>Fichiers sources\tools</Filter>
     </ClCompile>
-    <ClCompile Include="c6510sim.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="c6510ui.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
+    </ClCompile>
+    <ClCompile Include="c6510sim.cpp">
+      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
     </ClCompile>
     <ClCompile Include="c6510usb.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -431,10 +431,10 @@
     <ClInclude Include="cVoltage.h">
       <Filter>Fichiers sources\MainWindow\config\voltage\DC supply</Filter>
     </ClInclude>
-    <ClInclude Include="cDaqsim.h">
+    <ClInclude Include="cNiDaqsim.h">
       <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
     </ClInclude>
-    <ClInclude Include="cUSB6001.h">
+    <ClInclude Include="cNiDaq.h">
       <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
     </ClInclude>
     <ClInclude Include="cUsb.h">
@@ -496,8 +496,10 @@
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
     <ClInclude Include="c6510sim.h" />
-    <ClInclude Include="c6510ui.h" />
     <ClInclude Include="c6510usb.h" />
+    <ClInclude Include="c6510ui.h">
+      <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Lab++.rc">

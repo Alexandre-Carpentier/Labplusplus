@@ -33,7 +33,7 @@ class cDeviceMonitor;
 #include "cMeasurementControler.h"
 #include "cDaqmx.h"
 #include "cPressure.h"
-#include "cUsb6001.h"
+#include "cNiDaq.h"
 
 #include "data_types.h"
 #include "cMain.h"

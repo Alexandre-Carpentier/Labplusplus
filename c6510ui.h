@@ -6,6 +6,7 @@
 
 class cTable;
 class cDeviceMonitor;
+class cSignalTable;
 
 static wxImage daq6510_instrument_img;
 static wxPanel* daq6510_instrument_rightpanel_ = nullptr;
@@ -13,7 +14,7 @@ static wxPanel* daq6510_instrument_rightpanel_ = nullptr;
 class c6510ui : public wxFrame
 {
 public:
-	c6510ui(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon);
+	c6510ui(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table);
 	~c6510ui();
 
 	int launch_device(); // Start device with current config

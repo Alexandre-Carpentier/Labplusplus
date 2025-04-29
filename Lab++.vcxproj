@@ -178,7 +178,7 @@
     <ClCompile Include="cCycleControler.cpp" />
     <ClCompile Include="cDaqmx.cpp" />
     <ClCompile Include="cDaqmxScaleDlg.cpp" />
-    <ClCompile Include="cDaqsim.cpp" />
+    <ClCompile Include="cNiDaqsim.cpp" />
     <ClCompile Include="cDeviceIDSaver.cpp" />
     <ClCompile Include="cDeviceMonitor.cpp" />
     <ClCompile Include="cDropper.cpp" />
@@ -224,7 +224,7 @@
     <ClCompile Include="cVisausb.cpp" />
     <ClCompile Include="cVoltage.cpp" />
     <ClCompile Include="cTick.cpp" />
-    <ClCompile Include="cUSB6001.cpp" />
+    <ClCompile Include="cNiDaq.cpp" />
     <ClCompile Include="cVisa.cpp" />
     <ClCompile Include="cVoltageRs.cpp" />
     <ClCompile Include="encoding.cpp" />
@@ -246,7 +246,7 @@
     <ClInclude Include="cCycleControler.h" />
     <ClInclude Include="cDaqmx.h" />
     <ClInclude Include="cDaqmxScaleDlg.h" />
-    <ClInclude Include="cDaqsim.h" />
+    <ClInclude Include="cNiDaqsim.h" />
     <ClInclude Include="cDeviceIDSaver.h" />
     <ClInclude Include="cDeviceMonitor.h" />
     <ClInclude Include="cDropper.h" />
@@ -293,7 +293,7 @@
     <ClInclude Include="cVisausb.h" />
     <ClInclude Include="cVoltage.h" />
     <ClInclude Include="cTick.h" />
-    <ClInclude Include="cUSB6001.h" />
+    <ClInclude Include="cNiDaq.h" />
     <ClInclude Include="cVisa.h" />
     <ClInclude Include="cVoltageRs.h" />
     <ClInclude Include="data_types.h" />

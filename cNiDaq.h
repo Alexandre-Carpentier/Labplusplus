@@ -6,22 +6,41 @@
 // Licence:     LGPL-2.1-or-later
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
-#include <winsock2.h> 
 #include <vector>
+#include <format>
+#include <bitset>
 class cTick;
 class cMeasurement;
 
 #include "cMeasurement.h"
+
+#ifdef _WIN64
+#pragma comment (lib, "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\lib64\\msvc\\NIDAQmx.lib")
+#else
+#pragma comment (lib, "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\lib32\\msvc\\NIDAQmx.lib")
+#endif
+
+// Must Install Nationnal Instrument DAQmx Lib freely available here:
+// https://www.ni.com/fr-fr/support/downloads/drivers/download.ni-daqmx.html#460239
+// Default instalation path is located at :
+// C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include
 #include "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\include\\NIDAQmx.h"
 
-class cDaqsim : public cMeasurement {
+
+class cNiDaq : public cMeasurement {
 private:
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
+
+
+	TaskHandle analog_taskHandle;
+	TaskHandle digital_taskHandle[MAX_CHAN];
+	int32 DAQret;
+	int sample_number = 2;
+	float64 multiple_data[1200];
 	DATAS result;
-	double *current_fake_value=nullptr;
 public:
 
-	cDaqsim();
+	cNiDaq();
 	std::string device_name() override;
 	MEAS_TYPE device_type() override;
 	size_t chan_count() override;
@@ -37,6 +56,6 @@ public:
 	void stop_device()override;
 
 
-	virtual ~cDaqsim();
+	~cNiDaq();
 
 };
