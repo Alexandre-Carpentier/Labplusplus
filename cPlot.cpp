@@ -231,11 +231,20 @@ void cPlot::update_chan_statistic_labels()
 		}
 	}
 }
+int cPlot::GetButtonBaseID()
+{
+	return chan_info_btn_pool[0]->GetId();
+}
 
 int cPlot::GuiPositionToWingraphPosition(wxWindowID id)
 {
+
+		// Deduce signal number
+
 	int first_signal = chan_info_btn_pool[0]->GetId();
 	int signal_position = id - first_signal;
+
+		// Sanitize
 
 	if (signal_position < 0)
 	{
@@ -244,7 +253,6 @@ int cPlot::GuiPositionToWingraphPosition(wxWindowID id)
 	}
 
 	std::list<CHAN_LEGEND_STRUCT> chan_legend_struct_list = sig_->get_signal_table();
-
 	int struct_pos = 0;
 	for (auto&& chan : chan_legend_struct_list)
 	{
@@ -255,29 +263,15 @@ int cPlot::GuiPositionToWingraphPosition(wxWindowID id)
 				std::string target_name = chan_info_btn_pool[signal_position]->get_name().ToStdString();
 				if (target_name.compare(chan.channel_legend_name) == 0)
 				{
+					std::cout << "[*] GuiPositionToWingraphPosition success, name found.\n";
 					return struct_pos;
 				}
 				struct_pos++;
 			}
 		}
 	}
+	std::cout << "[!] GuiPositionToWingraphPosition signal_position is invalid \n";
 	return -1;
-	/*
-	std::list<CHAN_LEGEND_STRUCT>::iterator it;
-	it = chan_legend_struct_list.begin();
-
-	// Iterate until and count valid signal
-	int j = 0;
-	for (int i = 0; i <= signal_position; i++)
-	{
-		if (it->channel_legend_name.compare("slot free") != 0)
-		{
-			j++;
-		}
-		it++; // inc iterator until the position 
-	}
-	return j;
-	*/
 }
 
 void cPlot::update_chan_color(wxColor col, wxWindowID id)
@@ -341,18 +335,25 @@ int cPlot::get_graph_signal_count()
 void cPlot::set_signal_filter(FILTER_M isFiltering, int position)
 {
 	int index = GuiPositionToWingraphPosition(position);
+	assert(index >= 0);
+	assert(index < MAX_SIG);
 	SetFilteringMode(hGraph, isFiltering, index);
 }
 
 void cPlot::set_signal_filter_threshold(float intensity, int position)
 {
 	int index = GuiPositionToWingraphPosition(position);
+	assert(index >= 0);
+	assert(index < MAX_SIG);
 	SetFilteringThreshold(hGraph, intensity, index);
 }
 
 void cPlot::set_signal_name(std::string signame, int position)
 {
-	SetSignalLabel(hGraph, signame.c_str(), position);
+	int index = GuiPositionToWingraphPosition(position);
+	assert(index >= 0);
+	assert(index < MAX_SIG);
+	SetSignalLabel(hGraph, signame.c_str(), index);
 }
 
 void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header)
@@ -411,12 +412,6 @@ void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
 
 double cPlot::get_signal_min_value(size_t id, int SignalNumber)
 {
-	std::list<CHAN_LEGEND_STRUCT> list = sig_->get_signal_table();
-
-	for (auto& chan : list)
-	{
-
-	}
 	return GetSignalMinValue(hGraph, SignalNumber);
 }
 
@@ -433,6 +428,10 @@ double cPlot::get_signal_max_value(int SignalNumber)
 void cPlot::set_signal_visible(bool bShow, int SignalNumber)
 {
 	int index = GuiPositionToWingraphPosition(SignalNumber);
+	if (index < 0)
+	{
+		MessageBox(0, L"Fail to resolve the signal index in set_signal_visible().", L"Fail", S_OK|MB_ICONERROR);
+	}
 	assert(index >= 0);
 	assert(index < MAX_SIG);
 	SetSignalVisible(hGraph, bShow, index);

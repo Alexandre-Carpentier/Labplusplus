@@ -46,7 +46,7 @@ wxCustomButton::wxCustomButton(wxFrame* parent, wxWindowID id, wxString name, wx
     txt->SetFont(font);
 
     picker = new wxColourPickerCtrl(this, IDCPICKER, *wxLIGHT_GREY, wxDefaultPosition,
-        this->FromDIP(wxSize(20, 10)), wxCLRP_DEFAULT_STYLE,
+        this->FromDIP(wxSize(60, 10)), wxCLRP_DEFAULT_STYLE,
         wxDefaultValidator,
         wxString(""));
 

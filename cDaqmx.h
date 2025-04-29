@@ -224,7 +224,7 @@ public:
 	void load_combobox(wxComboBox* combo, wxString str);
 	void load_combobox(wxComboBox* combo, double floating);
 
-	void update_graph_names();
+	// void update_graph_names(); //not used
 
 	wxArrayString LoadScalePresetArray(wxString filename);
 	//void EnableChanProperties();

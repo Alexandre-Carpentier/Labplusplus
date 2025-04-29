@@ -146,9 +146,9 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			{
 				if (chan == true)
 				{
-					m_plot_->set_signal_name(config->channel_name.at(c), i);
-					m_plot_->set_signal_filter(FILTER_NONE, i);
-					m_plot_->set_signal_filter_threshold(0.5, i);
+					m_plot_->set_signal_name(config->channel_name.at(c), i + m_plot_->GetButtonBaseID());
+					m_plot_->set_signal_filter(FILTER_NONE, i + m_plot_->GetButtonBaseID());
+					m_plot_->set_signal_filter_threshold(0.5, i + m_plot_->GetButtonBaseID());
 					i++;
 				}
 				c++;

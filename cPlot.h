@@ -58,7 +58,7 @@ private:
 
 	wxBoxSizer* left_vsizer = nullptr;
 
-	const static int MAX_SIG = 64; // Must add new IDCCHANINFO0+i in enum.h
+	const static int MAX_SIG = 64;
 	int CURRENT_SIG;
 	wxBoxSizer* legend_vsizer = nullptr;
 
@@ -83,6 +83,7 @@ public:
 	void update_chan_physical_name_to_gui(std::string name, size_t position); // change the signal physical name in the channel btn class
 	void update_chan_physical_unit_to_gui(std::string unit, size_t position); // change the signal physical unit in the channel btn class
 	void update_chan_statistic_labels();
+	int GetButtonBaseID();
 	int GuiPositionToWingraphPosition(wxWindowID id);
 	void update_chan_color(wxColor col, wxWindowID id);
 	void reset_chan_statistic_labels(wxWindowID id);

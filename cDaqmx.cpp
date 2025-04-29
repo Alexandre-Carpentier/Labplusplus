@@ -1856,7 +1856,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 	}
 	evt.Skip();
 }
-
+/*
 void cDaqmx::update_graph_names()
 {
 	for (size_t chan_ind = 0; chan_ind < config.chan_number; chan_ind++)
@@ -1875,6 +1875,7 @@ void cDaqmx::update_graph_names()
 		}
 	}
 }
+*/
 
 wxArrayString cDaqmx::LoadScalePresetArray(wxString filename)
 {
