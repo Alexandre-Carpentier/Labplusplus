@@ -13,7 +13,8 @@
 #include <GL/glu.h>
 #include <float.h>
 
-//#include "xlsx.h"
+#include <algorithm>
+
 #include "Mouse.h"
 #include "math.h"
 #include "datetimeapi.h"
@@ -101,6 +102,7 @@ typedef struct {
 	char* logfilename;
 	FILTER_M Filtering;							// Filtering type
 	bool bAutoscale;							// Autoscale active
+	bool bSwapDone;							// Autoscale active
 	bool bDisplayCursor;						// Logging active
 	int scale_factor;							// Fix the X scale factor (zoom)
 	DATA* signal[];								// ! (flexible array member) Array of pointers for every signal to be store by the struct - Must be last member of the struct
@@ -913,6 +915,16 @@ void SetRecordingMode(HGRAPH hGraph, LOGGER_M logging)
 	pgraph->Logging = logging;
 }
 /*-------------------------------------------------------------------------
+	SwapPtr: Swap 2 pointers
+  -------------------------------------------------------------------------*/
+void inline SwapPtr(void** p1, void** p2)
+{
+	void* p3 = NULL;
+	p3 = *p1; // temporary store
+	*p1 = *p2;
+	*p2 = p3;
+}
+/*-------------------------------------------------------------------------
 	SwapRecBuffer: Swap first half of the signal with the second half
 	- This is used to swap the signal buffer when autoscale is disabled
 	- So the logguer can continue to log data and add points when only the
@@ -932,31 +944,65 @@ void SwapRecBuffer(HGRAPH hGraph, bool swap)
 
 		// determine middle to swap
 
-	int offset = pgraph->signalcount;
-
-		// Lock and swap
-
-	EnterCriticalSection(&cs);
-	if (swap == true)
+	if (swap == false && pgraph->bSwapDone == false)
 	{
-		//pgraph->cur_nbpoints_swap = pgraph->cur_nbpoints;
-		for (int i = 0; i < offset; i++)
+			// Lock, save and swap
+
+		EnterCriticalSection(&cs); // Lock
+		for (int i = 0; i < pgraph->signalcount; i++) // Save
 		{
-			*pgraph->signal[i + offset] = *pgraph->signal[i];
-			//memcpy(pgraph->signal[i + offset], pgraph->signal[i], sizeof(DATA));
+			DATA* pDATAcurrent = (DATA*)pgraph->signal[i];
+			DATA* pDATAsaved = (DATA*)pgraph->signal[i + pgraph->signalcount];
+
+			for (int k = 0; k < pgraph->BufferSize; k++)
+			{
+				pDATAsaved->X[k] = pDATAcurrent->X[k];
+				pDATAsaved->Y[k] = pDATAcurrent->Y[k];
+				pDATAsaved->Xnorm[k] = pDATAcurrent->Xnorm[k];
+				pDATAsaved->Ynorm[k] = pDATAcurrent->Ynorm[k];
+			}
+			strncpy(pDATAsaved->signame, pDATAcurrent->signame, sizeof(pDATAsaved->signame));
+			pDATAsaved->color[0] = pDATAcurrent->color[0];
+			pDATAsaved->color[1] = pDATAcurrent->color[1];
+			pDATAsaved->color[2] = pDATAcurrent->color[2];
+			pDATAsaved->show = pDATAcurrent->show;
+			pDATAsaved->filter = pDATAcurrent->filter;
+			pDATAsaved->filter_threshold = pDATAcurrent->filter_threshold;
+			pDATAsaved->stat = pDATAcurrent->stat; // to check
+			pDATAsaved->Xmin = pDATAcurrent->Xmin;
+			pDATAsaved->Xmax = pDATAcurrent->Xmax;
+			pDATAsaved->Ymin = pDATAcurrent->Ymin;
+			pDATAsaved->Ymax = pDATAcurrent->Ymax;
+			pDATAsaved->Yaverage = pDATAcurrent->Yaverage;
 		}
+		for (int i = 0; i < pgraph->signalcount; i++) // Swap
+		{
+			printf("addr:%p\n", pgraph->signal[i]);
+			std::swap(pgraph->signal[i], pgraph->signal[i + pgraph->signalcount]);
+			//SwapPtr((void**)&pgraph->signal[i], (void**)&pgraph->signal[i + pgraph->signalcount]); // C style
+			printf("addr:%p\n", pgraph->signal[i]);
+		}
+		pgraph->bSwapDone = true;
+		LeaveCriticalSection(&cs); //unlock
 	}
-	else if (swap == false)
+	else if (swap == true && pgraph->bSwapDone == true)
 	{
-		//pgraph->cur_nbpoints = pgraph->cur_nbpoints_swap;
-		for (int i = 0; i < offset; i++)
-		{
-			*pgraph->signal[i]  = *pgraph->signal[i + offset];
-			//memcpy(pgraph->signal[i], pgraph->signal[i + offset] , sizeof(DATA));
-		}
+		// Lock, save and swap
 		
+		EnterCriticalSection(&cs); // Lock
+
+		for (int i = 0; i < pgraph->signalcount; i++) // Swap
+		{
+			printf("addr:%08x\n", pgraph->signal[i]);
+			//SwapPtr((void**)&pgraph->signal[i], (void**)&pgraph->signal[i + pgraph->signalcount]); // C style
+			std::swap(pgraph->signal[i], pgraph->signal[i + pgraph->signalcount]);
+			printf("addr:%08x\n", pgraph->signal[i]);
+		}
+		pgraph->bSwapDone = false;
+		LeaveCriticalSection(&cs);
 	}
-	LeaveCriticalSection(&cs);
+
+
 
 }
 /*-------------------------------------------------------------------------
@@ -983,6 +1029,7 @@ void SetAutoscaleMode(HGRAPH hGraph, bool mode)
 			// Swap buffers
 
 		SwapRecBuffer(hGraph, mode);
+
 
 	}
 
@@ -1062,6 +1109,11 @@ void SetZoomFactor(HGRAPH hGraph, int zoom)
 	{
 		printf("[!] Error at SetZoomFactor() zoom can't be <0\n");
 		return;
+	}
+
+	if (pgraph->BufferSize / zoom < 1.0)
+	{
+		zoom = 1;
 	}
 
 	pgraph->scale_factor = zoom;
@@ -1587,6 +1639,35 @@ void SignalResetStatisticValue(HGRAPH hGraph, int SIGNB)
 	}
 	LeaveCriticalSection(&cs);
 }
+
+void ShowDataInConsole(HGRAPH hGraph)
+{
+	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
+
+		for (int index = 0; index < pgraph->signalcount; index++)
+		{
+			DATA* pDATA = pgraph->signal[index];
+			if (index == 0)
+			{
+				printf("\n");
+				printf("\n");
+				printf("SIG0\n");
+				for (int j = 0; j < pgraph->BufferSize; j++)
+				{
+					printf("%.1lf ", pDATA->X[j]); printf("\t");
+					printf("%.1lf ", pDATA->Y[j]); printf("\n");
+				}
+				pDATA = pgraph->signal[index+ pgraph->signalcount];
+				printf("SIG4\n");
+				for (int j = 0; j < pgraph->BufferSize; j++)
+				{
+					printf("%.1lf ", pDATA->X[j]); printf("\t");
+					printf("%.1lf ", pDATA->Y[j]); printf("\n");
+				}
+			}
+
+		}																		
+}
 /*-------------------------------------------------------------------------
 	AddPoint: Add one POINT for every signal
   -------------------------------------------------------------------------*/
@@ -1594,7 +1675,7 @@ void AddPoint(HGRAPH hGraph, double* y, int SignalCount)
 {
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
-	// Sanity check
+		// Sanity check
 
 	if (NULL == pgraph)
 	{
@@ -1603,15 +1684,8 @@ void AddPoint(HGRAPH hGraph, double* y, int SignalCount)
 	}
 
 	DATA* pDATA = NULL;
-	/*
-	if (cs.DebugInfo == NULL)
-	{
-		printf("[!] Error at AddPoint() critical section not available\n");
-		return;
-	}
-	*/
 
-	// Sanity check
+		// Sanity check
 
 	if (FALSE == pgraph->bRunning)
 	{
@@ -1619,7 +1693,7 @@ void AddPoint(HGRAPH hGraph, double* y, int SignalCount)
 		return;
 	}
 
-	// TODO: Check if signalcount = length of y!
+		// Check if signalcount = length of y!
 
 	if (pgraph->signalcount != SignalCount)
 	{
@@ -1627,14 +1701,101 @@ void AddPoint(HGRAPH hGraph, double* y, int SignalCount)
 		return;
 	}
 
+	EnterCriticalSection(&cs);
+
 		//transfert recording to the second half arrays
 
-	if (pgraph->bAutoscale == false)
+	int offset = 0;
+	if (pgraph->bAutoscale == false && pgraph->bSwapDone == true)
 	{
-			// save current point pos
-
-		pgraph->cur_nbpoints_swap = pgraph->cur_nbpoints;
+		offset = pgraph->signalcount;
 	}
+
+	// If the maximum points are reached 
+	// in the buffer, shift left the array and
+	// dec the current number of points
+
+	if (pgraph->cur_nbpoints == pgraph->BufferSize)
+	{
+		for (int index = 0 + offset; index < pgraph->signalcount + offset; index++)
+		{
+			pDATA = pgraph->signal[index];
+			for (int j = 0; j < pgraph->BufferSize - 1; j++)
+			{
+				pDATA->X[j] = pDATA->X[j + 1];																// Shift left X
+				pDATA->Y[j] = pDATA->Y[j + 1];																// Shift left Y
+			}
+		}
+		pgraph->cur_nbpoints--;																				// Update the current POINT number
+	}
+
+	// Save the actual timestamp
+
+	if (pgraph->cur_nbpoints == 0)
+	{
+		finish = start;
+	}
+	else
+	{
+		finish = PerformanceCounter();
+	}
+
+	for (int index = 0 + offset; index < pgraph->signalcount + offset; index++)
+	{
+		pDATA = pgraph->signal[index];
+		if (NULL == pDATA)
+		{
+			LeaveCriticalSection(&cs);
+			printf("[!] Error at AddPoint() data buffer is null\n");
+			return;
+		}
+
+		// Add points to the selected buffer	
+
+		pDATA->X[pgraph->cur_nbpoints] = (double)((finish - start)) / frequency;							// Save in X the elapsed time from start
+		pDATA->Y[pgraph->cur_nbpoints] = y[index- offset];															// Save Y
+
+		// Perform some statistics
+
+	// period
+		pDATA->stat.period_s = pDATA->X[pgraph->cur_nbpoints] - pDATA->X[0];								// Update current period
+
+		//min
+		if (pDATA->Y[pgraph->cur_nbpoints] < pDATA->stat.min_value)
+		{
+			pDATA->stat.min_value = pDATA->Y[pgraph->cur_nbpoints];											// Update current min value displayed
+		}
+
+		//average
+		if (pgraph->cur_nbpoints > 0)
+		{
+			pDATA->stat.average_value_accumulator += pDATA->Y[pgraph->cur_nbpoints];
+			pDATA->stat.average_value_counter++;
+
+			pDATA->stat.average_value = pDATA->stat.average_value_accumulator / pDATA->stat.average_value_counter;
+		}
+
+		//max
+		if (pDATA->Y[pgraph->cur_nbpoints] > pDATA->stat.max_value)
+		{
+			pDATA->stat.max_value = pDATA->Y[pgraph->cur_nbpoints];											// Update current max value displayed
+		}
+	}
+
+	// Inc the number of points
+
+	pgraph->cur_nbpoints++;
+
+	LeaveCriticalSection(&cs);
+
+	ShowDataInConsole(hGraph);
+	printf("[*] AddPoint() with autoscale end success.\n");
+	return;
+
+
+	///////////////////////////////////////////////////////////////////
+	//
+	///////////////////////////////////////////////////////////////////
 
 	EnterCriticalSection(&cs);
 
@@ -2671,7 +2832,7 @@ void normalize_data(HGRAPH hGraph, double Xmin, double Xmax, double Ymin, double
 			int zoom = GetZoomFactor(hGraph);
 			if (zoom > 1)
 			{
-				min_point = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / zoom);
+				min_point = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / zoom);				
 			}
 
 			for (int x = min_point; x < pgraph->cur_nbpoints; x++)
