@@ -70,7 +70,7 @@ class cMain :public wxFrame
 {
 public:
 	enum { DISP_FREQ = 16 };						// ms to draw
-	enum { GRAPH_NBPOINTS = 10 };				// pts
+	enum { GRAPH_NBPOINTS = 10000 };				// pts
 
 	////////////////////////////////////////////////////////////////////////////////
 	// DEV MONITOR

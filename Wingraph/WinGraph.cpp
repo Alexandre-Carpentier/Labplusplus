@@ -13,7 +13,6 @@
 #include <GL/glu.h>
 #include <float.h>
 
-#include <algorithm>
 
 #include "Mouse.h"
 #include "math.h"
@@ -29,11 +28,11 @@
 
 enum { MAX_SIGNAL_COUNT = 64 };
 
-void InitGL(HGRAPH hGraph, int Width, int Height);
-void SetGLView(int Width, int Height);
+void InitGL(HGRAPH hGraph, const int Width, const int Height);
+void SetGLView();
 void CheckErr(void);
 
-bool BuildMyFont(HGRAPH hGraph, char* FontName, int Fontsize);
+bool BuildMyFont(HGRAPH hGraph, const char* FontName, const int Fontsize);
 void KillFont(GLvoid);
 GLvoid glPrint(const char* fmt, ...);
 
@@ -942,14 +941,16 @@ void SwapRecBuffer(HGRAPH hGraph, bool swap)
 		return;
 	}
 
-		// determine middle to swap
+		// Swap half first signals to half last signals (hidden signals)
 
 	if (swap == false && pgraph->bSwapDone == false)
 	{
 			// Lock, save and swap
 
 		EnterCriticalSection(&cs); // Lock
-		for (int i = 0; i < pgraph->signalcount; i++) // Save
+
+		pgraph->cur_nbpoints_swap = pgraph->cur_nbpoints;// Save	
+		for (int i = 0; i < pgraph->signalcount; i++) 
 		{
 			DATA* pDATAcurrent = (DATA*)pgraph->signal[i];
 			DATA* pDATAsaved = (DATA*)pgraph->signal[i + pgraph->signalcount];
@@ -977,10 +978,8 @@ void SwapRecBuffer(HGRAPH hGraph, bool swap)
 		}
 		for (int i = 0; i < pgraph->signalcount; i++) // Swap
 		{
-			printf("addr:%p\n", pgraph->signal[i]);
-			std::swap(pgraph->signal[i], pgraph->signal[i + pgraph->signalcount]);
-			//SwapPtr((void**)&pgraph->signal[i], (void**)&pgraph->signal[i + pgraph->signalcount]); // C style
-			printf("addr:%p\n", pgraph->signal[i]);
+			//std::swap(pgraph->signal[i], pgraph->signal[i + pgraph->signalcount]);
+			SwapPtr((void**)&pgraph->signal[i], (void**)&pgraph->signal[i + pgraph->signalcount]);
 		}
 		pgraph->bSwapDone = true;
 		LeaveCriticalSection(&cs); //unlock
@@ -993,10 +992,8 @@ void SwapRecBuffer(HGRAPH hGraph, bool swap)
 
 		for (int i = 0; i < pgraph->signalcount; i++) // Swap
 		{
-			printf("addr:%08x\n", pgraph->signal[i]);
-			//SwapPtr((void**)&pgraph->signal[i], (void**)&pgraph->signal[i + pgraph->signalcount]); // C style
-			std::swap(pgraph->signal[i], pgraph->signal[i + pgraph->signalcount]);
-			printf("addr:%08x\n", pgraph->signal[i]);
+			SwapPtr((void**)&pgraph->signal[i], (void**)&pgraph->signal[i + pgraph->signalcount]);
+			//std::swap(pgraph->signal[i], pgraph->signal[i + pgraph->signalcount]);
 		}
 		pgraph->bSwapDone = false;
 		LeaveCriticalSection(&cs);
@@ -1030,10 +1027,13 @@ void SetAutoscaleMode(HGRAPH hGraph, bool mode)
 
 		SwapRecBuffer(hGraph, mode);
 
+			// Save current position in the buffer when stopping autoscale
 
-	}
-
-	
+		if (pgraph->bAutoscale == false)
+		{
+			pgraph->cur_nbpoints_swap = pgraph->cur_nbpoints;
+		}
+	}	
 }
 
 /*-------------------------------------------------------------------------
@@ -1111,7 +1111,7 @@ void SetZoomFactor(HGRAPH hGraph, int zoom)
 		return;
 	}
 
-	if (pgraph->BufferSize / zoom < 1.0)
+	if ((pgraph->BufferSize) / zoom < 1.0)
 	{
 		zoom = 1;
 	}
@@ -1600,7 +1600,7 @@ double GetSignalMaxValue(HGRAPH hGraph, int SIGNB)
 	return 0.0;
 }
 
-void SignalResetStatisticValue(HGRAPH hGraph, int SIGNB)
+void SignalResetStatisticValue(HGRAPH hGraph, const int SIGNB)
 {
 	if (SIGNB > MAX_SIGNAL_COUNT || SIGNB < 0)
 	{
@@ -1640,7 +1640,7 @@ void SignalResetStatisticValue(HGRAPH hGraph, int SIGNB)
 	LeaveCriticalSection(&cs);
 }
 
-void ShowDataInConsole(HGRAPH hGraph)
+void ShowDataInConsole(const HGRAPH hGraph)
 {
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
@@ -1666,12 +1666,13 @@ void ShowDataInConsole(HGRAPH hGraph)
 				}
 			}
 
-		}																		
+		}		
+		printf("pgraph->cur_nbpoints: %i\n", pgraph->cur_nbpoints);
 }
 /*-------------------------------------------------------------------------
 	AddPoint: Add one POINT for every signal
   -------------------------------------------------------------------------*/
-void AddPoint(HGRAPH hGraph, double* y, int SignalCount)
+void AddPoint(HGRAPH hGraph, double* y, const int SignalCount)
 {
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
 
@@ -1788,8 +1789,8 @@ void AddPoint(HGRAPH hGraph, double* y, int SignalCount)
 
 	LeaveCriticalSection(&cs);
 
-	ShowDataInConsole(hGraph);
-	printf("[*] AddPoint() with autoscale end success.\n");
+	//ShowDataInConsole(hGraph);
+
 	return;
 
 
@@ -2344,7 +2345,7 @@ void ReshapeGraph(HGRAPH hGraph, int left, int top, int right, int bottom)
 	HWND hitem = GetGraphWnd(hGraph);
 	if (SetWindowPos(hitem, NULL, left, top, right, bottom, SWP_SHOWWINDOW))
 	{
-		SetGLView(right, bottom);
+		SetGLView();
 	}
 	else
 	{
@@ -2371,18 +2372,18 @@ void InitGL(HGRAPH hGraph, int Width, int Height)		// Called after the main wind
 	//glEnable(GL_BLEND);
 	glDepthMask(false);
 
-	if (!BuildMyFont(hGraph, (char*)"Verdana", 14))		// Build The Font BuildMyFont(HGRAPH hGraph, char* FontName, int Fontsize)
+	if (!BuildMyFont(hGraph, (const char*)"Verdana", 14))		// Build The Font BuildMyFont(HGRAPH hGraph, char* FontName, int Fontsize)
 	{
 		// error on creating the Font
 	}
-	SetGLView(Width, Height);
+	SetGLView();
 }
 
 /*-------------------------------------------------------------------------
 	SetGLView: Make background and check for errors
   -------------------------------------------------------------------------*/
 
-void SetGLView(int Width, int Height)
+void SetGLView()
 {
 	glClearColor(0.98f, 0.98f, 0.98f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -2393,7 +2394,7 @@ void SetGLView(int Width, int Height)
 	BuildFont: Create a Windows Bitmap Font to write the device context with
   -------------------------------------------------------------------------*/
 
-bool BuildMyFont(HGRAPH hGraph, char* FontName, int Fontsize)
+bool BuildMyFont(HGRAPH hGraph, const char* FontName, const int Fontsize)
 {
 	HFONT hCustomFont = NULL;									// New font to create
 	HFONT hCurrentFont = NULL;									// Store the current Windows font
@@ -2597,7 +2598,15 @@ void DrawWave(HGRAPH hGraph)
 		return;
 	}
 
-	if (pgraph->cur_nbpoints > 0)
+		// Select last point in the buffer when autoscale is running or not
+	int last_point = pgraph->cur_nbpoints;
+	if (pgraph->bAutoscale == false)
+	{		
+			// Save current position in the buffer
+		last_point = pgraph->cur_nbpoints_swap;
+	}
+
+	if (last_point > 0)
 	{
 		DATA* pDATA;
 		glLineWidth(1.5);
@@ -2612,13 +2621,13 @@ void DrawWave(HGRAPH hGraph)
 			glColor3f(pDATA->color[0], pDATA->color[1], pDATA->color[2]);								// Colors of the signal
 			glBegin(GL_LINE_STRIP);
 
-			int first_point = pgraph->cur_nbpoints - (pgraph->cur_nbpoints / GetZoomFactor(hGraph));	// first_point [0-cur_nbpoints]
+			int first_point = last_point - (last_point / GetZoomFactor(hGraph));	// first_point [0-last_point]
 			if (first_point < 0)
 			{
 				first_point = 0;
 			}
 				
-			for (int i = first_point; i < pgraph->cur_nbpoints; i++)	// Handle zoom here
+			for (int i = first_point; i < last_point; i++)	// Handle zoom here
 			{
 				//printf("\n [!] X%i = %lf \n", i, TakeFiniteNumber(pDATA->Xnorm[i]));
 
@@ -2776,11 +2785,9 @@ double FindFirstFiniteNumber(double* tab, int length)
 
 LPSTR dtos(LPSTR str, int len, double value)
 {
-
-
 	if (value < 1.0 && value > -1.0)
 	{
-		sprintf_s(str, len, "%.3lf", value);
+		sprintf_s(str, len, "%.2lf", value);
 	}
 	else if (value < 10.0 && value > -10.0)
 	{

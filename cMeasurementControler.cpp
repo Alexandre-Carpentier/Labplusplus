@@ -226,7 +226,7 @@ void cMeasurementControler::poll()
 								
 								if (length != read)
 								{
-									MessageBox(GetFocus(), L"Can't read instrument command\nExiting...", L"Fail", S_OK);
+									MessageBox(GetFocus(), L"Can't read instrument command in the table view\nExiting...", L"Fail", S_OK);
 								}
 
 								assert(length == read);

@@ -28,7 +28,14 @@ void cTable::serialize(std::string config_name)
 			std::string fullpath = "Lab++Table";
 			fullpath.append(col_name);
 			fullpath.append(".ini");
+
+			{
+				cSerialize configsaver(fullpath);
+				configsaver.del();
+			}
+
 			cSerialize configsaver(fullpath);
+
 			
 			for (size_t i = 0; i < LINE_NB; i++)
 			{

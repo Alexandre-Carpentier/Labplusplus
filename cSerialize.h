@@ -34,6 +34,12 @@ public:
 		data = cfg->Read(key, data);
 	}
 
+	void del()
+	{
+		cfg->DeleteAll();
+	}
+	
+
 private:
 	std::string filename_;
 	std::unique_ptr<wxFileConfig> cfg;
