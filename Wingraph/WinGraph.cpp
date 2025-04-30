@@ -1740,6 +1740,13 @@ void AddPoint(HGRAPH hGraph, double* y, const int SignalCount)
 	{
 		finish = PerformanceCounter();
 	}
+	if (pgraph->Logging == LOGGER_ASCII)
+	{
+		if (logfile)
+		{
+			fprintf(logfile, "%lf\t", (double)((finish - start)) / frequency);
+		}
+	}
 
 	for (int index = 0 + offset; index < pgraph->signalcount + offset; index++)
 	{
@@ -1749,6 +1756,54 @@ void AddPoint(HGRAPH hGraph, double* y, const int SignalCount)
 			LeaveCriticalSection(&cs);
 			printf("[!] Error at AddPoint() data buffer is null\n");
 			return;
+		}
+
+		// Is filter enable ?
+
+		if (pDATA->filter != FILTER_NONE)
+		{
+			// Low pass filter 
+
+			if (pDATA->filter == FILTER_EMA)
+			{
+				//double a = 0.1; // Custom cut freq 
+				float a = pDATA->filter_threshold;
+				if (pgraph->cur_nbpoints == 0)
+					y[index] = y[index]; // First POINT skip to prevent INF
+				else
+					y[index] = a * y[index] + (1 - a) * pDATA->Y[pgraph->cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
+			}
+
+			// Hanning window filter
+
+			if (pDATA->filter == FILTER_HANNING) // experimental (not properly working)
+			{
+				const int window_size = 20;																		// Define the Hann windows size here
+				static double dataOut[window_size];
+				static int accumulator = 0;
+				if (accumulator < window_size)
+				{
+					printf("[*] Hanning filter collecting...\n");
+					LeaveCriticalSection(&cs);
+					accumulator++;
+					return;
+				}
+				accumulator = 0;
+
+				for (int i = 0; i < window_size; i++)
+				{
+
+					const double PI = 3.14159;
+					double multiplier = 0.5 * (1 - cos(2 * PI * i / window_size));
+					dataOut[i] = multiplier * y[index];
+				}
+			}
+
+			// Besel filter
+
+			if (pDATA->filter == FILTER_BESEL)
+			{
+			}
 		}
 
 		// Add points to the selected buffer	
@@ -1780,6 +1835,22 @@ void AddPoint(HGRAPH hGraph, double* y, const int SignalCount)
 		if (pDATA->Y[pgraph->cur_nbpoints] > pDATA->stat.max_value)
 		{
 			pDATA->stat.max_value = pDATA->Y[pgraph->cur_nbpoints];											// Update current max value displayed
+		}
+
+		if (pgraph->Logging == LOGGER_ASCII)
+		{
+			if (logfile)
+			{
+				fprintf_s(logfile, "%lf\t", y[index]);
+			}
+		}
+	}
+
+	if (pgraph->Logging == LOGGER_ASCII)
+	{
+		if (logfile)
+		{
+			fprintf(logfile, "\n");
 		}
 	}
 
