@@ -188,6 +188,7 @@ public:
 
 	wxBoxSizer* btn_box_sizer[max_chan_number];
 	wxBoxSizer* daqinfo_v_sizer = nullptr;
+
 	wxTextCtrl* daq_type = nullptr;
 	wxButton* chanbtntype[max_chan_number];
 	wxButton* chanbtn[max_chan_number];

@@ -320,14 +320,14 @@ cConfig::~cConfig()
 {
 	std::cout << "cConfig dtor...\n";
 	unload_plugins(); 
-	delete m_daqmx;
+	if (m_daqmx) { delete m_daqmx; 	m_daqmx = nullptr;}
 	delete m_daq_dev;
 	delete m_pressure;
 	delete m_oscope;
 	//delete m_pressure_dev;
 	delete m_voltage;
 	delete m_voltage_rs;
-	m_daqmx = nullptr;
+
 	m_pressure = nullptr;
 	m_voltage = nullptr;
 	m_voltage_rs = nullptr;
