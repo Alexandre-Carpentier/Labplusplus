@@ -21,7 +21,6 @@ enum {
     IDCCHANSHIFT_,
     IDCSTATICCHANUNIT_,
     IDCCHANUNIT_
-
 };
 
 
