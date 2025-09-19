@@ -2,34 +2,45 @@
 #include "loginterface.h"
 #include "none.h"
 #include "sim.h"
+#include "csv.h"
+#include "tdms.h"
+#include "xlsx.h"
 
 #include <iostream>
+#include <print>
+#include <chrono>
 
+///////////////////////////////////////////////////////////////////////////
+/// BUILD THE SELECTED LOGGER
+///////////////////////////////////////////////////////////////////////////
 class log_factory
 {
 public:
-	std::list<std::unique_ptr<dolog>> create(std::list<LOGTYPE> types)
+	std::unique_ptr<dolog> create(LOGTYPE type)
 	{
-		for (auto type : types)
-		{
 			switch (type)
 			{
 			case LOGTYPE::NONE:
-				std::cout << "[*] NONE logger selected\n";
-				loggers.emplace_back(std::move(std::make_unique<none>()));
-				break;
+				std::println("[*] log_factory: NONE logger selected");
+				return std::make_unique<none>();
 			case LOGTYPE::SIM:
-				std::cout << "[*] SIM logger selected\n";
-				loggers.emplace_back(std::move(std::make_unique<sim>()));
-				break;
+				std::println("[*] log_factory: SIM logger selected");
+				return std::make_unique<sim>();
+			case LOGTYPE::CSV:
+				std::println("[*] log_factory: CSV logger selected");
+				return std::make_unique<csv>();
+			case LOGTYPE::TDMS:
+				std::println("[*] log_factory: TDMS logger selected");
+				return std::make_unique<tdms>();
+			case LOGTYPE::XLSX:
+				std::println("[*] log_factory: XLSX logger selected");
+				return std::make_unique<xlsx>();
 			default:
-				std::cout << "[!] Unknown logger type selected\n";
-			}
-		}
-		return std::move(loggers);
+				std::println("\x1b[31m[!] log_factory: Unknown logger type selected\x1b[0m");
+				break;
+			}		
+			return nullptr;
 	}
-private:
-	std::list<std::unique_ptr<dolog>> loggers;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -39,44 +50,98 @@ private:
 class cLog::logimpl
 {
 public:
-	bool set(std::list<LOGTYPE> types, std::string filename)
+	bool set(LOGTYPE type, std::string filename)
 	{
-		loggers = factory.create(types);
-		if (loggers.size() == 0)
+		log_factory factory;
+		logger = factory.create(type);
+		if (logger == nullptr)
 		{
-			std::cout << "[!] No loggers created.\n";
+			std::println("\x1b[31m[!] Logimpl: no logger created.\x1b[0m");
 			return false;
 		}
 
-		std::cout << "[*] loggers created with success...\n";
+		std::println("[*] Logimpl: logger set with success...");
+
+		if(filename.size() == 0)
+		{
+			std::println("\x1b[31m[!] Logimpl: filename is empty.\x1b[0m");
+			return false;
+		}
+
+		if (filename.size() > 260)
+		{
+			std::println("\x1b[31m[!] Logimpl: filename length is too long.\x1b[0m");
+			return false;
+		}
+
+		m_filename = filename;
 		return true;
 	}
 
-	bool create(std::string filename)
+	bool isReady()
 	{
+		return isOk;
+	}
 
+	void isReady(bool isReady)
+	{
+		isOk = isReady;
+	}
+
+	bool create()
+	{
+		if (logger->open(m_filename) == false)
+		{
+			std::println("\x1b[31m[!] Failed to open logger: {}\x1b[0m", m_filename);
+				return false;
+		}
 		return true;
 	}
 
 	bool add_header(std::string str)
 	{
+		if (logger->add_header(str) == false)
+		{
+			std::println("\x1b[31m[!] Failed to add logger header: {}\x1b[0m", str);
+			return false;
+		}
 		return true;
 	}
 
 	bool add_value(std::string value)
 	{
+		if (logger->add_value(value) == false)
+		{
+			std::println("\x1b[31m[!] Failed to add logger value: {}\x1b[0m", value);
+			return false;
+		}
 		return true;
 	}
 
 	bool new_line()
 	{
+		if (logger->new_line() == false)
+		{
+			std::println("\x1b[31m[!] Failed to feed new line\x1b[0m");
+			return false;
+		}
 		return true;
 	}
 
+	bool close()
+	{
+		if (logger->close() == false)
+		{
+			std::println("\x1b[31m[!] Failed close the logger\x1b[0m");
+			return false;
+		}
+		return true;
+	}
 
 private:
-	log_factory factory;
-	std::list<std::unique_ptr<dolog>> loggers;
+	std::unique_ptr<dolog> logger;
+	std::string m_filename;
+	bool isOk;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -84,44 +149,104 @@ private:
 ///////////////////////////////////////////////////////////////////////////
 
 // Setup the implementation 
-cLog::cLog()
+cLog::cLog() :pimpl(std::make_unique<logimpl>())
 {
-	std::cout << "log ctor...\n";
-	pimpl = std::make_unique<logimpl>();
+	pimpl->isReady(false);
+	std::println("[*] Log ctor");
 }
 
-// forward the list of loggers to create from the implementation
-bool cLog::set(std::list<LOGTYPE> types, std::string filename)
+cLog::cLog(LOGTYPE type, std::string filename) :pimpl(std::make_unique<logimpl>())
 {
-	if (!pimpl->set(types, filename))
+	std::println("[*] Log ctor");
+	if (!pimpl->set(type, filename))
 	{
-		std::cout << "[!] Failed to set the implementation.\n";
+		std::println("\x1b[31m[!] Failed to set the implementation.\x1b[0m\n");
+		pimpl->isReady(false);
+		return;
+	}
+	std::println("[*] Log implementation success...");
+	pimpl->isReady(true);
+}
+
+cLog::~cLog()
+{
+	std::println("[*] Log dtor");
+}
+
+bool cLog::set(LOGTYPE type, std::string filename)
+{
+	if (!pimpl->set(type, filename))
+	{
+		std::println("\x1b[31m[!] Failed to set the implementation.\x1b[0m");
+		pimpl->isReady(false);
 		return false;
 	}
 	std::cout << "[*] Log implementation success...\n";
+	pimpl->isReady(true);
 	return true;
 }
 
-bool cLog::create(std::string filename)
+bool cLog::isReady()
 {
-	pimpl->create(filename);
+	return pimpl->isReady();
+}
+
+// Using the implementation
+bool cLog::create()
+{
+	if(pimpl->isReady() == false)
+	{
+		std::println("\x1b[31m[!] Logger is not ready to create\x1b[0m");
+		return false;
+	}
+
+	pimpl->create();
 	return true;
 }
 
 bool cLog::add_header(std::string str)
 {
+	if (pimpl->isReady() == false)
+	{
+		std::println("\x1b[31m[!] Logger is not ready to add header\x1b[0m");
+		return false;
+	}
+
 	pimpl->add_header(str);
 	return true;
 }
 
 bool cLog::add_value(std::string value)
 {
+	if (pimpl->isReady() == false)
+	{
+		std::println("\x1b[31m[!] Logger is not ready to add value\x1b[0m");
+		return false;
+	}
+
 	pimpl->add_value(value);
 	return true;
 }
 
 bool cLog::new_line()
 {
+	if (pimpl->isReady() == false)
+	{
+		std::println("\x1b[31m[!] Logger is not ready to put new line\x1b[0m");
+		return false;
+	}
+
 	pimpl->new_line();
+	return true;
+}
+
+bool cLog::close()
+{
+	if (pimpl->isReady() == false)
+	{
+		std::println("\x1b[31m[!] Logger is not ready to close\x1b[0m");
+		return false;
+	}
+	pimpl->close();
 	return true;
 }

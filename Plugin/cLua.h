@@ -152,7 +152,6 @@ static int luaGetObject(lua_State* L)
 {
 	lua_pushlightuserdata(L, (*reinterpret_cast<DeviceBuilder1**>(luaL_checkudata(L, 1, "builder")))->GetObject());
 	return 1;
-	 
 }
 
 // Destroy object with the lua garbage collector

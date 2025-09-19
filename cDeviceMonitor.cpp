@@ -24,7 +24,7 @@ std::vector<int> get_rs232port_list()
 		hCom = CreateFile(comaddr.c_str(), GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_EXISTING, NULL, NULL);
 		if (hCom != INVALID_HANDLE_VALUE && hCom != NULL)
 		{
-			std::cout << "[*] - Opening success :" << comaddr << " with CreateFile() \n";
+			std::wcout << "[*] - Opening success :" << comaddr << " with CreateFile() \n";
 			com_list.push_back(iComNb);
 			CloseHandle(hCom);
 		}
@@ -88,7 +88,7 @@ void cDeviceMonitor::Notify()
 			dev.set_type(L"RS232");
 			dev.set_name(L"Unknown");		
 		}
-		std::cout << "[*] cDeviceMonitor found: " << dev.get_type() << " " << dev.get_name() << " at COM" << item << "\n";
+		std::wcout << "[*] cDeviceMonitor found: " << dev.get_type() << " " << dev.get_name() << " at COM" << item << "\n";
 		dev_list.push_back(dev);
 	}
 	for (auto& item : usb)
@@ -144,7 +144,8 @@ void cDeviceMonitor::Notify()
 			dev.set_type(L"USB");
 			dev.set_name(L"Unknown");
 		}
-		std::cout << "[*] cDeviceMonitor found: " << dev.get_type() << " " << dev.get_name() << " at USB" << item << "\n";
+		
+		std::wcout << "[*] cDeviceMonitor found: " << dev.get_type() << " " << dev.get_name() << " at USB" << ConvertAnsiToWide(item) << "\n";
 		dev_list.push_back(dev);
 	}
 }

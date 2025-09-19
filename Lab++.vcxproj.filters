@@ -296,6 +296,9 @@
     <ClCompile Include="c6510usb.cpp">
       <Filter>Fichiers sources\Measurement\Type\voltage</Filter>
     </ClCompile>
+    <ClCompile Include="PlotWindow.cpp">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cApp.h">
@@ -499,6 +502,12 @@
     <ClInclude Include="c6510usb.h" />
     <ClInclude Include="c6510ui.h">
       <Filter>Fichiers sources\MainWindow\config\voltage</Filter>
+    </ClInclude>
+    <ClInclude Include="filename.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="PlotWindow.h">
+      <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

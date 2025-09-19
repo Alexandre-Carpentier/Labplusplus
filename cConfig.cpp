@@ -264,7 +264,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSigna
 	std::wstring wDir;
 	wDir.append(lpszDir);
 	wDir.append(L"\\ADDON");
-	std::cout << "[*] Try to load plugin in folder: " << wDir << "\n";
+	std::wcout << "[*] Try to load plugin in folder: " << wDir << "\n";
 	load_plugins(book, wDir);
 
 	mainSizer->Add(book, 1, wxEXPAND);
@@ -288,7 +288,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSigna
 	{
 		plugin.name.resize(plugin.name.size() - 4); // suppress .dll from name
 		config_tree_ctrl->AppendItem(config_voltage_node, plugin.name);
-		std::cout << "[*] Add to tree list view: " << plugin.name << "\n";
+		std::wcout << "[*] Add to tree list view: " << plugin.name << "\n";
 	}
 
 	config_tree_ctrl->ExpandAll();
@@ -420,8 +420,8 @@ void cConfig::load_plugins(wxWindow* parent, std::wstring folder_path)
 					FreeLibrary(hModule);
 					continue;
 				}
-				std::cout << "[*] Found plugin module to load: " << dllfilepath << "\n";
-				std::cout << "[*] Loading success. \n";		
+				std::wcout << "[*] Found plugin module to load: " << dllfilepath << "\n";
+				std::wcout << "[*] Loading success. \n";		
 
 				// Populate vector of PLUGIN_DATA
 				std::wstring plugin_name = ffd.cFileName;

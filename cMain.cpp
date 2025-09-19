@@ -13,6 +13,8 @@
 #include <vector>
 #include <memory>
 
+#include "oleauto.h"
+#pragma comment (lib, "OleAut32.lib")
 #include <shellapi.h>
 #include "Shlobj.h"
 #include "Shlobj_core.h"
@@ -140,7 +142,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	// STATUS BAR
 	////////////////////////////////////////////////////////////////////////////////
 	statusBar = CreateStatusBar();
-	statusBar->SetStatusText("Welcome to Lab++, your raw low level c++ acquizition software.");
+	statusBar->SetStatusText("Welcome to Lab++, c++ acquizition software.");
 	manager->set_status_bar(statusBar);
 
 	////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +221,7 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 	////////////////////////////////////////////////////////////////////////////////
 	// PLOT WND
 	////////////////////////////////////////////////////////////////////////////////
-	m_plot = new cPlot(this, GRAPH_NBPOINTS, &signal_table);
+	m_plot = new cPlot(this, GRAPH_NBPOINTS , &signal_table);
 	manager->set_plot(m_plot);
 	m_config->set_graph(m_plot);
 
@@ -447,7 +449,7 @@ bool delete_all_conf_files(wchar_t* path)
 					size_t pos = full_path.find(L"*");
 					full_path = full_path.substr(0, pos);
 					full_path += filename;
-					std::cout << "Erasing file:" << full_path << "\n";
+					std::wcout << "Erasing file:" << full_path << "\n";
 					//DeleteFile
 					DeleteFile(full_path.c_str());
 				}

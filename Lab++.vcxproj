@@ -139,7 +139,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -231,6 +232,7 @@
     <ClCompile Include="Instrumentimpl.cpp" />
     <ClCompile Include="ListUsbDevice.cpp" />
     <ClCompile Include="LoadBitmapFromRessource.cpp" />
+    <ClCompile Include="PlotWindow.cpp" />
     <ClCompile Include="Plugin\cDevice.cpp" />
     <ClCompile Include="cStatrender.cpp" />
     <ClCompile Include="xlsx.cpp" />
@@ -258,6 +260,7 @@
     <ClInclude Include="cObserver.h" />
     <ClInclude Include="cSerialize.h" />
     <ClInclude Include="cSignalDisplay.h" />
+    <ClInclude Include="filename.h" />
     <ClInclude Include="IInstrument.h" />
     <ClInclude Include="cMain.h" />
     <ClInclude Include="cMeasurement.h" />
@@ -302,6 +305,7 @@
     <ClInclude Include="instrumentimpl.h" />
     <ClInclude Include="ListUsbDevice.h" />
     <ClInclude Include="LoadBitmapFromRessource.h" />
+    <ClInclude Include="PlotWindow.h" />
     <ClInclude Include="Plugin\cDevice.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="WinGraph.h" />

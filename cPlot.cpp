@@ -7,6 +7,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #include "cPlot.h"
 #include "cSignalTable.h"
+#include <print>
 
 cPlot::cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table)
 {
@@ -51,24 +52,11 @@ cPlot::cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table)
 
 	plot_leftpanel_->SetSizerAndFit(left_vsizer);
 
-	plot_rightpanel_ = new wxPanel(inst, PLOTRIGHTPANEL, wxDefaultPosition, wxSize(600, 600), wxSUNKEN_BORDER);
-	//plot_rightpanel_->SetBackgroundColour(wxColor(00, 60, 60));
-	plot_rightpanel_->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+	plot_rightpanel_ = new wxPanel(inst, PLOTRIGHTPANEL, wxDefaultPosition, inst->FromDIP(wxSize(600, 600)));
 
-	/*
-	wxRect r = plot_rightpanel_->GetClientRect();
-	RECT rect;
-	rect.left = r.GetLeft(); rect.right = r.GetRight(); rect.top = r.GetTop(); rect.bottom = r.GetBottom();
-	hGraph = CreateGraph(plot_rightpanel_->GetHWND(), rect, 63, nbPoints);	// Max signal = 64
-	
-	*/
-
-	wxWindow* wxGraph = new wxWindow(plot_rightpanel_, PLOTWINDOW, wxDefaultPosition, wxSize(600, 600), wxSUNKEN_BORDER| wxNO_FULL_REPAINT_ON_RESIZE | wxCLIP_CHILDREN);
-	wxRect r = wxGraph->GetClientRect();
-	RECT rect;
-	rect.left = r.GetLeft(); rect.right = r.GetRight(); rect.top = r.GetTop(); rect.bottom = r.GetBottom();
-	hGraph = CreateGraph(wxGraph->GetHWND(), rect, 63, nbPoints);	// Max signal = 64
-
+	// Create the plot window
+	//
+	plot = std::make_unique<PlotWindow>(plot_rightpanel_, 600, 600);
 
 	plot_hsizer_ = new wxBoxSizer(wxHORIZONTAL);
 	plot_hsizer_->Add(plot_leftpanel_, 0, wxEXPAND);
@@ -79,10 +67,6 @@ cPlot::cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table)
 cPlot::~cPlot()
 {
 	std::cout << "cPlot dtor...\n";
-	if (hGraph != nullptr)
-	{
-		FreeGraph(&hGraph);
-	}
 }
 
 void cPlot::update_gui()
@@ -100,8 +84,6 @@ void cPlot::update_gui()
 	
 	// update Wingraph internal struct
 	
-	if (hGraph != nullptr)
-	{
 		// update signal total number	
 		int sig_count = 0;
 		for (auto &chan : chan_legend_struct_list)
@@ -114,7 +96,7 @@ void cPlot::update_gui()
 				}
 			}
 		}
-		SetSignalCount(hGraph, sig_count);
+		plot->SetSignalCount(sig_count);
 
 		// set every valid signal in Wingraph + display in cPlot gui
 		int k = 0;
@@ -124,8 +106,8 @@ void cPlot::update_gui()
 			{
 				if (chan.channel_legend_name.compare("slot free") != 0)
 				{
-					SetSignalLabel(hGraph, chan.channel_legend_name.c_str(), k);
-					SetSignalColor(hGraph, (int)chan.channel_legend_color.Red(), (int)chan.channel_legend_color.Green(), (int)chan.channel_legend_color.Blue(), k);
+					plot->SetSignalLabel(chan.channel_legend_name.c_str(), k);
+					plot->SetSignalColor((int)chan.channel_legend_color.Red(), (int)chan.channel_legend_color.Green(), (int)chan.channel_legend_color.Blue(), k);
 				
 					
 					chan_info_btn_pool[k]->set_name(chan.channel_legend_name);
@@ -139,7 +121,7 @@ void cPlot::update_gui()
 				}
 			}
 		}
-	}
+	
 	/*
 	// Display every active signals in plot windows
 	it = chan_legend_struct_list.begin();
@@ -231,6 +213,7 @@ void cPlot::update_chan_statistic_labels()
 		}
 	}
 }
+
 int cPlot::GetButtonBaseID()
 {
 	return chan_info_btn_pool[0]->GetId();
@@ -277,59 +260,39 @@ int cPlot::GuiPositionToWingraphPosition(wxWindowID id)
 void cPlot::update_chan_color(wxColor col, wxWindowID id)
 {
 	int index = GuiPositionToWingraphPosition(id);
-	SetSignalColor(hGraph, col.Red(), col.Green(), col.Blue(), index);
+	plot->SetSignalColor(col.Red(), col.Green(), col.Blue(), index);
 }
 
 void cPlot::reset_chan_statistic_labels(wxWindowID id)
 {
-	/*
-	int first_signal = chan_info_btn_pool[0]->GetId();
-	int signal_position =  id - first_signal;
-
-	if (signal_position < 0)
-	{
-		std::cout << "[!] reset_chan_statistic_labels signal_position is invalid \n";
-		return;
-	}
-
-	std::list<CHAN_LEGEND_STRUCT>::iterator it;
-	it = chan_legend_struct_list.begin();
-
-	// Iterate until and count valid signal
-	int j = 0;
-	for (int i = 0; i < signal_position; i++)
-	{
-		if (it->channel_legend_name.compare("slot free") != 0)
-		{
-			j++;
-		}
-		it++; // inc iterator until the position
-	}
-	signal_position = j;
-	SignalResetStatisticValue(hGraph, signal_position);
-	*/
 	int signal_position = GuiPositionToWingraphPosition(id);
-	SignalResetStatisticValue(hGraph, signal_position);
+	plot->SignalResetStatisticValue(signal_position);
 }
 
-HGRAPH cPlot::get_graph_handle()
+void cPlot::reset_chan_statistic_by_signal_position(size_t signal_position)
 {
-	return hGraph;
+	plot->SignalResetStatisticValue(signal_position);
 }
 
 bool cPlot::get_graph_state()
 {
-	return GetGraphState(hGraph);
+	if (!plot)
+	{
+		std::print("[*] get_graph_state() return false (not loaded)\n");
+		return false;
+	}
+
+	return plot->GetGraphState();
 }
 
 char* cPlot::get_graph_filename()
 {
-	return GetGraphFilename(hGraph);
+	return plot->GetGraphFilename();
 }
 
 int cPlot::get_graph_signal_count()
 {
-	return GetGraphSignalCount(hGraph);
+	return plot->GetGraphSignalCount();
 }
 
 void cPlot::set_signal_filter(FILTER_M isFiltering, int position)
@@ -337,7 +300,7 @@ void cPlot::set_signal_filter(FILTER_M isFiltering, int position)
 	int index = GuiPositionToWingraphPosition(position);
 	assert(index >= 0);
 	assert(index < MAX_SIG);
-	SetFilteringMode(hGraph, isFiltering, index);
+	plot->SetFilteringMode(isFiltering, index);
 }
 
 void cPlot::set_signal_filter_threshold(float intensity, int position)
@@ -345,7 +308,7 @@ void cPlot::set_signal_filter_threshold(float intensity, int position)
 	int index = GuiPositionToWingraphPosition(position);
 	assert(index >= 0);
 	assert(index < MAX_SIG);
-	SetFilteringThreshold(hGraph, intensity, index);
+	plot->SetFilteringThreshold(intensity, index);
 }
 
 void cPlot::set_signal_name(std::string signame, int position)
@@ -353,76 +316,86 @@ void cPlot::set_signal_name(std::string signame, int position)
 	int index = GuiPositionToWingraphPosition(position);
 	assert(index >= 0);
 	assert(index < MAX_SIG);
-	SetSignalLabel(hGraph, signame.c_str(), index);
+	plot->SetSignalLabel(signame.c_str(), index);
 }
 
 void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header)
 {
-	if (GetGraphState(hGraph) == FALSE)
+	if (plot->GetGraphState() == FALSE)
 	{
-		if (GetGraphSignalCount(hGraph) != SignalNumber)
+		if (plot->GetGraphSignalCount() != SignalNumber)
 		{
-			if (SetSignalCount(hGraph, SignalNumber) == FALSE)
+			if (plot->SetSignalCount(SignalNumber) == FALSE)
 			{
 				std::cout << "[!] Start graph is canceled, imposible to set signals\n";
 				return;
 			}
 		}
 
-		SetRecordingMode(hGraph, ReccordingType);
-		
-		if(opt_header.size()>0)
-			StartGraph(hGraph, opt_header.c_str());
+		if (!logger.set(LOGTYPE::CSV, "test.csv"))
+		{
+			std::cout << "[!] Fail to open log file\n";
+			return;
+		}
+
+		plot->SetRecordingMode(ReccordingType);
+
+		if (opt_header.size() > 0)
+		{
+			logger.add_header(opt_header);
+			plot->StartGraph(opt_header.c_str());
+		}
 		else
-			StartGraph(hGraph, nullptr);
+		{
+			plot->StartGraph(nullptr);
+		}		
 	}
 }
 
 void cPlot::stop_graph()
 {
-	if (TRUE == GetGraphState(hGraph))
+	logger.close();
+
+	if (TRUE == plot->GetGraphState())
 	{
 		//cMeasurementControler* meas_controler = nullptr;
 		//meas_controler = meas_manager->get_measurement_controler();
 		//meas_controler->stop();
-		StopGraph(hGraph);
+		plot->StopGraph();
 	}
 }
 
 void cPlot::graph_addpoint(const int signb, double val[])
 {
-	if (hGraph == nullptr)
+	plot->AddPoint(val, signb);
+
+	for(size_t i=0; i< (size_t)signb; i++)
 	{
-		std::cout << "cPlot::graph_addpoint() -> hGraph is null\n";
-		return;
+		std::string s = std::to_string(val[i]);
+		logger.add_value(s);
 	}
-	AddPoint(hGraph, val, signb);
+	logger.new_line();
 }
 
 void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
 {
-	if (hGraph == nullptr)
-	{
-		std::cout << "cPlot::graph_addpoint() -> hGraph is null\n";
-		return;
-	}
 	MessageBox(0, L"Procedure graph_addpoints() not implemented.", L"Fail", S_OK);
 	//AddMultiplePoints(hGraph, val, signb, chunk_size);
 }
 
 double cPlot::get_signal_min_value(size_t id, int SignalNumber)
 {
-	return GetSignalMinValue(hGraph, SignalNumber);
+	return plot->GetSignalMinValue(SignalNumber);
 }
 
 double cPlot::get_signal_average_value(int SignalNumber)
 {
-	return GetSignalAverageValue(hGraph, SignalNumber);
+	return plot->GetSignalAverageValue(SignalNumber);
 }
 
 double cPlot::get_signal_max_value(int SignalNumber)
 {
-	return GetSignalMaxValue(hGraph, SignalNumber);
+	return plot->GetSignalMaxValue(SignalNumber);
 }
 
 void cPlot::set_signal_visible(bool bShow, int SignalNumber)
@@ -434,17 +407,17 @@ void cPlot::set_signal_visible(bool bShow, int SignalNumber)
 	}
 	assert(index >= 0);
 	assert(index < MAX_SIG);
-	SetSignalVisible(hGraph, bShow, index);
+	plot->SetSignalVisible(bShow, index);
 }
 
 void cPlot::set_autoscale(bool enable)
 {
-	SetAutoscaleMode(hGraph, enable);
+	plot->SetAutoscaleMode(enable);
 }
 
 void cPlot::set_zoom(int factor)
 {
-	SetZoomFactor(hGraph, factor);
+	plot->SetZoomFactor(factor);
 }
 
 void cPlot::show_all_signals(bool isDisplayed)
@@ -458,17 +431,32 @@ void cPlot::show_all_signals(bool isDisplayed)
 
 int cPlot::get_zoom()
 {
-	return GetZoomFactor(hGraph);
+	return plot->GetZoomFactor();
 }
 
 void cPlot::SizeGraph()
 {
-	if (inst_ != nullptr)
+	if (!inst_)
 	{
-		//wxRect r = plot_rightpanel_->GetClientSize();
-		wxRect r = plot_rightpanel_->GetClientRect();
-		ReshapeGraph(hGraph, r.GetLeft(), r.GetTop(), r.GetRight(), r.GetBottom());
+		std::print("[!] SizeGraph() inst_ is nullptr\n");
+		return;
 	}
+
+	if (!plot)
+	{
+		std::print("[!] SizeGraph() plot is nullptr\n");
+		return;
+	}
+
+	//wxRect r = plot_rightpanel_->GetClientSize();
+	//wxRect r = plot_rightpanel_->GetClientRect();
+	//plot->ReshapeGraph(r.GetLeft(), r.GetTop(), r.GetRight(), r.GetBottom());
+	
+	wxSize sz = plot_rightpanel_->GetClientSize();
+
+	plot->SetClientSize(sz.GetWidth(), sz.GetHeight());
+	//plot->SetPosition(wxPoint(0,0));
+	
 }
 
 void cPlot::RenderGraph()
@@ -480,9 +468,12 @@ void cPlot::RenderGraph()
 	*/
 	//if (GetGraphState(hGraph) == true)
 	//{
-		Render(hGraph);
-	//}
+	
+	plot->Render();
 
+		
+	//}
+		
 }
 
 wxPanel* cPlot::Getleftpan()

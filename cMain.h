@@ -7,20 +7,23 @@
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
 #if _WIN64
-#pragma comment (lib, "WinGraph64.lib")
+//#pragma comment (lib, "WinGraph.lib")
 #else 
-#pragma comment (lib, "WinGraph32.lib")
+//#pragma comment (lib, "WinGraph32.lib")
 #endif
 #pragma comment (lib, "Advapi32.lib")
 #pragma comment (lib, "Gdi32.lib")
 #pragma comment (lib, "Winspool.lib")
 #pragma comment (lib, "Ole32.lib")
+
 #pragma comment (lib, "Comctl32.lib")
 #pragma comment (lib, "Comdlg32.lib")
 #pragma comment (lib, "Rpcrt4.lib")
 #pragma comment (lib, "Kernel32.lib")
 #pragma comment(lib, "SetupAPI.lib")
 #pragma comment(lib, "Winusb.lib")
+
+
 
 class cDeviceMonitor;
 
@@ -69,8 +72,8 @@ class cInicfg;
 class cMain :public wxFrame
 {
 public:
-	enum { DISP_FREQ = 16 };						// ms to draw
-	enum { GRAPH_NBPOINTS = 10000 };				// pts
+	const enum { DISP_FREQ = 250 };						// ms to draw
+	const enum { GRAPH_NBPOINTS = 1000 };					// pts
 
 	////////////////////////////////////////////////////////////////////////////////
 	// DEV MONITOR

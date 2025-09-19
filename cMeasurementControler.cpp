@@ -139,14 +139,11 @@ void cMeasurementControler::poll()
 		memset(Y, 0, sizeof(Y));
 
 		// Update min avg max value
-		HGRAPH hGraph_ = m_plot_->get_graph_handle();
-		if (hGraph_ != nullptr)
-		{
+
 			for (int z = 0; z < buffer_index; z++)
 			{
-				SignalResetStatisticValue(hGraph_, z);
+				m_plot_->reset_chan_statistic_by_signal_position(z);
 			}
-		}
 
 		// Update acquire rate
 		m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));

@@ -14,7 +14,6 @@ cOpen::cOpen(wxWindow* inst)
 	open_leftpanel_ = new wxPanel(inst, 11014, wxDefaultPosition, wxSize(300, 600));
 	open_leftpanel_->SetBackgroundColour(wxColor(00, 50, 60));
 
-
 	open_rightpanel_ = new wxPanel(inst, 11015, wxDefaultPosition, wxSize(600, 600), wxSUNKEN_BORDER);
 
 	wxBoxSizer* wall_vsizer = new wxBoxSizer(wxHORIZONTAL);

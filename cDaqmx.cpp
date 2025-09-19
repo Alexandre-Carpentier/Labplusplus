@@ -1418,25 +1418,25 @@ void cDaqmx::load_current_chan_config(int channel_index)
 	load_combobox(chan_scale, config.channel_linearize[channel_index]);
 
 	// Channel slope value
-	chan_slope->SetLabelText(config.channel_linearize_slope[channel_index]);
+	chan_slope->SetValue(config.channel_linearize_slope[channel_index]);
 
 	// Channel shift value
-	chan_shift->SetLabelText(config.channel_linearize_shift[channel_index]);
+	chan_shift->SetValue(config.channel_linearize_shift[channel_index]);
 
 	// Channel unit value	
-	chan_unit->SetLabelText(config.channel_linearize_unit[channel_index]);
+	chan_unit->SetValue(config.channel_linearize_unit[channel_index]);
 
 	// Channel filter 
 	load_combobox(chan_filter, config.channel_filter[channel_index]);
 
 	// Channel filter intensity
-	chan_filter_intensity->SetLabelText(config.channel_filter_intensity[channel_index]);
+	chan_filter_intensity->SetValue(config.channel_filter_intensity[channel_index]);
 
 	// Channel trigger
-	chan_trigger->SetLabelText(config.channel_trigger[channel_index]);
+	chan_trigger->SetValue(config.channel_trigger[channel_index]);
 
 	// Channel threshold
-	chan_trigger_threshold->SetLabelText(config.channel_trigger_threshold[channel_index]);
+	chan_trigger_threshold->SetValue(config.channel_trigger_threshold[channel_index]);
 
 	std::cout << "[*] Field " << channel_index << " saved\n";
 	return;

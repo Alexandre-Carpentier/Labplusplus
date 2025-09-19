@@ -17,44 +17,30 @@
 #include <Windows.h>
 #include <process.h>
 
-#include "WinGraph.h"
-
+#pragma comment(lib, "LogLibrary.lib")
+#include "LogLibrary\log.h"
 
 #include "cMeasurementmanager.h"
 #include "cSignalBtn.h"
 
-static HGRAPH hGraph;
-/*
-class cMeasurementControler;
-class cObjectmanager;
-class cMeasurementmanager;
-*/
-/*
+#include "PlotWindow.h"
 
-#include "cMeasurement.h"
-
-
-#include "cDaqmx.h"
-#include "cUSB6001.h"
-#include "enum.h"
-
-#include "cMeasurementControler.h"
-#include "cObjectmanager.h"
-
-*/
 class cSignalTable;
 
 class cPlot
 {
-
 private:
-	wxPanel* plot_leftpanel_ = nullptr;;
-	wxPanel* plot_rightpanel_ = nullptr;;
-	wxBoxSizer* plot_hsizer_ = nullptr;;
-	wxWindow* inst_ = nullptr;;
+	// Use to log data on disk
+	cLog logger;
+
+	wxPanel* plot_leftpanel_ = nullptr;
+	wxPanel* plot_rightpanel_ = nullptr;
+	wxBoxSizer* plot_hsizer_ = nullptr;
+	wxWindow* inst_ = nullptr;
 	wxSizer* main_vsizer_ = nullptr;
 	cMeasurementmanager* meas_manager = nullptr;
 
+	std::unique_ptr<PlotWindow> plot;
 
 	wxBoxSizer* left_vsizer = nullptr;
 
@@ -71,14 +57,6 @@ public:
 
 	void update_gui();
 
-	// Channel btn class
-	//void init_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color);
-	//void resize_chan_number_to_gui(size_t max_item);
-	//int gui_get_last_active_channel_number();
-	//int get_chan_number_to_gui();
-	//void add_chan_to_gui(std::string chan_name, std::string chan_addr, std::string chan_unit, wxColor chan_color, size_t position);
-	//void draw_chan_to_gui();
-	//void remove_chan_to_gui(size_t position);
 	void update_chan_name_to_gui(MEAS_TYPE type, std::string name, size_t position); // change the signal name in the channel btn class
 	void update_chan_physical_name_to_gui(std::string name, size_t position); // change the signal physical name in the channel btn class
 	void update_chan_physical_unit_to_gui(std::string unit, size_t position); // change the signal physical unit in the channel btn class
@@ -87,9 +65,8 @@ public:
 	int GuiPositionToWingraphPosition(wxWindowID id);
 	void update_chan_color(wxColor col, wxWindowID id);
 	void reset_chan_statistic_labels(wxWindowID id);
+	void reset_chan_statistic_by_signal_position(size_t signal_position);
 
-	// Wingraph
-	HGRAPH get_graph_handle();
 	bool get_graph_state();
 	char* get_graph_filename();
 	int get_graph_signal_count();

@@ -159,7 +159,15 @@ err_struct cUsb::init()
 	// SENDREQUEST
 	//overlapped;
 	ZeroMemory(&overlapped, sizeof(OVERLAPPED));
+	overlapped.hEvent = 0;
 	overlapped.hEvent = CreateEvent(NULL, false, false, NULL);
+	if (overlapped.hEvent == 0)
+	{
+		std::cout << "CreateEvent failed with code " << GetLastError() << "\n";
+		last_error.err_msg = std::wstring(L"CreateEvent failed");
+		last_error.err_code = -6;
+		return last_error;
+	}
 
 	const int bufferSize = 0x12;
 	unsigned char buffer[bufferSize];
@@ -212,7 +220,7 @@ err_struct cUsb::init()
 
 	const char* cmd = "*RST\n";
 	retVal = 0;
-	if (WriteFile(hUsb, cmd, strlen(cmd), &retVal, &overlapped)) {
+	if (WriteFile(hUsb, cmd, static_cast<DWORD>(strlen(cmd)), &retVal, &overlapped)) {
 		std::cout << "WriteFile wrote " << retVal << " bytes\n";
 	}
 	else if (GetLastError() == ERROR_IO_PENDING) {

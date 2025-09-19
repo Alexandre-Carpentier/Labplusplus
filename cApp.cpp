@@ -16,6 +16,7 @@ wxIMPLEMENT_APP_CONSOLE(cApp);
 
 bool cApp::OnInit() 
 {
+	
 	wxInitAllImageHandlers();
 	m_Frame = new cMain();	
 	if (m_Frame)

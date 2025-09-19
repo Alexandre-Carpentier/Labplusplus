@@ -13,7 +13,6 @@
 #include <GL/glu.h>
 #include <float.h>
 
-
 #include "Mouse.h"
 #include "math.h"
 #include "datetimeapi.h"
@@ -148,7 +147,7 @@ PIXELFORMATDESCRIPTOR pfd =
 };
 
 /*-------------------------------------------------------------------------
-	DllMain: DLL Entry POINT
+	DllMain: DLL Entry point
   -------------------------------------------------------------------------*/
 
 bool APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call,
@@ -458,10 +457,7 @@ void FreeGraph(HGRAPH* hGraph)
 	DeleteCriticalSection(&cs);
 
 	*hGraph = NULL;
-
 }
-
-
 
 /*-------------------------------------------------------------------------
 	CreateGraph: Initialize the structure, signals,
@@ -650,15 +646,14 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, int SignalCount, int BufferSize)
 	memset(SnapPlot->Ynorm, 0, sizeof(double) * BufferSize);
 
 	pgraph->hParentWnd = hWnd;
-	/////////////////////////////////////////////
-	pgraph->hGraphWnd = hWnd;
-	/*
+
+	
 	// Graph created in a "Static" control windows class named ""
 	// When redrawn the control will be painted with the graph in place of
-	pgraph->hGraphWnd = CreateWindow(
-		"Static",													// Predefined class; Unicode assumed 
+	pgraph->hGraphWnd = CreateWindowEx(WS_EX_TRANSPARENT,			// Styles WS_EX_TRANSPARENT mandatory
+		"STATIC",													// Predefined class; Unicode assumed 
 		"",															// The text will be erased by OpenGL
-		WS_EX_TRANSPARENT | WS_VISIBLE | WS_CHILD,					// Styles WS_EX_TRANSPARENT mandatory
+		WS_CHILD,													// Consider childrens
 		GraphArea.left,												// x pos
 		GraphArea.top,												// y pos
 		GraphArea.right,											// Graph width
@@ -666,10 +661,17 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, int SignalCount, int BufferSize)
 		hWnd,														// Parent window
 		NULL,														// No menu.
 		(HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),			// HINST of the app
-		NULL);														// No parameters
+		NULL);		
+		
+
+	DWORD err_code = GetLastError();
+	if (err_code != 0)
+	{
+		printf("[*] CreateWindow error code: %ld\n", err_code);
+	}
 
 	// Sanity check
-	*/
+	
 	if (NULL == pgraph->hGraphWnd)
 	{
 		printf("[!] CreateWindow() failed in CreateGraph()\n");
@@ -687,7 +689,6 @@ HGRAPH CreateGraph(HWND hWnd, RECT GraphArea, int SignalCount, int BufferSize)
 		LeaveCriticalSection(&cs);
 		return NULL;
 	}
-
 
 	// Load OpenGL specific to legacy version
 
@@ -926,7 +927,7 @@ void inline SwapPtr(void** p1, void** p2)
 /*-------------------------------------------------------------------------
 	SwapRecBuffer: Swap first half of the signal with the second half
 	- This is used to swap the signal buffer when autoscale is disabled
-	- So the logguer can continue to log data and add points when only the
+	- So the logger can continue to log data and add points when only the
 	- current point will be displayed.
   -------------------------------------------------------------------------*/
 void SwapRecBuffer(HGRAPH hGraph, bool swap)
@@ -1017,7 +1018,7 @@ void SetAutoscaleMode(HGRAPH hGraph, bool mode)
 		printf("[!] Error at SetAutoscaleMode() graph handle is null\n");
 		return;
 	}
-
+	
 	pgraph->bAutoscale = mode;
 
 	if (pgraph->bRunning)
@@ -2184,11 +2185,52 @@ void AddMultiplePoints(HGRAPH hGraph, double** Chunks, int SignalCount, int Buff
 	LeaveCriticalSection(&cs);
 }
 /*-------------------------------------------------------------------------
+	Render_: FAKE MOCK
+  -------------------------------------------------------------------------*/
+bool Render_(HGRAPH hGraph)
+{
+	HDC hDC = GetGraphDC(hGraph);
+	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
+
+	RECT  rc;
+	GetClientRect(pgraph->hGraphWnd, &rc);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+
+	// Dessin d'un triangle (OpenGL 1.0)
+	glBegin(GL_TRIANGLES);
+	glColor3f(1.0f, 0.0f, 0.0f); // sommet rouge
+	glVertex2f(0.0f, 0.6f);
+
+	glColor3f(0.0f, 1.0f, 0.0f); // sommet vert
+	glVertex2f(-0.6f, -0.6f);
+
+	glColor3f(0.0f, 0.0f, 1.0f); // sommet bleu
+	glVertex2f(0.6f, -0.6f);
+	glEnd();
+
+	SwapBuffers(hDC);
+	return true;
+}
+/*-------------------------------------------------------------------------
 	Render: Analyze the data buffers and print waves to the
 	OpenGL device context
   -------------------------------------------------------------------------*/
 bool Render(HGRAPH hGraph)
 {
+	GLenum err_code;
+	RECT r;
+	const int div = 10;
+	float txtlen = 0.0;
+	float txtheight = 0.0;
+	char value[260];
+	const char Xname[] = "Time (s)";
+	double reelval = SnapPlot->Ymin;
+	if(cs.DebugInfo == NULL)
+	{
+		return false;
+	}
 	EnterCriticalSection(&cs);
 
 	PGRAPHSTRUCT pgraph = (PGRAPHSTRUCT)hGraph;
@@ -2209,14 +2251,6 @@ bool Render(HGRAPH hGraph)
 		return FALSE;
 	}
 
-	RECT r;
-	const int div = 10;
-	float txtlen = 0.0;
-	float txtheight = 0.0;
-	char value[260];
-	const char Xname[] = "Time (s)";
-	double reelval = SnapPlot->Ymin;
-
 	if (pgraph->cur_nbpoints == 0 && start == 0.0f)														// Display a void graph when app start only
 	{
 		SnapPlot->Xmin = 0.0f;
@@ -2232,24 +2266,31 @@ bool Render(HGRAPH hGraph)
 		normalize_data(hGraph, SnapPlot->Xmin, SnapPlot->Xmax, SnapPlot->Ymin, SnapPlot->Ymax);			// normalize between [0;1]
 	}
 
-	GetClientRect(pgraph->hGraphWnd, &DispArea);
-
 	// Use the Projection Matrix
 
 	glMatrixMode(GL_PROJECTION);
+	if (glGetError() == GL_INVALID_ENUM || glGetError() == GL_INVALID_OPERATION)
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
 
 	// Reset Matrix
 
 	glLoadIdentity();
+	if (glGetError() == GL_INVALID_OPERATION)
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
 
 	// Set the correct perspective.
-
-	//gluOrtho2D(-0.08, 1.04, 0 - 0.08, 1 + 0.02);
 
 	const float orthoLeft = -0.08f; const float orthoRight = 1.04f;
 	const float orthoBottom = -0.08f; const float orthoTop = 1.02f;
 	gluOrtho2D(orthoLeft, orthoRight, orthoBottom, orthoTop);
 
+	GetClientRect(pgraph->hGraphWnd, &DispArea);
 	glViewport(0, 0, DispArea.right, DispArea.bottom);
 
 	// Use the Model Matrix
@@ -2257,16 +2298,33 @@ bool Render(HGRAPH hGraph)
 	glMatrixMode(GL_MODELVIEW);
 
 	// Reset Matrix
-
+	
 	glLoadIdentity();
+	if (glGetError() == GL_INVALID_OPERATION)
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
 
 	// Clear Color and Depth Buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	err_code = glGetError();
+	if (err_code == GL_INVALID_VALUE || err_code == GL_INVALID_OPERATION)
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
+	
+	// Draw graph frame and grid
+	if (GetGraphState(hGraph) == false)
+	{
+		printf("Graph state false\n");
+	}
 
 	DrawGraphSquare();
 	DrawGridLines();
-
+	
 	if (SnapPlot->Ymax != SnapPlot->Ymin)
 	{
 
@@ -2289,7 +2347,12 @@ bool Render(HGRAPH hGraph)
 
 		// Determine the length of a typical string for resizing purpose
 
-		GetWindowRect(GetGraphWnd(hGraph), &r);
+		if(!GetWindowRect(GetGraphWnd(hGraph), &r))
+		{
+			LeaveCriticalSection(&cs);
+			return FALSE;
+		}
+
 		txtlen = (float)dispStringWidth.cx / r.right; // Normalize the width of the printed value characters between [0-1]
 		txtheight = (float)dispStringWidth.cy / r.bottom;
 
@@ -2307,18 +2370,20 @@ bool Render(HGRAPH hGraph)
 
 		// Ymin to Ymax values
 
+		reelval = SnapPlot->Ymin;
 		for (float ytmp = 0.0f; ytmp <= 1.1f; ytmp += 1.0f / (float)div)
 		{
 			DrawString(-txtlen * 1.5f, ytmp - ((txtheight * 0.8f) / 2.0f), dtos(value, sizeof(value), reelval));
 			reelval += (SnapPlot->Ymax - SnapPlot->Ymin) / (float)div;
 		}
 	}
+	
 
 	// Display cursor with values if hoover
-
+	
 	if (pgraph->bDisplayCursor)
 	{
-		//DisplayPointer(hGraph);
+		DisplayPointer(hGraph);
 
 		if (isMouseHover(hGraph))
 		{
@@ -2357,13 +2422,13 @@ bool Render(HGRAPH hGraph)
 
 						// Display lines indicator
 
-						/*
-						glColor3f(0.0f, 1.0f, 0.5f);
-						glBegin(GL_LINE_STRIP);
-						glVertex2f(0, 0);
-						glVertex2f(normal_pos_x_shifted, normal_pos_y_shifted);
-						glEnd();
-						*/
+						
+						//glColor3f(0.0f, 1.0f, 0.5f);
+						//glBegin(GL_LINE_STRIP);
+						//glVertex2f(0, 0);
+						//glVertex2f(normal_pos_x_shifted, normal_pos_y_shifted);
+						//glEnd();
+						
 						glColor3f(0.0f, 0.4f, 0.5f);
 						glBegin(GL_LINE_STRIP);
 						glVertex2f(0, normal_pos_y_shifted);
@@ -2393,9 +2458,13 @@ bool Render(HGRAPH hGraph)
 			}
 		}
 	}
-	SwapBuffers(GetGraphDC(hGraph));
-	LeaveCriticalSection(&cs);
 
+	if (!SwapBuffers(GetGraphDC(hGraph)))
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
+	LeaveCriticalSection(&cs);
 	return TRUE;
 }
 
@@ -2438,16 +2507,15 @@ void InitGL(HGRAPH hGraph, int Width, int Height)		// Called after the main wind
 		return;
 	}
 
-	//glShadeModel(GL_SMOOTH);							// Enable Smooth drawing MSAA...
-	//glEnable(GL_LINE_SMOOTH);							// Enable Smooth drawing MSAA...
-	//glEnable(GL_BLEND);
+	glShadeModel(GL_SMOOTH);							// Enable Smooth drawing MSAA...
+	glEnable(GL_LINE_SMOOTH);							// Enable Smooth drawing MSAA...
+	glEnable(GL_BLEND);
 	glDepthMask(false);
 
 	if (!BuildMyFont(hGraph, (const char*)"Verdana", 14))		// Build The Font BuildMyFont(HGRAPH hGraph, char* FontName, int Fontsize)
 	{
 		// error on creating the Font
 	}
-	SetGLView();
 }
 
 /*-------------------------------------------------------------------------
@@ -2456,9 +2524,17 @@ void InitGL(HGRAPH hGraph, int Width, int Height)		// Called after the main wind
 
 void SetGLView()
 {
-	glClearColor(0.98f, 0.98f, 0.98f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	//CheckErr();
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // fond sombre
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW);
+
+
+	//OLD
+	//glClearColor(0.98f, 0.98f, 0.98f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	CheckErr();
 }
 
 /*-------------------------------------------------------------------------
@@ -2777,7 +2853,7 @@ void DrawGridLines(void)
 		glVertex2f(xtmp, 1.0);
 		glVertex2f(0.0, xtmp);
 		glVertex2f(1.0, xtmp);
-	};
+	}
 	glEnd();
 
 	//Draw Grid 
@@ -2997,7 +3073,7 @@ void UpdateBorder(HGRAPH hGraph)
 			}
 			else
 			{
-				//MessageBox(0, 0, 0, 0);
+				MessageBox(0, 0, 0, 0);
 			}
 
 		}
