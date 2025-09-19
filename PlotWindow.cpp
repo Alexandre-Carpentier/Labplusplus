@@ -174,10 +174,10 @@ bool WinGraph::StartGraph(const char* opt_header)
 
 	for (int index = 0; index < m_graph.signalcount; index++)
 	{
-		memset(&m_graph.signals[index]->X, 0, sizeof(double) * m_graph.BufferSize);
-		memset(&m_graph.signals[index]->Y, 0, sizeof(double) * m_graph.BufferSize);
-		memset(&m_graph.signals[index]->Xnorm, 0, sizeof(double) * m_graph.BufferSize);
-		memset(&m_graph.signals[index]->Ynorm, 0, sizeof(double) * m_graph.BufferSize);
+		memset(m_graph.signals[index]->X, 0, sizeof(double) * m_graph.BufferSize);
+		memset(m_graph.signals[index]->Y, 0, sizeof(double) * m_graph.BufferSize);
+		memset(m_graph.signals[index]->Xnorm, 0, sizeof(double) * m_graph.BufferSize);
+		memset(m_graph.signals[index]->Ynorm, 0, sizeof(double) * m_graph.BufferSize);
 		m_graph.signals[index]->Xmin = 0.0f;
 		m_graph.signals[index]->Xmax = 0.0f;
 		m_graph.signals[index]->Ymin = 0.0f;
@@ -1383,7 +1383,7 @@ bool WinGraph::Render_()
   -------------------------------------------------------------------------*/
 bool WinGraph::Render()
 {
-	GLenum err_code;
+	//GLenum err_code;
 	RECT r;
 	const int div = 10;
 	float txtlen = 0.0;

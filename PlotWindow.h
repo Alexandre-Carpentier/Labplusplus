@@ -46,13 +46,12 @@ struct DATA_STATISTIC {
 
 struct DATA{
 public:
-	~DATA() {/* delete DATA */ };
-	DATA(size_t array_length)
-		:X(std::make_unique<double[]>(array_length)),
-		Y(std::make_unique<double[]>(array_length)),
-		Xnorm(std::make_unique<double[]>(array_length)),
-		Ynorm(std::make_unique<double[]>(array_length))
-	{
+	~DATA() { delete[] X; delete[] Y; delete[] Xnorm; delete[] Ynorm; };
+	DATA(size_t array_length) {
+		X = new double[array_length];
+		Y = new double[array_length];
+		Xnorm = new double[array_length];
+		Ynorm = new double[array_length];
 		show = true;
 		filter = FILTER_M::FILTER_NONE;
 		filter_threshold = 0.0f;
@@ -74,10 +73,10 @@ public:
 	FILTER_M filter;
 	float filter_threshold;
 	DATA_STATISTIC stat;
-	std::unique_ptr<double[]> X;
-	std::unique_ptr<double[]> Y;
-	std::unique_ptr<double[]> Xnorm;
-	std::unique_ptr<double[]> Ynorm;
+	double* X;
+	double* Y;
+	double* Xnorm;
+	double* Ynorm;
 	double Xmin;
 	double Xmax;
 	double Ymin;
