@@ -322,6 +322,23 @@
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="back-arrow20x20.png" />
+    <Image Include="icon.ico" />
+    <Image Include="imgs\configuration.png" />
+    <Image Include="imgs\exit.png" />
+    <Image Include="imgs\graph.png" />
+    <Image Include="imgs\next.png" />
+    <Image Include="imgs\previous.png" />
+    <Image Include="imgs\table.png" />
+    <Image Include="multi_function_daq_img600x300.png" />
+    <Image Include="Plugin\2280S.png" />
+    <Image Include="Plugin\DAQ6510.png" />
+    <Image Include="Plugin\DSOX.png" />
+    <Image Include="Plugin\pace6000.png" />
+    <Image Include="Plugin\RS6005P.png" />
+    <Image Include="sinus20x20.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />

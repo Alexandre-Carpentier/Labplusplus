@@ -523,4 +523,51 @@
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="imgs\configuration.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="imgs\table.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="imgs\graph.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="imgs\exit.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="imgs\previous.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="imgs\next.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="multi_function_daq_img600x300.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="Plugin\pace6000.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="Plugin\2280S.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="Plugin\DAQ6510.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="Plugin\RS6005P.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="Plugin\DSOX.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="sinus20x20.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="back-arrow20x20.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
