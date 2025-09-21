@@ -139,6 +139,7 @@ inline long long PerformanceFrequency();
 inline long long PerformanceCounter();
 
 void ZeroObject(DATA* pgraph, int iBufferSize);
+bool MakeUniqueFilename(wchar_t* lpFilename, const wchar_t* lpFileExtension);
 
 // Global access
 
@@ -178,10 +179,8 @@ bool WinGraph::StartGraph(const char* opt_header)
 
 	for (int index = 0; index < m_graph.signalcount; index++)
 	{
-		//memset(m_graph.signals[index]->X.get(), 0, sizeof(double) * m_graph.BufferSize);
-		//memset(m_graph.signals[index]->Y.get(), 0, sizeof(double) * m_graph.BufferSize);
-		//memset(m_graph.signals[index]->Xnorm.get(), 0, sizeof(double) * m_graph.BufferSize);
-		//memset(m_graph.signals[index]->Ynorm.get(), 0, sizeof(double) * m_graph.BufferSize);
+		m_graph.signals[index].reset_data();
+
 		m_graph.signals[index].Xmin = 0.0f;
 		m_graph.signals[index].Xmax = 0.0f;
 		m_graph.signals[index].Ymin = 0.0f;
@@ -320,7 +319,6 @@ WinGraph::WinGraph(HWND parent, RECT GraphArea, const int SignalCount, const int
 	m_graph.bAutoscale = true;
 	m_graph.bDisplayCursor = true;
 	m_graph.Logging = LOGGER_NONE;
-	m_graph.logfilename = NULL;
 	m_graph.Filtering = FILTER_NONE;
 
 	LeaveCriticalSection(&cs);
@@ -713,18 +711,40 @@ bool WinGraph::GetGraphState()
 	GetGraphFilename: return the filename used to save data on disk. If not exist return NULL ptr.
   -------------------------------------------------------------------------*/
 
-char* WinGraph::GetGraphFilename()
+std::wstring WinGraph::GetGraphFilename()
 {
-	static char no_allocated[] = "null.txt";
-	if (!m_graph.logfilename)
-	{
-		std::print("[*] Warning at GetGraphFilename() no log file allocated, generated: null.txt\n");
-		m_graph.logfilename = no_allocated;
-	}
-
 	return m_graph.logfilename;
 }
 
+/*-------------------------------------------------------------------------
+	SetGraphFilename: return the filename used to save data on disk. If not exist return NULL ptr.
+  -------------------------------------------------------------------------*/
+
+void WinGraph::SetGraphFilename(std::wstring filename)
+{
+		m_graph.logfilename = filename;
+}
+
+/*-------------------------------------------------------------------------
+	GetUniqueFilename: return the filename used to save data on disk. If not exist return NULL ptr.
+  -------------------------------------------------------------------------*/
+
+bool WinGraph::GetUniqueFilename(std::wstring& filename)
+{
+	// create unique filename
+
+	wchar_t lpDateStr[MAX_PATH] = L"";
+	if (!MakeUniqueFilename(lpDateStr, L".lab"))
+	{
+		MessageBox(GetFocus(), L"Error: impossible to generate an unique filename in the current directory", L"Error", MB_ICONERROR);
+		LeaveCriticalSection(&cs);
+		return false;
+	}
+
+	filename = lpDateStr;
+
+	return true;
+}
 
 /*-------------------------------------------------------------------------
 	GetGraphRC: return the graph render context
@@ -955,9 +975,8 @@ void WinGraph::ShowDataInConsole()
 /*-------------------------------------------------------------------------
 	AddPoint: Add one POINT for every signal
   -------------------------------------------------------------------------*/
-void WinGraph::AddPoint(double* y, const int SignalCount)
+void WinGraph::AddPoint(double timestamp, double* y, const int SignalCount)
 {
-
 	if (false == m_graph.bRunning)
 	{
 		printf("[!] Error at AddPoint() graph not strated\n");
@@ -1003,6 +1022,7 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 
 	if (m_graph.cur_nbpoints == 0)
 	{
+		timestamp = 0;
 		finish = start;
 	}
 	else
@@ -1063,7 +1083,7 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 
 		// Add points to the selected buffer	
 
-		m_graph.signals[index].X[m_graph.cur_nbpoints] = (double)((finish - start)) / frequency;							// Save in X the elapsed time from start
+		m_graph.signals[index].X[m_graph.cur_nbpoints] = timestamp;							// Save in X the elapsed time from start
 		m_graph.signals[index].Y[m_graph.cur_nbpoints] = y[index - offset];															// Save Y
 
 		// Perform some statistics
@@ -2328,7 +2348,7 @@ int WinGraph::GetBufferSize()
 	GetUniqueFilename: return an unique filename for logging purpose
 -------------------------------------------------------------------------*/
 
-bool GetUniqueFilename(wchar_t* lpFilename, wchar_t* lpFileExtension)
+bool MakeUniqueFilename(wchar_t* lpFilename, const wchar_t* lpFileExtension)
 {
 	SYSTEMTIME t;
 

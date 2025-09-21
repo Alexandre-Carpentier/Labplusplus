@@ -22,7 +22,6 @@ inline long long cTick::PerformanceCounter()
 }
 
 
-
 cTick::cTick()
 {
 	start_ = PerformanceCounter();

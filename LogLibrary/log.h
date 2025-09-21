@@ -6,6 +6,7 @@
 enum LOGTYPE {
 	NONE=0,
 	SIM,
+	TSV,
 	CSV,
 	TDMS,
 	XLSX,
@@ -30,7 +31,9 @@ public:
 	bool add_header(std::string str);
 	bool add_value(std::string value);
 	bool new_line();
+
 	std::string get_filename();
+	LOGTYPE get_reccording_mode();
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Clean logger

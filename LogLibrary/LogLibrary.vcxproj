@@ -142,6 +142,7 @@
     <ClCompile Include="none.cpp" />
     <ClCompile Include="sim.cpp" />
     <ClCompile Include="tdms.cpp" />
+    <ClCompile Include="tsv.cpp" />
     <ClCompile Include="xlsx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="none.h" />
     <ClInclude Include="sim.h" />
     <ClInclude Include="tdms.h" />
+    <ClInclude Include="tsv.h" />
     <ClInclude Include="xlsx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

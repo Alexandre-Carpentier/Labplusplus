@@ -51,10 +51,13 @@ cFooter::cFooter(wxWindow* inst, cPlot* m_plot, cTable* m_table, cConfig* m_conf
 
 	wxArrayString   m_arrItems2;
 	m_arrItems2.Add(wxT("None"));
-	m_arrItems2.Add(wxT("Ascii"));
-	m_arrItems2.Add(wxT("TDMS"));
-	m_arrItems2.Add(wxT("Xlsx"));
-	combo2 = new wxComboBox(inst_, IDC_RECCOMBO, L"Ascii", wxDefaultPosition, inst->FromDIP(wxSize(100, 25)), m_arrItems2, wxCB_READONLY, wxDefaultValidator, _T("ID_COMBOBOX1"));
+	m_arrItems2.Add(wxT("Simulated"));
+	m_arrItems2.Add(wxT(".tsv"));
+	m_arrItems2.Add(wxT(".csv"));
+	m_arrItems2.Add(wxT(".tdms"));
+	m_arrItems2.Add(wxT(".xlsx"));
+
+	combo2 = new wxComboBox(inst_, IDC_RECCOMBO, L".tsv", wxDefaultPosition, inst->FromDIP(wxSize(100, 25)), m_arrItems2, wxCB_READONLY, wxDefaultValidator, _T("ID_COMBOBOX1"));
 	combo2->SetBackgroundColour(wxColor(240, 245, 255));
 
 	wxStaticText* staticfreqtxt = new wxStaticText(inst_, IDC_FREQTXT, L"freq (ms):", wxDefaultPosition, inst->FromDIP(wxSize(60, 25)), wxTE_CENTER);
@@ -221,22 +224,30 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 
 		/////////////////////////////////////////////////////////
 		int iRec = this->combo2->GetCurrentSelection();
-		LOGGER_M Rec = LOGGER_NONE;
+		LOGTYPE Rec = LOGTYPE::TSV;
 		if (iRec == 0)
 		{
-			Rec = LOGGER_NONE;
+			Rec = LOGTYPE::NONE;
 		}
 		else if (iRec == 1)
 		{
-			Rec = LOGGER_ASCII;
+			Rec = LOGTYPE::SIM;
 		}
 		else if (iRec == 2)
 		{
-			Rec = LOGGER_TDMS;
+			Rec = LOGTYPE::TSV;
 		}
 		else if (iRec == 3)
 		{
-			Rec = LOGGER_XLSX;
+			Rec = LOGTYPE::CSV;
+		}
+		else if (iRec == 4)
+		{
+			Rec = LOGTYPE::TDMS;
+		}
+		else if (iRec == 5)
+		{
+			Rec = LOGTYPE::XLSX;
 		}
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -409,6 +420,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	
 		size_t sizesig = meas_manager->get_measurement_total_channel_number();
 		meas_controler->start();
+
 		m_plot_->start_graph(Rec, sizesig, head);
 
 		startbtn->SetBackgroundColour(wxColor(250, 80, 90));
@@ -418,6 +430,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 	{
 		std::cout << "[*] Stopping cycle controler.\n";
 		cycle_controler->stop();
+
 		m_plot_->stop_graph();
 		
 
@@ -501,9 +514,46 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 			std::string token;
 			std::stringstream input_stringstream(header);
 
+			char tok;
+			LOGTYPE logtype = m_plot_->get_graph_logger_mode();
+			switch (logtype)
+			{
+			case LOGTYPE::SIM:	
+				MessageBeep(MB_ICONERROR);
+				MessageBox(0, L"Graphing for SIM logger type is not available.", L"Info", S_OK);
+				std::cout << "[*] Logger type is SIM\n";
+				return;
+			case LOGTYPE::NONE:		
+				MessageBeep(MB_ICONERROR);
+				MessageBox(0, L"Graphing for NONE logger type is not available.", L"Info", S_OK);
+				std::cout << "[*] Logger type is SIM\n";
+				return;
+			case LOGTYPE::TSV:
+				tok = '\t';
+				std::cout << "[*] Logger type is SIM\n";
+				break;
+			case LOGTYPE::CSV:
+				tok = ';';
+				std::cout << "[*] Logger type is SIM\n";
+				break;
+			case LOGTYPE::TDMS:
+				MessageBeep(MB_ICONERROR);
+				MessageBox(0, L"Graphing for TDMS logger type is not available.", L"Info", S_OK);
+				std::cout << "[*] Logger type is SIM\n";
+				return;
+			case LOGTYPE::XLSX:
+				MessageBeep(MB_ICONERROR);
+				MessageBox(0, L"Graphing for TDMS logger type is not available.", L"Info", S_OK);
+				std::cout << "[*] Logger type is SIM\n";
+				return;
+
+				std::cout << "[!] Error Logger type is invalid\n";
+			}
+
+		
 			//tokenize each col
 			int col = 0;
-			while (getline(input_stringstream, token, '\t'))
+			while (getline(input_stringstream, token, tok))
 			{
 				if (col >= 1)
 				{

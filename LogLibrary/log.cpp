@@ -3,6 +3,7 @@
 #include "none.h"
 #include "sim.h"
 #include "csv.h"
+#include "tsv.h"
 #include "tdms.h"
 #include "xlsx.h"
 
@@ -29,6 +30,9 @@ public:
 			case LOGTYPE::CSV:
 				std::println("[*] log_factory: CSV logger selected");
 				return std::make_unique<csv>();
+			case LOGTYPE::TSV:
+				std::println("[*] log_factory: TSV logger selected");
+				return std::make_unique<tsv>();
 			case LOGTYPE::TDMS:
 				std::println("[*] log_factory: TDMS logger selected");
 				return std::make_unique<tdms>();
@@ -75,6 +79,7 @@ public:
 		}
 
 		m_filename = filename;
+		m_type = type;
 		return true;
 	}
 
@@ -133,6 +138,11 @@ public:
 		return m_filename;
 	}
 
+	LOGTYPE get_reccording_mode()
+	{
+		return m_type;
+	}
+
 	bool close()
 	{
 		if (logger->close() == false)
@@ -145,6 +155,7 @@ public:
 
 private:
 	std::unique_ptr<dolog> logger;
+	LOGTYPE m_type = LOGTYPE::NONE;
 	std::string m_filename;
 	bool isOk;
 };
@@ -248,6 +259,11 @@ bool cLog::new_line()
 std::string cLog::get_filename()
 {
 	return pimpl->get_filename();
+}
+
+LOGTYPE cLog::get_reccording_mode()
+{
+	return pimpl->get_reccording_mode();
 }
 
 bool cLog::close()

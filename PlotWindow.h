@@ -125,7 +125,7 @@ struct GRAPHSTRUCT
 	size_t BufferSize = 0;							// The total amount of POINT to handle							
 	bool bRunning = false;							// Status of the graph
 	LOGGER_M Logging = LOGGER_M::LOGGER_NONE;		// Logging type
-	char* logfilename = nullptr;
+	std::wstring logfilename;
 	FILTER_M Filtering = FILTER_M::FILTER_NONE;		// Filtering type
 	bool bAutoscale = false;						// Autoscale active
 	bool bSwapDone = false;							// Autoscale active
@@ -160,7 +160,9 @@ public:
 	void SetSignalAverageValue(const int SIGNB, double val);
 	void SetSignalMaxValue(const int SIGNB, double val);
 	bool GetGraphState();
-	char* GetGraphFilename();
+	std::wstring GetGraphFilename();
+	void SetGraphFilename(std::wstring filename);
+	bool GetUniqueFilename(std::wstring& filename);
 	HGLRC GetGraphRC();
 	HDC GetGraphDC();
 	HWND GetGraphParentWnd();
@@ -173,7 +175,7 @@ public:
 	double GetSignalMaxValue(const int SIGNB);
 	void SignalResetStatisticValue(const int SIGNB);
 	void ShowDataInConsole();
-	void AddPoint(double* y, const int SignalCount);
+	void AddPoint(double timestamp, double* y, const int SignalCount);
 	void AddMultiplePoints(double** Chunks, const int SignalCount, const int BufferLength);
 	bool Render_();
 	bool Render();

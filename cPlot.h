@@ -22,6 +22,7 @@
 
 #include "cMeasurementmanager.h"
 #include "cSignalBtn.h"
+#include "cTick.h"
 
 #include "PlotWindow.h"
 
@@ -32,6 +33,7 @@ class cPlot
 private:
 	// Use to log data on disk
 	cLog logger;
+	cTick tick;
 
 	wxPanel* plot_leftpanel_ = nullptr;
 	wxPanel* plot_rightpanel_ = nullptr;
@@ -69,12 +71,14 @@ public:
 
 	bool get_graph_state();
 	std::string get_graph_filename();
+	LOGTYPE get_graph_logger_mode();
 	int get_graph_signal_count();
+
 	void set_signal_filter(FILTER_M FilteringType, int position);
 	void set_signal_filter_threshold(float intensity, int position);
 	void set_signal_name(std::string signame, int position);  // change the signal name in the WinGraph module
 	void show_all_signals(bool isDisplayed);
-	void start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header);
+	void start_graph(LOGTYPE ReccordingType, int SignalNumber, std::string opt_header);
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);
 	void graph_addpoints(const int signb, double* val[], int chunk_size);

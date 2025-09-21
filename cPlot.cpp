@@ -8,6 +8,7 @@
 #include "cPlot.h"
 #include "cSignalTable.h"
 #include <print>
+#include "encoding.h"
 
 cPlot::cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table)
 {
@@ -290,6 +291,11 @@ std::string cPlot::get_graph_filename()
 	return logger.get_filename();
 }
 
+LOGTYPE cPlot::get_graph_logger_mode()
+{
+	return logger.get_reccording_mode();
+}
+
 int cPlot::get_graph_signal_count()
 {
 	return plot->GetGraphSignalCount();
@@ -319,7 +325,7 @@ void cPlot::set_signal_name(std::string signame, int position)
 	plot->SetSignalLabel(signame.c_str(), index);
 }
 
-void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string opt_header)
+void cPlot::start_graph(LOGTYPE ReccordingType, int SignalNumber, std::string opt_header)
 {
 	if (plot->GetGraphState() == FALSE)
 	{
@@ -332,13 +338,25 @@ void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string o
 			}
 		}
 
-		if (!logger.set(LOGTYPE::CSV, "test.csv"))
+		// Setup the logger
+		std::wstring new_filename;
+		plot->GetUniqueFilename(new_filename);
+		plot->SetGraphFilename(new_filename);
+		std::wcout << "[*] Log filename: " << new_filename << "\n";
+		std::string ansi_filename = ConvertWideToANSI(plot->GetGraphFilename());
+		if (!logger.set(ReccordingType, ansi_filename))
 		{
-			std::cout << "[!] Fail to open log file\n";
+			std::cout << "[!] Fail to configure log file\n";
 			return;
 		}
 
-		plot->SetRecordingMode(ReccordingType);
+		if (!logger.create())
+		{
+			std::cout << "[!] Fail to create log file\n";
+			return;
+		}
+
+		tick.start_tick();
 
 		if (opt_header.size() > 0)
 		{
@@ -355,6 +373,7 @@ void cPlot::start_graph(LOGGER_M ReccordingType, int SignalNumber, std::string o
 void cPlot::stop_graph()
 {
 	logger.close();
+	tick.reset_tick();
 
 	if (TRUE == plot->GetGraphState())
 	{
@@ -367,14 +386,22 @@ void cPlot::stop_graph()
 
 void cPlot::graph_addpoint(const int signb, double val[])
 {
-	plot->AddPoint(val, signb);
+	// Get elapsed time at the first point
+	double timestamp = tick.get_tick();
+	std::print("[*] graph_addpoint timestamp: {}\n", timestamp);
 
+	// Log the data
+	std::string elapsed = std::to_string(timestamp);
+	logger.add_value(elapsed);
 	for(size_t i=0; i< (size_t)signb; i++)
 	{
 		std::string s = std::to_string(val[i]);
 		logger.add_value(s);
 	}
 	logger.new_line();
+
+	// Add the point to the graph
+	plot->AddPoint(timestamp, val, signb);
 }
 
 void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
