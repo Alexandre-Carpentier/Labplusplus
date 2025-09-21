@@ -285,9 +285,9 @@ bool cPlot::get_graph_state()
 	return plot->GetGraphState();
 }
 
-char* cPlot::get_graph_filename()
+std::string cPlot::get_graph_filename()
 {
-	return plot->GetGraphFilename();
+	return logger.get_filename();
 }
 
 int cPlot::get_graph_signal_count()
@@ -447,33 +447,22 @@ void cPlot::SizeGraph()
 		std::print("[!] SizeGraph() plot is nullptr\n");
 		return;
 	}
-
-	//wxRect r = plot_rightpanel_->GetClientSize();
-	//wxRect r = plot_rightpanel_->GetClientRect();
-	//plot->ReshapeGraph(r.GetLeft(), r.GetTop(), r.GetRight(), r.GetBottom());
 	
 	wxSize sz = plot_rightpanel_->GetClientSize();
-
 	plot->SetClientSize(sz.GetWidth(), sz.GetHeight());
-	//plot->SetPosition(wxPoint(0,0));
 	
 }
 
 void cPlot::RenderGraph()
 {
-	/*
-	static int counter = 0;
-	std::cout << "Rendering..."<< counter <<"\n";
-	counter++;
-	*/
-	//if (GetGraphState(hGraph) == true)
-	//{
-	
+	std::print("[*] Render\n");
 	plot->Render();
+}
 
-		
-	//}
-		
+void cPlot::Refresh()
+{
+	std::print("[*] Render\n");
+	plot->Refresh();
 }
 
 wxPanel* cPlot::Getleftpan()

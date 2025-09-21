@@ -30,6 +30,7 @@ public:
 	bool add_header(std::string str);
 	bool add_value(std::string value);
 	bool new_line();
+	std::string get_filename();
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Clean logger

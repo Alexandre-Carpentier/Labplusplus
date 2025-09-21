@@ -128,6 +128,11 @@ public:
 		return true;
 	}
 
+	std::string get_filename()
+	{
+		return m_filename;
+	}
+
 	bool close()
 	{
 		if (logger->close() == false)
@@ -238,6 +243,11 @@ bool cLog::new_line()
 
 	pimpl->new_line();
 	return true;
+}
+
+std::string cLog::get_filename()
+{
+	return pimpl->get_filename();
 }
 
 bool cLog::close()

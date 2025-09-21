@@ -297,7 +297,7 @@ cMain::~cMain()
 
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
 	delete m_table;
-	delete m_plot;
+	//delete m_plot;
 	delete m_footer;
 	delete m_config;
 

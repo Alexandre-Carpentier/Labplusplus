@@ -80,12 +80,14 @@ void PlotWindow::InitGL()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+	WinGraph::InitGL(GetSize().x, GetSize().y);
+
     gl_initialized_ = true;
 }
 
 void PlotWindow::Render()
 {
-	bool bres = WinGraph::Render(); // delegate
+
 #ifdef TRIANGLE
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -104,7 +106,10 @@ void PlotWindow::Render()
 
     // remettez la couleur par défaut si nécessaire
     glColor3f(0.0f, 0.0f, 0.0f);
+#else
+	bool bres = WinGraph::Render(); // delegate
 #endif
+
 }
 
 void CheckErr(void);
@@ -158,12 +163,11 @@ bool WinGraph::StartGraph(const char* opt_header)
 
 	// Sanity check
 
-	if (TRUE == m_graph.bRunning)
+	if (true == m_graph.bRunning)
 	{
 		printf("[!] Error at StartGraph() graph already running\n");
-		return FALSE;
+		return false;
 	}
-
 
 	EnterCriticalSection(&cs);
 
@@ -174,15 +178,15 @@ bool WinGraph::StartGraph(const char* opt_header)
 
 	for (int index = 0; index < m_graph.signalcount; index++)
 	{
-		memset(m_graph.signals[index]->X, 0, sizeof(double) * m_graph.BufferSize);
-		memset(m_graph.signals[index]->Y, 0, sizeof(double) * m_graph.BufferSize);
-		memset(m_graph.signals[index]->Xnorm, 0, sizeof(double) * m_graph.BufferSize);
-		memset(m_graph.signals[index]->Ynorm, 0, sizeof(double) * m_graph.BufferSize);
-		m_graph.signals[index]->Xmin = 0.0f;
-		m_graph.signals[index]->Xmax = 0.0f;
-		m_graph.signals[index]->Ymin = 0.0f;
-		m_graph.signals[index]->Ymax = 0.0f;
-		m_graph.signals[index]->show = true;
+		//memset(m_graph.signals[index]->X.get(), 0, sizeof(double) * m_graph.BufferSize);
+		//memset(m_graph.signals[index]->Y.get(), 0, sizeof(double) * m_graph.BufferSize);
+		//memset(m_graph.signals[index]->Xnorm.get(), 0, sizeof(double) * m_graph.BufferSize);
+		//memset(m_graph.signals[index]->Ynorm.get(), 0, sizeof(double) * m_graph.BufferSize);
+		m_graph.signals[index].Xmin = 0.0f;
+		m_graph.signals[index].Xmax = 0.0f;
+		m_graph.signals[index].Ymin = 0.0f;
+		m_graph.signals[index].Ymax = 0.0f;
+		m_graph.signals[index].show = true;
 	}
 
 	// Save the start time x=0
@@ -192,13 +196,13 @@ bool WinGraph::StartGraph(const char* opt_header)
 
 	// Update status -> Graph ON
 
-	m_graph.bRunning = TRUE;
+	m_graph.bRunning = true;
 
 
 	// reset runonce flag
 	runonce = 0;
 	LeaveCriticalSection(&cs);
-	return TRUE;
+	return true;
 }
 
 /*-------------------------------------------------------------------------
@@ -214,7 +218,7 @@ void WinGraph::StopGraph()
 
 	// Update status -> Graph OFF
 
-	m_graph.bRunning = FALSE;
+	m_graph.bRunning = false;
 	LeaveCriticalSection(&cs);
 }
 
@@ -225,6 +229,12 @@ void WinGraph::StopGraph()
 
 WinGraph::~WinGraph()
 {
+	if (GetGraphState() == true)
+	{
+		StopGraph();
+		Sleep(200);
+	}
+	
 	EnterCriticalSection(&cs);
 
 	wglMakeCurrent(m_graph.hDC, NULL);
@@ -233,14 +243,15 @@ WinGraph::~WinGraph()
 
 	LeaveCriticalSection(&cs);
 	DeleteCriticalSection(&cs);
-}
+ }
 
 /*-------------------------------------------------------------------------
 	CreateGraph: Initialize the structure, signals,
-	OpenGL and critical section. return HGRAPH
+	OpenGL and critical section.
   -------------------------------------------------------------------------*/
 
 WinGraph::WinGraph(HWND parent, RECT GraphArea, const int SignalCount, const int BufferSize)
+	:m_graph(BufferSize)
 {
 
 	if (SignalCount == 0 || SignalCount > MAX_SIGNAL_COUNT || BufferSize <=0)
@@ -258,36 +269,32 @@ WinGraph::WinGraph(HWND parent, RECT GraphArea, const int SignalCount, const int
 
 	for (int i = 0; i < SignalCount * 2; i++)
 	{
-		m_graph.signals.push_back(std::make_unique<DATA>(BufferSize));
+		m_graph.signals.push_back(DATA(BufferSize));
+		m_graph.signals[i].reset_data();
 
-		//memset(&m_graph.signals[i]->X, 0, sizeof(double) * BufferSize);
-		//memset(&m_graph.signals[i]->Y, 0, sizeof(double) * BufferSize);
-		//memset(&m_graph.signals[i]->Xnorm, 0, sizeof(double) * BufferSize);
-		//memset(&m_graph.signals[i]->Ynorm, 0, sizeof(double) * BufferSize);
+		m_graph.signals[i].Xmax = 0.0;
+		m_graph.signals[i].Xmin = 0.0;
+		m_graph.signals[i].Ymax = 0.0;
+		m_graph.signals[i].Ymin = 0.0;
 
-		m_graph.signals[i]->Xmax = 0.0;
-		m_graph.signals[i]->Xmin = 0.0;
-		m_graph.signals[i]->Ymax = 0.0;
-		m_graph.signals[i]->Ymin = 0.0;
-
-		m_graph.signals[i]->stat.min_value = 0.0;
-		m_graph.signals[i]->stat.average_value_accumulator = 0.0;
-		m_graph.signals[i]->stat.average_value_counter = 0;
-		m_graph.signals[i]->stat.average_value = 0.0;
-		m_graph.signals[i]->stat.max_value = 0.0;
+		m_graph.signals[i].stat.min_value = 0.0;
+		m_graph.signals[i].stat.average_value_accumulator = 0.0;
+		m_graph.signals[i].stat.average_value_counter = 0;
+		m_graph.signals[i].stat.average_value = 0.0;
+		m_graph.signals[i].stat.max_value = 0.0;
 
 		// set default signal name
-		m_graph.signals[i]->signame = std::format("Analog{}", i);
-		//snprintf(m_graph.signals[index]->signame.c_str(), sizeof(m_graph.signals[index]->signame) - 1, reinterpret_cast<char*>("Analog%i"), i);
+		m_graph.signals[i].signame = std::format("Analog{}", i);
+		//snprintf(m_graph.signals[index].signame.c_str(), sizeof(m_graph.signals[index].signame) - 1, reinterpret_cast<char*>("Analog%i"), i);
 
 		// set default signal color
 
-		m_graph.signals[i]->color[0] = 0.5f; m_graph.signals[i]->color[1] = 0.05f * i; m_graph.signals[i]->color[2] = 0.01f * i;
+		m_graph.signals[i].color[0] = 0.5f; m_graph.signals[i].color[1] = 0.05f * i; m_graph.signals[i].color[2] = 0.01f * i;
 
 		// set default filtering mode
 
-		m_graph.signals[i]->filter = FILTER_NONE;
-		m_graph.signals[i]->filter_threshold = 0.5f;
+		m_graph.signals[i].filter = FILTER_NONE;
+		m_graph.signals[i].filter_threshold = 0.5f;
 
 		// Update the number of signal inside object HGRAPH
 
@@ -304,7 +311,7 @@ WinGraph::WinGraph(HWND parent, RECT GraphArea, const int SignalCount, const int
 
 	// Allocate a temp struct for computing
 	// TEMP struct at the end
-	m_graph.SnapPlot = std::make_unique<DATA>(BufferSize);
+	m_graph.SnapPlot = DATA(BufferSize);
 
 
 	m_graph.hParentWnd = parent;
@@ -315,9 +322,7 @@ WinGraph::WinGraph(HWND parent, RECT GraphArea, const int SignalCount, const int
 	m_graph.Logging = LOGGER_NONE;
 	m_graph.logfilename = NULL;
 	m_graph.Filtering = FILTER_NONE;
-	//GetClientRect(m_graph.hGraphWnd, &DispArea);
-	//InitGL(DispArea.right, DispArea.bottom);
-	//ReshapeGraph(DispArea.left, DispArea.top, DispArea.right, DispArea.bottom);
+
 	LeaveCriticalSection(&cs);
 }
 
@@ -331,11 +336,11 @@ bool WinGraph::SetSignalCount(const int iSignalNumber)
 	if (iSignalNumber > MAX_SIGNAL_COUNT)
 	{
 		std::print("[!] Error at SetSignalCount()\n%i signal max is reached\n", m_graph.signalcount);
-		return FALSE;
+		return false;
 	}
 
 	m_graph.signalcount = iSignalNumber;
-	return TRUE;
+	return true;
 }
 
 /*-------------------------------------------------------------------------
@@ -387,7 +392,7 @@ void WinGraph::SetSignalColor(int R, int G, int B, int iSignalNumber)
 	}
 
 	//printf("[*] a new signal color is assigned: RGBf (%i %i %i) at position: %i\n", R, G, B, iSignalNumber);
-	DATA* signal = (DATA*)&m_graph.signals[iSignalNumber];
+	DATA* signal = &m_graph.signals[iSignalNumber];
 	if (NULL == signal)
 	{
 		printf("[!] Error at SetSignalColor() graph signal %i is null\n", iSignalNumber);
@@ -403,7 +408,7 @@ void WinGraph::SetSignalColor(int R, int G, int B, int iSignalNumber)
 
 	for (int i = 0; i < m_graph.signalcount; i++)
 	{
-		signal = (DATA*)&m_graph.signals[i];
+		//signal = m_graph.signals[i].get();
 		//printf("[WINGRAPH]%i %s (%i %i %i)\n", i, signal->signame, (int)(signal->color[0] * 255.0f), (int)(signal->color[1] * 255.0f), (int)(signal->color[2] * 255.0f));
 	}
 }
@@ -420,7 +425,7 @@ void WinGraph::SetSignalVisible(bool bDisplay, int iSignalNumber)
 		return;
 	}
 
-	DATA* signal = (DATA*)&m_graph.signals[iSignalNumber];
+	DATA* signal = &m_graph.signals[iSignalNumber];
 	signal->show = bDisplay;
 
 	printf("[*] Signal visibility changed at signal number: %i\n", iSignalNumber);
@@ -465,8 +470,8 @@ void WinGraph::SwapRecBuffer(bool swap)
 		m_graph.cur_nbpoints_swap = m_graph.cur_nbpoints;// Save	
 		for (int i = 0; i < m_graph.signalcount; i++)
 		{
-			DATA* pDATAcurrent = (DATA*)&m_graph.signals[i];
-			DATA* pDATAsaved = (DATA*)&m_graph.signals[i + m_graph.signalcount];
+			DATA* pDATAcurrent = &m_graph.signals[i];
+			DATA* pDATAsaved = &m_graph.signals[i + m_graph.signalcount];
 
 			for (int k = 0; k < m_graph.BufferSize; k++)
 			{
@@ -491,8 +496,8 @@ void WinGraph::SwapRecBuffer(bool swap)
 		}
 		for (int i = 0; i < m_graph.signalcount; i++) // Swap
 		{
-			//std::swap(m_graph.signal[i], m_graph.signal[i + m_graph.signalcount]);
-			SwapPtr((void**)&m_graph.signals[i], (void**)&m_graph.signals[i + m_graph.signalcount]);
+			std::swap(m_graph.signals[i], m_graph.signals[i + m_graph.signalcount]);
+			//SwapPtr((void**)&m_graph.signals[i], (void**)&m_graph.signals[i + m_graph.signalcount]);
 		}
 		m_graph.bSwapDone = true;
 		LeaveCriticalSection(&cs); //unlock
@@ -505,8 +510,8 @@ void WinGraph::SwapRecBuffer(bool swap)
 
 		for (int i = 0; i < m_graph.signalcount; i++) // Swap
 		{
-			SwapPtr((void**)&m_graph.signals[i], (void**)&m_graph.signals[i + m_graph.signalcount]);
-			//std::swap(m_graph.signal[i], m_graph.signal[i + m_graph.signalcount]);
+			//SwapPtr((void**)&m_graph.signals[i], (void**)&m_graph.signals[i + m_graph.signalcount]);
+			std::swap(m_graph.signals[i], m_graph.signals[i + m_graph.signalcount]);
 		}
 		m_graph.bSwapDone = false;
 		LeaveCriticalSection(&cs);
@@ -596,7 +601,7 @@ void WinGraph::SetFilteringMode(FILTER_M filtering, int iSignalNumber)
 		return;
 	}
 
-	m_graph.signals[iSignalNumber]->filter = filtering;
+	m_graph.signals[iSignalNumber].filter = filtering;
 }
 
 void WinGraph::SetFilteringThreshold(float intensity, int iSignalNumber)
@@ -613,7 +618,7 @@ void WinGraph::SetFilteringThreshold(float intensity, int iSignalNumber)
 		return;
 	}
 
-	m_graph.signals[iSignalNumber]->filter_threshold = intensity;
+	m_graph.signals[iSignalNumber].filter_threshold = intensity;
 }
 
 void WinGraph::SetSignalMinValue(int SIGNB, double val)
@@ -635,9 +640,9 @@ void WinGraph::SetSignalMinValue(int SIGNB, double val)
 
 	if (m_graph.cur_nbpoints >= 0)
 	{
-		m_graph.signals[SIGNB]->stat.min_value = val;
-		m_graph.signals[SIGNB]->stat.average_value_accumulator = 0.0;
-		m_graph.signals[SIGNB]->stat.average_value_counter = 0;
+		m_graph.signals[SIGNB].stat.min_value = val;
+		m_graph.signals[SIGNB].stat.average_value_accumulator = 0.0;
+		m_graph.signals[SIGNB].stat.average_value_counter = 0;
 	}
 	LeaveCriticalSection(&cs);
 }
@@ -661,9 +666,9 @@ void WinGraph::SetSignalAverageValue(int SIGNB, double val)
 
 	if (m_graph.cur_nbpoints >= 0)
 	{
-		m_graph.signals[SIGNB]->stat.average_value = val;
-		m_graph.signals[SIGNB]->stat.average_value_accumulator = 0.0;
-		m_graph.signals[SIGNB]->stat.average_value_counter = 0;
+		m_graph.signals[SIGNB].stat.average_value = val;
+		m_graph.signals[SIGNB].stat.average_value_accumulator = 0.0;
+		m_graph.signals[SIGNB].stat.average_value_counter = 0;
 
 	}
 	LeaveCriticalSection(&cs);
@@ -688,9 +693,9 @@ void WinGraph::SetSignalMaxValue(int SIGNB, double val)
 
 	if (m_graph.cur_nbpoints >= 0)
 	{
-		m_graph.signals[SIGNB]->stat.average_value_accumulator = 0.0;
-		m_graph.signals[SIGNB]->stat.average_value_counter = 0;
-		m_graph.signals[SIGNB]->stat.max_value = val;
+		m_graph.signals[SIGNB].stat.average_value_accumulator = 0.0;
+		m_graph.signals[SIGNB].stat.average_value_counter = 0;
+		m_graph.signals[SIGNB].stat.max_value = val;
 	}
 	LeaveCriticalSection(&cs);
 }
@@ -710,6 +715,13 @@ bool WinGraph::GetGraphState()
 
 char* WinGraph::GetGraphFilename()
 {
+	static char no_allocated[] = "null.txt";
+	if (!m_graph.logfilename)
+	{
+		std::print("[*] Warning at GetGraphFilename() no log file allocated, generated: null.txt\n");
+		m_graph.logfilename = no_allocated;
+	}
+
 	return m_graph.logfilename;
 }
 
@@ -734,12 +746,14 @@ HGLRC WinGraph::GetGraphRC()
 
 HDC WinGraph::GetGraphDC()
 {
-	if (NULL == m_graph.hDC)
+	HDC hdc = GetDC(m_graph.hParentWnd);
+	if (NULL == hdc)
 	{
 		printf("[!] Error at GetGraphDC() graph DC is null\n");
 		return NULL;
 	}
 
+	m_graph.hDC = hdc;
 	return m_graph.hDC;
 }
 
@@ -812,7 +826,7 @@ double WinGraph::GetGraphLastSignalValue(int SIGNB)
 	if (m_graph.cur_nbpoints > 0)
 	{
 		LeaveCriticalSection(&cs);
-		return m_graph.signals[SIGNB]->Y[m_graph.cur_nbpoints - 1];
+		return m_graph.signals[SIGNB].Y[m_graph.cur_nbpoints - 1];
 	}
 	else
 	{
@@ -837,7 +851,7 @@ double WinGraph::GetSignalMinValue(int SIGNB)
 
 	if (m_graph.cur_nbpoints > 0)
 	{
-		return m_graph.signals[SIGNB]->stat.min_value;
+		return m_graph.signals[SIGNB].stat.min_value;
 	}
 	return 0.0;
 }
@@ -858,7 +872,7 @@ double WinGraph::GetSignalAverageValue(int SIGNB)
 
 	if (m_graph.cur_nbpoints > 0)
 	{
-		return m_graph.signals[SIGNB]->stat.average_value;
+		return m_graph.signals[SIGNB].stat.average_value;
 	}
 	return 0.0;
 }
@@ -879,7 +893,7 @@ double WinGraph::GetSignalMaxValue(int SIGNB)
 
 	if (m_graph.cur_nbpoints > 0)
 	{
-		return m_graph.signals[SIGNB]->stat.max_value;
+		return m_graph.signals[SIGNB].stat.max_value;
 	}
 	return 0.0;
 }
@@ -903,12 +917,12 @@ void WinGraph::SignalResetStatisticValue(const int SIGNB)
 
 	if (m_graph.cur_nbpoints > 0)
 	{
-		m_graph.signals[SIGNB]->stat.min_value = m_graph.signals[SIGNB]->Y[m_graph.cur_nbpoints - 1];
-		m_graph.signals[SIGNB]->stat.average_value = m_graph.signals[SIGNB]->Y[m_graph.cur_nbpoints - 1];
-		m_graph.signals[SIGNB]->stat.average_value_accumulator = 0.0;
-		m_graph.signals[SIGNB]->stat.average_value_counter = 0;
-		m_graph.signals[SIGNB]->stat.max_value = m_graph.signals[SIGNB]->Y[m_graph.cur_nbpoints - 1];
-		printf("[*] SignalResetStatisticValue() min: %lf	avg: %lf	max: %lf\n", m_graph.signals[SIGNB]->stat.min_value, m_graph.signals[SIGNB]->stat.average_value, m_graph.signals[SIGNB]->stat.max_value);
+		m_graph.signals[SIGNB].stat.min_value = m_graph.signals[SIGNB].Y[m_graph.cur_nbpoints - 1];
+		m_graph.signals[SIGNB].stat.average_value = m_graph.signals[SIGNB].Y[m_graph.cur_nbpoints - 1];
+		m_graph.signals[SIGNB].stat.average_value_accumulator = 0.0;
+		m_graph.signals[SIGNB].stat.average_value_counter = 0;
+		m_graph.signals[SIGNB].stat.max_value = m_graph.signals[SIGNB].Y[m_graph.cur_nbpoints - 1];
+		printf("[*] SignalResetStatisticValue() min: %lf	avg: %lf	max: %lf\n", m_graph.signals[SIGNB].stat.min_value, m_graph.signals[SIGNB].stat.average_value, m_graph.signals[SIGNB].stat.max_value);
 	}
 	LeaveCriticalSection(&cs);
 }
@@ -924,15 +938,15 @@ void WinGraph::ShowDataInConsole()
 			printf("SIG0\n");
 			for (int j = 0; j < m_graph.BufferSize; j++)
 			{
-				printf("%.1lf ", m_graph.signals[index]->X[j]); printf("\t");
-				printf("%.1lf ", m_graph.signals[index]->Y[j]); printf("\n");
+				printf("%.1lf ", m_graph.signals[index].X[j]); printf("\t");
+				printf("%.1lf ", m_graph.signals[index].Y[j]); printf("\n");
 			}
 
 			printf("SIG4\n");
 			for (int j = 0; j < m_graph.BufferSize; j++)
 			{
-				printf("%.1lf ", m_graph.signals[index + m_graph.signalcount]->X[j]); printf("\t");
-				printf("%.1lf ", m_graph.signals[index + m_graph.signalcount]->Y[j]); printf("\n");
+				printf("%.1lf ", m_graph.signals[index + m_graph.signalcount].X[j]); printf("\t");
+				printf("%.1lf ", m_graph.signals[index + m_graph.signalcount].Y[j]); printf("\n");
 			}
 		}
 	}
@@ -944,7 +958,7 @@ void WinGraph::ShowDataInConsole()
 void WinGraph::AddPoint(double* y, const int SignalCount)
 {
 
-	if (FALSE == m_graph.bRunning)
+	if (false == m_graph.bRunning)
 	{
 		printf("[!] Error at AddPoint() graph not strated\n");
 		return;
@@ -978,8 +992,8 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 		{
 			for (int j = 0; j < m_graph.BufferSize - 1; j++)
 			{
-				m_graph.signals[index]->X[j] = m_graph.signals[index]->X[j + 1];																// Shift left X
-				m_graph.signals[index]->Y[j] = m_graph.signals[index]->Y[j + 1];																// Shift left Y
+				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + 1];																// Shift left X
+				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + 1];																// Shift left Y
 			}
 		}
 		m_graph.cur_nbpoints--;																				// Update the current POINT number
@@ -998,32 +1012,26 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 
 	for (int index = 0 + offset; index < m_graph.signalcount + offset; index++)
 	{
-		if (NULL == m_graph.signals[index])
-		{
-			LeaveCriticalSection(&cs);
-			printf("[!] Error at AddPoint() data buffer is null\n");
-			return;
-		}
 
 		// Is filter enable ?
 
-		if (m_graph.signals[index]->filter != FILTER_NONE)
+		if (m_graph.signals[index].filter != FILTER_NONE)
 		{
 			// Low pass filter 
 
-			if (m_graph.signals[index]->filter == FILTER_EMA)
+			if (m_graph.signals[index].filter == FILTER_EMA)
 			{
 				//double a = 0.1; // Custom cut freq 
-				float a = m_graph.signals[index]->filter_threshold;
+				float a = m_graph.signals[index].filter_threshold;
 				if (m_graph.cur_nbpoints == 0)
 					y[index] = y[index]; // First POINT skip to prevent INF
 				else
-					y[index] = a * y[index] + (1 - a) * m_graph.signals[index]->Y[m_graph.cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
+					y[index] = a * y[index] + (1 - a) * m_graph.signals[index].Y[m_graph.cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
 			}
 
 			// Hanning window filter
 
-			if (m_graph.signals[index]->filter == FILTER_HANNING) // experimental (not properly working)
+			if (m_graph.signals[index].filter == FILTER_HANNING) // experimental (not properly working)
 			{
 				const int window_size = 20;																		// Define the Hann windows size here
 				static double dataOut[window_size];
@@ -1048,40 +1056,40 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 
 			// Besel filter
 
-			if (m_graph.signals[index]->filter == FILTER_BESEL)
+			if (m_graph.signals[index].filter == FILTER_BESEL)
 			{
 			}
 		}
 
 		// Add points to the selected buffer	
 
-		m_graph.signals[index]->X[m_graph.cur_nbpoints] = (double)((finish - start)) / frequency;							// Save in X the elapsed time from start
-		m_graph.signals[index]->Y[m_graph.cur_nbpoints] = y[index - offset];															// Save Y
+		m_graph.signals[index].X[m_graph.cur_nbpoints] = (double)((finish - start)) / frequency;							// Save in X the elapsed time from start
+		m_graph.signals[index].Y[m_graph.cur_nbpoints] = y[index - offset];															// Save Y
 
 		// Perform some statistics
 
 		// period
-		m_graph.signals[index]->stat.period_s = m_graph.signals[index]->X[m_graph.cur_nbpoints] - m_graph.signals[index]->X[0];								// Update current period
+		m_graph.signals[index].stat.period_s = m_graph.signals[index].X[m_graph.cur_nbpoints] - m_graph.signals[index].X[0];								// Update current period
 
 		//min
-		if (m_graph.signals[index]->Y[m_graph.cur_nbpoints] < m_graph.signals[index]->stat.min_value)
+		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] < m_graph.signals[index].stat.min_value)
 		{
-			m_graph.signals[index]->stat.min_value = m_graph.signals[index]->Y[m_graph.cur_nbpoints];											// Update current min value displayed
+			m_graph.signals[index].stat.min_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current min value displayed
 		}
 
 		//average
 		if (m_graph.cur_nbpoints > 0)
 		{
-			m_graph.signals[index]->stat.average_value_accumulator += m_graph.signals[index]->Y[m_graph.cur_nbpoints];
-			m_graph.signals[index]->stat.average_value_counter++;
+			m_graph.signals[index].stat.average_value_accumulator += m_graph.signals[index].Y[m_graph.cur_nbpoints];
+			m_graph.signals[index].stat.average_value_counter++;
 
-			m_graph.signals[index]->stat.average_value = m_graph.signals[index]->stat.average_value_accumulator / m_graph.signals[index]->stat.average_value_counter;
+			m_graph.signals[index].stat.average_value = m_graph.signals[index].stat.average_value_accumulator / m_graph.signals[index].stat.average_value_counter;
 		}
 
 		//max
-		if (m_graph.signals[index]->Y[m_graph.cur_nbpoints] > m_graph.signals[index]->stat.max_value)
+		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] > m_graph.signals[index].stat.max_value)
 		{
-			m_graph.signals[index]->stat.max_value = m_graph.signals[index]->Y[m_graph.cur_nbpoints];											// Update current max value displayed
+			m_graph.signals[index].stat.max_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current max value displayed
 		}
 	}
 
@@ -1113,8 +1121,8 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 		{
 			for (int j = 0; j < m_graph.BufferSize - 1; j++)
 			{
-				m_graph.signals[index]->X[j] = m_graph.signals[index]->X[j + 1];																// Shift left X
-				m_graph.signals[index]->Y[j] = m_graph.signals[index]->Y[j + 1];																// Shift left Y
+				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + 1];																// Shift left X
+				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + 1];																// Shift left Y
 			}
 		}
 		m_graph.cur_nbpoints--;																				// Update the current POINT number
@@ -1135,32 +1143,26 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 	EnterCriticalSection(&cs);
 	for (int index = 0; index < m_graph.signalcount; index++)
 	{
-		if (NULL == m_graph.signals[index])
-		{
-			LeaveCriticalSection(&cs);
-			printf("[!] Error at AddPoint() data buffer is null\n");
-			return;
-		}
 
 		// Is filter enable ?
 
-		if (m_graph.signals[index]->filter != FILTER_NONE)
+		if (m_graph.signals[index].filter != FILTER_NONE)
 		{
 			// Low pass filter 
 
-			if (m_graph.signals[index]->filter == FILTER_EMA)
+			if (m_graph.signals[index].filter == FILTER_EMA)
 			{
 				//double a = 0.1; // Custom cut freq 
-				float a = m_graph.signals[index]->filter_threshold;
+				float a = m_graph.signals[index].filter_threshold;
 				if (m_graph.cur_nbpoints == 0)
 					y[index] = y[index]; // First POINT skip to prevent INF
 				else
-					y[index] = a * y[index] + (1 - a) * m_graph.signals[index]->Y[m_graph.cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
+					y[index] = a * y[index] + (1 - a) * m_graph.signals[index].Y[m_graph.cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
 			}
 
 			// Hanning window filter
 
-			if (m_graph.signals[index]->filter == FILTER_HANNING) // experimental (not properly working)
+			if (m_graph.signals[index].filter == FILTER_HANNING) // experimental (not properly working)
 			{
 				const int window_size = 20;																		// Define the Hann windows size here
 				static double dataOut[window_size];
@@ -1185,40 +1187,40 @@ void WinGraph::AddPoint(double* y, const int SignalCount)
 
 			// Besel filter
 
-			if (m_graph.signals[index]->filter == FILTER_BESEL)
+			if (m_graph.signals[index].filter == FILTER_BESEL)
 			{
 			}
 		}
 
 		// Add points to the selected buffer	
 
-		m_graph.signals[index]->X[m_graph.cur_nbpoints] = (double)((finish - start)) / frequency;							// Save in X the elapsed time from start
-		m_graph.signals[index]->Y[m_graph.cur_nbpoints] = y[index];															// Save Y
+		m_graph.signals[index].X[m_graph.cur_nbpoints] = (double)((finish - start)) / frequency;							// Save in X the elapsed time from start
+		m_graph.signals[index].Y[m_graph.cur_nbpoints] = y[index];															// Save Y
 
 		// Perform some statistics
 
 		// period
-		m_graph.signals[index]->stat.period_s = m_graph.signals[index]->X[m_graph.cur_nbpoints] - m_graph.signals[index]->X[0];								// Update current period
+		m_graph.signals[index].stat.period_s = m_graph.signals[index].X[m_graph.cur_nbpoints] - m_graph.signals[index].X[0];								// Update current period
 
 		//min
-		if (m_graph.signals[index]->Y[m_graph.cur_nbpoints] < m_graph.signals[index]->stat.min_value)
+		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] < m_graph.signals[index].stat.min_value)
 		{
-			m_graph.signals[index]->stat.min_value = m_graph.signals[index]->Y[m_graph.cur_nbpoints];											// Update current min value displayed
+			m_graph.signals[index].stat.min_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current min value displayed
 		}
 
 		//average
 		if (m_graph.cur_nbpoints > 0)
 		{
-			m_graph.signals[index]->stat.average_value_accumulator += m_graph.signals[index]->Y[m_graph.cur_nbpoints];
-			m_graph.signals[index]->stat.average_value_counter++;
+			m_graph.signals[index].stat.average_value_accumulator += m_graph.signals[index].Y[m_graph.cur_nbpoints];
+			m_graph.signals[index].stat.average_value_counter++;
 
-			m_graph.signals[index]->stat.average_value = m_graph.signals[index]->stat.average_value_accumulator / m_graph.signals[index]->stat.average_value_counter;
+			m_graph.signals[index].stat.average_value = m_graph.signals[index].stat.average_value_accumulator / m_graph.signals[index].stat.average_value_counter;
 		}
 
 		//max
-		if (m_graph.signals[index]->Y[m_graph.cur_nbpoints] > m_graph.signals[index]->stat.max_value)
+		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] > m_graph.signals[index].stat.max_value)
 		{
-			m_graph.signals[index]->stat.max_value = m_graph.signals[index]->Y[m_graph.cur_nbpoints];											// Update current max value displayed
+			m_graph.signals[index].stat.max_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current max value displayed
 		}
 
 	}
@@ -1273,8 +1275,8 @@ void WinGraph::AddMultiplePoints(double** Chunks, int SignalCount, int BufferLen
 
 			for (int j = 0; j < m_graph.BufferSize - graph_overflow; j++)
 			{
-				m_graph.signals[index]->X[j] = m_graph.signals[index]->X[j + graph_overflow];																// Shift left X
-				m_graph.signals[index]->Y[j] = m_graph.signals[index]->Y[j + graph_overflow];																// Shift left Y
+				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + graph_overflow];																// Shift left X
+				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + graph_overflow];																// Shift left Y
 			}
 		}
 		m_graph.cur_nbpoints = m_graph.BufferSize - graph_overflow;
@@ -1295,50 +1297,44 @@ void WinGraph::AddMultiplePoints(double** Chunks, int SignalCount, int BufferLen
 	EnterCriticalSection(&cs);
 	for (int index = 0; index < m_graph.signalcount; index++)
 	{
-		if (NULL == m_graph.signals[index])
-		{
-			LeaveCriticalSection(&cs);
-			printf("[!] Error at AddMultiplePoints() data buffer is null\n");
-			return;
-		}
 
 		// Add points to the selected buffer	
 		double x_step = ((double)((finish - start)) / frequency) / BufferLength;
 		for (size_t i = 0; i < BufferLength; i++)
 		{
-			m_graph.signals[index]->X[m_graph.cur_nbpoints + i] = x_step * i;												// Save in X the elapsed time from start
+			m_graph.signals[index].X[m_graph.cur_nbpoints + i] = x_step * i;												// Save in X the elapsed time from start
 		}
 
 		for (size_t i = 0; i < BufferLength; i++)
 		{
-			m_graph.signals[index]->Y[m_graph.cur_nbpoints + i] = Chunks[index][i];													// Save Y										
+			m_graph.signals[index].Y[m_graph.cur_nbpoints + i] = Chunks[index][i];													// Save Y										
 		}
 
 
 		// Perform some statistics
 
 		// period
-		m_graph.signals[index]->stat.period_s = m_graph.signals[index]->X[m_graph.cur_nbpoints] - m_graph.signals[index]->X[0];								// Update current period
+		m_graph.signals[index].stat.period_s = m_graph.signals[index].X[m_graph.cur_nbpoints] - m_graph.signals[index].X[0];								// Update current period
 
 		//min
-		if (m_graph.signals[index]->Y[m_graph.cur_nbpoints] < m_graph.signals[index]->stat.min_value)
+		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] < m_graph.signals[index].stat.min_value)
 		{
-			m_graph.signals[index]->stat.min_value = m_graph.signals[index]->Y[m_graph.cur_nbpoints];											// Update current min value displayed
+			m_graph.signals[index].stat.min_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current min value displayed
 		}
 
 		//average
 		if (m_graph.cur_nbpoints > 0)
 		{
-			m_graph.signals[index]->stat.average_value_accumulator += m_graph.signals[index]->Y[m_graph.cur_nbpoints];
-			m_graph.signals[index]->stat.average_value_counter++;
+			m_graph.signals[index].stat.average_value_accumulator += m_graph.signals[index].Y[m_graph.cur_nbpoints];
+			m_graph.signals[index].stat.average_value_counter++;
 
-			m_graph.signals[index]->stat.average_value = m_graph.signals[index]->stat.average_value_accumulator / m_graph.signals[index]->stat.average_value_counter;
+			m_graph.signals[index].stat.average_value = m_graph.signals[index].stat.average_value_accumulator / m_graph.signals[index].stat.average_value_counter;
 		}
 
 		//max
-		if (m_graph.signals[index]->Y[m_graph.cur_nbpoints] > m_graph.signals[index]->stat.max_value)
+		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] > m_graph.signals[index].stat.max_value)
 		{
-			m_graph.signals[index]->stat.max_value = m_graph.signals[index]->Y[m_graph.cur_nbpoints];											// Update current max value displayed
+			m_graph.signals[index].stat.max_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current max value displayed
 		}
 	}
 
@@ -1353,12 +1349,6 @@ void WinGraph::AddMultiplePoints(double** Chunks, int SignalCount, int BufferLen
   -------------------------------------------------------------------------*/
 bool WinGraph::Render_()
 {
-	//HDC hDC = GetGraphDC();
-	
-
-	//RECT  rc;
-	//GetClientRect(m_graph.hGraphWnd, &rc);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 
@@ -1374,7 +1364,6 @@ bool WinGraph::Render_()
 	glVertex2f(0.6f, -0.6f);
 	glEnd();
 
-	//SwapBuffers(hDC);
 	return true;
 }
 /*-------------------------------------------------------------------------
@@ -1383,52 +1372,97 @@ bool WinGraph::Render_()
   -------------------------------------------------------------------------*/
 bool WinGraph::Render()
 {
-	//GLenum err_code;
 	RECT r;
 	const int div = 10;
 	float txtlen = 0.0;
 	float txtheight = 0.0;
 	char value[260];
 	const char Xname[] = "Time (s)";
-	if (!m_graph.SnapPlot)
-	{
-		std::print("[!] Error at Render() SnapPlot is null\n");
-		return false;
-	}
-	double reelval = m_graph.SnapPlot->Ymin;
+
 	if (cs.DebugInfo == NULL)
 	{
 		return false;
 	}
 	EnterCriticalSection(&cs);
 
+	double reelval = m_graph.SnapPlot.Ymin;
+
 	if (m_graph.cur_nbpoints == 0 && start == 0.0f)														// Display a void graph when app start only
 	{
-		m_graph.SnapPlot->Xmin = 0.0f;
-		m_graph.SnapPlot->Xmax = 1.0f;
-		m_graph.SnapPlot->Ymin = 0.0f;
-		m_graph.SnapPlot->Ymax = 1.0f;
+		m_graph.SnapPlot.Xmin = 0.0f;
+		m_graph.SnapPlot.Xmax = 1.0f;
+		m_graph.SnapPlot.Ymin = 0.0f;
+		m_graph.SnapPlot.Ymax = 1.0f;
 	}
 	else if (m_graph.cur_nbpoints > 0)
 	{
 		UpdateBorder();																			// border determination for each signal: meaning finding X and Y min max values																		
-		//ZeroObject(&m_graph.SnapPlot, GetBufferSize());													// Clear SnapPlot
-		FindGlobalMaxScale(m_graph.SnapPlot->Xmin, m_graph.SnapPlot->Xmax, m_graph.SnapPlot->Ymin, m_graph.SnapPlot->Ymax);		// Load the Y min and max of all the signals in SnapPlot
-		normalize_data(m_graph.SnapPlot->Xmin, m_graph.SnapPlot->Xmax, m_graph.SnapPlot->Ymin, m_graph.SnapPlot->Ymax);			// normalize between [0;1]
+		//ZeroObject(m_graph.SnapPlot.get(), GetBufferSize());													// Clear SnapPlot
+		FindGlobalMaxScale(m_graph.SnapPlot.Xmin, m_graph.SnapPlot.Xmax, m_graph.SnapPlot.Ymin, m_graph.SnapPlot.Ymax);		// Load the Y min and max of all the signals in SnapPlot
+		normalize_data(m_graph.SnapPlot.Xmin, m_graph.SnapPlot.Xmax, m_graph.SnapPlot.Ymin, m_graph.SnapPlot.Ymax);			// normalize between [0;1]
 	}
-	
 
+	// Use the Projection Matrix
+
+	glMatrixMode(GL_PROJECTION);
+	if (glGetError() == GL_INVALID_ENUM || glGetError() == GL_INVALID_OPERATION)
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
+
+	// Reset Matrix
+
+	glLoadIdentity();
+	if (glGetError() == GL_INVALID_OPERATION)
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
+
+	// Set the correct perspective.
+
+	const float orthoLeft = -0.08f; const float orthoRight = 1.04f;
+	const float orthoBottom = -0.08f; const float orthoTop = 1.02f;
+	gluOrtho2D(orthoLeft, orthoRight, orthoBottom, orthoTop);
+
+	GetClientRect(GetGraphParentWnd(), &DispArea);
+	glViewport(0, 0, DispArea.right, DispArea.bottom);
+
+	// Use the Model Matrix
+
+	glMatrixMode(GL_MODELVIEW);
+
+	// Reset Matrix
+
+	glLoadIdentity();
+	if (glGetError() == GL_INVALID_OPERATION)
+	{
+		LeaveCriticalSection(&cs);
+		return false;
+	}
+
+	// Clear Color and Depth Buffers
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	GLenum err_code = glGetError();
+	if (err_code == GL_INVALID_VALUE || err_code == GL_INVALID_OPERATION)
+	{
+		std::print("{}\n", (char*)gluErrorString(err_code));
+		LeaveCriticalSection(&cs);
+		return false;
+	}
 
 	// Draw graph frame and grid
 	if (GetGraphState() == false)
 	{
-		printf("Graph state false\n");
+		printf("[*] Graph state is false\n");
 	}
 
 	DrawGraphSquare();
 	DrawGridLines();
 
-	if (m_graph.SnapPlot->Ymax != m_graph.SnapPlot->Ymin)
+	if (m_graph.SnapPlot.Ymax != m_graph.SnapPlot.Ymin)
 	{
 
 		// draw points
@@ -1441,7 +1475,7 @@ bool WinGraph::Render()
 
 		// draw zero cursor
 
-		double zero = GetStandardizedData(0, m_graph.SnapPlot->Ymin, m_graph.SnapPlot->Ymax);
+		double zero = GetStandardizedData(0, m_graph.SnapPlot.Ymin, m_graph.SnapPlot.Ymax);
 		if (zero > 0 && zero < 1)
 		{
 			DrawString(-0.02f, (float)zero - 0.01f, (char*)"0");
@@ -1453,7 +1487,7 @@ bool WinGraph::Render()
 		if (!GetWindowRect(GetGraphParentWnd(), &r))
 		{
 			LeaveCriticalSection(&cs);
-			return FALSE;
+			return false;
 		}
 
 		txtlen = (float)dispStringWidth.cx / r.right; // Normalize the width of the printed value characters between [0-1]
@@ -1461,11 +1495,11 @@ bool WinGraph::Render()
 
 		//Xmin
 
-		DrawString(-txtlen / 1.2f, -0.05f, dtos(value, sizeof(value), m_graph.SnapPlot->Xmin));
+		DrawString(-txtlen / 1.2f, -0.05f, dtos(value, sizeof(value), m_graph.SnapPlot.Xmin));
 
 		//Xmax
 
-		DrawString(1 - txtlen / 1.2f, -0.05f, dtos(value, sizeof(value), m_graph.SnapPlot->Xmax));
+		DrawString(1 - txtlen / 1.2f, -0.05f, dtos(value, sizeof(value), m_graph.SnapPlot.Xmax));
 
 		//Time (s)
 
@@ -1473,11 +1507,10 @@ bool WinGraph::Render()
 
 		// Ymin to Ymax values
 
-		reelval = m_graph.SnapPlot->Ymin;
 		for (float ytmp = 0.0f; ytmp <= 1.1f; ytmp += 1.0f / (float)div)
 		{
 			DrawString(-txtlen * 1.5f, ytmp - ((txtheight * 0.8f) / 2.0f), dtos(value, sizeof(value), reelval));
-			reelval += (m_graph.SnapPlot->Ymax - m_graph.SnapPlot->Ymin) / (float)div;
+			reelval += (m_graph.SnapPlot.Ymax - m_graph.SnapPlot.Ymin) / (float)div;
 		}
 	}
 
@@ -1512,13 +1545,13 @@ bool WinGraph::Render()
 					{
 						// Display X indicator
 
-						//DrawString(normal_pos_x, normal_pos_y - 0.05, dtos(value, sizeof(value), (normal_pos_x_shifted * (SnapPlot->Xmax - SnapPlot->Xmin)) + SnapPlot->Xmin));
+						//DrawString(normal_pos_x, normal_pos_y - 0.05, dtos(value, sizeof(value), (normal_pos_x_shifted * (SnapPlot.Xmax - SnapPlot.Xmin)) + SnapPlot.Xmin));
 
 						// Display Y indicator
 
 						double dy = 0.0;
-						dy = (m_graph.SnapPlot->Ymin - m_graph.SnapPlot->Ymax) * (1 - normal_pos_y_shifted);
-						dy = m_graph.SnapPlot->Ymax + dy;
+						dy = (m_graph.SnapPlot.Ymin - m_graph.SnapPlot.Ymax) * (1 - normal_pos_y_shifted);
+						dy = m_graph.SnapPlot.Ymax + dy;
 						DrawString(normal_pos_x + 0.05f, normal_pos_y - 0.05f, dtos(value, sizeof(value), dy));
 
 						//printf("x=%lf	y=%lf	xnorm=%lf	ynorm=%lf\n", normal_pos_x, normal_pos_y, normal_pos_x_shifted, normal_pos_y_shifted);
@@ -1544,14 +1577,14 @@ bool WinGraph::Render()
 						glEnd();
 
 						// OK
-						//DrawString(normal_pos_x, normal_pos_y - 0.05, dtos(value, sizeof(value), (normal_pos_x * (SnapPlot->Xmax - SnapPlot->Xmin)) + SnapPlot->Xmin));
+						//DrawString(normal_pos_x, normal_pos_y - 0.05, dtos(value, sizeof(value), (normal_pos_x * (SnapPlot.Xmax - SnapPlot.Xmin)) + SnapPlot.Xmin));
 
 
 						//~OK
 						//double dy = 0.0;
-						//dy = (SnapPlot->Ymin - SnapPlot->Ymax)* (1-normal_pos_y);
-						//dy = SnapPlot->Ymax + dy;
-						//printf("dy:%lf, ymin:%lf ymax%lf\n", dy, SnapPlot->Ymin, SnapPlot->Ymax);
+						//dy = (SnapPlot.Ymin - SnapPlot.Ymax)* (1-normal_pos_y);
+						//dy = SnapPlot.Ymax + dy;
+						//printf("dy:%lf, ymin:%lf ymax%lf\n", dy, SnapPlot.Ymin, SnapPlot.Ymax);
 
 
 						// OK
@@ -1569,7 +1602,7 @@ bool WinGraph::Render()
 	}
 	*/
 	LeaveCriticalSection(&cs);
-	return TRUE;
+	return true;
 }
 
 /*-------------------------------------------------------------------------
@@ -1654,6 +1687,7 @@ void WinGraph::InitGL(int Width, int Height)		// Called after the main window is
 	if (!BuildMyFont(L"Verdana", 14))		// Build The Font BuildMyFont(char* FontName, int Fontsize)
 	{
 		// error on creating the Font
+		std::print("[!] Error at InitGL() with code: 0x%x\nerror on creating the Font\n", GetLastError());
 	}
 }
 
@@ -1687,7 +1721,7 @@ bool WinGraph::BuildMyFont(const wchar_t* FontName, const int Fontsize)
 	{
 		// error when generate the empty list
 		printf("[!] Error at BuildMyFont() with code: 0x%x\nerror when generate the empty list\n", GetLastError());
-		return FALSE;
+		return false;
 	}
 
 	hCustomFont = CreateFont(-1 * Fontsize,						// Font size
@@ -1695,9 +1729,9 @@ bool WinGraph::BuildMyFont(const wchar_t* FontName, const int Fontsize)
 		0,														// Angle Of Escapement
 		0,														// Orientation Angle
 		FW_NORMAL,												// Font Weight
-		FALSE,													// Italic
-		FALSE,													// Underline
-		FALSE,													// Strikeout
+		false,													// Italic
+		false,													// Underline
+		false,													// Strikeout
 		ANSI_CHARSET,											// Character Set Identifier
 		OUT_TT_PRECIS,											// Output Precision
 		CLIP_DEFAULT_PRECIS,									// Clipping Precision
@@ -1709,7 +1743,7 @@ bool WinGraph::BuildMyFont(const wchar_t* FontName, const int Fontsize)
 	{
 		// error when creating the font
 		printf("[!] Error at BuildMyFont() with code: 0x%x\nerror when creating the font\n", GetLastError());
-		return FALSE;
+		return false;
 	}
 
 	hCurrentFont = (HFONT)SelectObject(GetGraphDC(), hCustomFont);	// Select the custom Font and store the current font
@@ -1718,7 +1752,7 @@ bool WinGraph::BuildMyFont(const wchar_t* FontName, const int Fontsize)
 	{
 		// error when loading the font
 		printf("[!] Error at BuildMyFont() with code: 0x%x\nerror when loading the font\n", GetLastError());
-		return FALSE;
+		return false;
 	}
 	const char text[] = "-0.0000";
 	SetTextCharacterExtra(GetGraphDC(), 1);
@@ -1727,7 +1761,7 @@ bool WinGraph::BuildMyFont(const wchar_t* FontName, const int Fontsize)
 
 	SelectObject(GetGraphDC(), hCurrentFont);							// restore the initial Font
 	DeleteObject(hCustomFont);												// We don't need the Custom Font anymore as we populate the list and load it in OpenGL
-	return TRUE;
+	return true;
 }
 
 /*-------------------------------------------------------------------------
@@ -1772,7 +1806,7 @@ bool WinGraph::FindGlobalMaxScale(double& Xmin, double& Xmax, double& Ymin, doub
 		int first_sig = 0;
 		for (int index = 0; index < m_graph.signalcount; index++)			// find first displayed signal (show=true)
 		{
-			if (m_graph.signals[index]->show == false)
+			if (m_graph.signals[index].show == false)
 			{
 				continue;
 			}
@@ -1783,26 +1817,26 @@ bool WinGraph::FindGlobalMaxScale(double& Xmin, double& Xmax, double& Ymin, doub
 			}
 		}
 
-		Xmin = m_graph.signals[first_sig]->Xmin;										// save first value
-		Xmax = m_graph.signals[first_sig]->Xmax;										// save first value	
-		Ymin = m_graph.signals[first_sig]->Ymin;										// save first value
-		Ymax = m_graph.signals[first_sig]->Ymax;										// save first value
+		Xmin = m_graph.signals[first_sig].Xmin;										// save first value
+		Xmax = m_graph.signals[first_sig].Xmax;										// save first value	
+		Ymin = m_graph.signals[first_sig].Ymin;										// save first value
+		Ymax = m_graph.signals[first_sig].Ymax;										// save first value
 
 		for (int index = first_sig + 1; index < m_graph.signalcount; index++)			// Iterate every signals
 		{
-			if (m_graph.signals[index]->show == true)						// Update limit only if signal displayed
+			if (m_graph.signals[index].show == true)						// Update limit only if signal displayed
 			{
-				if (Xmin > m_graph.signals[index]->Xmin)
-					Xmin = m_graph.signals[index]->Xmin;							// Update if needed
+				if (Xmin > m_graph.signals[index].Xmin)
+					Xmin = m_graph.signals[index].Xmin;							// Update if needed
 
-				if (Xmax < m_graph.signals[index]->Xmax)
-					Xmax = m_graph.signals[index]->Xmax;							// Update if needed
+				if (Xmax < m_graph.signals[index].Xmax)
+					Xmax = m_graph.signals[index].Xmax;							// Update if needed
 
-				if (Ymin > m_graph.signals[index]->Ymin)
-					Ymin = m_graph.signals[index]->Ymin;							// Update if needed
+				if (Ymin > m_graph.signals[index].Ymin)
+					Ymin = m_graph.signals[index].Ymin;							// Update if needed
 
-				if (Ymax < m_graph.signals[index]->Ymax)
-					Ymax = m_graph.signals[index]->Ymax;							// Update if needed
+				if (Ymax < m_graph.signals[index].Ymax)
+					Ymax = m_graph.signals[index].Ymax;							// Update if needed
 			}
 		}
 
@@ -1832,15 +1866,15 @@ bool WinGraph::FindGlobalMaxScale(double& Xmin, double& Xmax, double& Ymin, doub
 			{
 				Ymax = high;
 				Ymin = low;
-				return TRUE;
+				return true;
 			}
 		}
 		printf("[!] Error at FindGlobalMaxScale()\nimpossible to calculate good proportion with the algorythm\n");
-		return FALSE;
+		return false;
 
 	}
 	printf("[!] Error at FindGlobalMaxScale()\nsignal count  = 0\n");
-	return FALSE;
+	return false;
 }
 
 
@@ -1866,11 +1900,11 @@ void WinGraph::DrawWave()
 
 		for (int index = 0; index < m_graph.signalcount; index++)
 		{
-			if (m_graph.signals[index]->show == false)																	// Skip signal display if requiered
+			if (m_graph.signals[index].show == false)																	// Skip signal display if requiered
 			{
 				continue;
 			}
-			glColor3f(m_graph.signals[index]->color[0], m_graph.signals[index]->color[1], m_graph.signals[index]->color[2]);								// Colors of the signal
+			glColor3f(m_graph.signals[index].color[0], m_graph.signals[index].color[1], m_graph.signals[index].color[2]);								// Colors of the signal
 			glBegin(GL_LINE_STRIP);
 
 			int first_point = last_point - (last_point / GetZoomFactor());	// first_point [0-last_point]
@@ -1881,14 +1915,14 @@ void WinGraph::DrawWave()
 
 			for (int i = first_point; i < last_point; i++)	// Handle zoom here
 			{
-				//printf("\n [!] X%i = %lf \n", i, TakeFiniteNumber(m_graph.signals[index]->Xnorm[i]));
+				//printf("\n [!] X%i = %lf \n", i, TakeFiniteNumber(m_graph.signals[index].Xnorm[i]));
 
 				// prevent NAN
 
-				if (m_graph.signals[index]->Xnorm[i] != m_graph.signals[index]->Xnorm[i] || m_graph.signals[index]->Ynorm[i] != m_graph.signals[index]->Ynorm[i])
+				if (m_graph.signals[index].Xnorm[i] != m_graph.signals[index].Xnorm[i] || m_graph.signals[index].Ynorm[i] != m_graph.signals[index].Ynorm[i])
 					continue;
 
-				glVertex2f(TakeFiniteNumber(m_graph.signals[index]->Xnorm[i]), TakeFiniteNumber(m_graph.signals[index]->Ynorm[i]));		// Create GPU wave
+				glVertex2f(TakeFiniteNumber(m_graph.signals[index].Xnorm[i]), TakeFiniteNumber(m_graph.signals[index].Ynorm[i]));		// Create GPU wave
 			}
 			glEnd();
 		}
@@ -2077,7 +2111,7 @@ void WinGraph::normalize_data(double Xmin, double Xmax, double Ymin, double Ymax
 
 	for (int index = 0; index < m_graph.signalcount; index++)
 	{
-		if (m_graph.signals[index]->show == true)											// Show signal enable?
+		if (m_graph.signals[index].show == true)											// Show signal enable?
 		{
 			int min_point = 0;
 			int zoom = GetZoomFactor();
@@ -2091,22 +2125,22 @@ void WinGraph::normalize_data(double Xmin, double Xmax, double Ymin, double Ymax
 
 				// prevent Nan numbers
 
-				if (m_graph.signals[index]->Y[x] != m_graph.signals[index]->Y[x] || Xmax == Xmin)
+				if (m_graph.signals[index].Y[x] != m_graph.signals[index].Y[x] || Xmax == Xmin)
 					continue;
 
 				// Xnorm = (X - min) / (max - min);
 
-				m_graph.signals[index]->Xnorm[x] = (m_graph.signals[index]->X[x] - Xmin) / (Xmax - Xmin);
-				m_graph.signals[index]->Ynorm[x] = (m_graph.signals[index]->Y[x] - Ymin) / (Ymax - Ymin);
+				m_graph.signals[index].Xnorm[x] = (m_graph.signals[index].X[x] - Xmin) / (Xmax - Xmin);
+				m_graph.signals[index].Ynorm[x] = (m_graph.signals[index].Y[x] - Ymin) / (Ymax - Ymin);
 
-				//printf("\n [!] X%i = %lf \n", x, TakeFiniteNumber(m_graph.signal[index]->Xnorm[x]));
+				//printf("\n [!] X%i = %lf \n", x, TakeFiniteNumber(m_graph.signal[index].Xnorm[x]));
 
 				// prevent Nan numbers in normalized buffer
 
 				////////////////////////////////////////////////////////////////////////////////!
 				// Error prone = 0.0 in place of +inf or -inf
-				if (m_graph.signals[index]->Ynorm[x] != m_graph.signals[index]->Ynorm[x])
-					m_graph.signals[index]->Y[x] = 0.0;
+				if (m_graph.signals[index].Ynorm[x] != m_graph.signals[index].Ynorm[x])
+					m_graph.signals[index].Y[x] = 0.0;
 
 			}
 		}
@@ -2145,18 +2179,18 @@ void WinGraph::UpdateBorder()
 		//AnalizedPts = 0;
 		for (int index = 0; index <= m_graph.signalcount - 1; index++)
 		{
-			if (m_graph.signals[index]->show == false)
+			if (m_graph.signals[index].show == false)
 			{
 				continue;
 			}
-			m_graph.signals[index]->Xmin = TakeFiniteNumber(m_graph.signals[index]->X[AnalizedPts]);
-			m_graph.signals[index]->Xmax = TakeFiniteNumber(m_graph.signals[index]->X[AnalizedPts]);
+			m_graph.signals[index].Xmin = TakeFiniteNumber(m_graph.signals[index].X[AnalizedPts]);
+			m_graph.signals[index].Xmax = TakeFiniteNumber(m_graph.signals[index].X[AnalizedPts]);
 			//m_graph.BufferSize = 50;
 
-			if (m_graph.bAutoscale == TRUE)
+			if (m_graph.bAutoscale == true)
 			{
-				m_graph.signals[index]->Ymin = TakeFiniteNumber(m_graph.signals[index]->Y[AnalizedPts]);
-				m_graph.signals[index]->Ymax = TakeFiniteNumber(m_graph.signals[index]->Y[AnalizedPts]);
+				m_graph.signals[index].Ymin = TakeFiniteNumber(m_graph.signals[index].Y[AnalizedPts]);
+				m_graph.signals[index].Ymax = TakeFiniteNumber(m_graph.signals[index].Y[AnalizedPts]);
 			}
 			else
 			{
@@ -2172,10 +2206,10 @@ void WinGraph::UpdateBorder()
 	{
 		for (int index = 0; index <= m_graph.signalcount - 1; index++)
 		{
-			m_graph.signals[index]->Xmin = 0.0f;
-			m_graph.signals[index]->Xmax = 0.0f;
-			m_graph.signals[index]->Ymin = 0.0f;
-			m_graph.signals[index]->Ymax = 0.0f;
+			m_graph.signals[index].Xmin = 0.0f;
+			m_graph.signals[index].Xmax = 0.0f;
+			m_graph.signals[index].Ymin = 0.0f;
+			m_graph.signals[index].Ymax = 0.0f;
 		}
 		return;
 	}
@@ -2184,14 +2218,14 @@ void WinGraph::UpdateBorder()
 	{
 		for (int index = 0; index <= m_graph.signalcount - 1; index++)
 		{
-			if (m_graph.signals[index]->show == false)
+			if (m_graph.signals[index].show == false)
 			{
 				continue;
 			}
-			m_graph.signals[index]->Xmin = TakeFiniteNumber(m_graph.signals[index]->X[AnalizedPts]);
-			m_graph.signals[index]->Xmax = TakeFiniteNumber(m_graph.signals[index]->X[AnalizedPts]);
-			m_graph.signals[index]->Ymin = TakeFiniteNumber(m_graph.signals[index]->Y[AnalizedPts]);
-			m_graph.signals[index]->Ymax = TakeFiniteNumber(m_graph.signals[index]->Y[AnalizedPts]);
+			m_graph.signals[index].Xmin = TakeFiniteNumber(m_graph.signals[index].X[AnalizedPts]);
+			m_graph.signals[index].Xmax = TakeFiniteNumber(m_graph.signals[index].X[AnalizedPts]);
+			m_graph.signals[index].Ymin = TakeFiniteNumber(m_graph.signals[index].Y[AnalizedPts]);
+			m_graph.signals[index].Ymax = TakeFiniteNumber(m_graph.signals[index].Y[AnalizedPts]);
 		}
 	}
 
@@ -2199,7 +2233,7 @@ void WinGraph::UpdateBorder()
 	{
 		for (int index = 0; index <= m_graph.signalcount - 1; index++)
 		{
-			if (m_graph.signals[index]->show == false)
+			if (m_graph.signals[index].show == false)
 			{
 				continue;
 			}
@@ -2219,25 +2253,25 @@ void WinGraph::UpdateBorder()
 					zoom = 0;
 				}
 
-				m_graph.signals[index]->Xmin = TakeFiniteNumber(m_graph.signals[index]->X[zoom]);
-				//m_graph.signal[index]->Xmin = TakeFiniteNumber(m_graph.signal[index]->X[0]);
+				m_graph.signals[index].Xmin = TakeFiniteNumber(m_graph.signals[index].X[zoom]);
+				//m_graph.signal[index].Xmin = TakeFiniteNumber(m_graph.signal[index].X[0]);
 
 				////////////////////////////////////////////
-				if (TakeFiniteNumber(m_graph.signals[index]->X[CurrentPoint]) > m_graph.signals[index]->Xmax)
+				if (TakeFiniteNumber(m_graph.signals[index].X[CurrentPoint]) > m_graph.signals[index].Xmax)
 				{
-					m_graph.signals[index]->Xmax = TakeFiniteNumber(m_graph.signals[index]->X[CurrentPoint]);
+					m_graph.signals[index].Xmax = TakeFiniteNumber(m_graph.signals[index].X[CurrentPoint]);
 					xmaxpos = CurrentPoint;
 				}
 
-				if (TakeFiniteNumber(m_graph.signals[index]->Y[CurrentPoint]) < m_graph.signals[index]->Ymin)
+				if (TakeFiniteNumber(m_graph.signals[index].Y[CurrentPoint]) < m_graph.signals[index].Ymin)
 				{
-					m_graph.signals[index]->Ymin = TakeFiniteNumber(m_graph.signals[index]->Y[CurrentPoint]);
+					m_graph.signals[index].Ymin = TakeFiniteNumber(m_graph.signals[index].Y[CurrentPoint]);
 					yminpos = CurrentPoint;
 				}
 
-				if (TakeFiniteNumber(m_graph.signals[index]->Y[CurrentPoint]) > m_graph.signals[index]->Ymax)
+				if (TakeFiniteNumber(m_graph.signals[index].Y[CurrentPoint]) > m_graph.signals[index].Ymax)
 				{
-					m_graph.signals[index]->Ymax = TakeFiniteNumber(m_graph.signals[index]->Y[CurrentPoint]);
+					m_graph.signals[index].Ymax = TakeFiniteNumber(m_graph.signals[index].Y[CurrentPoint]);
 					ymaxpos = CurrentPoint;
 				}
 			}
@@ -2270,10 +2304,11 @@ void ZeroObject(DATA* pgraph, int iBufferSize)
 		return;
 	}
 
-	memset(&pgraph->X, 0, sizeof(double) * iBufferSize);
-	memset(&pgraph->Y, 0, sizeof(double) * iBufferSize);
-	memset(&pgraph->Xnorm, 0, sizeof(double) * iBufferSize);
-	memset(&pgraph->Ynorm, 0, sizeof(double) * iBufferSize);
+	pgraph->reset_data();
+	//memset(pgraph.X.get(), 0, sizeof(double) * iBufferSize);
+	//memset(pgraph.Y.get(), 0, sizeof(double) * iBufferSize);
+	//memset(pgraph.Xnorm.get(), 0, sizeof(double) * iBufferSize);
+	//memset(pgraph.Ynorm.get(), 0, sizeof(double) * iBufferSize);
 	pgraph->Xmin = 0.0f;
 	pgraph->Xmax = 0.0f;
 	pgraph->Ymin = 0.0f;
@@ -2304,7 +2339,7 @@ bool GetUniqueFilename(wchar_t* lpFilename, wchar_t* lpFileExtension)
 	if (wcslen(lpFileExtension) > 10)
 	{
 		printf("[!] Error at GetUniqueFilename() lpFileExtension > 10 char (forbiden)\n");
-		return FALSE;
+		return false;
 	}
 	swprintf_s(name_format, L"yyyy_MM_dd_%s", lpFileExtension);
 	GetLocalTime(&t);
@@ -2330,7 +2365,7 @@ try_next_file:
 	if (hFind == INVALID_HANDLE_VALUE)
 	{
 		printf("[*] Make unique filename successfull: %ws\n", lpFilename);
-		return TRUE;
+		return true;
 	}
 
 	// Build (0) str
@@ -2359,7 +2394,7 @@ try_next_file:
 
 
 	printf("[!] Make unique filename failed\n");
-	return FALSE;
+	return false;
 }
 
 inline long long PerformanceFrequency()
@@ -2423,7 +2458,7 @@ void CheckErr(void)
 POINT WinGraph::GetMousePosition(void)
 {
 	POINT POINT;
-	if (GetCursorPos(&POINT) == FALSE)
+	if (GetCursorPos(&POINT) == false)
 		return { 0, 0 };
 
 	return POINT;
@@ -2432,8 +2467,8 @@ POINT WinGraph::GetMousePosition(void)
 bool WinGraph::isMouseHover()
 {
 	POINT POINT;
-	if (GetCursorPos(&POINT) == FALSE)
-		return FALSE;
+	if (GetCursorPos(&POINT) == false)
+		return false;
 
 	RECT client;
 	HWND hwndGraph = NULL;
@@ -2448,12 +2483,12 @@ bool WinGraph::isMouseHover()
 				if (((POINT.x > client.left) && (POINT.x < client.right)) && ((POINT.y < client.bottom) && (POINT.y > client.top)))
 				{
 					//printf("Hoover\n");
-					return TRUE;
+					return true;
 				}
 			}
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 void WinGraph::DisplayPointer()

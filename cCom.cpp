@@ -113,7 +113,7 @@ err_struct cCom::write(std::wstring scpi)
 	assert(scpi.size() > 0);
 
 	DWORD dwBytes = 0x0;
-	if (!WriteFile(hCom, scpi.c_str(), std::wcslen(scpi.c_str()), &dwBytes, nullptr))
+	if (!WriteFile(hCom, scpi.c_str(), static_cast<DWORD>(std::wcslen(scpi.c_str())), &dwBytes, nullptr))
 	{
 		last_error.err_msg = std::wstring(L"WriteFile() error");
 		last_error.err_code = 0;
@@ -136,7 +136,7 @@ err_struct cCom::read(std::wstring& scpi)
 
 	do
 	{
-		if (!ReadFile(hCom, &buffer[0] + dwBytes, buff_size, &dwBytes, NULL))
+		if (!ReadFile(hCom, &buffer[0] + dwBytes, static_cast<DWORD>(buff_size), &dwBytes, NULL))
 		{
 			last_error.err_msg = std::wstring(L"Undeterminate error at ReadFile().\n");
 			last_error.err_code = -1;

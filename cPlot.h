@@ -68,7 +68,7 @@ public:
 	void reset_chan_statistic_by_signal_position(size_t signal_position);
 
 	bool get_graph_state();
-	char* get_graph_filename();
+	std::string get_graph_filename();
 	int get_graph_signal_count();
 	void set_signal_filter(FILTER_M FilteringType, int position);
 	void set_signal_filter_threshold(float intensity, int position);
@@ -90,6 +90,7 @@ public:
 
 	void SizeGraph();
 	void RenderGraph();
+	void Refresh();
 
 	// wxWidget panel
 	wxPanel* Getleftpan();
