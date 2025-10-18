@@ -40,7 +40,7 @@ err_struct cSerial::init()
 		
 #define INSTR_SIZE 512
 		char instr[INSTR_SIZE] = "";		
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, ViString("ASRL*?::*INSTR"), list, count, instr))
+		if (VI_SUCCESS != mviFindRsrc(ressource_manager, ViString("ASRL*?::*INSTR"), list, count, instr))
 		{
 			return { std::wstring(L"[!] viFindRsrc() failled."), -1 };
 		}
@@ -148,7 +148,7 @@ err_struct cSerial::init()
 	//status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
 	//status = viOpen(ressource_manager, (ViRsrc)"ASRL4::INSTR", VI_NULL, 0, &device_);
 	device_ = 0;
-	status = viOpen(ressource_manager,  (ViRsrc)visa_device.c_str(), VI_NULL, 0, &device_);
+	status = mviOpen(ressource_manager,  (ViRsrc)visa_device.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failled."), -4 };
@@ -157,18 +157,18 @@ err_struct cSerial::init()
 	assert(device_ > 0);
 
 	// Clear line
-	status = viClear(device_);
+	status = mviClear(device_);
 
 	// For Serial and TCP/IP socket connections enable the read Termination Character, or read's will timeout
 	ViChar fullAddress[100] = "";
-	viGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
+	mviGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
 	if (strncmp("ASRL", fullAddress, 4) != 0)
 	{
 		return { std::wstring(L"[!] viGetAttribute() failled. It is not a ASRL device"), -5 };
 	}
 
 	// Set timeout value to X s
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 1000);
+	status = mviSetAttribute(device_, VI_ATTR_TMO_VALUE, 1000);
 
 	/*
 	#define VI_ATTR_ASRL_AVAIL_NUM                (0x3FFF00ACUL
@@ -183,30 +183,30 @@ err_struct cSerial::init()
 	#define VI_ATTR_ASRL_XOFF_CHAR                (0x3FFF00C2UL)
 	*/
 
-	viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_FALSE);
+	mviSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_FALSE);
 
-	viSetAttribute(device_, VI_ATTR_SEND_END_EN, VI_TRUE);
-	viSetAttribute(device_, VI_ATTR_SUPPRESS_END_EN, VI_FALSE);
+	mviSetAttribute(device_, VI_ATTR_SEND_END_EN, VI_TRUE);
+	mviSetAttribute(device_, VI_ATTR_SUPPRESS_END_EN, VI_FALSE);
 
-	viSetAttribute(device_, VI_ATTR_ASRL_END_IN, VI_TRUE);
-	viSetAttribute(device_, VI_ATTR_ASRL_END_OUT, VI_TRUE);
+	mviSetAttribute(device_, VI_ATTR_ASRL_END_IN, VI_TRUE);
+	mviSetAttribute(device_, VI_ATTR_ASRL_END_OUT, VI_TRUE);
 	
-	viSetAttribute(device_, VI_ATTR_ASRL_BAUD, 9600);
+	mviSetAttribute(device_, VI_ATTR_ASRL_BAUD, 9600);
 	
 	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_NONE);
 	//viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_XON_XOFF);
-	viSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
+	mviSetAttribute(device_, VI_ATTR_ASRL_FLOW_CNTRL, VI_ASRL_FLOW_RTS_CTS);
 
-	viSetAttribute(device_, VI_ATTR_ASRL_PARITY, VI_ASRL_PAR_NONE);
-	viSetAttribute(device_, VI_ATTR_ASRL_DATA_BITS, 8);
-	viSetAttribute(device_, VI_ATTR_ASRL_STOP_BITS, VI_ASRL_STOP_ONE);
+	mviSetAttribute(device_, VI_ATTR_ASRL_PARITY, VI_ASRL_PAR_NONE);
+	mviSetAttribute(device_, VI_ATTR_ASRL_DATA_BITS, 8);
+	mviSetAttribute(device_, VI_ATTR_ASRL_STOP_BITS, VI_ASRL_STOP_ONE);
 	
 
-	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0xD); // CR=0x0D LF=0x0A
-	viSetAttribute(device_, VI_ATTR_IO_PROT, VI_PROT_4882_STRS);
+	mviSetAttribute(device_, VI_ATTR_TERMCHAR, 0xD); // CR=0x0D LF=0x0A
+	mviSetAttribute(device_, VI_ATTR_IO_PROT, VI_PROT_4882_STRS);
 
-	viFlush(device_, 0xC0);
-	viSetBuf(device_, 0x30, 4096);
+	mviFlush(device_, 0xC0);
+	mviSetBuf(device_, 0x30, 4096);
 
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
@@ -216,8 +216,8 @@ err_struct cSerial::init()
 err_struct cSerial::close()
 {
 	//std::wcout << L"[*] cSerial close() called\n";
-	viClose(device_);
-	viClose(ressource_manager);
+	mviClose(device_);
+	mviClose(ressource_manager);
 	/*
 	'Lab++.exe' (Win32) : Déchargé 'C:\Program Files\IVI Foundation\VISA\Win64\NIvisa\PxiPlugins\NiViPpiP.dll'
 'Lab++.exe' (Win32) : Déchargé 'C:\Program Files\Keysight\IO Libraries Suite\bin\ioModInstPpi.dll'

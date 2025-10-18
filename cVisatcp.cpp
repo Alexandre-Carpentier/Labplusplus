@@ -34,7 +34,7 @@ err_struct cTcp::init()
 		ViPUInt32 count = 0;
 #define INSTR_SIZE 260
 		ViChar instrument_name[INSTR_SIZE] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, ViString("TCPIP*?::*INSTR"), list, count, instrument_name))
+		if (VI_SUCCESS != mviFindRsrc(ressource_manager, ViString("TCPIP*?::*INSTR"), list, count, instrument_name))
 		{
 			return { std::wstring(L"[!] viOpen() failled."), -1 };
 		}
@@ -47,7 +47,7 @@ err_struct cTcp::init()
 
 	std::string device_utf8 = ConvertWideToUtf8(device_name_);
 	device_ = 0;
-	status = viOpen(ressource_manager, (ViRsrc)device_utf8.c_str(), VI_NO_LOCK, 0, &device_);
+	status = mviOpen(ressource_manager, (ViRsrc)device_utf8.c_str(), VI_NO_LOCK, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failled."), -2 };
@@ -56,18 +56,18 @@ err_struct cTcp::init()
 
 	// For Serial and TCP/IP socket connections enable the read Termination Character, or read's will timeout
 	ViChar fullAddress[100] = "";
-	viGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
+	mviGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
 	if (strncmp("TCPIP", fullAddress, 5) != 0)
 	{
 		return { std::wstring(L"[!] viGetAttribute() failled. It is not a ASRL device"), -3 };
 	}
-	viClear(device_);
+	mviClear(device_);
 
-	viSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE);
-	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0x0A); // CR=0x0D LF=0x0A
+	mviSetAttribute(device_, VI_ATTR_TERMCHAR_EN, VI_TRUE);
+	mviSetAttribute(device_, VI_ATTR_TERMCHAR, 0x0A); // CR=0x0D LF=0x0A
 
 	// Set timeout value to 500 ms
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 100);
+	status = mviSetAttribute(device_, VI_ATTR_TMO_VALUE, 100);
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
 	return last_error;
@@ -76,8 +76,8 @@ err_struct cTcp::init()
 err_struct cTcp::close()
 {
 	std::wcout << L"[*] cSerial close() called\n";
-	viClose(device_);
-	viClose(ressource_manager);
+	mviClose(device_);
+	mviClose(ressource_manager);
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
 	return last_error;

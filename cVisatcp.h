@@ -7,8 +7,8 @@
 /////////////////////////////////////////////////////////////////////////////
 #ifndef _TCP_H__
 #define _TCP_H__
-#pragma comment (lib, "visa32.lib") 
-#include <visa.h> 
+//#pragma comment (lib, "visa32.lib") 
+//#include <visa.h> 
 
 #include <iostream>
 #include <locale>

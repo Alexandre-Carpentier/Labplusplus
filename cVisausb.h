@@ -7,8 +7,8 @@
 /////////////////////////////////////////////////////////////////////////////
 #ifndef _VISAUSB_H__
 #define _VISAUSB_H__
-#pragma comment (lib, "visa32.lib") 
-#include <visa.h>
+//#pragma comment (lib, "visa32.lib") 
+//#include <visa.h>
 
 #include <format>
 #include <string>

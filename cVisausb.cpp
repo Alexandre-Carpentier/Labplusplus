@@ -40,7 +40,7 @@ err_struct cVisausb::init()
 
 #define INSTR_SIZE 512
 		char instr[INSTR_SIZE] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, ViString("USB*INSTR"), list, count, instr))
+		if (VI_SUCCESS != mviFindRsrc(ressource_manager, ViString("USB*INSTR"), list, count, instr))
 		{
 			return { std::wstring(L"[!] viFindRsrc() failled."), -1 };
 		}
@@ -69,7 +69,7 @@ err_struct cVisausb::init()
 	//status = viOpen(ressource_manager, (ViRsrc)device_name_.c_str(), VI_NULL, 0, &device_);
 	//status = viOpen(ressource_manager, (ViRsrc)"ASRL4::INSTR", VI_NULL, 0, &device_);
 	device_ = 0;
-	status = viOpen(ressource_manager, (ViRsrc)device_utf8.c_str(), VI_NULL, 0, &device_);
+	status = mviOpen(ressource_manager, (ViRsrc)device_utf8.c_str(), VI_NULL, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		if (status == -1073807343) 
@@ -82,18 +82,18 @@ err_struct cVisausb::init()
 	assert(device_ > 0);
 
 	// Clear line
-	status = viClear(device_);
+	status = mviClear(device_);
 
 	// For Serial and TCP/IP socket connections enable the read Termination Character, or read's will timeout
 	ViChar fullAddress[100] = "";
-	viGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
+	mviGetAttribute(device_, VI_ATTR_RSRC_NAME, fullAddress);
 	if (strncmp("USB", fullAddress, 3) != 0)
 	{
 		return { std::wstring(L"[!] viGetAttribute() failled. It is not a USB device"), -5 };
 	}
 
 	// Set timeout value to X s
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 500);
+	status = mviSetAttribute(device_, VI_ATTR_TMO_VALUE, 500);
 
 	/*
 #define VI_ATTR_4882_COMPLIANT                (0x3FFF019FUL)
@@ -103,11 +103,11 @@ err_struct cVisausb::init()
 #define VI_ATTR_USB_MAX_INTR_SIZE             (0x3FFF01AFUL)
 	*/
 
-	viSetAttribute(device_, VI_ATTR_TERMCHAR, 0xA); // CR=0x0D LF=0x0A
+	mviSetAttribute(device_, VI_ATTR_TERMCHAR, 0xA); // CR=0x0D LF=0x0A
 
 
-	viFlush(device_, 0xC0);
-	viSetBuf(device_, 0x30, 4096);
+	mviFlush(device_, 0xC0);
+	mviSetBuf(device_, 0x30, 4096);
 
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
@@ -117,8 +117,8 @@ err_struct cVisausb::init()
 err_struct cVisausb::close()
 {
 	//std::wcout << L"[*] cVisausb close() called\n";
-	viClose(device_);
-	viClose(ressource_manager);
+	mviClose(device_);
+	mviClose(ressource_manager);
 
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;

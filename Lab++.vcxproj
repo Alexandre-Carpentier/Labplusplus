@@ -260,6 +260,7 @@
     <ClInclude Include="cObserver.h" />
     <ClInclude Include="cSerialize.h" />
     <ClInclude Include="cSignalDisplay.h" />
+    <ClInclude Include="extern_ptr.h" />
     <ClInclude Include="filename.h" />
     <ClInclude Include="IInstrument.h" />
     <ClInclude Include="cMain.h" />
@@ -308,6 +309,7 @@
     <ClInclude Include="PlotWindow.h" />
     <ClInclude Include="Plugin\cDevice.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="visa_ptr.h" />
     <ClInclude Include="WinGraph.h" />
     <ClInclude Include="xlsx.h" />
   </ItemGroup>

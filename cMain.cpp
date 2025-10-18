@@ -12,6 +12,7 @@
 #include <wx/dcbuffer.h>
 #include <vector>
 #include <memory>
+#include <print>
 
 #include "oleauto.h"
 #pragma comment (lib, "OleAut32.lib")
@@ -25,7 +26,7 @@
 #include "cDeviceMonitor.h"
 #include "cConfig.h"
 #include "cTable.h"
-
+#include "visa_ptr.h"
 
 #include "resource.h"
 
@@ -44,6 +45,7 @@ EVT_SIZING(cMain::Moveevt)
 EVT_MAXIMIZE(cMain::Maximizeevt)
 wxEND_EVENT_TABLE()
 
+
 cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1200, 600))
 {
 #ifdef _DEBUG
@@ -54,6 +56,21 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 		ShutdownBlockReasonCreate(this->GetHWND(), L"Do not stop before end of recording.");
 	}
 
+	/////////////////////////////////////////////////////////////
+	//
+	//	Load NI library dynamically at startup
+	//
+	if (!load_ni_visa_dll(&hVisa))
+	{
+		std::print("[!] Failed to load NI visa32.dll..\n");
+		return;
+	}
+
+	if (!load_ni_visa_ptrs(&hVisa))
+	{
+		std::print("[!] Failed to load NI visa32.dll functions..\n");
+		return;
+	}
 
 	/////////////////////////////////////////////////////////////
 	//
@@ -310,6 +327,7 @@ cMain::~cMain()
 	std::cout << "cObjectmanager->getInstance()\n";
 	cObjectmanager* manager = manager->getInstance();
 	manager->kill();
+
 #ifdef _DEBUG
 	//_CrtDumpMemoryLeaks();
 #endif

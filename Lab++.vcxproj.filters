@@ -509,6 +509,12 @@
     <ClInclude Include="PlotWindow.h">
       <Filter>Fichiers sources\MainWindow\plot</Filter>
     </ClInclude>
+    <ClInclude Include="visa_ptr.h">
+      <Filter>Fichiers sources\Measurement\Protocol\VISA</Filter>
+    </ClInclude>
+    <ClInclude Include="extern_ptr.h">
+      <Filter>Fichiers sources\tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Lab++.rc">

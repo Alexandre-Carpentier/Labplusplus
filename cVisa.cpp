@@ -12,7 +12,7 @@ cVisa::cVisa()
 	//std::wcout << "[*] cVisa default constructor called\n";
 	device_name_ = L"magic";
 
-	if (viOpenDefaultRM(&ressource_manager) != VI_SUCCESS)
+	if (mviOpenDefaultRM(&ressource_manager) != VI_SUCCESS)
 	{
 		last_error.err_msg = std::wstring(L"[!] viOpen() failed.");
 		last_error.err_code = -1;
@@ -41,7 +41,7 @@ err_struct cVisa::init()
 
 #define INSTR_SIZE 512
 		char instr[INSTR_SIZE] = "";
-		if (VI_SUCCESS != viFindRsrc(ressource_manager, ViString("?::*INSTR"), list, count, instr))
+		if (VI_SUCCESS != mviFindRsrc(ressource_manager, ViString("?::*INSTR"), list, count, instr))
 		{
 			return { std::wstring(L"[!] viOpen() failed."), -1 };
 		}
@@ -71,7 +71,7 @@ err_struct cVisa::init()
 	assert(dev_name_utf8.size() < 20);
 
 	device_ = 0;
-	status = viOpen(ressource_manager, (ViString)dev_name_utf8.c_str(), VI_NO_LOCK, 0, &device_);
+	status = mviOpen(ressource_manager, (ViString)dev_name_utf8.c_str(), VI_NO_LOCK, 0, &device_);
 	if (status != VI_SUCCESS)
 	{
 		return { std::wstring(L"[!] viOpen() failed."), -3 };
@@ -80,7 +80,7 @@ err_struct cVisa::init()
 	assert(device_ > 0);
 
 	// Set timeout value to 500 ms
-	status = viSetAttribute(device_, VI_ATTR_TMO_VALUE, 500);
+	status = mviSetAttribute(device_, VI_ATTR_TMO_VALUE, 500);
 
 	last_error.err_msg = std::wstring(L"OK");
 	last_error.err_code = 0;
@@ -103,7 +103,7 @@ err_struct cVisa::write(std::wstring scpi)
 	assert(utf8.size() > 0);
 	assert(utf8.size() < 256);
 
-	ViStatus res = viPrintf(device_, (char *)utf8.c_str());
+	ViStatus res = mviPrintf(device_, (char *)utf8.c_str());
 
 	// TODO: check this part
 	if (res != VI_SUCCESS)
@@ -113,7 +113,7 @@ err_struct cVisa::write(std::wstring scpi)
 		// Note  The size of the desc parameter should be at least 256 bytes.
 		char msg[512] = "";
 
-		res = viStatusDesc(device_, res, msg);
+		res = mviStatusDesc(device_, res, msg);
 		assert(strlen(msg) < 300);
 		assert(strlen(msg) > 0);
 
@@ -165,7 +165,7 @@ err_struct cVisa::read(std::wstring& scpi)
 	ViUInt32 iRead = 0;
 
 	ZeroMemory(msg, sizeof(msg));
-	ViStatus res = viRead(device_, msg, BUFFER_SIZE, &iRead);
+	ViStatus res = mviRead(device_, msg, BUFFER_SIZE, &iRead);
 	last_error.err_code = res;
 
 	assert(iRead < BUFFER_SIZE);
@@ -346,8 +346,8 @@ err_struct cVisa::read(std::wstring& scpi)
 err_struct cVisa::close()
 {
 	//std::wcout << L"[*] cVisa close() called\n";
-	viClear(device_);
-	viClose(device_);
+	mviClear(device_);
+	mviClose(device_);
 	last_error.err_msg = std::wstring(L"OK\n");
 	last_error.err_code = 0;
 	return last_error;
