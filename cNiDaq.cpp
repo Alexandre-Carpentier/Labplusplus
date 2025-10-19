@@ -10,6 +10,46 @@
 #include "cMeasurement.h"
 #include <string>
 
+typedef int32(*DAQmxSelfTestDevice_)(const char deviceName[]);
+typedef int32(*DAQmxGetDevAISupportedMeasTypes_)(const char device[], int32* data, uInt32 arraySizeInElements);
+typedef int32(*DAQmxGetDevProductType_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetDevChassisModuleDevNames_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxCreateTask_)(const char taskName[], TaskHandle* taskHandle);
+typedef int32(*DAQmxCreateAIVoltageChan_)(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+typedef int32(*DAQmxStartTask_)(TaskHandle taskHandle);
+typedef int32(*DAQmxStopTask_)(TaskHandle taskHandle);
+typedef int32(*DAQmxClearTask_)(TaskHandle taskHandle);
+typedef int32(*DAQmxCreateAIThrmcplChan_)(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
+typedef int32(*DAQmxCreateAIThrmstrChanIex_)(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, float64 a, float64 b, float64 c);
+typedef int32(*DAQmxCreateDIChan_)(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+typedef int32(*DAQmxCreateDOChan_)(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+typedef int32(*DAQmxGetTaskChannels_)(TaskHandle taskHandle, char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetAIMeasType_)(TaskHandle taskHandle, const char channel[], int32* data);
+typedef int32(*DAQmxReadAnalogF64_)(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32* sampsPerChanRead, bool32* reserved);
+typedef int32(*DAQmxReadDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInBytes, int32* sampsPerChanRead, int32* numBytesPerSamp, bool32* reserved);
+typedef int32(*DAQmxWriteDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32* sampsPerChanWritten, bool32* reserved);
+typedef int32(*DAQmxGetTaskNumChans_)(TaskHandle taskHandle, uInt32* data);
+
+extern DAQmxSelfTestDevice_ mDAQmxSelfTestDevice;
+extern DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
+extern DAQmxGetDevProductType_ mDAQmxGetDevProductType;
+extern DAQmxGetDevChassisModuleDevNames_ mDAQmxGetDevChassisModuleDevNames;
+extern DAQmxCreateTask_ mDAQmxCreateTask;
+extern DAQmxCreateAIVoltageChan_ mDAQmxCreateAIVoltageChan;
+extern DAQmxStartTask_ mDAQmxStartTask;
+extern DAQmxStopTask_ mDAQmxStopTask;
+extern DAQmxClearTask_ mDAQmxClearTask;
+extern DAQmxCreateAIThrmcplChan_ mDAQmxCreateAIThrmcplChan;
+extern DAQmxCreateAIThrmstrChanIex_ mDAQmxCreateAIThrmstrChanIex;
+extern DAQmxCreateDIChan_ mDAQmxCreateDIChan;
+extern DAQmxCreateDOChan_ mDAQmxCreateDOChan;
+extern DAQmxGetTaskChannels_ mDAQmxGetTaskChannels;
+extern DAQmxGetAIMeasType_ mDAQmxGetAIMeasType;
+extern DAQmxReadAnalogF64_ mDAQmxReadAnalogF64;
+extern DAQmxReadDigitalLines_ mDAQmxReadDigitalLines;
+extern DAQmxWriteDigitalLines_ mDAQmxWriteDigitalLines;
+extern DAQmxGetTaskNumChans_ mDAQmxGetTaskNumChans;
+
 cNiDaq::cNiDaq()
 {
     std::cout << "cNiDaq ctor...\n";
@@ -89,7 +129,7 @@ int cNiDaq::launch_device()
 
     // Setup DAQmx
 
-    if (0 != DAQmxSelfTestDevice(config_struct_.device_name))
+    if (0 != mDAQmxSelfTestDevice(config_struct_.device_name))
     {
         MessageBox(0, 0, L"DAQmxSelfTestDevice Failed", 0);
     }
@@ -97,7 +137,7 @@ int cNiDaq::launch_device()
     // Check compatible measurement
 
     int32 meas_types[64]; memset(meas_types, 0, sizeof(meas_types)); // officially 29 different type is supported by NI we put 64 to be sure there is enought space for further NI API updates
-    if (0 != DAQmxGetDevAISupportedMeasTypes(config_struct_.device_name, meas_types, sizeof(meas_types)))
+    if (0 != mDAQmxGetDevAISupportedMeasTypes(config_struct_.device_name, meas_types, sizeof(meas_types)))
     {
         // DAQmx_Val_Voltage 	    10322 	Voltage measurement.
         // DAQmx_Val_Temp_TC 	    10303 	Temperature measurement using a thermocouple.
@@ -123,13 +163,13 @@ int cNiDaq::launch_device()
     }
 
     char producttype[256] = "";
-    DAQmxGetDevProductType(config_struct_.device_name, producttype, sizeof(producttype));
+    mDAQmxGetDevProductType(config_struct_.device_name, producttype, sizeof(producttype));
 
     char modulenames[256] = "";
-    DAQmxGetDevChassisModuleDevNames(config_struct_.device_name, modulenames, sizeof(modulenames));
+    mDAQmxGetDevChassisModuleDevNames(config_struct_.device_name, modulenames, sizeof(modulenames));
 
     int analog_count = 0;
-    DAQret = DAQmxCreateTask("", &analog_taskHandle);
+    DAQret = mDAQmxCreateTask("", &analog_taskHandle);
     if (0 != DAQret)
     {
         MessageBox(0, 0, L"DAQmxCreateTask for analog channels Failed", 0);
@@ -206,7 +246,7 @@ int cNiDaq::launch_device()
                     config_struct_.channel_max[c].ToCDouble(&max_range);
 
 
-                    DAQret = DAQmxCreateAIVoltageChan(
+                    DAQret = mDAQmxCreateAIVoltageChan(
                         analog_taskHandle,
                         chan.c_str(), // DEV1/ai0
                         name.c_str(), // Chan0
@@ -219,7 +259,7 @@ int cNiDaq::launch_device()
                     if (0 != DAQret)
                     {
                         MessageBox(0, 0, L"DAQmxCreateAIVoltageChan() Failed", 0);
-                        DAQmxClearTask(analog_taskHandle);
+                        mDAQmxClearTask(analog_taskHandle);
                         analog_taskHandle = nullptr;
                         return 0;
                     }
@@ -231,7 +271,7 @@ int cNiDaq::launch_device()
                 if (config_struct_.channel_type[c].compare(L"Thermocouple") == 0)
                 {
                     std::cout << "[!] TC chan: " << chan.c_str() << "name " << name.c_str() << "AnalogHandle" << analog_taskHandle << "\n";
-                    DAQret = DAQmxCreateAIThrmcplChan(
+                    DAQret = mDAQmxCreateAIThrmcplChan(
                         analog_taskHandle,
                         chan.c_str(),           // DEV1/ai0
                         name.c_str(),           // Chan0
@@ -247,7 +287,7 @@ int cNiDaq::launch_device()
                     if (0 != DAQret)
                     {
                         MessageBox(0, 0, L"DAQmxCreateAIThrmcplChan() Failed", 0);
-                        DAQmxClearTask(analog_taskHandle);
+                        mDAQmxClearTask(analog_taskHandle);
                         analog_taskHandle = nullptr;
                         return 0;
                     }
@@ -259,7 +299,7 @@ int cNiDaq::launch_device()
                 // Create an appropriate chan with DAQmxCreateAIThrmcplChan()
                 if (config_struct_.channel_type[c].compare(L"Thermistance") == 0)
                 {
-                    DAQret = DAQmxCreateAIThrmstrChanIex(
+                    DAQret = mDAQmxCreateAIThrmstrChanIex(
                         analog_taskHandle,
                         chan.c_str(),           // DEV1/ai0
                         name.c_str(),           // Chan0
@@ -277,7 +317,7 @@ int cNiDaq::launch_device()
                     if (0 != DAQret)
                     {
                         MessageBox(0, 0, L"DAQmxCreateAIThrmstrChanIex() Failed", 0);
-                        DAQmxClearTask(analog_taskHandle);
+                        mDAQmxClearTask(analog_taskHandle);
                         analog_taskHandle = nullptr;
                         return 0;
                     }
@@ -286,7 +326,7 @@ int cNiDaq::launch_device()
             }
             else if (config_struct_.channel_mode.at(c) == CHANDIGITAL)
             {
-                DAQret = DAQmxCreateTask("", &digital_taskHandle[c]);
+                DAQret = mDAQmxCreateTask("", &digital_taskHandle[c]);
                 if (0 != DAQret)
                 {
                     MessageBox(0, 0, L"DAQmxCreateTask for digital channels Failed", 0);
@@ -298,7 +338,7 @@ int cNiDaq::launch_device()
                 // Create an appropriate chan with DAQmxCreateDIChan()
                 if (config_struct_.digital_channel_type[c].compare(L"Input") == 0)
                 {
-                    DAQret = DAQmxCreateDIChan(
+                    DAQret = mDAQmxCreateDIChan(
                         digital_taskHandle[c],
                         chan.c_str(),           // DEV1/ai0
                         name.c_str(),           // Digital 0
@@ -308,7 +348,7 @@ int cNiDaq::launch_device()
                     if (0 != DAQret)
                     {
                         MessageBox(0, 0, L"DAQmxCreateDIChan() Failed", 0);
-                        DAQmxClearTask(digital_taskHandle[c]);
+                        mDAQmxClearTask(digital_taskHandle[c]);
                         digital_taskHandle[c] = nullptr;
                         return 0;
                     }
@@ -318,7 +358,7 @@ int cNiDaq::launch_device()
                 // Create an appropriate chan with DAQmxCreateDOChan()
                 if (config_struct_.digital_channel_type[c].compare(L"Output") == 0)
                 {
-                    DAQret = DAQmxCreateDOChan(
+                    DAQret = mDAQmxCreateDOChan(
                         digital_taskHandle[c],
                         chan.c_str(),           // DEV1/ai0
                         name.c_str(),           // Digital 0
@@ -328,7 +368,7 @@ int cNiDaq::launch_device()
                     if (0 != DAQret)
                     {
                         MessageBox(0, 0, L"DAQmxCreateDOChan() Failed", 0);
-                        DAQmxClearTask(digital_taskHandle[c]);
+                        mDAQmxClearTask(digital_taskHandle[c]);
                         digital_taskHandle[c] = nullptr;
                         return 0;
                     }
@@ -339,26 +379,26 @@ int cNiDaq::launch_device()
 
     if (analog_count > 0)
     {
-        DAQret = DAQmxStartTask(analog_taskHandle);
+        DAQret = mDAQmxStartTask(analog_taskHandle);
         if (0 != DAQret)
         {
             MessageBox(0, 0, L"DAQmxStartTask Failed", 0);
-            DAQmxStopTask(analog_taskHandle);
-            DAQmxClearTask(analog_taskHandle);
+            mDAQmxStopTask(analog_taskHandle);
+            mDAQmxClearTask(analog_taskHandle);
             analog_taskHandle = nullptr;
         }
     }
-    else { DAQmxClearTask(analog_taskHandle); analog_taskHandle = nullptr; }
+    else { mDAQmxClearTask(analog_taskHandle); analog_taskHandle = nullptr; }
 
     if (digital_count > 0)
     {
         for (auto& task : digital_taskHandle)
         {
-            DAQret = DAQmxStartTask(task);
+            DAQret = mDAQmxStartTask(task);
             if (0 != DAQret)
             {
-                DAQmxStopTask(task);
-                DAQmxClearTask(task);
+                mDAQmxStopTask(task);
+                mDAQmxClearTask(task);
                 std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
                 std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
                 task = nullptr;
@@ -369,8 +409,8 @@ int cNiDaq::launch_device()
     {
         for (auto& task : digital_taskHandle)
         {
-                DAQmxStopTask(task);
-                DAQmxClearTask(task);
+                mDAQmxStopTask(task);
+                mDAQmxClearTask(task);
                 std::cout << "[*] No digital input clearing the task\n";
                 task = nullptr;
         }
@@ -442,7 +482,7 @@ DATAS cNiDaq::read()
         //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
 
         
-        DAQret = DAQmxGetTaskChannels(analog_taskHandle, buff, 512);// "Digital0" 
+        DAQret = mDAQmxGetTaskChannels(analog_taskHandle, buff, 512);// "Digital0" 
 
         // Tokenize buff
         std::vector<std::string> channel_task_name;
@@ -482,14 +522,14 @@ DATAS cNiDaq::read()
         assert(channel_task_name.size() > 0);
         for (auto& token : channel_task_name)
         {
-            DAQret = DAQmxGetAIMeasType(analog_taskHandle, token.c_str(), &chan_type);
+            DAQret = mDAQmxGetAIMeasType(analog_taskHandle, token.c_str(), &chan_type);
         }
 
         //if (chan_type == DAQmx_Val_Voltage || chan_type == DAQmx_Val_Temp_TC || chan_type == DAQmx_Val_Temp_Thrmstr)
         //{
 
             int32 read_nb = 0;
-            DAQret = DAQmxReadAnalogF64(analog_taskHandle, sample_number, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result.buffer_size * sample_number, &read_nb, NULL); // Read multiple sample
+            DAQret = mDAQmxReadAnalogF64(analog_taskHandle, sample_number, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result.buffer_size * sample_number, &read_nb, NULL); // Read multiple sample
             if (read_nb != sample_number)
             {
                 std::cout << "[!] DAQmxReadAnalogF64() read issue in Usb6001.cpp\n";
@@ -498,7 +538,7 @@ DATAS cNiDaq::read()
             if (0 != DAQret)
             {
                 MessageBox(0, 0, L"DAQmxReadAnalogF64 Failed", 0);
-                DAQmxClearTask(analog_taskHandle);
+                mDAQmxClearTask(analog_taskHandle);
                 //TODO: exit
             }
 
@@ -531,7 +571,7 @@ DATAS cNiDaq::read()
             if (task)
             {
                 char digital_chan_names[512] = "";
-                DAQret = DAQmxGetTaskChannels(digital_taskHandle, digital_chan_names, 512);// "Digital0" 
+                DAQret = mDAQmxGetTaskChannels(digital_taskHandle, digital_chan_names, 512);// "Digital0" 
                 std::cout << "[*] Digital task channel: " << digital_chan_names << "\n";
             }
         }
@@ -544,7 +584,7 @@ DATAS cNiDaq::read()
             int32 bytes_per_samples = 0;
 
             // Digital input
-            DAQret = DAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
+            DAQret = mDAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
             if (DAQret != 0)
             {
                 //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
@@ -569,11 +609,11 @@ DATAS cNiDaq::read()
                     int32 bytes_per_samples = 0;
 
                     uInt32 chan_number_in_task = 0;
-                    DAQmxGetTaskNumChans(task, &chan_number_in_task);
+                    mDAQmxGetTaskNumChans(task, &chan_number_in_task);
                     std::cout << "[*] Chan number: " << chan_number_in_task << "in current task.\n";
 
                     // Digital input
-                    DAQret = DAQmxReadDigitalLines(task, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 1, &sample_read, &bytes_per_samples, NULL);
+                    DAQret = mDAQmxReadDigitalLines(task, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 1, &sample_read, &bytes_per_samples, NULL);
                     total_sample_read += sample_read;
 
                     results.push_back(read_buffer[0]);
@@ -648,7 +688,7 @@ void cNiDaq::set(double* value, size_t length)
             else
                 cmd[0] = 0;
 
-            DAQret = DAQmxWriteDigitalLines(task, 1, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, cmd, &sample_written, NULL);
+            DAQret = mDAQmxWriteDigitalLines(task, 1, bAutostart, timeout_s, DAQmx_Val_GroupByChannel, cmd, &sample_written, NULL);
             if (DAQret != 0)
             {
                 std::cout << "[!] DAQ digital write failed\n";
@@ -664,8 +704,8 @@ void cNiDaq::stop_device()
     std::cout << "cNiDaq->stoping...\n";
     if (analog_taskHandle != nullptr)
     {
-        DAQmxStopTask(analog_taskHandle);
-        DAQmxClearTask(analog_taskHandle);
+        mDAQmxStopTask(analog_taskHandle);
+        mDAQmxClearTask(analog_taskHandle);
         std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
         std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
         analog_taskHandle = nullptr;
@@ -676,8 +716,8 @@ void cNiDaq::stop_device()
     {
         if (task != nullptr)
         {
-            DAQmxStopTask(task);
-            DAQmxClearTask(task);
+            mDAQmxStopTask(task);
+            mDAQmxClearTask(task);
             std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
             std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
             task = nullptr;
@@ -691,8 +731,8 @@ cNiDaq::~cNiDaq()
     std::cout << "cNiDaq dtor...\n";
     if (analog_taskHandle != nullptr)
     {
-        DAQmxStopTask(analog_taskHandle);
-        DAQmxClearTask(analog_taskHandle);
+        mDAQmxStopTask(analog_taskHandle);
+        mDAQmxClearTask(analog_taskHandle);
         std::cout << "[*] DAQmxStopTask() in Usb6001.cpp\n";
         std::cout << "[*] DAQmxClearTask() in Usb6001.cpp\n";
         analog_taskHandle = nullptr;
@@ -701,8 +741,8 @@ cNiDaq::~cNiDaq()
     {
         if (task != nullptr)
         {
-            DAQmxStopTask(task);
-            DAQmxClearTask(task);
+            mDAQmxStopTask(task);
+            mDAQmxClearTask(task);
             task = nullptr;
         }
     }

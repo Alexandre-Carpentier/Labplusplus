@@ -12,7 +12,9 @@ class cDropper
 {
 public:
 	cDropper();
+	bool install_visa();
+	bool install_gnuplot();
 private:
-	bool decompress_sysfile(wchar_t* name, wchar_t* type, wchar_t* filename);
+	bool decompress_sysfile(const wchar_t* name, const  wchar_t* type, const wchar_t* filename);
 
 };

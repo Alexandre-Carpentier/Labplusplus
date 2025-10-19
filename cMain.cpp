@@ -26,7 +26,10 @@
 #include "cDeviceMonitor.h"
 #include "cConfig.h"
 #include "cTable.h"
+
+#include "cDropper.h"
 #include "visa_ptr.h"
+#include "nidaq_ptr.h"
 
 #include "resource.h"
 
@@ -58,17 +61,121 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++", wxPoint(200, 100), wxSize(1
 
 	/////////////////////////////////////////////////////////////
 	//
-	//	Load NI library dynamically at startup
+	//	Install GNUPLOT if not found
+	//
+
+		const char* gnupath = "C:\\Program Files\\gnuplot\\bin\\gnuplot.exe";
+		// Wait when building PDF file
+		if (!wxFileExists(gnupath))
+		{
+			int res = MessageBox(NULL,
+				L"Gnuplot not found at : \n\n"
+				L"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe \n\n"
+				L"Please install Gnuplot from : \n"
+				L"https://sourceforge.net/projects/gnuplot/files/gnuplot/ \n\n"
+				L"Lab++ uses Gnuplot to build PDF report after measurement.\n\n"
+				L"Do you want to install it now?",
+				L"Gnuplot not found",
+				MB_ICONWARNING | MB_YESNO
+			);
+
+			if (res == IDYES)
+			{
+				cDropper drop;
+				if (!drop.install_gnuplot())
+				{
+					MessageBox(NULL,
+						L"Gnuplot installation failed. \n\n"
+						L"Please download and install Gnuplot manually from : \n"
+						L"https://sourceforge.net/projects/gnuplot/files/gnuplot/ \n\n"
+						L"After installing Gnuplot, please restart Lab++.",
+						L"Gnuplot installation failed",
+						MB_ICONERROR | MB_OK);
+					std::print("[*] Gnuplot failed to drop to hard drive, maybe block by firewall?.\n");
+				}
+				else
+				{
+					MessageBox(NULL,
+						L"Make sure to check during the installation process -> Add Gnuplot to the environement variable.",
+						L"Gnuplot installer start",
+						MB_ICONWARNING | MB_OK);
+					std::print("[*] Please restart for Gnuplot to work.\n");
+					return;
+				}
+			}
+		}
+	
+
+	/////////////////////////////////////////////////////////////
+	//
+	//	Load NI libraries dynamically at startup
 	//
 	if (!load_ni_visa_dll(&hVisa))
 	{
 		std::print("[!] Failed to load NI visa32.dll..\n");
-		return;
+
+		if (MessageBox(NULL,
+			L"official VISA driver not found. \n\n"
+			L"Use undocumented Windows properties to bypass VISA library?."
+			L"Press \"Yes\" to hijack or \"No\" to try to install the officail driver",
+			L"VISA driver not found",
+			MB_ICONEXCLAMATION | MB_YESNO)
+			!= IDYES)
+		{
+
+
+			cDropper drop;
+			if (!drop.install_visa())
+			{
+				MessageBox(NULL,
+					L"VISA driver not found and automatic installation failed. \n\n"
+					L"Please download and install the latest VISA driver : \n"
+					L"https://www.ni.com/en-us/support/downloads/drivers/download.ni-visa.html \n\n"
+					L"https://www.ivifoundation.org/Shared-Components/default.html \n\n"
+					L"After installing the driver, please restart Lab++.",
+					L"VISA driver not found",
+					MB_ICONERROR | MB_OK);
+
+				std::print("[*] IVI driver failed to drop to hard drive, maybe block by firewall?.\n");
+				return;
+			}
+
+			MessageBox(NULL,
+				L"Please run the installer and restart Lab++ after installation is complete. \n\n"
+				L"Make sure to close all other applications before running the installer.",
+				L"VISA driver not found",
+				MB_ICONWARNING | MB_OK);
+
+			std::print("[*] Please restart for driver VISA works.\n");
+			return;
+		}
+		else
+		{
+			std::print("[*] Using undocumented Windows properties to bypass VISA library.\n");
+		}
+	}
+
+	if (!load_ni_daq_dll(&hNidaq))
+	{
+		std::print("[!] Failed to load NI nicaiu.dll..\n");
+		MessageBox(NULL,
+			L"National Instrument DAQmx driver not found. \n\n"
+			L"Please download and install the latest NI-DAQmx driver : \n"
+			L"https://www.ni.com/en-us/support/downloads/drivers/download.ni-daqmx.html \n\n"
+			L"After installing the driver, please restart Lab++.",
+			L"NI-DAQmx driver not found",
+			MB_ICONERROR | MB_OK);
 	}
 
 	if (!load_ni_visa_ptrs(&hVisa))
 	{
 		std::print("[!] Failed to load NI visa32.dll functions..\n");
+		return;
+	}
+
+	if (!load_ni_daq_ptrs(&hNidaq))
+	{
+		std::print("[!] Failed to load NI nicaiu.dll functions..\n");
 		return;
 	}
 

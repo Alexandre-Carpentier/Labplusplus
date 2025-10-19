@@ -13,17 +13,47 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <strsafe.h>
+#include <print>
 #pragma comment (lib, "kernel32.lib")
 #pragma comment (lib, "user32.lib")
 #pragma comment(lib,"shell32.lib")
 
-
 cDropper::cDropper()
 {
-	//decompress_sysfile(L"BOT", L"BINARY", L"FileToDrop.exe");
+	std::print("[*] cDropper initialized\n");
 }
 
-bool cDropper::decompress_sysfile(wchar_t* name, wchar_t* type, wchar_t* filename)
+bool cDropper::install_visa()
+{
+	if(!decompress_sysfile(L"IVIDRIVER", L"BINARY", L"IviSharedComponents_303.exe"))
+	{
+		std::print("[*] IviSharedComponents_303.exe uncompressed failed\n");
+		return false;
+	}
+
+	std::print("[*] IviSharedComponents_303.exe uncompressed success\n");
+	system("IviSharedComponents_303.exe");
+	std::print("[*] calling: IviSharedComponents_303.exe\n");
+
+	return true;
+}
+
+bool cDropper::install_gnuplot()
+{
+	if (!decompress_sysfile(L"GNUPLOT", L"BINARY", L"gp603-win64-mingw.exe"))
+	{
+		std::print("[*] gp603-win64-mingw.exe uncompressed failed\n");
+		return false;
+	}
+
+	std::print("[*] gp603-win64-mingw.exe uncompressed success\n");
+	system("gp603-win64-mingw.exe");
+	std::print("[*] calling: \"gp603-win64-mingw.exe\"\n");
+
+	return true;
+}
+
+bool cDropper::decompress_sysfile(const wchar_t* name, const wchar_t* type, const wchar_t* filename)
 {
 	HRSRC aResourceH;
 	HGLOBAL aResourceHGlobal;
@@ -37,12 +67,14 @@ bool cDropper::decompress_sysfile(wchar_t* name, wchar_t* type, wchar_t* filenam
 	aResourceH = FindResource(NULL, name, type);
 	if (!aResourceH)
 	{
+		std::print("[!] Fail to find internal resource.\n");
 		return false;
 	}
 
 	aResourceHGlobal = LoadResource(NULL, aResourceH);
 	if (!aResourceHGlobal)
 	{
+		std::print("[!] Fail to load internal resource.\n");
 		return false;
 	}
 
@@ -50,6 +82,7 @@ bool cDropper::decompress_sysfile(wchar_t* name, wchar_t* type, wchar_t* filenam
 	aFilePtr = (unsigned char*)LockResource(aResourceHGlobal);
 	if (!aFilePtr)
 	{
+		std::print("[!] Lock resource fails.\n");
 		return false;
 	}
 	wchar_t filepath[255];
@@ -68,6 +101,7 @@ bool cDropper::decompress_sysfile(wchar_t* name, wchar_t* type, wchar_t* filenam
 
 	if (INVALID_HANDLE_VALUE == file_handle)
 	{
+		std::print("[!] CreateFile return INVALID_HANDLE_VALUE during decompress_sysfile.\n");
 		return false;
 	}
 
@@ -79,5 +113,6 @@ bool cDropper::decompress_sysfile(wchar_t* name, wchar_t* type, wchar_t* filenam
 	}
 	CloseHandle(file_handle);
 
+	std::print("[!] decompress sysfile success.\n");
 	return true;
 }

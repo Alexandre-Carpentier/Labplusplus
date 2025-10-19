@@ -515,6 +515,9 @@
     <ClInclude Include="extern_ptr.h">
       <Filter>Fichiers sources\tools</Filter>
     </ClInclude>
+    <ClInclude Include="nidaq_ptr.h">
+      <Filter>Fichiers sources\Measurement\Type\voltage\NI DAQmx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Lab++.rc">

@@ -118,61 +118,86 @@ bool load_ni_visa_ptrs(HMODULE* hVisa)
 
 	mviOpenDefaultRM = (viOpenDefaultRM_)GetProcAddress(*hVisa, "viOpenDefaultRM");
 	if (!mviOpenDefaultRM) { std::cerr << "Failed to get address for viOpenDefaultRM" << std::endl; return false; }
+	std::print("[*] viOpenDefaultRM address loaded: {}\n", (void*)mviOpenDefaultRM);
 	mviFindRsrc = (viFindRsrc_)GetProcAddress(*hVisa, "viFindRsrc");
 	if (!mviFindRsrc) { std::cerr << "Failed to get address for viFindRsrc" << std::endl; return false; }
+	std::print("[*] viFindRsrc address loaded: {}\n", (void*)mviFindRsrc);
 	mviFindNext = (viFindNext_)GetProcAddress(*hVisa, "viFindNext");
 	if (!mviFindNext) { std::cerr << "Failed to get address for viFindNext" << std::endl; return false; }
+	std::print("[*] viFindNext address loaded: {}\n", (void*)mviFindNext);
 	mviParseRsrc = (viParseRsrc_)GetProcAddress(*hVisa, "viParseRsrc");
 	if (!mviParseRsrc) { std::cerr << "Failed to get address for viParseRsrc" << std::endl; return false; }
+	std::print("[*] viParseRsrc address loaded: {}\n", (void*)mviParseRsrc);
 	mviOpen= (viOpen_)GetProcAddress(*hVisa, "viOpen");
 	if (!mviOpen) { std::cerr << "Failed to get address for viOpen" << std::endl; return false; }
+	std::print("[*] viOpen address loaded: {}\n", (void*)mviOpen);
 	mviClose = (viClose_)GetProcAddress(*hVisa, "viClose");
 	if (!mviClose) { std::cerr << "Failed to get address for viClose" << std::endl; return false; }
+	std::print("[*] viClose address loaded: {}\n", (void*)mviClose);
 	mviSetAttribute = (viSetAttribute_)GetProcAddress(*hVisa, "viSetAttribute");
 	if (!mviSetAttribute) { std::cerr << "Failed to get address for viSetAttribute" << std::endl; return false; }
+	std::print("[*] viSetAttribute address loaded: {}\n", (void*)mviSetAttribute);	
 	mviGetAttribute = (viGetAttribute_)GetProcAddress(*hVisa, "viGetAttribute");
 	if (!mviGetAttribute) { std::cerr << "Failed to get address for viGetAttribute" << std::endl; return false; }
+	std::print("[*] viGetAttribute address loaded: {}\n", (void*)mviGetAttribute);
 	mviStatusDesc = (viStatusDesc_)GetProcAddress(*hVisa, "viStatusDesc");		
 	if (!mviStatusDesc) { std::cerr << "Failed to get address for viStatusDesc" << std::endl; return false; }
+	std::print("[*] viStatusDesc address loaded: {}\n", (void*)mviStatusDesc);
 	mviTerminate= (viTerminate_)GetProcAddress(*hVisa, "viTerminate");
 	if (!mviTerminate) { std::cerr << "Failed to get address for viTerminate" << std::endl; return false; }
+	std::print("[*] viTerminate address loaded: {}\n", (void*)mviTerminate);
 	mviLock = (viLock_)GetProcAddress(*hVisa, "viLock");
 	if (!mviLock) { std::cerr << "Failed to get address for viLock" << std::endl; return false; }
+	std::print("[*] viLock address loaded: {}\n", (void*)mviLock);
 	mviUnlock = (viUnlock_)GetProcAddress(*hVisa, "viUnlock");
 	if (!mviUnlock) { std::cerr << "Failed to get address for viUnlock" << std::endl; return false; }
+	std::print("[*] viUnlock address loaded: {}\n", (void*)mviUnlock);
 	
 
 	mviRead = (viRead_)GetProcAddress(*hVisa, "viRead");
 	if (!mviRead) { std::cerr << "Failed to get address for viRead" << std::endl; return false; }
+	std::print("[*] viRead address loaded: {}\n", (void*)mviRead);
 	mviReadToFile = (viReadToFile_)GetProcAddress(*hVisa, "viReadToFile");
 	if (!mviReadToFile) { std::cerr << "Failed to get address for viReadToFile" << std::endl; return false; }
+	std::print("[*] viReadToFile address loaded: {}\n", (void*)mviReadToFile);
 	mviWrite = (viWrite_)GetProcAddress(*hVisa, "viWrite");
 	if (!mviWrite) { std::cerr << "Failed to get address for viWrite" << std::endl; return false; }
+	std::print("[*] viWrite address loaded: {}\n", (void*)mviWrite);
 	mviWriteFromFile = (viWriteFromFile_)GetProcAddress(*hVisa, "viWriteFromFile");
 	if (!mviWriteFromFile) { std::cerr << "Failed to get address for viWriteFromFile" << std::endl; return false; }
+	std::print("[*] viWriteFromFile address loaded: {}\n", (void*)mviWriteFromFile);
 	mviAssertTrigger = (viAssertTrigger_)GetProcAddress(*hVisa, "viAssertTrigger");
 	if (!mviAssertTrigger) { std::cerr << "Failed to get address for viAssertTrigger" << std::endl; return false; }
+	std::print("[*] viAssertTrigger address loaded: {}\n", (void*)mviAssertTrigger);
 	mviReadSTB = (viReadSTB_)GetProcAddress(*hVisa, "viReadSTB");
 	if (!mviReadSTB) { std::cerr << "Failed to get address for viReadSTB" << std::endl; return false; }
+	std::print("[*] viReadSTB address loaded: {}\n", (void*)mviReadSTB);
 	mviClear = (viClear_)GetProcAddress(*hVisa, "viClear");
 	if (!mviClear) { std::cerr << "Failed to get address for viClear" << std::endl; return false; }
+	std::print("[*] viClear address loaded: {}\n", (void*)mviClear);
 
 	mviSetBuf = (viSetBuf_)GetProcAddress(*hVisa, "viSetBuf");
 	if (!mviSetBuf) { std::cerr << "Failed to get address for viSetBuf" << std::endl; return false; }
+	std::print("[*] viSetBuf address loaded: {}\n", (void*)mviSetBuf);
 	mviFlush = (viFlush_)GetProcAddress(*hVisa, "viFlush");
 	if (!mviFlush) { std::cerr << "Failed to get address for viFlush" << std::endl; return false; }
+	std::print("[*] viFlush address loaded: {}\n", (void*)mviFlush);
 	mviBufWrite = (viBufWrite_)GetProcAddress(*hVisa, "viBufWrite");
 	if (!mviBufWrite) { std::cerr << "Failed to get address for viBufWrite" << std::endl; return false; }
+	std::print("[*] viBufWrite address loaded: {}\n", (void*)mviBufWrite);
 	
 	mviBufRead = (viBufRead_)GetProcAddress(*hVisa, "viBufRead");
 	if (!mviBufRead) { std::cerr << "Failed to get address for viBufRead" << std::endl; return false; }
+	std::print("[*] viBufRead address loaded: {}\n", (void*)mviBufRead);
 	mviPrintf = (viPrintf_)GetProcAddress(*hVisa, "viPrintf");
 	if (!mviPrintf) { std::cerr << "Failed to get address for viPrintf" << std::endl; return false; }
+	std::print("[*] viPrintf address loaded: {}\n", (void*)mviPrintf);
 	mviSPrintf = (viSPrintf_)GetProcAddress(*hVisa, "viSPrintf");
 	if (!mviSPrintf) { std::cerr << "Failed to get address for viSPrintf" << std::endl; return false; }
+	std::print("[*] viSPrintf address loaded: {}\n", (void*)mviSPrintf);
 	mviVSPrintf = (viVSPrintf_)GetProcAddress(*hVisa, "viVSPrintf");
 	if (!mviVSPrintf) { std::cerr << "Failed to get address for viVSPrintf" << std::endl; return false; }
-
+	std::print("[*] viVSPrintf address loaded: {}\n", (void*)mviVSPrintf);
 
 	return true;
 }

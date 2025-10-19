@@ -21,7 +21,7 @@ cGnuplot::cGnuplot(wxWindow* parent, wxWindowID id,
 	wxStaticText* static_file_name = new wxStaticText(this, wxID_ANY, L"Save to PDF?", wxDefaultPosition, this->FromDIP(wxSize(150, 30)), wxNO_BORDER );
 	static_file_name->SetFont(static_file_name->GetFont().Scale(1.5f));
 
-	file_name = new wxTextCtrl(this, wxID_ANY, L"XXXXXX-X-X-Leaktest", wxDefaultPosition, this->FromDIP(wxSize(300,30)), wxSUNKEN_BORDER );
+	file_name = new wxTextCtrl(this, wxID_ANY, L"IDXXXX-X-X-Testfile", wxDefaultPosition, this->FromDIP(wxSize(300,30)), wxSUNKEN_BORDER );
 	file_name->SetFont(file_name->GetFont().Scale(2.0f));
 	file_name->SetBackgroundColour(wxColour(255, 250, 250));
 
