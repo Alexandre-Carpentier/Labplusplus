@@ -24,6 +24,60 @@
 
 #include "cNiDaq.h"
 #include "cNiDaqsim.h"
+typedef int32(*DAQmxSelfTestDevice_)(const char deviceName[]);
+typedef int32(*DAQmxGetDevAISupportedMeasTypes_)(const char device[], int32* data, uInt32 arraySizeInElements);
+typedef int32(*DAQmxGetDevProductType_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetDevChassisModuleDevNames_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxCreateTask_)(const char taskName[], TaskHandle* taskHandle);
+typedef int32(*DAQmxCreateAIVoltageChan_)(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+typedef int32(*DAQmxStartTask_)(TaskHandle taskHandle);
+typedef int32(*DAQmxStopTask_)(TaskHandle taskHandle);
+typedef int32(*DAQmxClearTask_)(TaskHandle taskHandle);
+typedef int32(*DAQmxCreateAIThrmcplChan_)(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
+typedef int32(*DAQmxCreateAIThrmstrChanIex_)(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, float64 a, float64 b, float64 c);
+typedef int32(*DAQmxCreateDIChan_)(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+typedef int32(*DAQmxCreateDOChan_)(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+typedef int32(*DAQmxGetTaskChannels_)(TaskHandle taskHandle, char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetAIMeasType_)(TaskHandle taskHandle, const char channel[], int32* data);
+typedef int32(*DAQmxReadAnalogF64_)(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32* sampsPerChanRead, bool32* reserved);
+typedef int32(*DAQmxReadDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInBytes, int32* sampsPerChanRead, int32* numBytesPerSamp, bool32* reserved);
+typedef int32(*DAQmxWriteDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32* sampsPerChanWritten, bool32* reserved);
+typedef int32(*DAQmxGetTaskNumChans_)(TaskHandle taskHandle, uInt32* data);
+
+typedef int32(*DAQmxGetDevProductCategory_)(const char device[], int32* data);
+typedef int32(*DAQmxGetDevAISupportedMeasTypes_)(const char device[], int32* data, uInt32 arraySizeInElements);
+typedef int32(*DAQmxGetDevDOLines_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetSysDevNames_)(char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetDevAIPhysicalChans_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetDevProductType_)(const char device[], char* data, uInt32 bufferSize);
+
+extern DAQmxSelfTestDevice_ mDAQmxSelfTestDevice;
+extern DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
+extern DAQmxGetDevProductType_ mDAQmxGetDevProductType;
+extern DAQmxGetDevChassisModuleDevNames_ mDAQmxGetDevChassisModuleDevNames;
+extern DAQmxCreateTask_ mDAQmxCreateTask;
+extern DAQmxCreateAIVoltageChan_ mDAQmxCreateAIVoltageChan;
+extern DAQmxStartTask_ mDAQmxStartTask;
+extern DAQmxStopTask_ mDAQmxStopTask;
+extern DAQmxClearTask_ mDAQmxClearTask;
+extern DAQmxCreateAIThrmcplChan_ mDAQmxCreateAIThrmcplChan;
+extern DAQmxCreateAIThrmstrChanIex_ mDAQmxCreateAIThrmstrChanIex;
+extern DAQmxCreateDIChan_ mDAQmxCreateDIChan;
+extern DAQmxCreateDOChan_ mDAQmxCreateDOChan;
+extern DAQmxGetTaskChannels_ mDAQmxGetTaskChannels;
+extern DAQmxGetAIMeasType_ mDAQmxGetAIMeasType;
+extern DAQmxReadAnalogF64_ mDAQmxReadAnalogF64;
+extern DAQmxReadDigitalLines_ mDAQmxReadDigitalLines;
+extern DAQmxWriteDigitalLines_ mDAQmxWriteDigitalLines;
+extern DAQmxGetTaskNumChans_ mDAQmxGetTaskNumChans;
+
+extern DAQmxGetDevProductCategory_ mDAQmxGetDevProductCategory;
+extern DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
+extern DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
+extern DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
+extern DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
+extern DAQmxGetDevProductType_ mDAQmxGetDevProductType;
+
 
 #include "cSerialize.h"
 
@@ -1545,7 +1599,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 			constexpr size_t bufferSize = 1000;
 			char buffer[bufferSize] = {};
 			ZeroMemory(buffer, bufferSize);
-			if (DAQmxGetSysDevNames(buffer, bufferSize) != 0)
+			if (mDAQmxGetSysDevNames(buffer, bufferSize) != 0)
 			{
 				MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetSysDevNames() failed to resolve devices.\n", S_OK | MB_ICONERROR);
 				evt.Skip();
@@ -1589,7 +1643,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 				first_measurable_device++;
 
 				char product_type[256] = "";
-				if (DAQmxGetDevProductType(name.c_str(), product_type, sizeof(product_type)) != 0)
+				if (mDAQmxGetDevProductType(name.c_str(), product_type, sizeof(product_type)) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevProductType() failed to resolve devices product types.\n", S_OK | MB_ICONERROR);
 					evt.Skip();
@@ -1623,7 +1677,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 				// Find analog lines
 				ZeroMemory(buffer, bufferSize);
-				if (DAQmxGetDevAIPhysicalChans(name.c_str(), buffer, bufferSize) != 0)
+				if (mDAQmxGetDevAIPhysicalChans(name.c_str(), buffer, bufferSize) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
 					evt.Skip();
@@ -1658,7 +1712,7 @@ void cDaqmx::OnDaqEnableBtn(wxCommandEvent& evt)
 
 				// Find digital lines
 				ZeroMemory(buffer, bufferSize);
-				if (DAQmxGetDevDOLines(name.c_str(), buffer, bufferSize) != 0)
+				if (mDAQmxGetDevDOLines(name.c_str(), buffer, bufferSize) != 0)
 				{
 					MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevAIPhysicalChans() failed to resolve channels.\n", S_OK | MB_ICONERROR);
 					evt.Skip();
@@ -2331,7 +2385,7 @@ void cDaqmx::OnDaqChanTypeModified(wxCommandEvent& evt)
 
 	// Check if it is comapatible with current DAQ
 	int32 meas_types[64]; memset(meas_types, 0, sizeof(meas_types)); // officially 29 different type is supported put 64 to be sure there is enought space for further NI API updates
-	if (0 != DAQmxGetDevAISupportedMeasTypes(config.device_name.c_str(), meas_types, sizeof(meas_types)))
+	if (0 != mDAQmxGetDevAISupportedMeasTypes(config.device_name.c_str(), meas_types, sizeof(meas_types)))
 	{
 		MessageBox(0, L"Fail to check supported types.", L"DAQmxGetDevAISupportedMeasTypes Failure", 0);
 		return;
@@ -2465,7 +2519,7 @@ void cDaqmx::OnChannelBtnNumberCliqued(wxCommandEvent& evt)
 bool cDaqmx::isDeviceMeasurable(std::string dev_name)
 {
 	int32 dev_cat = 0;
-	if (DAQmxGetDevProductCategory(dev_name.c_str(), &dev_cat) != 0)
+	if (mDAQmxGetDevProductCategory(dev_name.c_str(), &dev_cat) != 0)
 	{
 		//MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevProductCategory() failed to resolve product category.\n", S_OK);
 		return false;

@@ -59,6 +59,11 @@ typedef int32(*DAQmxReadDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerC
 typedef int32(*DAQmxWriteDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32* sampsPerChanWritten, bool32* reserved);
 typedef int32(*DAQmxGetTaskNumChans_)(TaskHandle taskHandle, uInt32* data);
 
+typedef int32(*DAQmxGetDevProductCategory_)(const char device[], int32* data);
+typedef int32(*DAQmxGetDevDOLines_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetSysDevNames_)(char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetDevAIPhysicalChans_)(const char device[], char* data, uInt32 bufferSize);
+
 DAQmxSelfTestDevice_ mDAQmxSelfTestDevice;
 DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
 DAQmxGetDevProductType_ mDAQmxGetDevProductType;
@@ -78,6 +83,12 @@ DAQmxReadAnalogF64_ mDAQmxReadAnalogF64;
 DAQmxReadDigitalLines_ mDAQmxReadDigitalLines;
 DAQmxWriteDigitalLines_ mDAQmxWriteDigitalLines;
 DAQmxGetTaskNumChans_ mDAQmxGetTaskNumChans;
+
+DAQmxGetDevProductCategory_ mDAQmxGetDevProductCategory;
+DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
+DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
+DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
+
 
 bool load_ni_daq_dll(HMODULE* hNidaq)
 {
@@ -162,6 +173,19 @@ bool load_ni_daq_ptrs(HMODULE* hNidaq)
 	mDAQmxGetTaskNumChans = (DAQmxGetTaskNumChans_)GetProcAddress(*hNidaq, "DAQmxGetTaskNumChans");
 	if (!mDAQmxGetTaskNumChans) { std::cerr << "Failed to get address for DAQmxGetTaskNumChans" << std::endl; return false; }
 	std::print("[*] DAQmxGetTaskNumChans address loaded: {}\n", (void*)mDAQmxGetTaskNumChans);
+	mDAQmxGetDevProductCategory = (DAQmxGetDevProductCategory_)GetProcAddress(*hNidaq, "DAQmxGetDevProductCategory");
+	if (!mDAQmxGetDevProductCategory) { std::cerr << "Failed to get address for DAQmxGetDevProductCategory" << std::endl; return false; }
+	std::print("[*] DAQmxGetDevProductCategory address loaded: {}\n", (void*)mDAQmxGetDevProductCategory);
+	mDAQmxGetDevDOLines = (DAQmxGetDevDOLines_)GetProcAddress(*hNidaq, "DAQmxGetDevDOLines");
+	if (!mDAQmxGetDevDOLines) { std::cerr << "Failed to get address for DAQmxGetDevDOLines" << std::endl; return false; }
+	std::print("[*] DAQmxGetDevDOLines address loaded: {}\n", (void*)mDAQmxGetDevDOLines);
+	mDAQmxGetSysDevNames = (DAQmxGetSysDevNames_)GetProcAddress(*hNidaq, "DAQmxGetSysDevNames");
+	if (!mDAQmxGetSysDevNames) { std::cerr << "Failed to get address for DAQmxGetSysDevNames" << std::endl; return false; }
+	std::print("[*] DAQmxGetSysDevNames address loaded: {}\n", (void*)mDAQmxGetSysDevNames);
+	mDAQmxGetDevAIPhysicalChans = (DAQmxGetDevAIPhysicalChans_)GetProcAddress(*hNidaq, "DAQmxGetDevAIPhysicalChans");
+	if (!mDAQmxGetDevAIPhysicalChans) { std::cerr << "Failed to get address for DAQmxGetDevAIPhysicalChans" << std::endl; return false; }
+	std::print("[*] DAQmxGetDevAIPhysicalChans address loaded: {}\n", (void*)mDAQmxGetDevAIPhysicalChans);
+
 
 	return true;
 }

@@ -15,9 +15,9 @@ class cMeasurement;
 #include "cMeasurement.h"
 
 #ifdef _WIN64
-#pragma comment (lib, "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\lib64\\msvc\\NIDAQmx.lib")
+//#pragma comment (lib, "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\lib64\\msvc\\NIDAQmx.lib")
 #else
-#pragma comment (lib, "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\lib32\\msvc\\NIDAQmx.lib")
+//#pragma comment (lib, "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\lib32\\msvc\\NIDAQmx.lib")
 #endif
 
 // Must Install Nationnal Instrument DAQmx Lib freely available here:

@@ -6,6 +6,8 @@
 #define IDB_PNG1                        102
 #define IDB_PNG2                        103
 #define IDB_BITMAP1                     104
+#define IVIDRIVER                     10004
+//#define GNUPLOT                     10004
 
 // Next default values for new objects
 // 

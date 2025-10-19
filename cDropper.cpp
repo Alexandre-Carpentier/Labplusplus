@@ -40,15 +40,15 @@ bool cDropper::install_visa()
 
 bool cDropper::install_gnuplot()
 {
-	if (!decompress_sysfile(L"GNUPLOT", L"BINARY", L"gp603-win64-mingw.exe"))
-	{
-		std::print("[*] gp603-win64-mingw.exe uncompressed failed\n");
-		return false;
-	}
+	//if (!decompress_sysfile(L"GNUPLOT", L"RCDATA", L"gp603.exe.exe"))
+	//{
+	//	std::print("[*] gp603.exe.exe uncompressed failed\n");
+	//	return false;
+	//}
 
-	std::print("[*] gp603-win64-mingw.exe uncompressed success\n");
-	system("gp603-win64-mingw.exe");
-	std::print("[*] calling: \"gp603-win64-mingw.exe\"\n");
+	//std::print("[*] gp603.exe.exe uncompressed success\n");
+	system("gp603.exe.exe");
+	std::print("[*] calling: \"gp603.exe.exe\"\n");
 
 	return true;
 }

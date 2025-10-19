@@ -30,6 +30,11 @@ typedef int32(*DAQmxReadDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerC
 typedef int32(*DAQmxWriteDigitalLines_)(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32* sampsPerChanWritten, bool32* reserved);
 typedef int32(*DAQmxGetTaskNumChans_)(TaskHandle taskHandle, uInt32* data);
 
+typedef int32 (*DAQmxGetDevProductCategory_)(const char device[], int32* data);
+typedef int32(*DAQmxGetDevDOLines_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetSysDevNames_)(char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetDevAIPhysicalChans_)(const char device[], char* data, uInt32 bufferSize);
+
 extern DAQmxSelfTestDevice_ mDAQmxSelfTestDevice;
 extern DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
 extern DAQmxGetDevProductType_ mDAQmxGetDevProductType;
@@ -49,6 +54,13 @@ extern DAQmxReadAnalogF64_ mDAQmxReadAnalogF64;
 extern DAQmxReadDigitalLines_ mDAQmxReadDigitalLines;
 extern DAQmxWriteDigitalLines_ mDAQmxWriteDigitalLines;
 extern DAQmxGetTaskNumChans_ mDAQmxGetTaskNumChans;
+
+extern DAQmxGetDevProductCategory_ mDAQmxGetDevProductCategory;
+
+extern DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
+extern DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
+extern DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
+
 
 cNiDaq::cNiDaq()
 {

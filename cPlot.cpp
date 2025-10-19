@@ -482,13 +482,13 @@ void cPlot::SizeGraph()
 
 void cPlot::RenderGraph()
 {
-	std::print("[*] Render\n");
+	//std::print("[*] Render\n");
 	plot->Render();
 }
 
 void cPlot::Refresh()
 {
-	std::print("[*] Render\n");
+	//std::print("[*] Render\n");
 	plot->Refresh();
 }
 
