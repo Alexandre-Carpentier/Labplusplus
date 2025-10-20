@@ -4,40 +4,11 @@
 // Default instalation path is located at :
 // C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include
 #include "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\include\\NIDAQmx.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <iostream>
 #include <print>
-
-/*- Resource Manager Functions and Operations -------------------------------*/
-//typedef ViStatus(*viOpenDefaultRM_)(ViPSession vi);
-/*
-int32 __CFUNC     DAQmxSelfTestDevice(const char deviceName[]);
-int32 __CFUNC DAQmxGetDevAISupportedMeasTypes(const char device[], int32* data, uInt32 arraySizeInElements);
-int32 __CFUNC DAQmxGetDevProductType(const char device[], char* data, uInt32 bufferSize);
-int32 __CFUNC DAQmxGetDevChassisModuleDevNames(const char device[], char* data, uInt32 bufferSize);
-int32 __CFUNC     DAQmxCreateTask(const char taskName[], TaskHandle* taskHandle);
-int32 __CFUNC     DAQmxCreateAIVoltageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
-
-int32 __CFUNC     DAQmxStartTask(TaskHandle taskHandle);
-int32 __CFUNC     DAQmxStopTask(TaskHandle taskHandle);
-int32 __CFUNC     DAQmxClearTask(TaskHandle taskHandle);
-
-int32 __CFUNC     DAQmxCreateAIThrmcplChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
-int32 __CFUNC     DAQmxCreateAIThrmstrChanIex(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, float64 a, float64 b, float64 c);
-int32 __CFUNC     DAQmxCreateDIChan(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
-int32 __CFUNC     DAQmxCreateDOChan(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
-
-//*** Set/Get functions for DAQmx_Task_Channels ***
-int32 __CFUNC DAQmxGetTaskChannels(TaskHandle taskHandle, char* data, uInt32 bufferSize);
-int32 __CFUNC DAQmxGetAIMeasType(TaskHandle taskHandle, const char channel[], int32* data);
-int32 __CFUNC     DAQmxReadAnalogF64(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32* sampsPerChanRead, bool32* reserved);
-int32 __CFUNC     DAQmxReadDigitalLines(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInBytes, int32* sampsPerChanRead, int32* numBytesPerSamp, bool32* reserved);
-int32 __CFUNC     DAQmxWriteDigitalLines(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32* sampsPerChanWritten, bool32* reserved);
-
-int32 __CFUNC DAQmxGetTaskNumChans(TaskHandle taskHandle, uInt32* data);
-*/
-
 
 typedef int32(*DAQmxSelfTestDevice_)(const char deviceName[]);
 typedef int32(*DAQmxGetDevAISupportedMeasTypes_)(const char device[], int32* data, uInt32 arraySizeInElements);
@@ -88,7 +59,6 @@ DAQmxGetDevProductCategory_ mDAQmxGetDevProductCategory;
 DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
 DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
 DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
-
 
 bool load_ni_daq_dll(HMODULE* hNidaq)
 {
