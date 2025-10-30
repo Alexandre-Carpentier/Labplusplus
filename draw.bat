@@ -1,1 +1,0 @@
-chdir "C:\Program Files\gnuplot\bin\" && start gnuplot.exe
