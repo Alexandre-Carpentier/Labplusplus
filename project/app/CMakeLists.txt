@@ -125,7 +125,11 @@ add_custom_command(TARGET labapp POST_BUILD
 
 #############################################################################
 # linking
-target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
-target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
+#IRAM-BASED DATA
+target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\include")
+target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
+#HOME-BASED DATA
+#target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
+#target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
 
 message("[*] ${PROJECT_NAME} built.")
