@@ -114,7 +114,7 @@ file(GLOB_RECURSE APP_RES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
     *.rc 
 )
 
-add_executable(labapp ${APP_SOURCES} ${APP_HEADERS} ${APP_RES})
+add_executable(labapp ${APP_SOURCES} ${APP_HEADERS} ${APP_RES} "measurements/cSimPoll.cpp" "measurements/cPoller.h")
 
 # copy icon to output dir so runtime find "icon.ico"
 add_custom_command(TARGET labapp POST_BUILD

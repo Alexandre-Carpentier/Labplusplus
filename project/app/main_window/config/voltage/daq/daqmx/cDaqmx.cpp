@@ -1038,19 +1038,6 @@ cDaqmx::~cDaqmx()
 	// Serialize 
 	save_current_chan_config(label.channel_index);
 	serialize(config.device_name.ToStdString());
-
-	// Free heap memory 
-	cMeasurementmanager *meas_manager = meas_manager->getInstance();
-	bool isDestroyed = meas_manager->destroy_subsystem(MEAS_TYPE::DAQ_INSTR);
-
-	// If item destroyed delete from memory
-	if (isDestroyed)
-	{
-		std::cout << "[*] [delete] m_daq in cDaqmx.cpp\n";
-
-		delete m_daq_;
-		m_daq_ = nullptr;
-	}
 }
 
 void cDaqmx::OnPaint(wxPaintEvent& event)

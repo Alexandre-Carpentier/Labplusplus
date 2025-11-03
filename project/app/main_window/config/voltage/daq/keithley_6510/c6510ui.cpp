@@ -14,6 +14,7 @@
 
 #include "c6510sim.h"
 #include "c6510usb.h"
+#include "cObjectmanager.h"
 
 struct c6510ui::my_impl{
 

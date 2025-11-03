@@ -1,0 +1,51 @@
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# CMake / Ninja / builds
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+*.ninja
+.ninja_log
+.ninja_deps
+
+# Binaries / objects
+*.obj
+*.o
+*.pdb
+*.ilk
+
+# IntelliSense / temp
+*.ipch
+*.log
+*.tlog
+
+# IDE / editors
+.vscode/
+.idea/
+
+# vcpkg / package managers
+vcpkg_installed/
+_build/
+installed/
+
+# Secrets / credentials
+.env
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+
+# OS files
+Thumbs.db
+.DS_Store

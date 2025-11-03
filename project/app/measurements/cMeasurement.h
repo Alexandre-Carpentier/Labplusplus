@@ -16,7 +16,8 @@
 #include "cTick.h"
 #include "data_types.h"
 
-#define MAX_CHAN 64
+const short MAX_CHAN = 64;
+const short MAX_FRAME = 4096;
 
 struct DATAS
 {
@@ -25,11 +26,14 @@ struct DATAS
 	std::string unit;
 };
 
-struct CHUNKS
-{
-	size_t buffer_size;
-	double *buffer[MAX_CHAN];
-	std::string unit;
+struct CHUNK {
+	size_t buffer_size = 0;
+	std::vector<std::vector<double>> buffer; // buffer[channel][frame]
+	std::string unit = "Unit";
+
+	CHUNK(size_t channels = MAX_CHAN, size_t frames = MAX_FRAME)
+		: buffer(channels, std::vector<double>(frames, 0.0)) {
+	}
 };
 
 class cCommon : public cTick
@@ -53,7 +57,6 @@ public:
 class cMeasurement : public cCommon {
 private:
 	DATAS result_struct;
-	CHUNKS chunks_struct;
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 public:
 

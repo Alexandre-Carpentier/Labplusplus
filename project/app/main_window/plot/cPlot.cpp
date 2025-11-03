@@ -9,6 +9,7 @@
 #include "cSignalTable.h"
 #include <print>
 #include "encoding.h"
+#include "cMeasurementControler.h"
 
 cPlot::cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table)
 {
@@ -377,9 +378,8 @@ void cPlot::stop_graph()
 
 	if (TRUE == plot->GetGraphState())
 	{
-		//cMeasurementControler* meas_controler = nullptr;
-		//meas_controler = meas_manager->get_measurement_controler();
-		//meas_controler->stop();
+		std::shared_ptr<cMeasurementControler> meas_controler = meas_manager->get_measurement_controler();
+		meas_controler->stop();
 		plot->StopGraph();
 	}
 }
@@ -393,7 +393,7 @@ void cPlot::graph_addpoint(const int signb, double val[])
 	// Log the data
 	std::string elapsed = std::to_string(timestamp);
 	logger.add_value(elapsed);
-	for(size_t i=0; i< (size_t)signb; i++)
+	for(int i=0; i< signb; i++)
 	{
 		std::string s = std::to_string(val[i]);
 		logger.add_value(s);
@@ -404,10 +404,28 @@ void cPlot::graph_addpoint(const int signb, double val[])
 	plot->AddPoint(timestamp, val, signb);
 }
 
-void cPlot::graph_addpoints(const int signb, double *val[], int chunk_size)
+void cPlot::graph_addpoints(const size_t sigNb, double *values[], size_t chunkSize)
 {
-	MessageBox(0, L"Procedure graph_addpoints() not implemented.", L"Fail", S_OK);
-	//AddMultiplePoints(hGraph, val, signb, chunk_size);
+	// Get elapsed time at the first point
+	double timestamp = tick.get_tick();
+	//std::print("[*] graph_addpoint timestamp: {}\n", timestamp);
+
+	// Log the data
+	std::string elapsed = std::to_string(timestamp);
+	logger.add_value(elapsed);
+
+	for (size_t i = 0; i < chunkSize; i++)
+	{
+		for (size_t j = 0; j < sigNb; j++)
+		{
+			std::string s = std::to_string(values[i][j]);
+			logger.add_value(s);
+		}
+	}
+	logger.new_line();
+
+	// Add the point to the graph
+	plot->AddPoints(timestamp, values, sigNb, 1);
 }
 
 double cPlot::get_signal_min_value(size_t id, int SignalNumber)

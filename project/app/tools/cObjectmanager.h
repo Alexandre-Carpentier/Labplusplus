@@ -22,10 +22,11 @@ class cRender;
 #include "cConfig.h"
 #include "cMeasurementControler.h"
 
-class cObjectmanager :public cSingleton<cObjectmanager>
+//class cObjectmanager :public cSingleton<cObjectmanager>
+class cObjectmanager
 {
 private:
-	friend class cSingleton<cObjectmanager>;
+	//friend class cSingleton<cObjectmanager>;
 
 	// Gui refs
 
@@ -56,6 +57,9 @@ public:
 	void set_render(cRender* m_render);
 	void set_footer(cFooter* m_footer);
 
+	static cObjectmanager* getInstance();
+	void kill();
+
 	wxStatusBar* get_status_bar();
 	cConfig* get_config();
 	cDaqmx* get_daqmx();
@@ -69,4 +73,7 @@ public:
 	cRender* get_render();
 	cFooter* get_footer();
 };
+
+// C++
+//auto manager = cObjectmanager::getInstance();
 

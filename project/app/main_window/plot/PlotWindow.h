@@ -142,7 +142,6 @@ public:
 	~WinGraph();
 	bool StartGraph(const char* opt_header);
 	void StopGraph();
-	void FreeGraph();
 	bool SetSignalCount(const int iSignalNumber);
 	void SetSignalLabel(const char szLabel[260], const int iSignalNumber);
 	void SetSignalColor(const int R, const int G, const int B, const int iSignalNumber);
@@ -176,7 +175,7 @@ public:
 	void SignalResetStatisticValue(const int SIGNB);
 	void ShowDataInConsole();
 	void AddPoint(double timestamp, double* y, const int SignalCount);
-	void AddMultiplePoints(double** Chunks, const int SignalCount, const int BufferLength);
+	void AddPoints(double timestamp, double** y, const size_t SignalCount, size_t chunkSize);
 	bool Render_();
 	bool Render();
 	void ReshapeGraph(int left, int top, int right, int bottom);

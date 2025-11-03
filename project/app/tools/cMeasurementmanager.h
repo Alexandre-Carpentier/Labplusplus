@@ -14,16 +14,17 @@ class cDaqmx;
 class cMeasurementControler;
 class cMeasurement;
 
-class cMeasurementmanager :public cSingleton<cMeasurementmanager>
+//class cMeasurementmanager :public cSingleton<cMeasurementmanager>
+class cMeasurementmanager 
 {
 private:
-	friend class cSingleton<cMeasurementmanager>;
+	//friend class cSingleton<cMeasurementmanager>;
 
 	std::shared_ptr<cMeasurementControler> m_meas_controler_;
 	std::vector <cMeasurement*> m_meas_pool;
 	size_t signal_number = 0;
 public:
-
+	static cMeasurementmanager* getInstance();
 	void set_measurement_controler(std::shared_ptr<cMeasurementControler> m_controler);
 	void set_measurement(cMeasurement* measurement);
 

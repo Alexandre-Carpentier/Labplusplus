@@ -1253,116 +1253,138 @@ void WinGraph::AddPoint(double timestamp, double* y, const int SignalCount)
 /*-------------------------------------------------------------------------
 	AddMultiplePoints: Add a chunk of data in the graph buffer for each signal count
   -------------------------------------------------------------------------*/
-void WinGraph::AddMultiplePoints(double** Chunks, int SignalCount, int BufferLength)
+void WinGraph::AddPoints(double timestamp, double** y, const size_t SignalCount, size_t chunkSize)
 {
-	/*
-	if (cs.DebugInfo == NULL)
-	{
-		printf("[!] Error at AddMultiplePoints() critical section not available\n");
-		return;
-	}
-	*/
-
-	// Sanity check
-
 	if (false == m_graph.bRunning)
 	{
-		printf("[!] Error at AddMultiplePoints() graph not strated\n");
+		printf("[!] Error at AddPoint() graph not strated\n");
 		return;
 	}
 
-	// TODO: Check if signalcount = length of y!
+		// Check if signalcount = length of y!
 
 	if (m_graph.signalcount != SignalCount)
 	{
-		printf("[!] Error at AddMultiplePoints() signalcount not egual to y length\n");
+		printf("[!] Error at AddPoint() signalcount not egual to y length\n");
 		return;
 	}
 
 	EnterCriticalSection(&cs);
 
-	// If the maximum points are reached 
-	// in the buffer, shift left the array and
-	// dec the current number of points
+		//transfert recording to the second half arrays
 
-	size_t graph_overflow = m_graph.BufferSize - (m_graph.cur_nbpoints + BufferLength);
-	if (graph_overflow <= 0)
+	int offset = 0;
+	if (m_graph.bAutoscale == false && m_graph.bSwapDone == true)
 	{
-		graph_overflow = abs((int)graph_overflow);															//Absolute value
+		offset = m_graph.signalcount;
+	}
 
-		for (int index = 0; index < m_graph.signalcount; index++)
+		// If the maximum points are reached 
+		// in the buffer, shift left the array and
+		// dec the current number of points
+
+	if (m_graph.cur_nbpoints == m_graph.BufferSize)
+	{
+		for (int index = 0 + offset; index < m_graph.signalcount + offset; index++)
 		{
-
-			for (int j = 0; j < m_graph.BufferSize - graph_overflow; j++)
+			for (int j = 0; j < m_graph.BufferSize - 1; j++)
 			{
-				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + graph_overflow];																// Shift left X
-				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + graph_overflow];																// Shift left Y
+				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + 1];																// Shift left X
+				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + 1];																// Shift left Y
 			}
 		}
-		m_graph.cur_nbpoints = m_graph.BufferSize - graph_overflow;
+		m_graph.cur_nbpoints--;																				// Update the current POINT number
 	}
-	LeaveCriticalSection(&cs);
 
-	// Save the actual timestamp
+		// Save the actual timestamp
 
 	if (m_graph.cur_nbpoints == 0)
 	{
+		timestamp = 0;
 		finish = start;
 	}
 	else
 	{
 		finish = PerformanceCounter();
 	}
-
-	EnterCriticalSection(&cs);
-	for (int index = 0; index < m_graph.signalcount; index++)
+	for (size_t chunkIndex = 0; chunkIndex < chunkSize; chunkIndex++)
 	{
-
-		// Add points to the selected buffer	
-		double x_step = ((double)((finish - start)) / frequency) / BufferLength;
-		for (size_t i = 0; i < BufferLength; i++)
+		for (int index = 0 + offset; index < m_graph.signalcount + offset; index++)
 		{
-			m_graph.signals[index].X[m_graph.cur_nbpoints + i] = x_step * i;												// Save in X the elapsed time from start
-		}
 
-		for (size_t i = 0; i < BufferLength; i++)
-		{
-			m_graph.signals[index].Y[m_graph.cur_nbpoints + i] = Chunks[index][i];													// Save Y										
-		}
+			// Is filter enable ?
 
+			if (m_graph.signals[index].filter != FILTER_NONE)
+			{
+				// Low pass filter 
 
-		// Perform some statistics
+				if (m_graph.signals[index].filter == FILTER_EMA)
+				{
+					//double a = 0.1; // Custom cut freq 
+					float a = m_graph.signals[index].filter_threshold;
+					if (m_graph.cur_nbpoints == 0)
+						y[index][chunkIndex] = y[index][chunkIndex]; // First POINT skip to prevent INF
+					else
+						y[index][chunkIndex] = a * y[index][chunkIndex] + (1 - a) * m_graph.signals[index].Y[m_graph.cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
+				}
 
-		// period
-		m_graph.signals[index].stat.period_s = m_graph.signals[index].X[m_graph.cur_nbpoints] - m_graph.signals[index].X[0];								// Update current period
+				// Hanning window filter
 
-		//min
-		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] < m_graph.signals[index].stat.min_value)
-		{
-			m_graph.signals[index].stat.min_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current min value displayed
-		}
+				if (m_graph.signals[index].filter == FILTER_HANNING) // experimental (not properly working)
+				{
+					std::print("[!] HANNING not implemented\n");
+				}
 
-		//average
-		if (m_graph.cur_nbpoints > 0)
-		{
-			m_graph.signals[index].stat.average_value_accumulator += m_graph.signals[index].Y[m_graph.cur_nbpoints];
-			m_graph.signals[index].stat.average_value_counter++;
+				// Besel filter
+				
+				if (m_graph.signals[index].filter == FILTER_BESEL)
+				{
+					std::print("[!] BESEL not implemented\n");
+				}
+			}
 
-			m_graph.signals[index].stat.average_value = m_graph.signals[index].stat.average_value_accumulator / m_graph.signals[index].stat.average_value_counter;
-		}
+			// Add points to the selected buffer	
 
-		//max
-		if (m_graph.signals[index].Y[m_graph.cur_nbpoints] > m_graph.signals[index].stat.max_value)
-		{
-			m_graph.signals[index].stat.max_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current max value displayed
+			m_graph.signals[index].X[m_graph.cur_nbpoints] = timestamp;							// Save in X the elapsed time from start
+			m_graph.signals[index].Y[m_graph.cur_nbpoints] = y[index - offset][chunkIndex];															// Save Y
+
+			// Perform some statistics
+
+			// period
+
+			m_graph.signals[index].stat.period_s = m_graph.signals[index].X[m_graph.cur_nbpoints] - m_graph.signals[index].X[0];								// Update current period
+
+			//min
+
+			if (m_graph.signals[index].Y[m_graph.cur_nbpoints] < m_graph.signals[index].stat.min_value)
+			{
+				m_graph.signals[index].stat.min_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current min value displayed
+			}
+
+			//average
+
+			if (m_graph.cur_nbpoints > 0)
+			{
+				m_graph.signals[index].stat.average_value_accumulator += m_graph.signals[index].Y[m_graph.cur_nbpoints];
+				m_graph.signals[index].stat.average_value_counter++;
+
+				m_graph.signals[index].stat.average_value = m_graph.signals[index].stat.average_value_accumulator / m_graph.signals[index].stat.average_value_counter;
+			}
+
+			//max
+
+			if (m_graph.signals[index].Y[m_graph.cur_nbpoints] > m_graph.signals[index].stat.max_value)
+			{
+				m_graph.signals[index].stat.max_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current max value displayed
+			}
 		}
 	}
 
-	// Inc the number of points
-
-	m_graph.cur_nbpoints = m_graph.cur_nbpoints + BufferLength;
+	m_graph.cur_nbpoints++;
 
 	LeaveCriticalSection(&cs);
+
+	return;
 }
 /*-------------------------------------------------------------------------
 	Render_: FAKE MOCK
@@ -1476,7 +1498,7 @@ bool WinGraph::Render()
 	// Draw graph frame and grid
 	if (GetGraphState() == false)
 	{
-		printf("[*] Graph state is false\n");
+		//printf("[*] Graph state is false\n");
 	}
 
 	DrawGraphSquare();

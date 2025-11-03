@@ -23,6 +23,7 @@
 #include <wx/sizer.h>
 #include "types.h"
 #include "cDeviceBuilder.h"
+#include "cDevice.h"
 
 // Entrypoint to load custom GUI
 extern "C"

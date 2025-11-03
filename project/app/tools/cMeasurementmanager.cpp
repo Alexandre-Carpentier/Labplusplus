@@ -8,6 +8,13 @@
 #include "cMeasurementmanager.h"
 #include "cMeasurementControler.h"
 
+cMeasurementmanager* cMeasurementmanager::getInstance()
+{
+	static cMeasurementmanager instance;
+	return &instance;
+}
+
+
 void cMeasurementmanager::set_measurement_controler(std::shared_ptr<cMeasurementControler> m_controler)
 {
 	m_meas_controler_ = m_controler;

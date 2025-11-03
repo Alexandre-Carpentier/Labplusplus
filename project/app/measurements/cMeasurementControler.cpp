@@ -5,9 +5,10 @@
 // Copyright:   (c) Alexandre CARPENTIER
 // Licence:     LGPL-2.1-or-later
 /////////////////////////////////////////////////////////////////////////////
+
 #include "cMeasurementControler.h"
 
-#include "cCycleControler.h"
+
 #include "cMeasurement.h"
 #include "cMeasurementmanager.h"
 #include "cObjectmanager.h"
@@ -18,7 +19,25 @@
 
 #include <Windows.h>
 
+#include "cPoller.h"
+#include <algorithm>
+#include <print>
 
+void zero_instrument(std::vector<cMeasurement*> meas_pool)
+{
+	assert(meas_pool.size() > 0);
+
+	for (auto meas : meas_pool)
+	{
+		// Write data = 0 to every instruments 
+		size_t length = meas->chan_write_count();
+		if (length > 0)
+		{
+			std::vector<double> values(length, 0.0);
+			meas->set(values.data(), length);
+		}
+	}
+}
 
 bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
 {
@@ -39,46 +58,87 @@ bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, siz
 	return true;
 }
 
-void zero_instrument(std::vector<cMeasurement*> meas_pool)
-{
-	assert(meas_pool.size() > 0);
-
-	for (auto meas : meas_pool)
-	{
-		// Write data to instrument (controler)
-		size_t length = meas->chan_write_count();
-		if (length > 0)
-		{
-			double* values = new double(length);
-			assert(values != nullptr);
-			if (values != nullptr)
-			{
-				memset(values, 0.0, sizeof(double) * length);
-				meas->set(values, length);
-				delete(values);
-			}
-		}
-	}
-}
-
 void cMeasurementControler::poll()
 {
-	assert(m_cyclecontroler_->get_total_loop() > 0);
-	assert(m_cyclecontroler_->get_total_step() > 0);
-	assert(m_cyclecontroler_->get_total_step() < 300);
-	assert(m_cyclecontroler_->get_current_loop() > 0);
-	//assert(m_cyclecontroler_->get_current_step() == 0); // might fail if call is long...
-	std::cout << m_cyclecontroler_->get_current_step() << "\n";
+	cTick m_tick;
+	double m_time = 0.0;
 
-	std::cout << "cMeasurementcontroler->get_stop_token...\n";
+		// Get stop signal from jthread
+
+	std::print("[*] cMeasurementcontroler->get_stop_token()... \n");
 	auto st = measurement_controler_thread.get_stop_token();
 
+		// Get external references
+
+	cObjectmanager* object_manager = object_manager->getInstance();
+	cMeasurementmanager* meas_manager = meas_manager->getInstance();
+	m_footer_ = object_manager->get_footer();
+	std::vector<cMeasurement*> meas_pool = meas_manager->get_measurement_pool();
+	assert(object_manager != nullptr); 
+	assert(meas_manager != nullptr);
+	assert(m_footer_ != nullptr);
+	assert(meas_pool.size() >0);
+
+		// Get the available step to perform
+
+	std::cout << m_cyclecontroler->get_current_step() << "\n";
+
+		// Choose implementation 
+
+	Poller obj = cSimplePoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
+
+		// Handle frequency rate
+
+	wxString frequency = m_footer_->freq->GetValue();
+	frequency.ToCDouble(&freq_s_);
+	m_tick.start_tick();
+
+		// Start job
+
+	std::visit([](auto&& arg) {arg.runonce(); }, obj);
+	while (!st.stop_requested())
+	{
+			// Do work
+
+		m_time = m_tick.get_tick();
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		if (m_time > (freq_s_ / 1000))
+		{
+			m_tick.start_tick();
+			std::visit([](auto&& arg) {arg.loop(); }, obj);	
+			m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), m_time * 1000));// Update acquire rate
+		}
+	}
+	std::visit([](auto&& arg) {arg.stop(); }, obj);
+
+		// Exit thread
+
+	std::print("[*] cMeasurementcontroler->exiting thread... \n");
+	return;
+
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////
+
+
+
+
+	/*
 	meas_pool = meas_manager->get_measurement_pool();
 	std::cout << "cMeasurementcontroler->polling...\n";
 
 	DATAS val;
-	CHUNKS chunks;
-	double Y[80]; memset(Y, 0, sizeof(Y));
+	CHUNK chunk;
+
+	double* Y[80];
+	*Y = new double[2];
+	*(Y + 1) = new double[2];
+	Y[0][0] = -1.0;
+	Y[0][1] = -1.0;
+	Y[1][0] = -2.0;
+	Y[1][1] = -2.0;
+	
+	//memset(Y, 0, sizeof(Y));
 	cTick tick;
 	double time = 0.0;
 
@@ -105,7 +165,7 @@ void cMeasurementControler::poll()
 			}
 		}
 
-		int buffer_index = 0;
+		int buffer_len = 0;
 		for (auto meas : meas_pool)
 		{
 			// Write data to instrument (controler)
@@ -118,16 +178,17 @@ void cMeasurementControler::poll()
 				memset(values, 0.0, length*sizeof(double));
 				meas->set(values, length);
 			}
+
 			// Read data from instrument
 			val = meas->read();
-			for (size_t c = buffer_index; c < val.buffer_size; c++)
+			for (size_t c = buffer_len; c < val.buffer_size; c++)
 			{
-				Y[c] = val.buffer[c];
+				Y[c][0] = val.buffer[c];
 
 				// prepare send to observers
 				//currentValues.add_values(meas->device_name(), Y[c]);
 
-				buffer_index++;
+				buffer_len++;
 			}
 		}
 
@@ -135,15 +196,17 @@ void cMeasurementControler::poll()
 		//currentValues.clear();
 
 		// Add the first point to update min avg max value in indicator
-		m_plot_->graph_addpoint(buffer_index, Y);
-		memset(Y, 0, sizeof(Y));
+		m_plot_->graph_addpoints(buffer_len, Y, 1);
+
+		*Y[0] = -1.0;
+		*Y[1] = -1.0;
 
 		// Update min avg max value
 
-			for (int z = 0; z < buffer_index; z++)
-			{
-				m_plot_->reset_chan_statistic_by_signal_position(z);
-			}
+		for (int z = 0; z < buffer_len; z++)
+		{
+			m_plot_->reset_chan_statistic_by_signal_position(z);
+		}
 
 		// Update acquire rate
 		m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));
@@ -188,8 +251,6 @@ void cMeasurementControler::poll()
 				std::vector<double> read_pool;
 				for (auto meas : meas_pool)
 				{
-					std::unique_ptr<double> value ;
-
 						MEAS_TYPE type = meas->device_type();
 		
 						switch (type)
@@ -278,11 +339,12 @@ void cMeasurementControler::poll()
 
 				//this->notify(static_cast<void*>(&currentValues));
 				//currentValues.clear();
+				double** read_pool_ptr = new double* [2];
+				read_pool_ptr[0] = &read_pool[0];
+				read_pool_ptr[1] = &read_pool[1];
 
 				assert(read_pool.size() > 0);
-				m_plot_->graph_addpoint(read_pool.size(), &read_pool.at(0));
-				//memset(Y, 0, sizeof(Y));
-
+				m_plot_->graph_addpoints(read_pool.size(), read_pool_ptr, 1);
 
 				// Update acquire rate
 				m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), time * 1000));
@@ -291,35 +353,24 @@ void cMeasurementControler::poll()
 		}
 	}
 	// TODO:
-	// it doesn't called 
+	// doesn't called 
 	if (meas_pool.size() > 0)
 	{
 		zero_instrument(meas_pool);
 	}
 
-
+	
 	std::cout << "cMeasurementcontroler->exiting thread... \n";
 	return;
+	*/
 }
 
 void cMeasurementControler::start()
 {
 	std::cout << "[*] cMeasurementcontroler->starting called\n";
-	obj_manager = obj_manager->getInstance();
-	m_plot_ = obj_manager->get_plot();
-	m_footer_ = obj_manager->get_footer();
-	meas_manager = meas_manager->getInstance();
-
-	//meas_pool = meas_manager->get_measurement_pool();
-
-	//control_thread = std::thread([this, meas_pool]() { this->poll(meas_pool); });
-	//std::thread control_thread(&cMeasurementControler::poll, this);
-	//control_thread.detach();
-
-	//control_thread.detach();
-	//cMeasurementControler::control_thread = std::thread(&cMeasurementControler::poll, this);
-
-	measurement_controler_thread = std::jthread(&cMeasurementControler::poll, this);	
+	measurement_controler_thread = std::jthread([this](std::stop_token st){
+		this->poll();
+		});
 	std::cout << "[*] cMeasurementcontroler->started\n";
 }
 

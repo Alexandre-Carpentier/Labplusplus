@@ -207,15 +207,16 @@ int cNiDaq::launch_device()
             if (config_struct_.channel_mode.at(c) == CHANANALOG)
             {
                 analog_count++;
-                char* Cscalename = NULL;
+                //char* Cscalename = NULL;
                 int DAQ_customscale = DAQmx_Val_Volts;
                 if (config_struct_.channel_linearize[c].compare("No") != 0)
                 {
                     DAQ_customscale = DAQmx_Val_Volts;
 
                     std::string scale_name = config_struct_.channel_linearize[c].ToStdString();
-                    Cscalename = new char[scale_name.length() + 1];
-                    strcpy(Cscalename, scale_name.c_str());
+                    //Cscalename = new char[scale_name.length() + 1];
+                    //strcpy(Cscalename, scale_name.c_str());
+
                     double scale_slope = 0.0;
                     config_struct_.channel_linearize_slope[c].ToCDouble(&scale_slope);
                     double scale_intercept = 0.0;

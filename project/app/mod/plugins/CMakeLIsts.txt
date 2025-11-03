@@ -16,16 +16,23 @@ project(plugins)
 
 
 # Find every .cpp and .h 
-file(GLOB APP_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
+file(GLOB_RECURSE APP_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
     *.cpp
     *.c
 )
 
-file(GLOB APP_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
+file(GLOB_RECURSE APP_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
     *.h
     *.hpp
 )
 include_directories(/)
-add_library(plugins cLoader.cpp cLoader.h)
+
+message("[*] Building ${PROJECT_NAME} v${PROJECT_VERSION}")
+
+add_library(plugins STATIC)
+target_sources(plugins PRIVATE ${APP_SOURCES} ${APP_HEADERS})
+
 target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
-target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua")
+target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\")
+
+message("[*] Building ${PROJECT_NAME} complete")

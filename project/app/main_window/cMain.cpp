@@ -34,6 +34,8 @@
 
 #include "resource.h"
 
+#include "cObjectmanager.h"
+
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 EVT_TOOL(IDTOOL_OPENBTN, cMain::openButtonClicked)
 EVT_TOOL(IDTOOL_SAVEBTN, cMain::saveButtonClicked)
@@ -406,6 +408,8 @@ cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++ logger - Alexandre CARPENTIER
 	//wxSize s; s.SetWidth(600); s.SetHeight(600);
 	//this->SetMinSize(s);
 	//this->SetClientSize(this->FromDIP(wxSize(400, 300)));
+
+	cMeasurementmanager meas_manager;
 }
 
 void cMain::OnCloseWindow(wxCloseEvent& event)
@@ -415,27 +419,20 @@ void cMain::OnCloseWindow(wxCloseEvent& event)
 
 cMain::~cMain()
 {
+	////////////////////////////////////////////////////////////////////////////////
+	// OBJECT MANAGER
+	////////////////////////////////////////////////////////////////////////////////
+	std::cout << "cObjectmanager->getInstance()\n";
+	cObjectmanager* manager = manager->getInstance();
+	manager->kill();
+
+
 	if (this->GetHWND())
 	{
 		ShutdownBlockReasonDestroy(this->GetHWND());
 	}
 
 	std::cout << "cfg_saver, m_table, m_config, m_plot, m_graphrender, m_statrender, m_footer deleted in cMain.cpp\n";
-	//delete m_table;
-	//delete m_plot;
-	//delete m_footer;
-	//delete m_config;
-
-	//cfg_saver = nullptr; 
-	//m_config = nullptr;
-	//m_plot = nullptr;
-	//m_footer = nullptr;
-
-	// destroy singleton
-	std::cout << "cObjectmanager->getInstance()\n";
-	cObjectmanager* manager = manager->getInstance();
-	manager->kill();
-
 #ifdef _DEBUG
 	//_CrtDumpMemoryLeaks();
 #endif

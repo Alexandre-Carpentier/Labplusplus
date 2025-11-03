@@ -10,23 +10,25 @@
 #include <vector>
 #include <iostream>
 #include "cObserver.h"
+#include "cCycleControler.h"
 
 class cObjectmanager;
 class cMeasurementmanager;
 class cPlot;
 class cFooter;
 class cMeasurement;
-class cCycleControler;
+
+void zero_instrument(std::vector<cMeasurement*> meas_pool);
+bool get_instr_setpoint(cMeasurement* meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t* read);
 
 class cMeasurementControler : public currentValueObserved
 {
 private:
 	std::jthread measurement_controler_thread;
 	CURRENT_VALUE_STRUCT currentValues;
+	std::shared_ptr<cCycleControler> m_cyclecontroler;
 public:
-	std::shared_ptr<cCycleControler> m_cyclecontroler_;
 
-	//std::thread control_thread;
 	double freq_s_ = 0.0;
 
 	cObjectmanager* obj_manager = nullptr;
@@ -34,12 +36,12 @@ public:
 	cPlot* m_plot_ = nullptr;
 	cFooter* m_footer_ = nullptr;
 
-	std::vector<cMeasurement*> meas_pool;
+	//std::vector<cMeasurement*> meas_pool;
 
 public:
-	cMeasurementControler(std::shared_ptr<cCycleControler> m_cyclecontroler)
+	cMeasurementControler(std::shared_ptr<cCycleControler> cyclecontroler)
 	{
-		m_cyclecontroler_ = m_cyclecontroler;
+		m_cyclecontroler = cyclecontroler;
 	}
 	~cMeasurementControler()
 	{
