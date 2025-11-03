@@ -27,5 +27,9 @@ file(GLOB APP_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
 )
 include_directories(/)
 add_library(plugins cLoader.cpp cLoader.h)
-target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
-target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua")
+#IRAM-Based include and link directories for Lua and wxWidgets
+target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\include")
+target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua")
+#HOME-Based include and link directories for Lua and wxWidgets
+#target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
+#target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua")
