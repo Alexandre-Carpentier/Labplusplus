@@ -27,9 +27,14 @@ file(GLOB_RECURSE APP_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEP
 )
 include_directories(/)
 add_library(plugins cLoader.cpp cLoader.h)
+
+set(USE_IRAM_BUILD OFF)
+if(USE_IRAM_BUILD)
 #IRAM-Based include and link directories for Lua and wxWidgets
 target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\include")
 target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua")
+else()
 #HOME-Based include and link directories for Lua and wxWidgets
-#target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
-#target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua")
+target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
+target_link_libraries(plugins PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua")
+endif()
