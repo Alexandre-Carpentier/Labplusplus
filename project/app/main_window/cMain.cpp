@@ -426,7 +426,6 @@ cMain::~cMain()
 	cObjectmanager* manager = manager->getInstance();
 	manager->kill();
 
-
 	if (this->GetHWND())
 	{
 		ShutdownBlockReasonDestroy(this->GetHWND());
@@ -436,7 +435,6 @@ cMain::~cMain()
 #ifdef _DEBUG
 	//_CrtDumpMemoryLeaks();
 #endif
-
 }
 
 void cMain::openButtonClicked(wxCommandEvent& evt)

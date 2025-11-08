@@ -11,6 +11,13 @@
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 23)
 
+set(USE_IRAM_BUILD OFF)
+if(USE_IRAM_BUILD)
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+ #"CMAKE_TOOLCHAIN_FILE": "/DEV/00-BIN/01-vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake"
+else()
+ endif()
+
 project(plugins)
 
 
@@ -28,7 +35,6 @@ file(GLOB_RECURSE APP_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEP
 include_directories(/)
 add_library(plugins cLoader.cpp cLoader.h)
 
-set(USE_IRAM_BUILD OFF)
 if(USE_IRAM_BUILD)
 #IRAM-Based include and link directories for Lua and wxWidgets
 target_include_directories(plugins PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\include")

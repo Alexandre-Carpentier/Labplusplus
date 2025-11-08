@@ -39,7 +39,7 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 	}
 }
 
-bool get_instr_setpoint(cMeasurement *meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
+bool get_instr_setpoint(cMeasurement* meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
 {
 	std::string dev_name = meas->device_name();
 	assert(dev_name.size() > 0);

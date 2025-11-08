@@ -9,6 +9,12 @@
 #go modern
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_VERSION_CXX 23)
+set(USE_IRAM_BUILD OFF)
+if(USE_IRAM_BUILD)
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+ #"CMAKE_TOOLCHAIN_FILE": "/DEV/00-BIN/01-vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake"
+else()
+ endif()
 
 #MSVC hot reload
 if(WIN32)
@@ -126,10 +132,20 @@ add_custom_command(TARGET labapp POST_BUILD
 #############################################################################
 # linking
 #IRAM-BASED DATA
-target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\include")
-target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
+#target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\include")
+#target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
 #HOME-BASED DATA
 #target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
 #target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
+
+if(USE_IRAM_BUILD)
+#IRAM-Based include and link directories for Lua and wxWidgets
+target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\include")
+target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
+else()
+#HOME-Based include and link directories for Lua and wxWidgets
+target_include_directories(labapp PRIVATE ${LUA_INCLUDE_DIR} "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\include")
+target_link_libraries(labapp PRIVATE ${wxWidgets_LIBRARIES} ${LUA_LIBRARIES} logging "Winusb.lib" "C:\\DEV\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib")
+endif()
 
 message("[*] ${PROJECT_NAME} built.")

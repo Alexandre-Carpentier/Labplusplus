@@ -60,10 +60,8 @@ void cSimPoll::read_instruments()
 {
 	std::print("[*] cSimPoll read from instruments\n");
 	double val1 = 12.0 + rand() % 2;
-	double val2 = 12.5 + rand() % 3;
-	double** read_pool_ptr = new double* [2];
+	std::unique_ptr<double* []> read_pool_ptr = std::make_unique<double* [], 0>(1);
 	read_pool_ptr[0] = &val1;
-	read_pool_ptr[1] = &val2;
-	m_plot->graph_addpoints(2, read_pool_ptr, 1);
+	m_plot->graph_addpoints(1, std::move(read_pool_ptr), 1);
 	return;
 }

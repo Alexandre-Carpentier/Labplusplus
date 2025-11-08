@@ -404,7 +404,7 @@ void cPlot::graph_addpoint(const int signb, double val[])
 	plot->AddPoint(timestamp, val, signb);
 }
 
-void cPlot::graph_addpoints(const size_t sigNb, double *values[], size_t chunkSize)
+void cPlot::graph_addpoints(const size_t sigNb, std::unique_ptr<double* []> values, size_t chunkSize)
 {
 	// Get elapsed time at the first point
 	double timestamp = tick.get_tick();
@@ -425,7 +425,7 @@ void cPlot::graph_addpoints(const size_t sigNb, double *values[], size_t chunkSi
 	logger.new_line();
 
 	// Add the point to the graph
-	plot->AddPoints(timestamp, values, sigNb, 1);
+	plot->AddPoints(timestamp, std::move(values), sigNb, 1);
 }
 
 double cPlot::get_signal_min_value(size_t id, int SignalNumber)

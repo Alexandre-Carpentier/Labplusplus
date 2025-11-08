@@ -187,9 +187,9 @@ err_struct cVisa::read(std::wstring& scpi)
 		assert(msg_str.size() > 0);
 	
 		// remove forbiden character or corrupted bytes
-		int old_length = msg_str.size();
+		size_t old_length = msg_str.size();
 		msg_str.erase(remove_if(msg_str.begin(), msg_str.end(), [](char c) {return !(c >= 0 && c < 128); }), msg_str.end());
-		int new_length = msg_str.size();
+		size_t new_length = msg_str.size();
 		if (new_length < old_length)
 		{
 			std::cout << "[!] Corrupted data received at cVisa::read()\n";

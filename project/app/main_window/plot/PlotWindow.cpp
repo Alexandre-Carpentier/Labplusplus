@@ -1253,7 +1253,7 @@ void WinGraph::AddPoint(double timestamp, double* y, const int SignalCount)
 /*-------------------------------------------------------------------------
 	AddMultiplePoints: Add a chunk of data in the graph buffer for each signal count
   -------------------------------------------------------------------------*/
-void WinGraph::AddPoints(double timestamp, double** y, const size_t SignalCount, size_t chunkSize)
+void WinGraph::AddPoints(double timestamp, std::unique_ptr<double* []> y, const size_t SignalCount, size_t chunkSize)
 {
 	if (false == m_graph.bRunning)
 	{
