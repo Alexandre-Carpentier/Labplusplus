@@ -3,7 +3,7 @@
 ## Build with CMake
 
 ### Installing depedencies
-With vcpkg:
+1) With vcpkg:
 Install wxWidgets as static lib (no dlls)
 ```
 # .\vcpkg.exe install wxwidgets:x64-windows-static
@@ -19,13 +19,14 @@ C:\XXX\vcpkg\packages\wxwidgets_x64-windows-static\include
 C:\XXX\vcpkg\packages\wxwidgets_x64-windows-static\lib
 ```
 
-With wxWidgets installer:
+2) With wxWidgets installer:
 https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxMSW-3.3.1-Setup.exe
 Add to environnement variable the custom path to your librairie folder:
 ```
 WXWIN C:\XXX\WxWidget-3221
 ```
 
+3) Check installation
 If installation success find_package will retrieve automatically wxWidgets.
 ```
 find_package(wxWidgets REQUIRED COMPONENTS net core base gl)
