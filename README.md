@@ -1,5 +1,16 @@
 # Lab++
 
+## Build with CMake
+
+### MSVC VS
+### MSVC VS code
+install support for C/C++ plugin. Install support for CMake support.
+Open a terminal and do the standard building process.
+# mkdir build && cd build
+# cmake ..
+# make
+# .\Labplusplus.exe
+
 ## Install
 
 Some optionnal depedencies can be used. 
