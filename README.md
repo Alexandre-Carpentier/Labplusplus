@@ -1,8 +1,6 @@
 # Lab++
 
-## Build with CMake
-
-### Installing depedencies
+## Installing external depedencies
 1) With vcpkg:
 Install wxWidgets as static lib (no dlls)
 ```
@@ -23,7 +21,7 @@ C:\XXX\vcpkg\packages\wxwidgets_x64-windows-static\lib
 https://github.com/wxWidgets/wxWidgets/releases/download/v3.3.1/wxMSW-3.3.1-Setup.exe
 Add to environnement variable the custom path to your librairie folder:
 ```
-WXWIN C:\XXX\WxWidget-3221
+WXWIN C:\XXX\WxWidget-331
 ```
 
 3) Check installation
@@ -31,7 +29,7 @@ If installation success find_package will retrieve automatically wxWidgets.
 ```
 find_package(wxWidgets REQUIRED COMPONENTS net core base gl)
 ```
-
+## Build with CMake
 ### MSVC VS
 Open the folder directly in Visual studio. type "CTRL-S" when openning the top CMakeLists.txt.
 Select target application = labplusplus.exe and click generate.
