@@ -17,22 +17,26 @@
 #include "data_types.h"
 
 const short MAX_CHAN = 64;
-const short MAX_FRAME = 4096;
+const short MAX_FRAME = 1024;
 
 struct DATAS
 {
-	size_t buffer_size;
-	double buffer[MAX_CHAN];
-	std::string unit;
+	size_t buffer_size =0;
+	double buffer[MAX_CHAN] = { 0 };
+	std::string unit = "Unit";
 };
 
-struct CHUNK {
-	size_t buffer_size = 0;
+struct CHUNKS {
+	size_t buffer_numbers = 0;
 	std::vector<std::vector<double>> buffer; // buffer[channel][frame]
+	size_t rate_per_s = 1000;
 	std::string unit = "Unit";
 
-	CHUNK(size_t channels = MAX_CHAN, size_t frames = MAX_FRAME)
-		: buffer(channels, std::vector<double>(frames, 0.0)) {
+	CHUNKS(size_t channels = 0, size_t frames = MAX_FRAME)
+		: buffer(channels, std::vector<double>(frames, 0.0)),
+		buffer_numbers(0),
+		rate_per_s(1000)
+	{
 	}
 };
 
@@ -69,8 +73,8 @@ public:
 	virtual size_t chan_read_count() = 0;
 	virtual size_t chan_write_count() = 0;
 
-	virtual DATAS read() = 0;
-	//virtual CHUNKS read_chunks();
+	virtual DATAS read()=0;
+	virtual CHUNKS read_multiple();
 	virtual void set(double *value, size_t length) = 0;
 
 	

@@ -175,7 +175,7 @@ public:
 	void SignalResetStatisticValue(const int SIGNB);
 	void ShowDataInConsole();
 	void AddPoint(double timestamp, double* y, const int SignalCount);
-	void AddPoints(double timestamp, std::unique_ptr<double* []> y, const size_t SignalCount, size_t chunkSize);
+	void AddPoints(double timestamp, std::vector<std::vector<double>> y, const size_t SignalCount, size_t chunkSize);
 	bool Render_();
 	bool Render();
 	void ReshapeGraph(int left, int top, int right, int bottom);
@@ -198,7 +198,7 @@ private:
 class PlotWindow : public wxGLCanvas, public WinGraph
 {
 public:
-	PlotWindow(wxWindow* parent, int width = 600, int height = 600);
+	PlotWindow(wxWindow* parent, int width = 600, int height = 600, size_t point_numbers=1000);
     ~PlotWindow() override;
 	void OnSize(wxSizeEvent& evt);
 	void Render();

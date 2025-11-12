@@ -29,11 +29,11 @@ EVT_PAINT(PlotWindow::OnPaint)
 EVT_SIZE(PlotWindow::OnSize)
 wxEND_EVENT_TABLE()
 
-PlotWindow::PlotWindow(wxWindow* parent, int width, int height)
+PlotWindow::PlotWindow(wxWindow* parent, int width, int height, size_t point_numbers)
     : wxGLCanvas(parent, wxID_ANY, nullptr, wxDefaultPosition, wxSize(width, height), wxFULL_REPAINT_ON_RESIZE),
     ctx_(std::make_unique<wxGLContext>(this)),
     gl_initialized_(false),
-	WinGraph(parent->GetHWND(), {0, 0, width, height}, MAX_SIGNAL_COUNT, 1000) // Example: 64 signals, buffer size 1000
+	WinGraph(parent->GetHWND(), {0, 0, width, height}, MAX_SIGNAL_COUNT, point_numbers) // Example: 64 signals, buffer size 1000
 {
 	std::print("[*] PlotWindow created with size {}x{}\\n", width, height);
 }
@@ -1253,7 +1253,7 @@ void WinGraph::AddPoint(double timestamp, double* y, const int SignalCount)
 /*-------------------------------------------------------------------------
 	AddMultiplePoints: Add a chunk of data in the graph buffer for each signal count
   -------------------------------------------------------------------------*/
-void WinGraph::AddPoints(double timestamp, std::unique_ptr<double* []> y, const size_t SignalCount, size_t chunkSize)
+void WinGraph::AddPoints(double timestamp, std::vector<std::vector<double>> y, const size_t SignalCount, size_t chunkSize)
 {
 	if (false == m_graph.bRunning)
 	{
@@ -1262,7 +1262,7 @@ void WinGraph::AddPoints(double timestamp, std::unique_ptr<double* []> y, const 
 	}
 
 		// Check if signalcount = length of y!
-
+	assert(m_graph.signalcount == SignalCount);
 	if (m_graph.signalcount != SignalCount)
 	{
 		printf("[!] Error at AddPoint() signalcount not egual to y length\n");
@@ -1287,13 +1287,13 @@ void WinGraph::AddPoints(double timestamp, std::unique_ptr<double* []> y, const 
 	{
 		for (int index = 0 + offset; index < m_graph.signalcount + offset; index++)
 		{
-			for (int j = 0; j < m_graph.BufferSize - 1; j++)
+			for (int j = 0; j < m_graph.BufferSize - chunkSize; j++)
 			{
-				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + 1];																// Shift left X
-				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + 1];																// Shift left Y
+				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + chunkSize];																// Shift left X
+				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + chunkSize];																// Shift left Y
 			}
 		}
-		m_graph.cur_nbpoints--;																				// Update the current POINT number
+		m_graph.cur_nbpoints = m_graph.cur_nbpoints - chunkSize;																				// Update the current POINT number
 	}
 
 		// Save the actual timestamp

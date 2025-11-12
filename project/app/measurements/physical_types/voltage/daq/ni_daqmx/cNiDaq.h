@@ -26,18 +26,18 @@ class cMeasurement;
 // C:\Program Files (x86)\National Instruments\Shared\ExternalCompilerSupport\C\include
 #include "C:\\Program Files (x86)\\National Instruments\\Shared\\ExternalCompilerSupport\\C\\include\\NIDAQmx.h"
 
-
 class cNiDaq : public cMeasurement {
 private:
 	CURRENT_DEVICE_CONFIG_STRUCT config_struct_;
 
-
 	TaskHandle analog_taskHandle;
 	TaskHandle digital_taskHandle[MAX_CHAN];
 	int32 DAQret;
-	int sample_number = 2;
-	float64 multiple_data[1200];
+	int sample_number = 2; // Used by read()
+	size_t sample_numbers = 1000; // Used by read_multiple();
+	float64 multiple_data[1000];
 	DATAS result;
+	CHUNKS result_multiple;
 public:
 
 	cNiDaq();
@@ -51,6 +51,7 @@ public:
 	int launch_device() override;
 
 	DATAS read() override;
+	CHUNKS read_multiple() override;
 	void set(double* value, size_t length) override;
 
 	void stop_device()override;

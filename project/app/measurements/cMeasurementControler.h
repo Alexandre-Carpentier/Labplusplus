@@ -11,15 +11,15 @@
 #include <iostream>
 #include "cObserver.h"
 #include "cCycleControler.h"
+#include "cMeasurement.h"
 
 class cObjectmanager;
 class cMeasurementmanager;
 class cPlot;
 class cFooter;
-class cMeasurement;
 
 void zero_instrument(std::vector<cMeasurement*> meas_pool);
-bool get_instr_setpoint(cMeasurement* meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t* read);
+bool get_instr_setpoint(cMeasurement* meas, STEPSTRUCT step, double values[MAX_CHAN], size_t* read);
 
 class cMeasurementControler : public currentValueObserved
 {
@@ -35,8 +35,6 @@ public:
 	cMeasurementmanager* meas_manager = nullptr;
 	cPlot* m_plot_ = nullptr;
 	cFooter* m_footer_ = nullptr;
-
-	//std::vector<cMeasurement*> meas_pool;
 
 public:
 	cMeasurementControler(std::shared_ptr<cCycleControler> cyclecontroler)

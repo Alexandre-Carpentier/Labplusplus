@@ -12,8 +12,8 @@
 #include "cCycleControler.h"
 #include <variant>
 #include "cSimPoll.h" // Simulated aka mock
-#include "cSimplePoll.h" // Real instruments controler
-
+#include "cSimplePoll.h" // Real instruments controler: read ONE point per instruments
+#include "cMultiPoll.h" // Real instruments controler: read MULTIPLES points per instruments
 
 // Static polymorphism  via std::variant
-using Poller = std::variant<cSimPoll, cSimplePoll>;
+using Poller = std::variant<cSimPoll, cSimplePoll, cMultiPoll>;

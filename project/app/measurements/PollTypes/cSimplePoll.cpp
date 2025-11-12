@@ -57,7 +57,9 @@ void cSimplePoll::stop() {
 	}
 }
 
-void check_instr_setpoint(double value[MAX_CHAN], size_t read, size_t len)
+// Helper functions
+// Used by write instruments methods
+inline void check_instr_setpoint(double value[MAX_CHAN], size_t read, size_t len)
 {
 	std::cout << std::format("[GET] double[]:{};{};{};{}, length:{}\n", value[0], value[1], value[2], value[3], read);
 	if (len != read)
@@ -89,7 +91,7 @@ void cSimplePoll::write_instruments()
 
 			double value[MAX_CHAN] = { 0 };
 			STEPSTRUCT step = m_cycle_controler->get_current_step_param();	
-			bool success = get_instr_setpoint(meas, step, value, length, &read);
+			bool success = get_instr_setpoint(meas, step, value, &read);
 
 				// unprotect
 
@@ -135,39 +137,32 @@ void cSimplePoll::read_instruments()
 	std::print("[*] cSimPoll read from instruments\n");
 	DATAS datas;
 
-	std::vector<double> read_pool;
+	std::vector<std::vector<double>> datas_pack;
 	for (auto meas : m_meas_pool)
 	{
 			// Read data from instrument
 
 		datas = meas->read();
+		assert(datas.buffer);
+		assert(datas.buffer_size > 0);
+		assert(datas.buffer_size < MAX_CHAN);
 
-			// Add vector to store points
+			// Add raw point to a vector
 
+		std::vector<double> val;
 		for (size_t i = 0; i < datas.buffer_size; i++)
-		{
-				// prepare send to observers
-				
-			//currentValues.add_values(meas->device_name(), val.buffer[i]);
+		{	
+			assert(datas.buffer[i]);
+			val.push_back(datas.buffer[i]);
 
-			read_pool.push_back(datas.buffer[i]);
+				// Add the vector of size 1 to the datas_pack of n signals
+
+			datas_pack.push_back(val);
 		}
-		datas.buffer_size = 0;
-		break;
 	}
-	assert(read_pool.size() > 0);
+	assert(datas_pack.size() > 0);
+	assert(datas_pack.size() < MAX_CHAN);
 
-	size_t len = read_pool.size();
-	std::unique_ptr<double* []> read_pool_ptr = std::make_unique<double* []>(len);
-
-	for (size_t ind = 0; ind < len; ind++)
-	{
-		read_pool_ptr[ind] = &read_pool[ind];
-	}
-	//for (size_t ind = 0; ind < len; ind++)
-	//{
-	//	std::print("{}: {:p} = {}\n", ind, static_cast<void*>(read_pool_ptr[ind]), static_cast<double>(read_pool_ptr[ind][0]));
-	//}
-	m_plot->graph_addpoints(read_pool.size(), std::move(read_pool_ptr), 1);
+	m_plot->graph_addpoint(datas.buffer_size, datas.buffer);
 	return;
 }

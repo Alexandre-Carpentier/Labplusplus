@@ -8,18 +8,15 @@
 
 #include "cMeasurementControler.h"
 
-
-#include "cMeasurement.h"
 #include "cMeasurementmanager.h"
 #include "cObjectmanager.h"
 #include "cFooter.h"
+#include "cPoller.h"
 
 #include <wx/wx.h>
 #include <wx/app.h> 
-
 #include <Windows.h>
 
-#include "cPoller.h"
 #include <algorithm>
 #include <print>
 
@@ -39,22 +36,29 @@ void zero_instrument(std::vector<cMeasurement*> meas_pool)
 	}
 }
 
-bool get_instr_setpoint(cMeasurement* meas, STEPSTRUCT step, double* values, size_t buffer_length, size_t *read)
+bool get_instr_setpoint(cMeasurement* meas, STEPSTRUCT step, double values[MAX_CHAN], size_t* read)
 {
 	std::string dev_name = meas->device_name();
 	assert(dev_name.size() > 0);
 	int i = 0;
 
+	size_t index = 0;
 	for (auto& controler : step.controler_vec)
 	{
 		if (controler.first.find(dev_name) == 0)
 		{
-			*values = controler.second;
-			values++;
+			values[index] = controler.second;
+			index++;
 			i++;
 		}
 	}	
 	*read = i;
+
+	if(i==0)
+	{
+		std::print("[!] get_instr_setpoint: No setpoint found for device {}\n", dev_name);
+		return false;
+	}
 	return true;
 }
 
@@ -68,30 +72,30 @@ void cMeasurementControler::poll()
 	std::print("[*] cMeasurementcontroler->get_stop_token()... \n");
 	auto st = measurement_controler_thread.get_stop_token();
 
-		// Get external references
+	// Get external references
 
 	cObjectmanager* object_manager = object_manager->getInstance();
-	cMeasurementmanager* meas_manager = meas_manager->getInstance();
 	m_footer_ = object_manager->get_footer();
+	cMeasurementmanager* meas_manager = meas_manager->getInstance();
 	std::vector<cMeasurement*> meas_pool = meas_manager->get_measurement_pool();
-	assert(object_manager != nullptr); 
-	assert(meas_manager != nullptr);
-	assert(m_footer_ != nullptr);
-	assert(meas_pool.size() >0);
+	assert(object_manager);
+	assert(meas_manager);
+	assert(m_footer_);
+	assert(meas_pool.size() > 0);
 
 		// Get the available step to perform
 
 	std::cout << m_cyclecontroler->get_current_step() << "\n";
-
-		// Choose implementation 
-
-	Poller obj = cSimplePoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
 
 		// Handle frequency rate
 
 	wxString frequency = m_footer_->freq->GetValue();
 	frequency.ToCDouble(&freq_s_);
 	m_tick.start_tick();
+
+		// Choose implementation 
+
+	Poller obj = cMultiPoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
 
 		// Start job
 
@@ -368,9 +372,11 @@ void cMeasurementControler::poll()
 void cMeasurementControler::start()
 {
 	std::cout << "[*] cMeasurementcontroler->starting called\n";
-	measurement_controler_thread = std::jthread([this](std::stop_token st){
+
+	measurement_controler_thread = std::jthread([this](std::stop_token st) {
 		this->poll();
 		});
+
 	std::cout << "[*] cMeasurementcontroler->started\n";
 }
 

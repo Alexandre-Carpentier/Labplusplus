@@ -70,6 +70,7 @@ include_directories(measurements/physical_types/voltage/daq/keithley_6510)
 include_directories(measurements/physical_types/voltage/daq/ni_daqmx)
 include_directories(measurements/physical_types/voltage/dc_supply)
 include_directories(measurements/physical_types/voltage/oscopes)
+include_directories(measurements/PollTypes)
 include_directories(measurements/protocols)
 include_directories(measurements/protocols/native)
 include_directories(measurements/protocols/native/win32_rs232)
@@ -120,7 +121,7 @@ file(GLOB_RECURSE APP_RES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS
     *.rc 
 )
 
-add_executable(labapp ${APP_SOURCES} ${APP_HEADERS} ${APP_RES} "measurements/cSimPoll.cpp" "measurements/cPoller.h")
+add_executable(labapp ${APP_SOURCES} ${APP_HEADERS} ${APP_RES} )
 
 # copy icon to output dir so runtime find "icon.ico"
 add_custom_command(TARGET labapp POST_BUILD

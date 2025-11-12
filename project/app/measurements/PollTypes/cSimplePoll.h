@@ -7,19 +7,15 @@
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-struct cSimPoll
+struct cSimplePoll
 {
 public:
-	cSimPoll(cObjectmanager* obj_manager, cMeasurementmanager* meas_manager, std::shared_ptr<cCycleControler>);
+	cSimplePoll(cObjectmanager* obj_manager, cMeasurementmanager* meas_manager, std::shared_ptr<cCycleControler>, std::vector<cMeasurement*> meas_pool);
 	void runonce();
 	void loop();
 	void stop();
-	~cSimPoll() = default;
+	~cSimplePoll() = default;
 private:
-
-	// Loc variables
-	CHUNK m_chunk;
-
 	// Controlers refs
 	cObjectmanager* m_obj_manager = nullptr; // gui refs singleton
 	cMeasurementmanager* m_meas_manager = nullptr; // measurment refs singleton

@@ -58,7 +58,7 @@ cPlot::cPlot(wxWindow* inst, int nbPoints, cSignalTable* signal_table)
 
 	// Create the plot window
 	//
-	plot = std::make_unique<PlotWindow>(plot_rightpanel_, 600, 600);
+	plot = std::make_unique<PlotWindow>(plot_rightpanel_, 600, 600, nbPoints);
 
 	plot_hsizer_ = new wxBoxSizer(wxHORIZONTAL);
 	plot_hsizer_->Add(plot_leftpanel_, 0, wxEXPAND);
@@ -404,28 +404,31 @@ void cPlot::graph_addpoint(const int signb, double val[])
 	plot->AddPoint(timestamp, val, signb);
 }
 
-void cPlot::graph_addpoints(const size_t sigNb, std::unique_ptr<double* []> values, size_t chunkSize)
+void cPlot::graph_addpoints(const size_t sigNb, std::vector<std::vector<double>> values, size_t chunkSize)
 {
-	// Get elapsed time at the first point
-	double timestamp = tick.get_tick();
-	//std::print("[*] graph_addpoint timestamp: {}\n", timestamp);
-
-	// Log the data
-	std::string elapsed = std::to_string(timestamp);
-	logger.add_value(elapsed);
-
 	for (size_t i = 0; i < chunkSize; i++)
 	{
+			// Log the data
+
+		double timestamp = tick.get_tick();
+		std::string elapsed = std::to_string(timestamp);
+		logger.add_value(elapsed);
+
 		for (size_t j = 0; j < sigNb; j++)
 		{
-			std::string s = std::to_string(values[i][j]);
+			std::string s = std::to_string(values[j][i]);
 			logger.add_value(s);
-		}
-	}
-	logger.new_line();
 
-	// Add the point to the graph
-	plot->AddPoints(timestamp, std::move(values), sigNb, 1);
+				// Show the data
+
+			std::vector<double> item;
+			item.push_back( values[j][i]);
+			std::vector<std::vector<double>> sent;
+			sent.push_back(item);
+			plot->AddPoints(timestamp, sent, sigNb, 1);
+		}
+		logger.new_line();
+	}
 }
 
 double cPlot::get_signal_min_value(size_t id, int SignalNumber)

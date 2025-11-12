@@ -9,6 +9,7 @@
 
 #include "cMeasurement.h"
 #include <string>
+#include <print>
 
 typedef int32(*DAQmxSelfTestDevice_)(const char deviceName[]);
 typedef int32(*DAQmxGetDevAISupportedMeasTypes_)(const char device[], int32* data, uInt32 arraySizeInElements);
@@ -34,6 +35,8 @@ typedef int32 (*DAQmxGetDevProductCategory_)(const char device[], int32* data);
 typedef int32(*DAQmxGetDevDOLines_)(const char device[], char* data, uInt32 bufferSize);
 typedef int32(*DAQmxGetSysDevNames_)(char* data, uInt32 bufferSize);
 typedef int32(*DAQmxGetDevAIPhysicalChans_)(const char device[], char* data, uInt32 bufferSize);
+
+typedef int32(*DAQmxCfgSampClkTiming_)(TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
 
 extern DAQmxSelfTestDevice_ mDAQmxSelfTestDevice;
 extern DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
@@ -61,6 +64,7 @@ extern DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
 extern DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
 extern DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
 
+extern DAQmxCfgSampClkTiming_ mDAQmxCfgSampClkTiming;
 
 cNiDaq::cNiDaq()
 {
@@ -276,6 +280,16 @@ int cNiDaq::launch_device()
                         analog_taskHandle = nullptr;
                         return 0;
                     }
+
+                    // If mDAQmxCfgSampClkTiming used: hardware add to the buffer values continuously
+                    // If not: the buffer is filled on demand
+                    // 
+                    // DAQmx_Val_FiniteSamps		    Acquire or generate a finite number of samples.
+                    // DAQmx_Val_ContSamps		        Acquire or generate samples until you stop the task.
+                    // DAQmx_Val_HWTimedSinglePoint     Acquire or generate samples continuously using hardware timing without a buffer. Hardware timed single point sample mode is supported only for the sample clock and change detection timing types.
+                    //DAQret = mDAQmxCfgSampClkTiming(analog_taskHandle, NULL, 10000.0, DAQmx_Val_Rising, DAQmx_Val_ContSamps, 10000);
+                    //std::print("DAQret returned: {}\n", static_cast<int32_t>(DAQret));
+
                 }
 
                 // Thermocouple
@@ -647,6 +661,183 @@ DATAS cNiDaq::read()
         }
     }
     return result;
+}
+
+CHUNKS cNiDaq::read_multiple()
+{
+    assert(analog_taskHandle);
+    int32 chan_type = 0;
+    char buff[512] = "";
+    double timeout_s = 2.0;
+
+    int position = 0;
+    size_t AIO_number = 0;
+    size_t AI_number = 0;
+    size_t AO_number = 0;
+
+    size_t DIO_number = 0;
+    size_t DI_number = 0;
+    size_t DO_number = 0;
+
+    std::vector<uInt8> results;
+
+    for (auto type : config_struct_.channel_mode)
+    {
+        if (type == CHANANALOG)
+        {
+            if (config_struct_.channel_enabled.at(position))
+            {
+                if (config_struct_.channel_permision.at(position) == CHANREAD)
+                {
+                    AI_number++;
+                }
+                else
+                {
+                    AO_number++;
+                }
+                AIO_number++;
+            }
+        }
+        if (type == CHANDIGITAL)
+        {
+            if (config_struct_.channel_enabled.at(position))
+            {
+                if (config_struct_.channel_permision.at(position) == CHANWRITE)
+                {
+                    DO_number++;
+                }
+                else
+                {
+                    DI_number++;
+                }
+                DIO_number++;
+            }
+        }
+        position++;
+    }
+
+    if (AIO_number > 0)
+    {
+        //DAQmxGetTaskName(taskHandle, buff, 256);// "_unnamedTask<0>"
+
+        DAQret = mDAQmxGetTaskChannels(analog_taskHandle, buff, 512);// "Digital0" 
+
+        // Tokenize buff
+        std::vector<std::string> channel_task_name;
+        std::string string_task = buff;
+        string_task.append(",");
+        size_t pos = string_task.find(",");
+        while (pos != std::string::npos and pos > 0)
+        {
+            if (pos > 0)
+            {
+                channel_task_name.push_back(string_task.substr(0, pos));
+            }
+            string_task.erase(0, pos);
+            pos = string_task.find(",");
+        }
+
+        assert(channel_task_name.size() > 0);
+        for (auto& token : channel_task_name)
+        {
+            DAQret = mDAQmxGetAIMeasType(analog_taskHandle, token.c_str(), &chan_type);
+        }
+
+        result_multiple.buffer_numbers = 1; // 1 sig
+
+        int32 read_nb = 0;
+        DAQret = mDAQmxReadAnalogF64(analog_taskHandle, sample_numbers, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result_multiple.buffer_numbers * sample_numbers, &read_nb, NULL); // Read multiple sample
+        if (read_nb != sample_numbers)
+        {
+            std::cout << "[!] DAQmxReadAnalogF64() read issue in cNIDaq.cpp\n";
+        }
+
+        if (0 != DAQret)
+        {
+            if (DAQret == -200279)
+            {
+                std::print("The application is not able to keep up with the hardware acquisition. Increasing the buffer size, reading the data more frequently, or specifying a fixed number of samples to read instead of reading all available samples might correct the problem. \n");
+            }
+            MessageBox(0, 0, L"DAQmxReadAnalogF64 Failed", 0);
+            //mDAQmxClearTask(analog_taskHandle);
+            //TODO: exit
+        }
+
+		std::vector<double> vec = std::vector<double>(multiple_data, multiple_data + (result.buffer_size * sample_numbers));
+        result_multiple.buffer.clear();
+        result_multiple.buffer.push_back(vec);
+		result_multiple.buffer_numbers = result_multiple.buffer.size();
+    }
+    if (DIO_number > 0)
+    {
+        for (auto& task : digital_taskHandle)
+        {
+            if (task)
+            {
+                char digital_chan_names[512] = "";
+                DAQret = mDAQmxGetTaskChannels(digital_taskHandle, digital_chan_names, 512);// "Digital0" 
+                std::cout << "[*] Digital task channel: " << digital_chan_names << "\n";
+            }
+        }
+
+        if (DI_number > 0)
+        {
+            uInt8 read_buffer[48];
+            memset(read_buffer, 0, 48);
+            int32 sample_read = 0;
+            int32 bytes_per_samples = 0;
+
+            // Digital input
+            DAQret = mDAQmxReadDigitalLines(digital_taskHandle, 1, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, DIO_number, &sample_read, &bytes_per_samples, NULL);
+            if (DAQret != 0)
+            {
+                //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+            }
+
+            for (int i = 0; i < sample_read; i++)
+            {
+                result.buffer[DI_number + i] = read_buffer[i];
+            }
+        }
+        else if (DO_number > 0)
+        {
+            uInt8 read_buffer[1];
+
+
+            size_t total_sample_read = 0;
+            for (auto& task : digital_taskHandle)
+            {
+                if (task)
+                {
+                    int32 sample_read = 0;
+                    int32 bytes_per_samples = 0;
+
+                    uInt32 chan_number_in_task = 0;
+                    mDAQmxGetTaskNumChans(task, &chan_number_in_task);
+                    std::cout << "[*] Chan number: " << chan_number_in_task << "in current task.\n";
+
+                    // Digital input
+                    DAQret = mDAQmxReadDigitalLines(task, DAQmx_Val_Auto, timeout_s, DAQmx_Val_GroupByChannel, read_buffer, 1, &sample_read, &bytes_per_samples, NULL);
+                    total_sample_read += sample_read;
+
+                    results.push_back(read_buffer[0]);
+
+                    if (DAQret != 0)
+                    {
+                        //MessageBox(0, L"Failed at DAQmxReadDigitalLines()", 0, 0);
+                    }
+                    chan_number_in_task++;
+                }
+            }
+
+            for (int i = 0; i < total_sample_read; i++)
+            {
+                //result_multiple.buffer[AIO_number + i] = static_cast<double>(results[i]); // concat after Analog input
+            }
+
+        }
+    }
+    return result_multiple;
 }
 
 void cNiDaq::set(double* value, size_t length)
