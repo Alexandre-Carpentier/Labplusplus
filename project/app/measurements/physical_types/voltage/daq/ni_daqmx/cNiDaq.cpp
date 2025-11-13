@@ -139,17 +139,17 @@ int cNiDaq::launch_device()
         return -1;
     }
 
-    // Setup DAQmx
+        // Setup DAQmx
 
     if (0 != mDAQmxSelfTestDevice(config_struct_.device_name))
     {
         MessageBox(0, 0, L"DAQmxSelfTestDevice Failed", 0);
     }
 
-    // Check compatible measurement
+        // Check compatible measurement
 
-    int32 meas_types[64]; memset(meas_types, 0, sizeof(meas_types)); // officially 29 different type is supported by NI we put 64 to be sure there is enought space for further NI API updates
-    if (0 != mDAQmxGetDevAISupportedMeasTypes(config_struct_.device_name, meas_types, sizeof(meas_types)))
+    int32 meas_types[29] = { 0 }; // officially 29 different type is supported by NI
+    if (0 != mDAQmxGetDevAISupportedMeasTypes(config_struct_.device_name, meas_types, _countof(meas_types)))
     {
         // DAQmx_Val_Voltage 	    10322 	Voltage measurement.
         // DAQmx_Val_Temp_TC 	    10303 	Temperature measurement using a thermocouple.
@@ -175,7 +175,7 @@ int cNiDaq::launch_device()
     }
 
     char producttype[256] = "";
-    mDAQmxGetDevProductType(config_struct_.device_name, producttype, sizeof(producttype));
+    mDAQmxGetDevProductType(config_struct_.device_name, producttype, sizeof(producttype)); // Indicates the product name of the device.
 
     char modulenames[256] = "";
     mDAQmxGetDevChassisModuleDevNames(config_struct_.device_name, modulenames, sizeof(modulenames));
