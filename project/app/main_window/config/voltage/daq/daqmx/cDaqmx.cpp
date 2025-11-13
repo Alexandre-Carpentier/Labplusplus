@@ -12,7 +12,7 @@
 #include <wx/combobox.h>
 
 #include <fstream> 
-#include <iostream>
+#include <print>
 #include <filesystem>
 
 #include <string>
@@ -51,6 +51,8 @@ typedef int32(*DAQmxGetSysDevNames_)(char* data, uInt32 bufferSize);
 typedef int32(*DAQmxGetDevAIPhysicalChans_)(const char device[], char* data, uInt32 bufferSize);
 typedef int32(*DAQmxGetDevProductType_)(const char device[], char* data, uInt32 bufferSize);
 
+typedef int32(*DAQmxGetDevSerialNum_)(const char device[], uInt32* data);
+
 extern DAQmxSelfTestDevice_ mDAQmxSelfTestDevice;
 extern DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
 extern DAQmxGetDevProductType_ mDAQmxGetDevProductType;
@@ -77,6 +79,8 @@ extern DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
 extern DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
 extern DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
 extern DAQmxGetDevProductType_ mDAQmxGetDevProductType;
+
+extern DAQmxGetDevSerialNum_ mDAQmxGetDevSerialNum;
 
 
 #include "cSerialize.h"
@@ -2518,18 +2522,30 @@ void cDaqmx::OnChannelBtnNumberCliqued(wxCommandEvent& evt)
 
 bool cDaqmx::isDeviceMeasurable(std::string dev_name)
 {
-	int32 dev_cat = 0;
-	if (mDAQmxGetDevProductCategory(dev_name.c_str(), &dev_cat) != 0)
+		// Check serial number to avoid simulated devices
+
+	uInt32 dev_sn = 0;
+	mDAQmxGetDevSerialNum(dev_name.c_str(), &dev_sn);
+	if (dev_sn == 0)
 	{
-		//MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevProductCategory() failed to resolve product category.\n", S_OK);
+		std::print("[!] Serial number not found. This is not a valid device (probably a simulated device).\n");
 		return false;
 	}
+
+		// Resolve product category
 
 	// DAQmx_Val_USBDAQ 									14646 	USB DAQ.
 	// DAQmx_Val_CompactDAQChassis 							14658 	CompactDAQ chassis.
 	// DAQmx_Val_CompactRIOChassis 							16144 	CompactRIO Chassis.
 	// DAQmx_Val_CSeriesModule 								14659 	C Series I / O module.
 	// DAQmx_Val_Unknown 									12588 	Unknown category.
+
+	int32 dev_cat = 0;
+	if (mDAQmxGetDevProductCategory(dev_name.c_str(), &dev_cat) != 0)
+	{
+		//MessageBox(GetFocus(), L"[!] Warning", L"DAQmxGetDevProductCategory() failed to resolve product category.\n", S_OK);
+		return false;
+	}
 
 	if (dev_cat == DAQmx_Val_Unknown)
 		return false;

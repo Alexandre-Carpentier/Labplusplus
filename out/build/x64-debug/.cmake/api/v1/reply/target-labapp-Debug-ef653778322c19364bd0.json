@@ -1,0 +1,2265 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "project/app/labapp.exe"
+		},
+		{
+			"path" : "project/app/labapp.pdb"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"_add_executable",
+			"add_executable",
+			"target_link_libraries",
+			"set_property",
+			"include",
+			"include_directories",
+			"target_include_directories"
+		],
+		"files" : 
+		[
+			"/DEV/00-BIN/01-vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake",
+			"project/app/CMakeLists.txt",
+			"C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.31/Modules/UsewxWidgets.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 117,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 602,
+				"parent" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 131,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 1,
+				"line" : 34,
+				"parent" : 0
+			},
+			{
+				"file" : 2,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 2,
+				"line" : 55,
+				"parent" : 5
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 41,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 42,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 43,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 44,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 45,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 46,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 47,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 48,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 49,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 50,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 51,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 52,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 53,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 54,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 55,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 56,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 57,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 58,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 59,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 60,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 61,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 62,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 63,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 64,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 65,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 66,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 67,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 68,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 69,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 70,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 71,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 72,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 73,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 74,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 75,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 76,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 77,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 78,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 79,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 80,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 81,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 1,
+				"line" : 82,
+				"parent" : 0
+			},
+			{
+				"command" : 6,
+				"file" : 1,
+				"line" : 130,
+				"parent" : 0
+			},
+			{
+				"command" : 5,
+				"file" : 2,
+				"line" : 46,
+				"parent" : 5
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++latest -ZI"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 6,
+					"define" : "UNICODE"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "_UNICODE"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "C:/Program Files/IVI Foundation/VISA/Win64/Include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "C:/DEV/Labplusplus/project/app/cycles_controler"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/pressure"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/daq"
+				},
+				{
+					"backtrace" : 13,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/daq/daqmx"
+				},
+				{
+					"backtrace" : 14,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/daq/keithley_6510"
+				},
+				{
+					"backtrace" : 15,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/dc_supply"
+				},
+				{
+					"backtrace" : 16,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/dc_supply/keithley_2280s"
+				},
+				{
+					"backtrace" : 17,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/dc_supply/radiospare_rp500"
+				},
+				{
+					"backtrace" : 18,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/oscope"
+				},
+				{
+					"backtrace" : 19,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/oscope/Keysight_dsox1202g"
+				},
+				{
+					"backtrace" : 20,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/footer"
+				},
+				{
+					"backtrace" : 21,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/open"
+				},
+				{
+					"backtrace" : 22,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/plot"
+				},
+				{
+					"backtrace" : 23,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/table"
+				},
+				{
+					"backtrace" : 24,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements"
+				},
+				{
+					"backtrace" : 25,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types"
+				},
+				{
+					"backtrace" : 26,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/pressure"
+				},
+				{
+					"backtrace" : 27,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage"
+				},
+				{
+					"backtrace" : 28,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/daq"
+				},
+				{
+					"backtrace" : 29,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/daq/keithley_6510"
+				},
+				{
+					"backtrace" : 30,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/daq/ni_daqmx"
+				},
+				{
+					"backtrace" : 31,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/dc_supply"
+				},
+				{
+					"backtrace" : 32,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/oscopes"
+				},
+				{
+					"backtrace" : 33,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols"
+				},
+				{
+					"backtrace" : 34,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native"
+				},
+				{
+					"backtrace" : 35,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native/win32_rs232"
+				},
+				{
+					"backtrace" : 36,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native/win32_usb"
+				},
+				{
+					"backtrace" : 37,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native/win32_winsock"
+				},
+				{
+					"backtrace" : 38,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa"
+				},
+				{
+					"backtrace" : 39,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa/cross_rs232"
+				},
+				{
+					"backtrace" : 40,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa/cross_tcpip"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa/cross_usb"
+				},
+				{
+					"backtrace" : 42,
+					"path" : "C:/DEV/Labplusplus/project/app/mod"
+				},
+				{
+					"backtrace" : 43,
+					"path" : "C:/DEV/Labplusplus/project/app/mod/logging"
+				},
+				{
+					"backtrace" : 44,
+					"path" : "C:/DEV/Labplusplus/project/app/mod/plugins"
+				},
+				{
+					"backtrace" : 45,
+					"path" : "C:/DEV/Labplusplus/project/app/res"
+				},
+				{
+					"backtrace" : 46,
+					"path" : "C:/DEV/Labplusplus/project/app/tools"
+				},
+				{
+					"backtrace" : 47,
+					"path" : "C:/DEV/Labplusplus/project/app/tools/serialize"
+				},
+				{
+					"backtrace" : 48,
+					"path" : "C:/DEV/Labplusplus/project/app/tools/device_monitor"
+				},
+				{
+					"backtrace" : 49,
+					"path" : "C:/DEV/00-BIN/01-vcpkg/vcpkg/packages/lua_x64-windows-static/include"
+				},
+				{
+					"backtrace" : 50,
+					"isSystem" : true,
+					"path" : "/DEV/00-BIN/01-vcpkg/vcpkg/installed/x64-windows/lib/mswu"
+				},
+				{
+					"backtrace" : 50,
+					"isSystem" : true,
+					"path" : "/DEV/00-BIN/01-vcpkg/vcpkg/installed/x64-windows/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					2
+				],
+				"standard" : "23"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				56,
+				57,
+				58,
+				59,
+				60,
+				61,
+				62,
+				63,
+				64,
+				65,
+				66,
+				67,
+				68,
+				69,
+				70,
+				71,
+				72,
+				73,
+				74,
+				75,
+				76
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-DWIN32 -D_DEBUG"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 6,
+					"define" : "UNICODE"
+				},
+				{
+					"backtrace" : 6,
+					"define" : "_UNICODE"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 7,
+					"path" : "C:/Program Files/IVI Foundation/VISA/Win64/Include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "C:/DEV/Labplusplus/project/app/cycles_controler"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/pressure"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/daq"
+				},
+				{
+					"backtrace" : 13,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/daq/daqmx"
+				},
+				{
+					"backtrace" : 14,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/daq/keithley_6510"
+				},
+				{
+					"backtrace" : 15,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/dc_supply"
+				},
+				{
+					"backtrace" : 16,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/dc_supply/keithley_2280s"
+				},
+				{
+					"backtrace" : 17,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/dc_supply/radiospare_rp500"
+				},
+				{
+					"backtrace" : 18,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/oscope"
+				},
+				{
+					"backtrace" : 19,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/config/voltage/oscope/Keysight_dsox1202g"
+				},
+				{
+					"backtrace" : 20,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/footer"
+				},
+				{
+					"backtrace" : 21,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/open"
+				},
+				{
+					"backtrace" : 22,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/plot"
+				},
+				{
+					"backtrace" : 23,
+					"path" : "C:/DEV/Labplusplus/project/app/main_window/table"
+				},
+				{
+					"backtrace" : 24,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements"
+				},
+				{
+					"backtrace" : 25,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types"
+				},
+				{
+					"backtrace" : 26,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/pressure"
+				},
+				{
+					"backtrace" : 27,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage"
+				},
+				{
+					"backtrace" : 28,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/daq"
+				},
+				{
+					"backtrace" : 29,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/daq/keithley_6510"
+				},
+				{
+					"backtrace" : 30,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/daq/ni_daqmx"
+				},
+				{
+					"backtrace" : 31,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/dc_supply"
+				},
+				{
+					"backtrace" : 32,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/physical_types/voltage/oscopes"
+				},
+				{
+					"backtrace" : 33,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols"
+				},
+				{
+					"backtrace" : 34,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native"
+				},
+				{
+					"backtrace" : 35,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native/win32_rs232"
+				},
+				{
+					"backtrace" : 36,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native/win32_usb"
+				},
+				{
+					"backtrace" : 37,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/native/win32_winsock"
+				},
+				{
+					"backtrace" : 38,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa"
+				},
+				{
+					"backtrace" : 39,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa/cross_rs232"
+				},
+				{
+					"backtrace" : 40,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa/cross_tcpip"
+				},
+				{
+					"backtrace" : 41,
+					"path" : "C:/DEV/Labplusplus/project/app/measurements/protocols/visa/cross_usb"
+				},
+				{
+					"backtrace" : 42,
+					"path" : "C:/DEV/Labplusplus/project/app/mod"
+				},
+				{
+					"backtrace" : 43,
+					"path" : "C:/DEV/Labplusplus/project/app/mod/logging"
+				},
+				{
+					"backtrace" : 44,
+					"path" : "C:/DEV/Labplusplus/project/app/mod/plugins"
+				},
+				{
+					"backtrace" : 45,
+					"path" : "C:/DEV/Labplusplus/project/app/res"
+				},
+				{
+					"backtrace" : 46,
+					"path" : "C:/DEV/Labplusplus/project/app/tools"
+				},
+				{
+					"backtrace" : 47,
+					"path" : "C:/DEV/Labplusplus/project/app/tools/serialize"
+				},
+				{
+					"backtrace" : 48,
+					"path" : "C:/DEV/Labplusplus/project/app/tools/device_monitor"
+				},
+				{
+					"backtrace" : 49,
+					"path" : "C:/DEV/00-BIN/01-vcpkg/vcpkg/packages/lua_x64-windows-static/include"
+				},
+				{
+					"backtrace" : 50,
+					"isSystem" : true,
+					"path" : "/DEV/00-BIN/01-vcpkg/vcpkg/installed/x64-windows/lib/mswu"
+				},
+				{
+					"backtrace" : 50,
+					"isSystem" : true,
+					"path" : "/DEV/00-BIN/01-vcpkg/vcpkg/installed/x64-windows/include"
+				}
+			],
+			"language" : "RC",
+			"sourceIndexes" : 
+			[
+				180
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "logging::@89bfd9fecfea95d04ec5"
+		}
+	],
+	"id" : "labapp::@90bfdba48bada66b6638",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "/machine:x64 /debug /INCREMENTAL /subsystem:console",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\installed\\x64-windows\\debug\\lib\\wxbase33ud_net.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\installed\\x64-windows\\debug\\lib\\wxmsw33ud_core.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\installed\\x64-windows\\debug\\lib\\wxbase33ud.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\installed\\x64-windows\\debug\\lib\\wxmsw33ud_gl.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "opengl32.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "glu32.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "gdiplus.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "msimg32.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "winmm.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "comctl32.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "uuid.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "oleacc.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "uxtheme.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "rpcrt4.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "shlwapi.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "version.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "wsock32.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "project\\app\\mod\\logging\\logging.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "Winusb.lib",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "C:\\DEV\\00-BIN\\01-vcpkg\\vcpkg\\packages\\lua_x64-windows-static\\lib\\lua.lib",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "labapp",
+	"nameOnDisk" : "labapp.exe",
+	"paths" : 
+	{
+		"build" : "project/app",
+		"source" : "project/app"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23,
+				24,
+				25,
+				26,
+				27,
+				28,
+				29,
+				30,
+				31,
+				32,
+				33,
+				34,
+				35,
+				36,
+				37,
+				38,
+				39,
+				40,
+				41,
+				42,
+				43,
+				44,
+				45,
+				46,
+				47,
+				48,
+				49,
+				50,
+				51,
+				52,
+				53,
+				54,
+				55,
+				56,
+				57,
+				58,
+				59,
+				60,
+				61,
+				62,
+				63,
+				64,
+				65,
+				66,
+				67,
+				68,
+				69,
+				70,
+				71,
+				72,
+				73,
+				74,
+				75,
+				76,
+				180
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				77,
+				78,
+				79,
+				80,
+				81,
+				82,
+				83,
+				84,
+				85,
+				86,
+				87,
+				88,
+				89,
+				90,
+				91,
+				92,
+				93,
+				94,
+				95,
+				96,
+				97,
+				98,
+				99,
+				100,
+				101,
+				102,
+				103,
+				104,
+				105,
+				106,
+				107,
+				108,
+				109,
+				110,
+				111,
+				112,
+				113,
+				114,
+				115,
+				116,
+				117,
+				118,
+				119,
+				120,
+				121,
+				122,
+				123,
+				124,
+				125,
+				126,
+				127,
+				128,
+				129,
+				130,
+				131,
+				132,
+				133,
+				134,
+				135,
+				136,
+				137,
+				138,
+				139,
+				140,
+				141,
+				142,
+				143,
+				144,
+				145,
+				146,
+				147,
+				148,
+				149,
+				150,
+				151,
+				152,
+				153,
+				154,
+				155,
+				156,
+				157,
+				158,
+				159,
+				160,
+				161,
+				162,
+				163,
+				164
+			]
+		},
+		{
+			"name" : "Resources",
+			"sourceIndexes" : 
+			[
+				165,
+				166,
+				167,
+				168,
+				169,
+				170,
+				171,
+				172,
+				173,
+				174,
+				175,
+				176,
+				177,
+				183,
+				184,
+				185,
+				186,
+				187,
+				188,
+				189,
+				190,
+				191,
+				192,
+				193,
+				194,
+				195,
+				196
+			]
+		},
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				178,
+				179,
+				181,
+				182
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/cycles_controler/cCycle.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/cycles_controler/cCycleControler.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/cApp.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/cDeviceIDSaver.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/cMain.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/cConfig.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/pressure/cPressure.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/voltage/daq/daqmx/cDaqmx.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/voltage/daq/daqmx/cDaqmxScaleDlg.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/voltage/daq/keithley_6510/c6510ui.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/voltage/dc_supply/cVoltage.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/voltage/dc_supply/cVoltageRs.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/config/voltage/oscope/cOscope.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/footer/cFooter.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/open/cOpen.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/play/cPlay.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/PlotWindow.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/cGnuplot.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/cGraphrender.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/cPlot.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/cScaleBtn.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/cSignalBtn.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/cSignalTable.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/cStatrender.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/plot/xlsx.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/table/cSignalDisplay.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/main_window/table/cTable.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/cMeasurement.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/cMeasurementControler.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/IInstrument.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/Instrumentimpl.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/pressure/cPacecom.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/pressure/cPasesim.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/daq/keithley_6510/c6510sim.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/daq/keithley_6510/c6510usb.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/daq/ni_daqmx/cNiDaq.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/daq/ni_daqmx/cNiDaqsim.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplyrssim.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplyrsusb.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplysim.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplyusb.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/oscopes/cOscopesim.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/physical_types/voltage/oscopes/cOscopeusb.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/cProtocol.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/cProtocolFactory.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/native/win32_rs232/cCom.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/native/win32_usb/cUsb.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/visa/cVisa.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/visa/cross_rs232/cVisaserial.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/visa/cross_tcpip/cVisatcp.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/measurements/protocols/visa/cross_usb/cVisausb.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/csv.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/log.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/loginterface.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/main.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/none.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/sim.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/tdms.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/tsv.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/logging/xlsx.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/plugins/cBtn.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/plugins/cDevice.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/mod/plugins/cProtocol.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/LoadBitmapFromRessource.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cDropper.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cImagePanel.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cMeasurementmanager.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cObjectmanager.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cObserver.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cSingleton.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cSingletonSafe.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/cTick.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/device_monitor/ListUsbDevice.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/device_monitor/cDeviceMonitor.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/encoding.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/serialize/cInicfg.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "project/app/tools/serialize/cSerialize.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/cycles_controler/cCycle.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/cycles_controler/cCycleControler.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/cApp.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/cDeviceIDSaver.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/cMain.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/cConfig.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/pressure/cPressure.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/voltage/daq/daqmx/cDaqmx.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/voltage/daq/daqmx/cDaqmxScaleDlg.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/voltage/daq/keithley_6510/c6510ui.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/voltage/dc_supply/cVoltage.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/voltage/dc_supply/cVoltageRs.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/config/voltage/oscope/cOscope.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/enum.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/footer/cFooter.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/open/cOpen.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/play/cPlay.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/PlotWindow.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/cGnuplot.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/cGraphrender.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/cPlot.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/cScaleBtn.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/cSignalBtn.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/cSignalTable.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/cStatrender.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/plot/xlsx.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/table/cSignalDisplay.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/main_window/table/cTable.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/cMeasurement.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/cMeasurementControler.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/IInstrument.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/instrumentimpl.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/pressure/cPacecom.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/pressure/cPacesim.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/daq/keithley_6510/c6510sim.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/daq/keithley_6510/c6510usb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/daq/ni_daqmx/cNiDaq.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/daq/ni_daqmx/cNiDaqsim.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/daq/ni_daqmx/nidaq_ptr.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplyrssim.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplyrsusb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplysim.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/dc_supply/cSupplyusb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/oscopes/cOscopesim.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/physical_types/voltage/oscopes/cOscopeusb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/cProtocol.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/cProtocolFactory.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/native/win32_rs232/cCom.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/native/win32_usb/cUsb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/visa/cVisa.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/visa/cross_rs232/cVisaserial.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/visa/cross_tcpip/cVisatcp.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/visa/cross_usb/cVisausb.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/measurements/protocols/visa/visa_ptr.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/csv.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/log.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/loginterface.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/main.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/none.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/sim.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/tdms.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/tsv.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/logging/xlsx.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/cBtn.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/cDevice.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/cDeviceBuilder.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/cLoader.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/cLua.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/cProtocol.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/types.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/resource.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/LoadBitmapFromRessource.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cDropper.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cImagePanel.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cMeasurementmanager.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cObjectmanager.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cObserver.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cSingleton.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cSingletonSafe.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/cTick.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/data_types.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/device_monitor/ListUsbDevice.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/device_monitor/cDeviceMonitor.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/encoding.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/extern_ptr.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/filename.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/serialize/cInicfg.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/tools/serialize/cSerialize.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/2280S.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/DAQ6510.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/DSOX.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/PluginBuilder.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/RS6005P.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/add_on_bin/DAQ6510.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/add_on_bin/Plugin.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/add_on_bin/RS6005P.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/add_on_bin/RS6005P__.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/add_on_bin/SpaceX.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/add_on_bin/pace6000.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/julabo.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/mod/plugins/pace6000.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/Chart xy.bmp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/Exit.bmp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 1,
+			"path" : "project/app/res/Lab++.rc",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/Pixel editor.bmp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/Settings.bmp",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/back-arrow20x20.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/configuration.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/exit.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/exit_.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/graph.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/next.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/next_.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/previous.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/previous_.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/table.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/imgs/table_.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/multi_function_daq_img.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/multi_function_daq_img600x300.png",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "project/app/res/sinus20x20.png",
+			"sourceGroupIndex" : 2
+		}
+	],
+	"type" : "EXECUTABLE"
+}

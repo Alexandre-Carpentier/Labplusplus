@@ -35,6 +35,8 @@ typedef int32(*DAQmxGetDevDOLines_)(const char device[], char* data, uInt32 buff
 typedef int32(*DAQmxGetSysDevNames_)(char* data, uInt32 bufferSize);
 typedef int32(*DAQmxGetDevAIPhysicalChans_)(const char device[], char* data, uInt32 bufferSize);
 
+typedef int32(*DAQmxGetDevSerialNum_)(const char device[], uInt32* data);
+
 DAQmxSelfTestDevice_ mDAQmxSelfTestDevice;
 DAQmxGetDevAISupportedMeasTypes_ mDAQmxGetDevAISupportedMeasTypes;
 DAQmxGetDevProductType_ mDAQmxGetDevProductType;
@@ -59,6 +61,8 @@ DAQmxGetDevProductCategory_ mDAQmxGetDevProductCategory;
 DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
 DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
 DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
+
+DAQmxGetDevSerialNum_ mDAQmxGetDevSerialNum;
 
 bool load_ni_daq_dll(HMODULE* hNidaq)
 {
@@ -156,6 +160,8 @@ bool load_ni_daq_ptrs(HMODULE* hNidaq)
 	if (!mDAQmxGetDevAIPhysicalChans) { std::cerr << "Failed to get address for DAQmxGetDevAIPhysicalChans" << std::endl; return false; }
 	std::print("[*] DAQmxGetDevAIPhysicalChans address loaded: {}\n", (void*)mDAQmxGetDevAIPhysicalChans);
 
+	mDAQmxGetDevSerialNum = (DAQmxGetDevSerialNum_)GetProcAddress(*hNidaq, "DAQmxGetDevSerialNum");
+	if (!mDAQmxGetDevSerialNum) { std::cerr << "Failed to get address for DAQmxGetDevSerialNum" << std::endl; return false; }
 
 	return true;
 }
