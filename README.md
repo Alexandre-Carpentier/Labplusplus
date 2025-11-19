@@ -65,6 +65,5 @@ Gnuplot is available here: http://gnuplot.info/download.html
 To communicate with instruments it is possible to send commands with Serial line, Usb, Ethernet,... To do so, install a proprietery lib from any vendor or use the built in Windows driver. Labplusplus use a wrapper over CreateFile and other Ring3 api available natively.
 The main advantage is to not need admin right to install a proprietary device. This is particulary usefull when you need to setup a quick measurement without calling the company IT group to run installer with administrative right. The consortium between VISA is IVI foundation.
 
-## Using Labplusplus
 
 
