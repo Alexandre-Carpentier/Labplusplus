@@ -24,7 +24,7 @@ private:
 
 public:
 	const enum { DISP_FREQ = 250 };						// ms to draw
-	const enum { GRAPH_NBPOINTS = 1000 };					// pts
+	const enum { GRAPH_NBPOINTS = 100000 };					// pts
 
 	////////////////////////////////////////////////////////////////////////////////
 	// EXTERNAL LIB HANDLES
