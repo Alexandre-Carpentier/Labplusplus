@@ -14,12 +14,11 @@
 #include <vector>
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
-#ifdef WIN32
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include <cMeasurement.h>
 
 const enum { MAX_SIGNAL_COUNT = 64 };
+using frame_vec = std::vector<std::array< double, MAX_FRAME >>;
+using frame = std::array< double, MAX_FRAME >;
 
 enum FILTER_M {
 	FILTER_NONE = 100,
@@ -175,7 +174,7 @@ public:
 	void SignalResetStatisticValue(const int SIGNB);
 	void ShowDataInConsole();
 	void AddPoint(double timestamp, double* y, const int SignalCount);
-	void AddPoints(double timestamp, std::vector<std::vector<double>> y, const size_t SignalCount, size_t chunkSize);
+	void AddPoints(frame timestamp, frame_vec points);
 	bool Render_();
 	bool Render();
 	void ReshapeGraph(int left, int top, int right, int bottom);

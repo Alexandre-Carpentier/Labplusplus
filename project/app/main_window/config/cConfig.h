@@ -25,6 +25,7 @@ class cConfig : public wxFrame
 {
 private:
 	wxWindow* inst_;
+	size_t frame_size = 1;
 	wxPanel* config_leftpanel_ = nullptr;
 	wxPanel* config_rightpanel_ = nullptr;
 	wxBoxSizer* config_hsizer_ = nullptr;
@@ -76,6 +77,8 @@ private:
 public:
 	cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table);
 	~cConfig();
+	void setFrameSize(size_t size);
+	size_t getFrameSize();
 	void OnClickdrop(wxMouseEvent& evt);
 	void StopTest(bool stop);
 	void unload_plugins();
@@ -99,6 +102,7 @@ public:
 	void set_graph(cPlot* m_plot);
 	void set_table(cTable* m_table);
 	void OnPaint(wxPaintEvent& event);
+	void OnFrameSizeSelected(wxCommandEvent& event);
 };
 
 

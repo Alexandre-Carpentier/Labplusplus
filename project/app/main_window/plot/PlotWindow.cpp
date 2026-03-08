@@ -13,11 +13,16 @@
 #include <print>
 #include <vector>
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
 #include "datetimeapi.h"
 #include "fileapi.h"
+#ifdef _WIN32
+#include <gl/gl.h>
+#include <gl/glu.h>
+#endif
+
+#include "cMeasurement.h"
 
 #pragma comment (lib, "gdi32.lib")
 #pragma comment (lib, "User32.lib")
@@ -1251,21 +1256,22 @@ void WinGraph::AddPoint(double timestamp, double* y, const int SignalCount)
 	LeaveCriticalSection(&cs);
 }
 /*-------------------------------------------------------------------------
-	AddMultiplePoints: Add a chunk of data in the graph buffer for each signal count
+	AddPoints: Add chunks of data in the graph buffer for each signals 
   -------------------------------------------------------------------------*/
-void WinGraph::AddPoints(double timestamp, std::vector<std::vector<double>> y, const size_t SignalCount, size_t chunkSize)
+void WinGraph::AddPoints(frame timestamps, frame_vec points)
 {
 	if (false == m_graph.bRunning)
 	{
-		printf("[!] Error at AddPoint() graph not strated\n");
+		printf("[!] Error at AddPoints() graph not strated\n");
 		return;
 	}
 
 		// Check if signalcount = length of y!
-	assert(m_graph.signalcount == SignalCount);
-	if (m_graph.signalcount != SignalCount)
+
+	assert(m_graph.signalcount == points.size());
+	if (m_graph.signalcount != points.size())
 	{
-		printf("[!] Error at AddPoint() signalcount not egual to y length\n");
+		printf("[!] Error at AddPoints() points.size() not egual to m_graph.signalcount length\n");
 		return;
 	}
 
@@ -1283,31 +1289,12 @@ void WinGraph::AddPoints(double timestamp, std::vector<std::vector<double>> y, c
 		// in the buffer, shift left the array and
 		// dec the current number of points
 
-	if (m_graph.cur_nbpoints == m_graph.BufferSize)
+	if ((m_graph.cur_nbpoints + timestamps.size()) > m_graph.BufferSize)
 	{
-		for (int index = 0 + offset; index < m_graph.signalcount + offset; index++)
-		{
-			for (int j = 0; j < m_graph.BufferSize - chunkSize; j++)
-			{
-				m_graph.signals[index].X[j] = m_graph.signals[index].X[j + chunkSize];																// Shift left X
-				m_graph.signals[index].Y[j] = m_graph.signals[index].Y[j + chunkSize];																// Shift left Y
-			}
-		}
-		m_graph.cur_nbpoints = m_graph.cur_nbpoints - chunkSize;																				// Update the current POINT number
+		m_graph.cur_nbpoints = m_graph.cur_nbpoints - timestamps.size();							// Update the current POINT number
 	}
 
-		// Save the actual timestamp
-
-	if (m_graph.cur_nbpoints == 0)
-	{
-		timestamp = 0;
-		finish = start;
-	}
-	else
-	{
-		finish = PerformanceCounter();
-	}
-	for (size_t chunkIndex = 0; chunkIndex < chunkSize; chunkIndex++)
+	for (size_t chunkIndex = 0; chunkIndex < points.at(0).size(); chunkIndex++)
 	{
 		for (int index = 0 + offset; index < m_graph.signalcount + offset; index++)
 		{
@@ -1323,9 +1310,9 @@ void WinGraph::AddPoints(double timestamp, std::vector<std::vector<double>> y, c
 					//double a = 0.1; // Custom cut freq 
 					float a = m_graph.signals[index].filter_threshold;
 					if (m_graph.cur_nbpoints == 0)
-						y[index][chunkIndex] = y[index][chunkIndex]; // First POINT skip to prevent INF
+						points[index][chunkIndex] = points[index][chunkIndex]; // First POINT skip to prevent INF
 					else
-						y[index][chunkIndex] = a * y[index][chunkIndex] + (1 - a) * m_graph.signals[index].Y[m_graph.cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
+						points[index][chunkIndex] = a * points[index][chunkIndex] + (1 - a) * m_graph.signals[index].Y[m_graph.cur_nbpoints - 1];						// Low pass filter EMA "f(x) = x1 * a + (1-a) * x0" where a [0;1]
 				}
 
 				// Hanning window filter
@@ -1345,8 +1332,9 @@ void WinGraph::AddPoints(double timestamp, std::vector<std::vector<double>> y, c
 
 			// Add points to the selected buffer	
 
-			m_graph.signals[index].X[m_graph.cur_nbpoints] = timestamp;							// Save in X the elapsed time from start
-			m_graph.signals[index].Y[m_graph.cur_nbpoints] = y[index - offset][chunkIndex];															// Save Y
+			m_graph.signals[index].X[m_graph.cur_nbpoints] = timestamps[chunkIndex];			// Save in X the elapsed time from start
+			m_graph.signals[index].Y[m_graph.cur_nbpoints] = points[index - offset][chunkIndex]; // Save Y
+
 
 			// Perform some statistics
 
@@ -1377,10 +1365,13 @@ void WinGraph::AddPoints(double timestamp, std::vector<std::vector<double>> y, c
 			{
 				m_graph.signals[index].stat.max_value = m_graph.signals[index].Y[m_graph.cur_nbpoints];											// Update current max value displayed
 			}
+
+			// Inc
+			m_graph.cur_nbpoints++;
 		}
 	}
 
-	m_graph.cur_nbpoints++;
+
 
 	LeaveCriticalSection(&cs);
 

@@ -404,31 +404,43 @@ void cPlot::graph_addpoint(const int signb, double val[])
 	plot->AddPoint(timestamp, val, signb);
 }
 
-void cPlot::graph_addpoints(const size_t sigNb, std::vector<std::vector<double>> values, size_t chunkSize)
+void cPlot::graph_addpoints(frame timestamps, frame_vec frames)
 {
-	for (size_t i = 0; i < chunkSize; i++)
+		// Log the data on disk
+		
+	size_t index = 0;
+
+	// elem 1: time
+	auto write_time = [this](const double& t) {		
+			std::string elapsed = std::to_string(t);
+			logger.add_value(elapsed); //do log
+		};
+
+	// elem 2: values
+	auto write_datas = [this, &index](const frame_vec& frames){ 
+			for (const frame& f : frames)
+			{
+				std::string val = std::to_string(f[index]);
+				logger.add_value(val); //do log
+			}
+		};
+	// elem 3 : new line
+	auto write_eof = [this]() {		
+			logger.new_line(); //do log
+		};
+
+
+	// Iterate over every timestamps
+
+	for (const double& t : timestamps)
 	{
-			// Log the data
-
-		double timestamp = tick.get_tick();
-		std::string elapsed = std::to_string(timestamp);
-		logger.add_value(elapsed);
-
-		for (size_t j = 0; j < sigNb; j++)
-		{
-			std::string s = std::to_string(values[j][i]);
-			logger.add_value(s);
-
-				// Show the data
-
-			std::vector<double> item;
-			item.push_back( values[j][i]);
-			std::vector<std::vector<double>> sent;
-			sent.push_back(item);
-			plot->AddPoints(timestamp, sent, sigNb, 1);
-		}
-		logger.new_line();
+		write_time(t);
+		write_datas(frames);
+		write_eof();
+		index++;
 	}
+	
+	plot->AddPoints(timestamps, frames);
 }
 
 double cPlot::get_signal_min_value(size_t id, int SignalNumber)

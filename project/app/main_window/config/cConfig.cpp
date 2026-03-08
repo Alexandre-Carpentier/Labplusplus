@@ -14,10 +14,8 @@
 #include <wx/dcbuffer.h>
 #include <wx/combobox.h>
 #include <wx/treectrl.h>
+#include <wx/textctrl.h>
 
-
-
-//#pragma comment (lib, "Plugin.lib")
 #include "cDevice.h"
 
 #include "cTable.h"
@@ -30,71 +28,7 @@
 #include "cOscope.h"
 #include "c6510ui.h"
 
-/*---------------- - Duplication-------------------------------- -
-void cDevice::DisplayConfiguration()
-{
-	std::cout << "[*] Communication are configurated with: " << this->protocol->get_type() << "\n";
-	return;
-}
 
-void cDevice::set_device_name(std::string name)
-{
-	device_name = name;
-}
-
-void cDevice::scpi_open(std::string addr)
-{
-	std::cout << "[*] SCPI open called.\n";
-	this->protocol->open(addr);
-	return;
-}
-
-void cDevice::scpi_write(std::string command)
-{
-	std::cout << "[*] SCPI write called.\n";
-	this->protocol->send(command);
-	return;
-}
-
-std::string cDevice::scpi_read()
-{
-	std::string response;
-	this->protocol->recv(response);
-	std::cout << "[*] SCPI read recv: " << response << "\n";
-	return response;
-}
-
-void cDevice::scpi_close()
-{
-	std::cout << "[*] SCPI close called.\n";
-	return;
-}
-
-std::string cDevice::get_device_name()
-{
-	return device_name;
-}
-
-int cDevice::get_device_access_type()
-{
-	return static_cast<int>(plugin_access_type);
-}
-
-std::string cDevice::get_plugin_name()
-{
-	return plugin_control_name;
-}
-
-std::string cDevice::plugin_unit()
-{
-	return plugin_control_unit;
-}
-
-void cDevice::OnPaint()
-{
-	return;
-}
------------------Duplication---------------------------------*/
 
 cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSignalTable* signal_table)
 {
@@ -270,6 +204,28 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSigna
 	config_rightpanel_->SetSizer(mainSizer);
 
 	/////////////////////////////////////////////////////
+	// On top left choose framing mode acquisition
+	// single shot or buffer shot
+	// 
+	//
+
+	wxSizer* v_frame = new wxBoxSizer(wxVERTICAL);
+	wxSizer* h_frame = new wxBoxSizer(wxHORIZONTAL);
+	v_frame->Add(h_frame);
+
+	wxArrayString frameSizeList;
+	frameSizeList.push_back("1");
+	frameSizeList.push_back("256");
+	frameSizeList.push_back("512");
+	frameSizeList.push_back("1024");
+	frameSizeList.push_back("4096");
+
+	wxComboBox* frame_size = new wxComboBox(config_leftpanel_, IDC_FRAME_SIZE, frameSizeList[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), frameSizeList, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
+	config_leftpanel_->Bind(wxEVT_COMBOBOX, &cConfig::OnFrameSizeSelected, this, IDC_FRAME_SIZE);
+	
+	h_frame->Add(frame_size, 1, wxEXPAND | wxALL, 5);
+
+	/////////////////////////////////////////////////////
 	// Populate tree ctrl with 
 	// loaded plugin
 	//
@@ -293,6 +249,7 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSigna
 	config_tree_ctrl->ExpandAll();
 
 	wxBoxSizer* config_vtree_sizer_ = new wxBoxSizer(wxVERTICAL);
+	config_vtree_sizer_->Add(v_frame, 0, wxEXPAND | wxALL, 5);
 	config_vtree_sizer_->Add(config_tree_ctrl, 1, wxALL);
 	config_leftpanel_->SetSizerAndFit(config_vtree_sizer_);
 
@@ -330,6 +287,16 @@ cConfig::~cConfig()
 	m_pressure = nullptr;
 	m_voltage = nullptr;
 	m_voltage_rs = nullptr;
+}
+
+void cConfig::setFrameSize(size_t size)
+{
+	frame_size = size;
+}
+
+size_t cConfig::getFrameSize()
+{
+	return frame_size;
 }
 
 void cConfig::unload_plugins()
@@ -653,6 +620,26 @@ void cConfig::OnPaint(wxPaintEvent& event)
 	dc.DrawRectangle(size);
 
 	event.Skip();
+}
+
+void cConfig::OnFrameSizeSelected(wxCommandEvent& event)
+{
+    wxComboBox* combo = dynamic_cast<wxComboBox*>(event.GetEventObject());
+    if (combo)
+    {
+        // Get the selected string
+        wxString selectedText = combo->GetStringSelection();
+        
+        // get the index 
+        int selectedIndex = combo->GetSelection();
+        
+        // convert to a number (frame_size)
+        long value;
+        if (selectedText.ToLong(&value))
+        {
+            setFrameSize(static_cast<size_t>(value));
+        }
+    }
 }
 
 

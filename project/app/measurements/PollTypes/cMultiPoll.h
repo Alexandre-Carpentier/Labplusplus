@@ -16,6 +16,7 @@ public:
 	void stop();
 	~cMultiPoll() = default;
 private:
+	cTick tick;
 
 	// Loc variables
 	CHUNKS m_chunk;

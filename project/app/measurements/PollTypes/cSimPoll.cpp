@@ -36,6 +36,9 @@ void cSimPoll::runonce()
 		std::print("[!] cMeasurementcontroler->get_graph_state() state = stop\n");
 		return;
 	}
+
+	// chrono start
+	tick.start_tick();
 }
 
 void cSimPoll::loop() {
@@ -60,8 +63,25 @@ void cSimPoll::read_instruments()
 {
 	std::print("[*] cSimPoll read from instruments\n");
 	double val1 = 12.0 + rand() % 2;
-	std::vector<std::vector<double>> data;
-	data.push_back(std::vector<double>{ val1 });
-	m_plot->graph_addpoints(1, data, 1);
+	std::vector<std::array<double, MAX_FRAME>> data;
+	data.push_back(std::array<double, MAX_FRAME>{ val1 });
+
+	// Get elapsed time at the first point
+
+
+	auto create_time_stamp = [](const double& initial_time, const double& dt) {
+		frame timestamps;
+		for (double& t : timestamps)
+		{
+			t = initial_time + dt;
+		}
+		return timestamps;
+		};
+
+	double timestamp = tick.get_tick();
+	frame timestamps = create_time_stamp(timestamp, 0.01);
+	// Send all points to plot module
+
+	m_plot->graph_addpoints(timestamps, data);
 	return;
 }

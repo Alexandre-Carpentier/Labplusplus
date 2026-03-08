@@ -70,6 +70,9 @@ void cCycleControler::poll()
 		m_table_->set_line_highlight(m_cycle->get_current_step());
 		start_tick = PerformanceCounter();
 
+		// protect
+		cycle_mutex.lock();
+
 		delta_tick = (double)((end_tick - start_tick) / freq);
 		while (delta_tick < (m_cycle->get_duration()*10) and st.stop_requested() == false)
 		{
@@ -82,8 +85,7 @@ void cCycleControler::poll()
 			goto kill;
 		}
 
-		// protect
-		cycle_mutex.lock();
+
 
 		m_cycle->next();
 

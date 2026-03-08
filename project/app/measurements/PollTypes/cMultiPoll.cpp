@@ -1,9 +1,8 @@
 #include "cPoller.h"
 //#include "cMeasurementControler.h"
 #include <print>
-#include <chrono>
-#include <thread>
 #include <memory>
+#include <array>
 
 cMultiPoll::cMultiPoll(cObjectmanager* obj_manager, cMeasurementmanager* meas_manager, std::shared_ptr<cCycleControler>cycle_controler, std::vector<cMeasurement*> meas_pool)
 	: m_obj_manager(obj_manager), m_meas_manager(meas_manager), m_cycle_controler(cycle_controler), m_meas_pool(meas_pool)
@@ -39,6 +38,10 @@ void cMultiPoll::runonce()
 		return;
 	}
 
+	// chrono start
+	
+	tick.start_tick();
+
 	// Set instrument initial value
 
 	write_instruments();
@@ -47,7 +50,7 @@ void cMultiPoll::runonce()
 void cMultiPoll::loop() {
 	write_instruments();
 	read_instruments();
-}
+} 
 
 void cMultiPoll::stop() {
 	std::print("[*] cSimPoll stop\n");
@@ -81,14 +84,15 @@ void cMultiPoll::write_instruments()
 		{
 			size_t read;
 
-			// protect
+				// protect
 
 			m_cycle_controler->cycle_mutex.lock();
 
 			double value[MAX_CHAN];
 			STEPSTRUCT step = m_cycle_controler->get_current_step_param();
 			bool success = get_instr_setpoint(meas, step, value, &read);
-			// unprotect
+
+				// unprotect
 
 			m_cycle_controler->cycle_mutex.unlock();
 
@@ -118,7 +122,7 @@ void cMultiPoll::write_instruments()
 				std::cout << mod << "\n";
 			}
 
-			// call if modified
+			// call only if setpoint modified
 
 			if (mod > 0)
 			{
@@ -132,41 +136,53 @@ void cMultiPoll::write_instruments()
 
 void cMultiPoll::read_instruments()
 {
+	std::print("[*] cMultiPoll read from instruments\n");
+
 	CHUNKS chunks;
+	frame_vec datas_pack;
+
 	assert(m_meas_pool.size() > 0);
 	assert(m_meas_pool.size() < MAX_CHAN);
 	assert(MAX_FRAME <= 4096);
 
-	std::print("[*] cSimPoll read from instruments\n");
-	std::vector<std::vector<double>> datas_pack;
-
-	size_t signals_count = 0;
 	for (auto meas : m_meas_pool)
 	{
+
 			// Read data from instruments
 
 		chunks = meas->read_multiple();
-		assert(chunks.buffer_numbers > 0);
-		assert(chunks.buffer_numbers <= MAX_CHAN);
-
-			// Add buffers count
-
-		signals_count += chunks.buffer_numbers;
+		assert(chunks.size() > 0);
+		assert(chunks.size() <= MAX_CHAN);
 
 			// Stack all frames
 
-		for (auto chunk : chunks.buffer)
+		for (auto &chunk : chunks)
 		{
 			datas_pack.push_back(chunk);
 		}
 	}
-	assert(chunks.buffer[0].size() <= MAX_FRAME);
-	assert(chunks.buffer.size() == signals_count);
-	assert(signals_count > 0);
-	assert(signals_count < MAX_CHAN);
+	assert(chunks.size() <= MAX_FRAME);
+
+		// Build timestamps frame
+
+	auto create_time_stamp = [](const double& initial_time, const double& dt) {
+		frame timestamps ;
+		double t0 = initial_time;
+		for (double& t : timestamps)
+		{
+			t0 = t0 + (1/dt);
+			t = t0;
+		}
+		return timestamps;
+		};
+
+	double initial_time = tick.get_tick();
+	double dt = chunks.get_rate_hz();
+	frame timestamps = create_time_stamp(initial_time, dt);
 
 		// Send all points to plot module
 
-	m_plot->graph_addpoints(signals_count, datas_pack, chunks.buffer[0].size());
+	m_plot->graph_addpoints( timestamps, datas_pack);
+
 	return;
 }

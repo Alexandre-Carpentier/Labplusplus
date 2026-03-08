@@ -17,3 +17,4 @@
 
 // Static polymorphism  via std::variant
 using Poller = std::variant<cSimPoll, cSimplePoll, cMultiPoll>;
+

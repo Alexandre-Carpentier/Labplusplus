@@ -26,6 +26,9 @@
 
 #include "PlotWindow.h"
 
+using frame_vec= std::vector<std::array< double, MAX_FRAME >>;
+using frame = std::array< double, MAX_FRAME >;
+
 class cSignalTable;
 
 class cPlot
@@ -81,7 +84,7 @@ public:
 	void start_graph(LOGTYPE ReccordingType, int SignalNumber, std::string opt_header);
 	void stop_graph();
 	void graph_addpoint(const int signb, double val[]);
-	void graph_addpoints(const size_t sigNb, std::vector<std::vector<double>> values, size_t chunkSize);
+	void graph_addpoints(frame timestamp, frame_vec values);
 
 	double get_signal_min_value(size_t id, int SignalNumber);
 	double get_signal_average_value(int SignalNumber);

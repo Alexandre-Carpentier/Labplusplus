@@ -93,11 +93,13 @@ void cMeasurementControler::poll()
 	frequency.ToCDouble(&freq_s_);
 	m_tick.start_tick();
 
-		// Choose implementation 
+		// Choose implementation :
+		//cSimplePoll : read each time one sample
+		//cMultiPoll : read each time multiple samples (buffer)
 
 	Poller obj = cMultiPoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
 
-		// Start job
+		// Run once
 
 	std::visit([](auto&& arg) {arg.runonce(); }, obj);
 	while (!st.stop_requested())
@@ -110,7 +112,11 @@ void cMeasurementControler::poll()
 		{
 			m_tick.start_tick();
 			std::visit([](auto&& arg) {arg.loop(); }, obj);	
-			m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), m_time * 1000));// Update acquire rate
+			if (!st.stop_requested())
+			{
+				// Update acquire rate
+				m_footer_->ratetxt->SetValue(wxString::Format(wxT("%.1lf"), m_time * 1000));
+			}
 		}
 	}
 	std::visit([](auto&& arg) {arg.stop(); }, obj);

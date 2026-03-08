@@ -743,10 +743,8 @@ CHUNKS cNiDaq::read_multiple()
             DAQret = mDAQmxGetAIMeasType(analog_taskHandle, token.c_str(), &chan_type);
         }
 
-        result_multiple.buffer_numbers = 1; // 1 sig
-
         int32 read_nb = 0;
-        DAQret = mDAQmxReadAnalogF64(analog_taskHandle, sample_numbers, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, result_multiple.buffer_numbers * sample_numbers, &read_nb, NULL); // Read multiple sample
+        DAQret = mDAQmxReadAnalogF64(analog_taskHandle, sample_numbers, timeout_s, DAQmx_Val_GroupByChannel, multiple_data, 1 * sample_numbers, &read_nb, NULL); // Read multiple sample
         if (read_nb != sample_numbers)
         {
             std::cout << "[!] DAQmxReadAnalogF64() read issue in cNIDaq.cpp\n";
@@ -756,17 +754,29 @@ CHUNKS cNiDaq::read_multiple()
         {
             if (DAQret == -200279)
             {
+                std::print(" 	Onboard device memory overflow. Because of system and/or bus-bandwidth limitations, the driver could not read data from the device fast enough to keep up with the device throughput. Reduce your sample rate. If your data transfer method is interrupts, try using DMA or USB Bulk. You can also use a product with more onboard memory or reduce the number of programs your computer is executing concurrently. ");
+            }
+            if (DAQret == -200279)
+            {
                 std::print("The application is not able to keep up with the hardware acquisition. Increasing the buffer size, reading the data more frequently, or specifying a fixed number of samples to read instead of reading all available samples might correct the problem. \n");
             }
             MessageBox(0, 0, L"DAQmxReadAnalogF64 Failed", 0);
-            //mDAQmxClearTask(analog_taskHandle);
-            //TODO: exit
         }
-
-		std::vector<double> vec = std::vector<double>(multiple_data, multiple_data + (result.buffer_size * sample_numbers));
-        result_multiple.buffer.clear();
-        result_multiple.buffer.push_back(vec);
-		result_multiple.buffer_numbers = result_multiple.buffer.size();
+      
+        // Nombre d'échantillons à copier (ne pas dépasser MAX_FRAME)
+        size_t frames_to_copy = (sample_numbers < MAX_FRAME) ? static_cast<size_t>(sample_numbers) : MAX_FRAME;
+        for (size_t i = 0; i < frames_to_copy; ++i)
+        {
+            arr[i] = static_cast<double>(multiple_data[i]);
+        }
+        // remplir le reste avec 0.0 si nécessaire
+        for (size_t i = frames_to_copy; i < MAX_FRAME; ++i)
+        {
+            arr[i] = 0.0;
+        }
+        
+        result_multiple.clear();
+        result_multiple.push_back(arr);
     }
     if (DIO_number > 0)
     {

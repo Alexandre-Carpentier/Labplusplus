@@ -16,6 +16,8 @@ public:
 	void stop();
 	~cSimPoll() = default;
 private:
+	cTick tick;
+
 	// Controlers refs
 	cObjectmanager* m_obj_manager = nullptr; // gui refs singleton
 	cMeasurementmanager* m_meas_manager = nullptr; // measurment refs singleton

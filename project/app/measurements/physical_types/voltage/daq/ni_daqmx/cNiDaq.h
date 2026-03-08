@@ -34,10 +34,11 @@ private:
 	TaskHandle digital_taskHandle[MAX_CHAN];
 	int32 DAQret;
 	int sample_number = 2; // Used by read()
-	size_t sample_numbers = 1000; // Used by read_multiple();
-	float64 multiple_data[1000];
+	size_t sample_numbers = 512; // Used by read_multiple();
+	float64 multiple_data[512];
 	DATAS result;
 	CHUNKS result_multiple;
+	std::array<double, MAX_FRAME> arr{}; // temp array for read_multiple
 public:
 
 	cNiDaq();
