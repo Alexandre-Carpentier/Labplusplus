@@ -17,10 +17,6 @@
 #include <float.h>
 #include "datetimeapi.h"
 #include "fileapi.h"
-#ifdef _WIN32
-#include <gl/gl.h>
-#include <gl/glu.h>
-#endif
 
 #include "cMeasurement.h"
 
@@ -38,7 +34,7 @@ PlotWindow::PlotWindow(wxWindow* parent, int width, int height, size_t point_num
     : wxGLCanvas(parent, wxID_ANY, nullptr, wxDefaultPosition, wxSize(width, height), wxFULL_REPAINT_ON_RESIZE),
     ctx_(std::make_unique<wxGLContext>(this)),
     gl_initialized_(false),
-	WinGraph(parent->GetHWND(), {0, 0, width, height}, MAX_SIGNAL_COUNT, point_numbers) // Example: 64 signals, buffer size 1000
+	WinGraph(parent->GetHWND(), {0, 0, width, height}, MAX_SIGNAL_COUNT, 1000) // Example: 64 signals, buffer size 1000
 {
 	std::print("[*] PlotWindow created with size {}x{}\\n", width, height);
 }
