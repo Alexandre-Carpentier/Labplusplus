@@ -34,6 +34,7 @@ typedef int32(*DAQmxGetDevProductCategory_)(const char device[], int32* data);
 typedef int32(*DAQmxGetDevDOLines_)(const char device[], char* data, uInt32 bufferSize);
 typedef int32(*DAQmxGetSysDevNames_)(char* data, uInt32 bufferSize);
 typedef int32(*DAQmxGetDevAIPhysicalChans_)(const char device[], char* data, uInt32 bufferSize);
+typedef int32(*DAQmxGetDevSerialNum_)(const char device[], uInt32* data);
 
 typedef int32(*DAQmxCfgSampClkTiming_)(TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
 
@@ -62,6 +63,7 @@ DAQmxGetDevProductCategory_ mDAQmxGetDevProductCategory;
 DAQmxGetDevDOLines_ mDAQmxGetDevDOLines;
 DAQmxGetSysDevNames_ mDAQmxGetSysDevNames;
 DAQmxGetDevAIPhysicalChans_ mDAQmxGetDevAIPhysicalChans;
+DAQmxGetDevSerialNum_ mDAQmxGetDevSerialNum;
 
 DAQmxCfgSampClkTiming_ mDAQmxCfgSampClkTiming;
 
@@ -161,9 +163,13 @@ bool load_ni_daq_ptrs(HMODULE* hNidaq)
 	if (!mDAQmxGetDevAIPhysicalChans) { std::cerr << "Failed to get address for DAQmxGetDevAIPhysicalChans" << std::endl; return false; }
 	std::print("[*] DAQmxGetDevAIPhysicalChans address loaded: {}\n", (void*)mDAQmxGetDevAIPhysicalChans);
 	
+	mDAQmxGetDevSerialNum = (DAQmxGetDevSerialNum_)GetProcAddress(*hNidaq, "DAQmxGetDevSerialNum");
+	if (!mDAQmxGetDevSerialNum) { std::cerr << "Failed to get address for DAQmxGetDevSerialNum" << std::endl; return false; }
+	std::print("[*] DAQmxGetDevSerialNum address loaded: {}\n", (void*)mDAQmxGetDevSerialNum);
+	
 	mDAQmxCfgSampClkTiming = (DAQmxCfgSampClkTiming_)GetProcAddress(*hNidaq, "DAQmxCfgSampClkTiming");
 	if (!mDAQmxCfgSampClkTiming) { std::cerr << "Failed to get address for mDAQmxCfgSampClkTiming" << std::endl; return false; }
-	std::print("[*] DAQmxGetDevAIPhysicalChans address loaded: {}\n", (void*)mDAQmxCfgSampClkTiming);
+	std::print("[*] DAQmxCfgSampClkTiming address loaded: {}\n", (void*)mDAQmxCfgSampClkTiming);
 
 	return true;
 }

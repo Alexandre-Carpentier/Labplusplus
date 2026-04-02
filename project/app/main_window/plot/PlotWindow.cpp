@@ -17,6 +17,7 @@
 #include <float.h>
 #include "datetimeapi.h"
 #include "fileapi.h"
+#include "gl/GLU.h"
 
 #include "cMeasurement.h"
 
