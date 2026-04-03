@@ -64,7 +64,7 @@ bool get_instr_setpoint(cMeasurement* meas, STEPSTRUCT step, double values[MAX_C
 
 void cMeasurementControler::poll()
 {
-	cTick m_tick;
+
 	double m_time = 0.0;
 
 		// Get stop signal from jthread
@@ -91,13 +91,17 @@ void cMeasurementControler::poll()
 
 	wxString frequency = m_footer_->freq->GetValue();
 	frequency.ToCDouble(&freq_s_);
+
+	cTick m_tick;
+	double work_time = 0.0;
+
 	m_tick.start_tick();
 
 		// Choose implementation :
 		//cSimplePoll : read each time one sample
 		//cMultiPoll : read each time multiple samples (buffer)
 
-	Poller obj = cMultiPoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
+	Poller obj = cSimplePoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
 
 		// Run once
 
@@ -107,9 +111,10 @@ void cMeasurementControler::poll()
 			// Do work
 
 		m_time = m_tick.get_tick();
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		if (m_time > (freq_s_ / 1000))
+
+		if (m_time > ( (freq_s_ / 1000)))
 		{
+			
 			m_tick.start_tick();
 			std::visit([](auto&& arg) {arg.loop(); }, obj);	
 			if (!st.stop_requested())

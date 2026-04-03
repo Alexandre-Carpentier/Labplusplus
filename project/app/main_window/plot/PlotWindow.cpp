@@ -2224,7 +2224,9 @@ void WinGraph::UpdateBorder()
 			}
 			else
 			{
-				MessageBox(0, 0, 0, 0);
+				int swapped_index = index + m_graph.signalcount;
+				m_graph.signals[index].Ymin = TakeFiniteNumber(m_graph.signals[swapped_index].Y[AnalizedPts]);
+				m_graph.signals[index].Ymax = TakeFiniteNumber(m_graph.signals[swapped_index].Y[AnalizedPts]);
 			}
 
 		}
