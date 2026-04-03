@@ -85,8 +85,6 @@ void cCycleControler::poll()
 			goto kill;
 		}
 
-
-
 		m_cycle->next();
 
 		int total = m_cycle->get_total_step_number();

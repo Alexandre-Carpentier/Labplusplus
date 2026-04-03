@@ -414,7 +414,7 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		// MEASUREMENT CONTROLER
 		////////////////////////////////////////////////////////////////////////////////
 		std::cout << "Launching Measurement controler\n";
-		meas_controler = make_shared<cMeasurementControler>(cycle_controler);
+		meas_controler = make_shared<cMeasurementControler>(cycle_controler, m_config_->getFrameSize());
 		meas_manager->set_measurement_controler(meas_controler);
 		meas_controler->subscribe(m_table_);
 	

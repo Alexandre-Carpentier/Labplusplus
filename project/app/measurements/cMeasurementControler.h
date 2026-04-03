@@ -27,6 +27,7 @@ private:
 	std::jthread measurement_controler_thread;
 	CURRENT_VALUE_STRUCT currentValues;
 	std::shared_ptr<cCycleControler> m_cyclecontroler;
+	size_t m_frame_size = 1;
 public:
 
 	double freq_s_ = 0.0;
@@ -37,9 +38,10 @@ public:
 	cFooter* m_footer_ = nullptr;
 
 public:
-	cMeasurementControler(std::shared_ptr<cCycleControler> cyclecontroler)
+	cMeasurementControler(std::shared_ptr<cCycleControler> cyclecontroler, size_t frame_size)
 	{
 		m_cyclecontroler = cyclecontroler;
+		m_frame_size = frame_size;
 	}
 	~cMeasurementControler()
 	{

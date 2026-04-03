@@ -97,11 +97,26 @@ void cMeasurementControler::poll()
 
 	m_tick.start_tick();
 
-		// Choose implementation :
+	// Choose implementation :
 		//cSimplePoll : read each time one sample
 		//cMultiPoll : read each time multiple samples (buffer)
 
-	Poller obj = cSimplePoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
+	Poller obj = [&]() -> Poller {
+		if(m_frame_size > 1)
+		{
+			std::print("[*] cMeasurementcontroler->using cMultiPoll with frame size {}... \n", m_frame_size);
+			return cMultiPoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
+		}
+		else
+		{
+			std::print("[*] cMeasurementcontroler->using cSimplePoll... \n");
+			return cSimplePoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
+		}
+	}();
+
+
+
+	//Poller obj = cSimplePoll(object_manager, meas_manager, m_cyclecontroler, meas_pool);
 
 		// Run once
 

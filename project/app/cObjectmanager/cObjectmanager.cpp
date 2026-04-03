@@ -24,8 +24,6 @@ void cObjectmanager::kill()
     // that this manager is clearly the owner of. If some objects are also
     // deleted elsewhere adjust accordingly to prevent double-delete.
 
-
-
     if (m_footer_)
     {
         m_footer_->cycle_controler->stop();
@@ -71,15 +69,6 @@ void cObjectmanager::kill()
             m_daq_ = nullptr;
         }
     }
-
-
-
-
-
-
-
-
-
 
     // Optionally reset other internal state
     // e.g. any vectors/lists of pointers maintained by the manager.

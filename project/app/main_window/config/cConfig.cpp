@@ -215,15 +215,14 @@ cConfig::cConfig(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cSigna
 
 	wxArrayString frameSizeList;
 	frameSizeList.push_back("1");
-	frameSizeList.push_back("256");
-	frameSizeList.push_back("512");
-	frameSizeList.push_back("1024");
 	frameSizeList.push_back("4096");
 
 	wxComboBox* frame_size = new wxComboBox(config_leftpanel_, IDC_FRAME_SIZE, frameSizeList[0], wxDefaultPosition, inst->FromDIP(wxDefaultSize), frameSizeList, wxCB_READONLY | wxSUNKEN_BORDER | wxBG_STYLE_TRANSPARENT, wxDefaultValidator, _T(""));
 	config_leftpanel_->Bind(wxEVT_COMBOBOX, &cConfig::OnFrameSizeSelected, this, IDC_FRAME_SIZE);
-	
+
+	h_frame->Add(new wxStaticText(config_leftpanel_, wxID_ANY, "Data frame size"), 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
 	h_frame->Add(frame_size, 1, wxEXPAND | wxALL, 5);
+
 
 	/////////////////////////////////////////////////////
 	// Populate tree ctrl with 
@@ -634,8 +633,8 @@ void cConfig::OnFrameSizeSelected(wxCommandEvent& event)
         int selectedIndex = combo->GetSelection();
         
         // convert to a number (frame_size)
-        long value;
-        if (selectedText.ToLong(&value))
+        int value;
+        if (selectedText.ToInt(&value))
         {
             setFrameSize(static_cast<size_t>(value));
         }
