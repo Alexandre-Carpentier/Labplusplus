@@ -2,7 +2,32 @@
 # Ce fichier .gitignore a été automatiquement créé par Microsoft(R) Visual Studio.
 ################################################################################
 
+# Visual Studio
 /.vs
+.vs/
+
+# Build directories
 /out
+out/
 /build
+build/
 /apple-build
+apple-build/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+
+# Build artifacts
+*.ilk
+*.pdb
+*.obj
+*.exe
+*.dll
+*.lib
+*.exp
+
+# Data files (ajustez selon vos besoins)
+*.lab
