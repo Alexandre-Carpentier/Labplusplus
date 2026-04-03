@@ -52,6 +52,12 @@
 		assert(step_table.size() > 0);
 		const std::lock_guard<std::mutex> lock(step_mutex);
 
+		// Sauvegarder les valeurs initiales de jumpcount
+		for (auto& step : step_table)
+		{
+			step.jumpcount_initial = step.jumpcount;
+		}
+
 		cycle->step_table = step_table;
 	}
 
@@ -118,15 +124,68 @@
 		cycle->total_loop = count;
 	}
 
-	void cCycle::previous() {
+	void cCycle::reset_jump_counters()
+	{
+		assert(cycle != nullptr);
+		const std::lock_guard<std::mutex> lock(step_mutex);
+		
+		std::cout << "[*] cCycle::reset_jump_counters() - Resetting all jump counters\n";
+		
+		for (auto& step : cycle->step_table)
+		{
+			step.jumpcount = step.jumpcount_initial;
+		}
+	}
+
+	void cCycle::previous()
+	{
 		assert(cycle->current_step > 0);
 		const std::lock_guard<std::mutex> lock(step_mutex);
 		cycle->current_step--;
 	}
-	void cCycle::next() {
+
+	bool cCycle::next()
+	{
+		assert(cycle != nullptr);
 		assert(cycle->current_step < cycle->total_step);
+		
 		const std::lock_guard<std::mutex> lock(step_mutex);
+		
+		// Get current step information
+		int current_step_index = cycle->current_step;
+		
+		// Check if current step has a jump configured
+		if (current_step_index < static_cast<int>(cycle->step_table.size()))
+		{
+			STEPSTRUCT& current_step_struct = cycle->step_table[current_step_index];
+			
+			if (current_step_struct.jumpcount > 0)
+			{
+				// Decrement jump count
+				current_step_struct.jumpcount--;
+				
+				// Jump to specified step
+				int jump_target = current_step_struct.jumpto - 1; // Start at 0
+				
+				// Validate jump target
+				if (jump_target >= 0 && jump_target < cycle->total_step)
+				{
+
+					cycle->current_step = jump_target;
+					std::cout << "[*] cCycle::next() - Jumping to step " << jump_target 
+					          << " (jumpcount remaining: " << current_step_struct.jumpcount << ")\n";
+					return true; // Saut effectué
+				}
+
+
+				std::cout << "[!] cCycle::next() - Invalid jump target " << jump_target
+					<< ", proceeding to next step\n";
+			}
+		}
+		
+		// No jump or jump exhausted, proceed to next step normally
 		cycle->current_step++;
+		return false; // Pas de saut
 	}
 
 	int cCycle::get_jumpto() { return cycle->step_table.at(cycle->current_step).jumpto; }

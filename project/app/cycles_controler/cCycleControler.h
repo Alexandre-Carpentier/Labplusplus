@@ -30,8 +30,18 @@ public:
 	int get_total_loop();
 	STEPSTRUCT get_current_step_param();
 	~cCycleControler();
+
 private:
 	void poll();
+	
+	// Helper functions for poll()
+	bool wait_for_step_duration(const std::stop_source& stop_source);
+	bool is_cycle_completed() const;
+	bool handle_cycle_completion(const std::stop_source& stop_source);
+	void update_status_bar_completion();
+	void send_stop_event();
+	void cleanup_and_exit();
+
 	std::shared_ptr<cCycle> m_cycle = std::make_shared<cCycle>();
 
 	cTable* m_table_ = nullptr;

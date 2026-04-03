@@ -15,8 +15,9 @@ typedef struct {
 	std::vector<std::pair<std::string,double>> controler_vec; // an agregation of instrument name and setpoints
 	int jumpto;
 	int jumpcount;
+	int jumpcount_initial; // Sauvegarde de la valeur initiale
 	double duration;
-}STEPSTRUCT;
+}STEPSTRUCT;	
 
 class cCycle
 {
@@ -61,10 +62,12 @@ public:
 	int get_total_loop_number();
 
 	void set_total_loop_number(int count);
+	
+	void reset_jump_counters();
 
 public:
 	void previous();
-	void next();
+	bool next(); // Retourne true si un saut a été effectué
 
 	int get_jumpto();
 	int get_jumpto(const int index);

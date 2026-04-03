@@ -61,75 +61,119 @@ STEPSTRUCT cCycleControler::get_current_step_param()
 
 void cCycleControler::poll()
 {
-	auto st = thread.get_stop_source();
-
+	auto stop_source = thread.get_stop_source();
+	
+	std::cout << "[*] Cycle controler daemon started\n";
+	
 	end_tick = PerformanceCounter();
 
-	while (!st.stop_requested())
+	while (!stop_source.stop_requested())
 	{
+		// Highlight current step
 		m_table_->set_line_highlight(m_cycle->get_current_step());
-		start_tick = PerformanceCounter();
-
-		// protect
-		cycle_mutex.lock();
-
-		delta_tick = (double)((end_tick - start_tick) / freq);
-		while (delta_tick < (m_cycle->get_duration()*10) and st.stop_requested() == false)
+		
+		// Wait for step duration
+		if (!wait_for_step_duration(stop_source))
 		{
-			end_tick = PerformanceCounter();
-			delta_tick = (double)((end_tick - start_tick) / (freq/10));
+			break; // Stop requested during wait
 		}
 
-		if (st.stop_requested())
+		// Execute cycle step logic
 		{
-			goto kill;
-		}
-
-		m_cycle->next();
-
-		int total = m_cycle->get_total_step_number();
-		int current = m_cycle->get_current_step();
-		if (total - current == 0)
-		{
-			std::cout << "[*] Cycle controler step end\n";
-			m_table_->set_lines_white(); // Set all lines to white colour
-			std::atomic<int> loopcount = m_cycle->get_current_loop();
-
-			if (loopcount > 0)
+			std::lock_guard<std::mutex> lock(cycle_mutex);
+			
+			bool jumped = m_cycle->next();
+			
+			// Update highlight immediately if a jump occurred
+			if (jumped)
 			{
-				std::cout << "[*] Cycle controler next cycle loaded\n";
-				loopcount--;
-				m_cycle->set_current_step(0);
-				m_cycle->set_current_loop(loopcount);
-				m_table_->set_loop_count(loopcount);
-			}
-			if (loopcount <= 0)
-			{
-				// Update % in status bar
-				cObjectmanager* object_manager = object_manager->getInstance();
-				wxStatusBar* statusbar = object_manager->get_status_bar();
-				wxString statusstr = wxString::Format("100 %% performed...");
-				statusbar->SetLabelText(statusstr);
-
-				// Send virtual click on STOP btn
-				wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_BUTTON_CLICKED, IDC_STARTBTN);
-				wxPostEvent(inst_, evt);
-				cycle_mutex.unlock();
-				goto kill;
-
+				m_table_->set_line_highlight(m_cycle->get_current_step());
 			}
 		}
-		// unprotect
-		cycle_mutex.unlock();
+
+		// Check if all steps completed
+		if (is_cycle_completed())
+		{
+			if (!handle_cycle_completion(stop_source))
+			{
+				break; // Cycle finished, exit loop
+			}
+		}
 	}
-kill:
 
-	//MessageBox(GetFocus(), L"End of cycle", L"Success", MB_OK);
-	std::cout << "[*] Cycle controler exitting daemon\n";
-	//MessageBox(GetFocus(), L"Exit control daemon", L"Success", MB_OK);
-
+	cleanup_and_exit();
 }
 
+bool cCycleControler::wait_for_step_duration(const std::stop_source& stop_source)
+{
+	start_tick = PerformanceCounter();
+	
+	std::lock_guard<std::mutex> lock(cycle_mutex);
+	
+	delta_tick = static_cast<double>((end_tick - start_tick) / freq);
+	
+	while (delta_tick < (m_cycle->get_duration() * 10) && !stop_source.stop_requested())
+	{
+		end_tick = PerformanceCounter();
+		delta_tick = static_cast<double>((end_tick - start_tick) / (freq / 10));
+	}
+	
+	return !stop_source.stop_requested();
+}
+
+bool cCycleControler::is_cycle_completed() const
+{
+	int total = m_cycle->get_total_step_number();
+	int current = m_cycle->get_current_step();
+	return (total - current == 0);
+}
+
+bool cCycleControler::handle_cycle_completion(const std::stop_source& stop_source)
+{
+	std::cout << "[*] Cycle controler step end\n";
+	m_table_->set_lines_white();
+	
+	std::atomic<int> loop_count = m_cycle->get_current_loop();
+
+	if (loop_count > 0)
+	{
+		// Start next loop
+		std::cout << "[*] Cycle controler next cycle loaded\n";
+		loop_count--;
+		m_cycle->set_current_step(0);
+		m_cycle->set_current_loop(loop_count);
+		m_table_->set_loop_count(loop_count);
+		
+		// Réinitialiser les compteurs de saut pour le nouveau tour
+		m_cycle->reset_jump_counters();
+		
+		return true; // Continue polling
+	}
+	
+	// All loops completed
+	update_status_bar_completion();
+	send_stop_event();
+	return false; // Stop polling
+}
+
+void cCycleControler::update_status_bar_completion()
+{
+	cObjectmanager* object_manager = cObjectmanager::getInstance();
+	wxStatusBar* statusbar = object_manager->get_status_bar();
+	wxString statusstr = wxString::Format("100 %% performed...");
+	statusbar->SetLabelText(statusstr);
+}
+
+void cCycleControler::send_stop_event()
+{
+	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED, IDC_STARTBTN);
+	wxPostEvent(inst_, evt);
+}
+
+void cCycleControler::cleanup_and_exit()
+{
+	std::cout << "[*] Cycle controler exitting daemon\n";
+}
 
 cCycleControler::cCycleControler(cTable* m_table, wxWindow* inst)
 {
@@ -153,7 +197,7 @@ void cCycleControler::start()
 	m_cycle->set_total_step_number(m_table_->get_step_number());
 	m_cycle->set_total_loop_number(m_table_->get_loop_number());
 
-	m_cycle->set_step_table(m_table_->get_step_table());
+	m_cycle->set_step_table(m_table_->get_step_table()); // Get steps vector
 
 		// Send the cycle to statistic module 
 	
