@@ -9,12 +9,6 @@
 #go modern
 cmake_minimum_required(VERSION 3.20)
 set(CMAKE_VERSION_CXX 23)
-set(USE_IRAM_BUILD OFF)
-if(USE_IRAM_BUILD)
-set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
- #"CMAKE_TOOLCHAIN_FILE": "/DEV/00-BIN/01-vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake"
-else()
- endif()
 
 #MSVC hot reload
 if(WIN32)
@@ -22,6 +16,11 @@ if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
+endif()
+
+set(USE_IRAM_BUILD ON)
+if(USE_IRAM_BUILD)
+  set(CMAKE_TOOLCHAIN_FILE "C:/DEV/00-BIN/01-vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
 project(
