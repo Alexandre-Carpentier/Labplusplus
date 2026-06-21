@@ -6,9 +6,13 @@
 # Licence:     LGPL-2.1-or-later
 #############################################################################
 
+############################################################
+# for vcpkg after ./vcpkg.exe integrate install
+set(CMAKE_TOOLCHAIN_FILE "C:/DEV/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
 #########################################################################
 # go modern
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 23)
 
 # Activez Rechargement à chaud pour les compilateurs MSVC si cela est pris en charge.
@@ -26,6 +30,9 @@ HOMEPAGE_URL https://github.com/Alexandre-Carpentier/Labplusplus
 
 message("[*] Configuring ${PROJECT_NAME}...")
 
-add_subdirectory(project)
+# deprecated project(legacy)
+add_subdirectory(project) 
+# new modern codebase 2026-05-08 
+add_subdirectory(application)
 
 message("[*] ${PROJECT_NAME} built.")

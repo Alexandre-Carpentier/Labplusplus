@@ -91,6 +91,7 @@ struct DATA{
 		std::fill(Ynorm.begin(), Ynorm.end(), 0);
 	}
 	std::string signame;
+	std::string unit;  // Unit label for this signal
 	float color[3] = { 0 };
 	bool show =false;
 	FILTER_M filter = FILTER_M::FILTER_NONE;
@@ -144,6 +145,7 @@ public:
 	bool SetSignalCount(const int iSignalNumber);
 	void SetSignalLabel(const char szLabel[260], const int iSignalNumber);
 	void SetSignalColor(const int R, const int G, const int B, const int iSignalNumber);
+	void SetSignalUnit(const char szUnit[64], const int iSignalNumber);  // Add this line
 	void SetSignalVisible(bool bDisplay, const int iSignalNumber);
 	void SetRecordingMode(LOGGER_M logging);
 	void SwapRecBuffer(bool swap);

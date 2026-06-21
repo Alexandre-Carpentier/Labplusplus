@@ -110,7 +110,7 @@ void cPlot::update_gui()
 				{
 					plot->SetSignalLabel(chan.channel_legend_name.c_str(), k);
 					plot->SetSignalColor((int)chan.channel_legend_color.Red(), (int)chan.channel_legend_color.Green(), (int)chan.channel_legend_color.Blue(), k);
-				
+					plot->SetSignalUnit(chan.channel_legend_unit.c_str(), k);
 					
 					chan_info_btn_pool[k]->set_name(chan.channel_legend_name);
 					chan_info_btn_pool[k]->set_address(chan.channel_legend_addr);

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+message registerInstrument
+{
+    string name = 1; // Agilent E3445A
+    string favoriteAddress = 2; // 192.168.0.2:8888
+    string type = 3; // R/W/RW
+    string acceptProtocol = 4; // ETH/USB/COM/GPIB
+
+    uint64 timestamp_ms = 5;
+}
+
+message response
+{
+    bool ok = 1;
+    uint64 timestamp_ms = 2;
+}
+
+service createInstrument
+{
+    rpc SendCommand(registerInstrument) returns (response){}
+}

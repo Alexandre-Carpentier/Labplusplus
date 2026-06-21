@@ -52,7 +52,7 @@ EVT_MAXIMIZE(cMain::Maximizeevt)
 wxEND_EVENT_TABLE()
 
 
-cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Lab++ logger - Alexandre CARPENTIER - 2025-10-29 - 1.8(Baybi)", wxPoint(200, 100), wxSize(1200, 600)), devmon(std::make_shared<cDeviceMonitor>())
+cMain::cMain() : wxFrame(nullptr, wxID_ANY, "Labplusplus - Alexandre CARPENTIER - 2026-05-08 - 1.8(Canopee)", wxPoint(200, 100), wxSize(1200, 600)), devmon(std::make_shared<cDeviceMonitor>())
 {
 #ifdef _DEBUG
 	//_crtBreakAlloc = 248;	

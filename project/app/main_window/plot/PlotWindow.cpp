@@ -35,7 +35,7 @@ PlotWindow::PlotWindow(wxWindow* parent, int width, int height, size_t point_num
     : wxGLCanvas(parent, wxID_ANY, nullptr, wxDefaultPosition, wxSize(width, height), wxFULL_REPAINT_ON_RESIZE),
     ctx_(std::make_unique<wxGLContext>(this)),
     gl_initialized_(false),
-	WinGraph(parent->GetHWND(), {0, 0, width, height}, MAX_SIGNAL_COUNT, 1000) // Example: 64 signals, buffer size 1000
+	WinGraph(parent->GetHWND(), {0, 0, width, height}, MAX_SIGNAL_COUNT, 40000) // Example: 64 signals, buffer size 1000
 {
 	std::print("[*] PlotWindow created with size {}x{}\\n", width, height);
 }
@@ -1542,8 +1542,45 @@ bool WinGraph::Render()
 			DrawString(-txtlen * 1.5f, ytmp - ((txtheight * 0.8f) / 2.0f), dtos(value, sizeof(value), reelval));
 			reelval += (m_graph.SnapPlot.Ymax - m_graph.SnapPlot.Ymin) / (float)div;
 		}
-	}
 
+		// Display signal units on Y-axis
+		glPushMatrix();
+		
+		// Save current color
+		GLfloat current_color[4];
+		glGetFloatv(GL_CURRENT_COLOR, current_color);
+		
+		float unit_x_pos = 0.03f;
+		float unit_y_start = 0.03f;
+		float unit_y_spacing = 0.05f;
+		
+		int visible_signal_count = 0;
+		for (int index = 0; index < m_graph.signalcount; index++)
+		{
+			if (m_graph.signals[index].show && !m_graph.signals[index].unit.empty())
+			{
+				// Set color to match signal color
+				glColor3f(
+					m_graph.signals[index].color[0],
+					m_graph.signals[index].color[1],
+					m_graph.signals[index].color[2]
+				);
+				
+				// Calculate vertical position for this unit
+				float y_pos = unit_y_start + (visible_signal_count * unit_y_spacing);
+				
+				// Draw unit label
+				DrawString(unit_x_pos, y_pos, const_cast<char*>(m_graph.signals[index].unit.c_str()));
+				
+				visible_signal_count++;
+			}
+		}
+		
+		// Restore initial color
+		glColor4fv(current_color);
+		
+		glPopMatrix();
+	}
 
 	// Display cursor with values if hoover
 
@@ -2528,4 +2565,21 @@ void WinGraph::DisplayPointer()
 	if (isMouseHover())
 	{
 	}
+}
+
+/*-------------------------------------------------------------------------
+	SetSignalUnit: set a unit label for a signal [0;MAXSIG-1]
+-------------------------------------------------------------------------*/
+
+void WinGraph::SetSignalUnit(const char szUnit[64], int iSignalNumber)
+{
+	if (iSignalNumber < 0 || iSignalNumber >= m_graph.signalcount)
+	{
+		std::print("[!] Error at SetSignalUnit()\nrange must be [1;{}] and is {}\n", m_graph.signalcount, iSignalNumber);
+		return;
+	}
+
+	printf("[*] Unit assigned to signal %i: %s\n", iSignalNumber, szUnit);
+	DATA* signal = &m_graph.signals[iSignalNumber];
+	signal->unit = szUnit;
 }
