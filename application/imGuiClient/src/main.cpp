@@ -179,10 +179,10 @@ int main() {
     // Essayer de charger la police système
     const char* systemFont = GetSystemFontPath();
     if (systemFont) {
-        std::cout << "Using system font: " << systemFont << "\n";
+        //std::cout << "[*] Using system font: " << systemFont << "\n";
         io.Fonts->AddFontFromFileTTF(systemFont, font_size, &config);
     } else {
-        std::cerr << "System font not found, using default font\n" ;
+        std::cerr << "[!] System font not found, using default font\n" ;
         io.Fonts->AddFontDefault(&config);
     }
 
