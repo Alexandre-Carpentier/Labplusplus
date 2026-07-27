@@ -194,7 +194,7 @@ int main() {
     PageView pageView;
     g_pageView = &pageView;
 
-    // Installer le callback de rafraîchissement pour le redimensionnement
+	// install refresh callback to handle window resizing and redraw content
     glfwSetWindowRefreshCallback(window, window_refresh_callback);
 
     // Main loop

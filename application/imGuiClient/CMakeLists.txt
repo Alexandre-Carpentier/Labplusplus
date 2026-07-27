@@ -71,9 +71,29 @@ add_library(implot STATIC ${IMPLOT_SOURCE})
 target_include_directories(implot PUBLIC ${implot_SOURCE_DIR})
 target_link_libraries(implot PUBLIC imgui)
 
-add_executable(labpp ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/src/pageView.h
-${CMAKE_CURRENT_SOURCE_DIR}/src/pageView.cpp
+# Fichiers sources de l'application
+set(LABPP_SOURCES
+    src/main.cpp
+    src/pageView.cpp
+    src/instrument.cpp
 )
 
+# Fichiers d'en-tête
+set(LABPP_HEADERS
+    src/pageView.h
+    src/instrument.h
+)
+
+# Instruments
+set(LABPP_INSTRUMENTS
+    src/instruments/pressureSensor.cpp
+    src/instruments/pressureSensor.h
+)
+
+# Créer l'exécutable avec tous les fichiers
+add_executable(labpp 
+    ${LABPP_SOURCES}
+    ${LABPP_HEADERS}
+    ${LABPP_INSTRUMENTS}
+)
 target_link_libraries(labpp PRIVATE implot)

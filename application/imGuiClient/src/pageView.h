@@ -7,32 +7,25 @@
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "instrument.h"
+#include <vector>
+#include <memory>
+
 class PageView {
 public:
     PageView();
     ~PageView();
 
     void Render();
+    
+    void AddInstrument(std::unique_ptr<IInstrument> instrument);
+    void RemoveInstrument(size_t index);
+    IInstrument* GetInstrument(size_t index);
 
 private:
     void RenderInstrumentList();
     void RenderInstrumentPage();
-    void RenderInstrument1();
-    void RenderInstrument2();
-    void RenderInstrument3();
 
+    std::vector<std::unique_ptr<IInstrument>> instruments;
     int selectedInstrument;
-    
-    float slider1;
-    float slider2;
-    float slider3;
-    int counter1;
-    int counter2;
-    bool checkbox1;
-    bool checkbox2;
-    bool checkbox3;
-    char textBuffer1[256];
-    char textBuffer2[256];
-
-    double s_pressure;
 };

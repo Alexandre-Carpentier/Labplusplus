@@ -18,7 +18,7 @@ if (POLICY CMP0141)
 endif()
 endif()
 
-set(USE_IRAM_BUILD ON)
+set(USE_IRAM_BUILD OFF)
 if(USE_IRAM_BUILD)
   set(CMAKE_TOOLCHAIN_FILE "C:/DEV/00-BIN/01-vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
