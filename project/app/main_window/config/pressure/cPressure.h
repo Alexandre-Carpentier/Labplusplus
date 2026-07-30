@@ -21,7 +21,7 @@ static wxPanel* pace_rightpanel_ = nullptr;
 class cPressure : public wxFrame
 {
 private:
-	DEVICE_CONFIG_STRUCT label;		// Control label configuration struct in memory
+	DEVICE_CONFIG_STRUCT label{};		// Control label configuration struct in memory
 	CURRENT_DEVICE_CONFIG_STRUCT config; // Current selected configuration
 	cSignalTable* signal_table_ = nullptr;
 

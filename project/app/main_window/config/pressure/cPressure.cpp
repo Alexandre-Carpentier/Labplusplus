@@ -29,6 +29,7 @@ cPressure::cPressure(wxWindow* inst, std::shared_ptr <cDeviceMonitor> devmon, cS
 	////////////////////////////////////////////////////////////
 	// Load default labels in memory
 	////////////////////////////////////////////////////////////
+	label.channel_index = 0;
 	label.device_enabled = false;	
 	label.device_name.clear();
 	for (auto device : dev_list)
