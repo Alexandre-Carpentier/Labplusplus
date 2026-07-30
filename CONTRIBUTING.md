@@ -14,6 +14,8 @@
 - Keep functions focused and single-purpose
 - Respect SOLID principles if possible.
 - Use modern C++ features whenever possible (smart pointers, range-based for loops, etc.)
+- Debug messages start with '[*]<text>.' and error follow the format '[!]<text>.'
 
 ### Git Commit Messages
 - Write commit messages in English
+- Commit will respect this format: refactor: (files or part impacted) <short description of the change>

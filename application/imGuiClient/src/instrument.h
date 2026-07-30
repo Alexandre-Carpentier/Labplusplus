@@ -7,45 +7,33 @@
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include <cstddef>
 #include <string>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+enum class InstrumentStatus {
+    OK = 0,
+    ErrorInit = -1,
+    ErrorConfig = -2,
+    ErrorIO = -3
+};
 
-// Interface C pour les instruments
-typedef void* InstrumentHandle;
-
-typedef enum {
-    INSTRUMENT_OK = 0,
-    INSTRUMENT_ERROR_INIT = -1,
-    INSTRUMENT_ERROR_CONFIG = -2,
-    INSTRUMENT_ERROR_IO = -3
-} InstrumentStatus;
-
-InstrumentStatus instrument_start(InstrumentHandle handle);
-InstrumentStatus instrument_configure(InstrumentHandle handle, const char* config);
-InstrumentStatus instrument_stop(InstrumentHandle handle);
-InstrumentStatus instrument_read(InstrumentHandle handle, void* data, size_t size);
-InstrumentStatus instrument_write(InstrumentHandle handle, const void* data, size_t size);
-
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
-// Interface C++ pour les instruments
 class IInstrument {
 public:
     virtual ~IInstrument() = default;
 
+    // Basic interface
     virtual const char* GetName() const = 0;
+    virtual const char* GetType() const = 0;
     virtual void Render() = 0;
     
+    // Control methods
     virtual InstrumentStatus Start() = 0;
     virtual InstrumentStatus Configure(const char* config) = 0;
     virtual InstrumentStatus Stop() = 0;
     virtual InstrumentStatus Read(void* data, size_t size) = 0;
     virtual InstrumentStatus Write(const void* data, size_t size) = 0;
+
+    // Serialization methods
+    virtual std::string SerializeToLua() const = 0;
+    virtual bool DeserializeFromLua(const std::string& luaCode) = 0;
 };
-#endif

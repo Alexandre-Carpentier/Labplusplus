@@ -15,6 +15,7 @@ public:
     ~PressureSensor() override = default;
 
     const char* GetName() const override { return "Pressure Sensor"; }
+    const char* GetType() const override { return "PressureSensor"; }
     void Render() override;
     
     InstrumentStatus Start() override;
@@ -22,6 +23,9 @@ public:
     InstrumentStatus Stop() override;
     InstrumentStatus Read(void* data, size_t size) override;
     InstrumentStatus Write(const void* data, size_t size) override;
+
+    std::string SerializeToLua() const override;
+    bool DeserializeFromLua(const std::string& luaCode) override;
 
 private:
     double pressure;
