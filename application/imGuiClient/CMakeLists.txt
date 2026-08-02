@@ -46,15 +46,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(imgui implot)
 
-# Fetch stb_image (header-only library)
-FetchContent_Declare(
-    stb
-    GIT_REPOSITORY https://github.com/nothings/stb.git
-    GIT_TAG master
-    GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(stb)
-
 # ImGui library
 add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -104,8 +95,8 @@ add_executable(labpp
 
     src/style.h
 
-    src/tab/instrumentConfig.cpp
-    src/tab/instrumentConfig.h
+    
+    
     src/tab/instrumentList.cpp
     src/tab/instrumentList.h
     src/tab/testSequence.cpp
@@ -124,7 +115,6 @@ target_include_directories(labpp PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/appEvents
 
     ${CMAKE_SOURCE_DIR}/out/build/x64-debug/_deps/lua-src
-    ${stb_SOURCE_DIR}  # Add stb include path
 )
 
 # Link libraries
