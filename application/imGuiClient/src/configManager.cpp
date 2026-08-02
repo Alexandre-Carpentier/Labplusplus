@@ -82,6 +82,11 @@ std::vector<std::unique_ptr<IInstrument>> ConfigManager::LoadConfig(const std::s
             const char* type = lua_tostring(L, -1);
             lua_pop(L, 1);
 
+            // Get name
+            lua_getfield(L, -1, "name");
+            const char* name = lua_tostring(L, -1);
+            lua_pop(L, 1);
+            
             // Get config
             lua_getfield(L, -1, "config");
             const char* config = lua_tostring(L, -1);
@@ -89,7 +94,7 @@ std::vector<std::unique_ptr<IInstrument>> ConfigManager::LoadConfig(const std::s
 
             if (type) {
                 // Create instrument using factory
-                auto instrument = InstrumentFactory::GetInstance().CreateInstrument(type);
+                auto instrument = InstrumentFactory::GetInstance().CreateInstrument(name);
                 if (instrument) {
                     if (config) {
                         instrument->DeserializeFromLua(config);

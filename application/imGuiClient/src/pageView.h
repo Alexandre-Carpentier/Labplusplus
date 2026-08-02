@@ -14,7 +14,6 @@
 #include "instrument.h"
 #include "configManager.h"
 
-#include "instrumentConfig.h"
 #include "instrumentList.h"
 #include "testSequence.h"    
 #include "plot.h"
@@ -37,7 +36,6 @@ public:
 
 private:
     // Tab rendering methods
-    void RenderInstrumentConfigTab();
     void RenderInstrumentListTab();
     void RenderTestSequenceTab();
     void RenderPlotTab();
@@ -57,9 +55,6 @@ private:
     
     // Plot tab methods
     void UpdatePlotData();
-    
-    // Header
-    void InitializeHeader();
 
     // Data members
     std::vector<std::unique_ptr<IInstrument>> instruments;
@@ -69,7 +64,6 @@ private:
     bool showAddInstrumentDialog;
     int selectedInstrumentType;
   
-    std::unique_ptr<InstrumentConfigTab> instrumentConfigTab;
     std::unique_ptr<InstrumentListTab> instrumentListTab;
     std::unique_ptr<TestSequenceTab> testSequenceTab ;
     std::unique_ptr<PlotTab> plotTab ;

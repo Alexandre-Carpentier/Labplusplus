@@ -16,8 +16,6 @@
 #include "instrumentFactory.h"
 #include "testStructures.h"
 
-
-
 PageView::PageView() 
     : selectedInstrument(0), 
       showAddInstrumentDialog(false),   
@@ -33,7 +31,6 @@ PageView::PageView()
     AddTestStep();
 
     // Initialize tabs
-    instrumentConfigTab = std::make_unique<InstrumentConfigTab>(instruments);
     instrumentListTab = std::make_unique<InstrumentListTab>(instruments, selectedInstrument);
     testSequenceTab = std::make_unique<TestSequenceTab>(testSteps, selectedStep);
     plotTab = std::make_unique<PlotTab>(plotData, currentTime, isRunningTest);
@@ -93,12 +90,7 @@ void PageView::Render() {
     ImGui::Begin("MainWindow", nullptr, window_flags);
 
     if (ImGui::BeginTabBar("MainTabBar", ImGuiTabBarFlags_None)) {
-        
-        if (ImGui::BeginTabItem("Instrument Config")) {
-            RenderInstrumentConfigTab();
-            ImGui::EndTabItem();
-        }
-        
+     
         if (ImGui::BeginTabItem("Instruments")) {
             RenderInstrumentListTab();
             ImGui::EndTabItem();
@@ -125,17 +117,7 @@ void PageView::Render() {
 }
 
 // ============================================================================
-// TAB 1: Instrument Config
-// ============================================================================
-void PageView::RenderInstrumentConfigTab() {
-
-    if (instrumentConfigTab) {
-        instrumentConfigTab->Render();
-    }
-}
-
-// ============================================================================
-// TAB 2: Instrument List
+// TAB 1: Instrument List
 // ============================================================================
 void PageView::RenderInstrumentListTab() {
     if (instrumentListTab) {
@@ -152,7 +134,7 @@ void PageView::RenderInstrumentPage() {
 }
 
 // ============================================================================
-// TAB 3: Test Sequence
+// TAB 2: Test Sequence
 // ============================================================================
 void PageView::RenderTestSequenceTab() {
     if (testSequenceTab) {
@@ -178,7 +160,7 @@ void PageView::RemoveTestStep(size_t index) {
 }
 
 // ============================================================================
-// TAB 4: Plot
+// TAB 3: Plot
 // ============================================================================
 void PageView::RenderPlotTab() {
     if (plotTab) {

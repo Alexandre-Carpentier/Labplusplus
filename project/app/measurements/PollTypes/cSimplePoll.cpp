@@ -78,10 +78,10 @@ void cSimplePoll::write_instruments()
 	
 	for (auto meas : m_meas_pool)
 	{
-		size_t length = meas->chan_write_count();
-		assert(length < MAX_CHAN);
+		size_t writeNumbers = meas->chan_write_count();
+		assert(writeNumbers < MAX_CHAN);
 
-		if (length > 0)
+		if (writeNumbers > 0)
 		{
 			size_t read;
 			
@@ -97,7 +97,7 @@ void cSimplePoll::write_instruments()
 
 			m_cycle_controler->cycle_mutex.unlock();
 
-			check_instr_setpoint(value, read, length);
+			check_instr_setpoint(value, read, writeNumbers);
 
 			//std::cout << "Value: " << value[0] << "\n";
 			//std::cout << "Old Value: " << old_value[0] << "\n";
