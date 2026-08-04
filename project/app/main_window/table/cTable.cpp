@@ -294,10 +294,21 @@ int cTable::get_step_number()
 	return get_last_active_line();
 }
 
+// Get total loops 0 to 99 for 100 loops.
 int cTable::get_loop_number()
 {
 	wxString loopnumber = loop->GetValue();
-	int iloopnumber = wxAtoi(loopnumber);
+	int iloopnumber = 0;
+	try {
+		iloopnumber = wxAtoi(loopnumber);
+	}
+	catch (std::exception e)
+	{
+		std::cout << "[!] cTable::get_loop_number() exception: " << e.what() << "\n";
+		iloopnumber = 0;
+	}
+
+	iloopnumber--; // 0 to max
 	if (iloopnumber < 0)
 		return 0;
 
@@ -319,11 +330,11 @@ std::vector<STEPSTRUCT> cTable::get_step_table()
 	std::vector<STEPSTRUCT> step_table;
 
 	// For each table line
-	for (int row = 0; row < get_last_active_line(); row++)
+	for (int row = 0; row <= get_last_active_line(); row++)
 	{
 
 		// Fill the step struc for each line
-		STEPSTRUCT step;
+		STEPSTRUCT step{};
 		step.duration = 0.0;
 		step.jumpcount = 0.0;
 		step.jumpto = 0.0;
@@ -449,7 +460,7 @@ int cTable::get_last_active_line()
 	{
 		if (!IsActiveLine(i))
 		{
-			return i;
+			return i-1;
 		}
 	}
 	return 0;

@@ -97,8 +97,12 @@ void cFooter::startButtonClicked(wxCommandEvent& evt)
 		m_plot_->show_all_signals(true);
 
 			// Sanity check
+		size_t steps = m_table_->get_step_number();
+		size_t loops = m_table_->get_loop_number();
+		assert(steps >= 0);
+		assert(loops >= 0);
 
-		if ((m_table_->get_loop_number() < 1) || (m_table_->get_step_number() < 1))
+		if ((m_table_->get_loop_number() < 0) || (m_table_->get_step_number() < 0))
 		{
 			wxCommandEvent evt = wxCommandEvent(wxEVT_COMMAND_TOOL_CLICKED, IDTOOL_EDITBTN);
 			wxPostEvent(inst_, evt);

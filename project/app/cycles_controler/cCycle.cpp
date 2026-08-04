@@ -42,6 +42,7 @@
 
 	std::shared_ptr<cCycle::CYCLESTRUCT> cCycle::get_cycles()
 	{
+		const std::lock_guard<std::mutex> lock(step_mutex);
 		assert(cycle != nullptr);
 		return cycle;
 	}
@@ -139,7 +140,7 @@
 
 	void cCycle::previous()
 	{
-		assert(cycle->current_step > 0);
+		assert(cycle->current_step >= 0);
 		const std::lock_guard<std::mutex> lock(step_mutex);
 		cycle->current_step--;
 	}
@@ -147,12 +148,14 @@
 	bool cCycle::next()
 	{
 		assert(cycle != nullptr);
-		assert(cycle->current_step < cycle->total_step);
+		assert(cycle->current_step <= cycle->total_step);
 		
 		const std::lock_guard<std::mutex> lock(step_mutex);
 		
 		// Get current step information
 		int current_step_index = cycle->current_step;
+
+		int total_steps = cycle->total_step;
 		
 		// Check if current step has a jump configured
 		if (current_step_index < static_cast<int>(cycle->step_table.size()))
@@ -194,8 +197,21 @@
 	int cCycle::get_jumpcount(const int index) { return cycle->step_table.at(index).jumpcount; }
 
 	double cCycle::get_duration() {
+		if (cycle->current_step > cycle->total_step)
+		{
+			std::cout << "[!] cCycle::get_duration() - Current step (" << cycle->current_step << ") exceeds total steps (" << cycle->total_step << "), returning 0\n";
+			return 0;		
+		}
+
 		const std::lock_guard<std::mutex> lock(step_mutex);
-		return cycle->step_table.at(cycle->current_step).duration;
+		auto duration = cycle->step_table.at(cycle->current_step).duration;
+		if(duration <0)
+		{
+			std::cout << "[!] cCycle::get_duration() - Invalid duration (" << duration << ") at step " << cycle->current_step << ", returning 0\n";
+			return 0;
+		}
+		// OK
+		return duration;
 	}
 	double cCycle::get_duration(const int index) {
 		const std::lock_guard<std::mutex> lock(step_mutex);

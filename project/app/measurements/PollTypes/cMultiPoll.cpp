@@ -86,18 +86,22 @@ void cMultiPoll::write_instruments()
 
 				// protect
 
-			m_cycle_controler->cycle_mutex.lock();
+			std::lock_guard<std::mutex> lock(m_cycle_controler->cycle_mutex);
 
 			double value[MAX_CHAN];
-			STEPSTRUCT step = m_cycle_controler->get_current_step_param();
-			bool success = get_instr_setpoint(meas, step, value, &read);
+			STEPSTRUCT step{};
+			bool success = m_cycle_controler->get_current_step_param(step);
+			if(!success)
+			{
+				std::cout << "[!] cMultiPoll: Failed to get current step.\n";
+				continue;
+			}
 
-				// unprotect
-
-			m_cycle_controler->cycle_mutex.unlock();
-
+			// get setpoint from cycle controler
+			success = get_instr_setpoint(meas, step, value, &read);
 			if (!success)
 			{
+				std::cout << "[!] cMultiPoll: Failed to get instrument setpoint.\n";
 				continue;
 			}
 

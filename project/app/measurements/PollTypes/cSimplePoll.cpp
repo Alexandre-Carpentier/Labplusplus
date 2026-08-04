@@ -29,10 +29,10 @@ void cSimplePoll::runonce()
 
 		// Check everything is ok
 
-	assert(m_cycle_controler->get_total_loop() > 0);
-	assert(m_cycle_controler->get_total_step() > 0);
+	assert(m_cycle_controler->get_total_loop() >= 0); // 0 to n
+	assert(m_cycle_controler->get_total_step() >= 0);// 0 to n
 	assert(m_cycle_controler->get_total_step() < 300);
-	assert(m_cycle_controler->get_current_loop() > 0);
+	assert(m_cycle_controler->get_current_loop() >= 0);// 0 to n
 	if (m_plot->get_graph_state() == false)
 	{
 		std::print("[!] cMeasurementcontroler->get_graph_state() state = stop\n");
@@ -59,15 +59,24 @@ void cSimplePoll::stop() {
 
 // Helper functions
 // Used by write instruments methods
-inline void check_instr_setpoint(double value[MAX_CHAN], size_t read, size_t len)
+inline bool check_instr_setpoint(double value[MAX_CHAN], size_t read, size_t len)
 {
 	std::cout << std::format("[GET] double[]:{};{};{};{}, length:{}\n", value[0], value[1], value[2], value[3], read);
 	if (len != read)
 	{
 		MessageBox(GetFocus(), L"Can't read instrument command in the table view\n", L"Fail", S_OK);
+		assert(len == read);
+		return false;
 	}
-	assert(len == read);
-	assert(read < MAX_CHAN);
+
+	if (read > MAX_CHAN)
+	{
+		MessageBox(GetFocus(), L"[!] Read > MAX_CHAN\n", L"Fail", S_OK);
+		assert(read < MAX_CHAN);
+		return false;
+	}
+
+	return true;
 }
 
 void cSimplePoll::write_instruments()
@@ -84,18 +93,22 @@ void cSimplePoll::write_instruments()
 		if (writeNumbers > 0)
 		{
 			size_t read;
-			
-				// protect
-
-			m_cycle_controler->cycle_mutex.lock();
 
 			double value[MAX_CHAN] = { 0 };
-			STEPSTRUCT step = m_cycle_controler->get_current_step_param();	
-			bool success = get_instr_setpoint(meas, step, value, &read);
+			STEPSTRUCT step{};
+			bool success = m_cycle_controler->get_current_step_param(step);
+			if (!success)
+			{
+				std::cout << "[!] cSimplePoll: Failed to get current step.\n";
+				return;
+			}
 
-				// unprotect
-
-			m_cycle_controler->cycle_mutex.unlock();
+			success = get_instr_setpoint(meas, step, value, &read);
+			if (!success)
+			{
+				std::cout << "[!] cSimplePoll: Failed to get instrument setpoint.\n";
+				return;
+			}
 
 			check_instr_setpoint(value, read, writeNumbers);
 

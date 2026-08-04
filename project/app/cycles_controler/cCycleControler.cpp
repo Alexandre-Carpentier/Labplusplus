@@ -47,7 +47,7 @@ int cCycleControler::get_total_loop()
 	return m_cycle->get_total_loop_number();
 }
 
-STEPSTRUCT cCycleControler::get_current_step_param()
+bool cCycleControler::get_current_step_param(STEPSTRUCT currentStep)
 {
 	std::atomic <int> step = m_cycle->get_current_step();
 	std::vector<STEPSTRUCT> step_struct_vec = m_cycle->get_step_table();
@@ -55,8 +55,10 @@ STEPSTRUCT cCycleControler::get_current_step_param()
 	if (step_struct_vec.size() == 0)
 	{
 		std::cout << "[!] Error in cCycleControler: std::vector<STEPSTRUCT> step_struct_vec = m_cycle->get_step_table() return 0\n"; 
+		return false;
 	}
-	return step_struct_vec[step];
+	currentStep = step_struct_vec[step];
+	return true;
 }
 
 void cCycleControler::poll()
@@ -70,7 +72,8 @@ void cCycleControler::poll()
 	while (!stop_source.stop_requested())
 	{
 		// Highlight current step
-		m_table_->set_line_highlight(m_cycle->get_current_step());
+		auto stepPos = m_cycle->get_current_step();
+		m_table_->set_line_highlight(stepPos);
 		
 		// Wait for step duration
 		if (!wait_for_step_duration(stop_source))
@@ -125,12 +128,24 @@ bool cCycleControler::is_cycle_completed() const
 {
 	int total = m_cycle->get_total_step_number();
 	int current = m_cycle->get_current_step();
-	return (total - current == 0);
+
+	// continue
+	if (current <= total)
+	{
+		return false;
+	}
+	
+	// cycle completed
+	return true;
 }
 
 bool cCycleControler::handle_cycle_completion(const std::stop_source& stop_source)
 {
 	std::cout << "[*] Cycle controler step end\n";
+
+	// Reset to first step for next loop
+	m_cycle->set_current_step(0);
+
 	m_table_->set_lines_white();
 	
 	std::atomic<int> loop_count = m_cycle->get_current_loop();
@@ -140,7 +155,6 @@ bool cCycleControler::handle_cycle_completion(const std::stop_source& stop_sourc
 		// Start next loop
 		std::cout << "[*] Cycle controler next cycle loaded\n";
 		loop_count--;
-		m_cycle->set_current_step(0);
 		m_cycle->set_current_loop(loop_count);
 		m_table_->set_loop_count(loop_count);
 		
@@ -191,13 +205,16 @@ void cCycleControler::start()
 
 	assert(m_cycle != nullptr);
 	assert(m_table_ != nullptr);
+
+	size_t loop_number = m_table_->get_loop_number(); // loop max-1 -> 0 to XXX
+
 	m_cycle->clear_cycles();
 	m_cycle->set_current_step(0);
-	m_cycle->set_current_loop(m_table_->get_loop_number());
-	m_cycle->set_total_step_number(m_table_->get_step_number());
-	m_cycle->set_total_loop_number(m_table_->get_loop_number());
-
-	m_cycle->set_step_table(m_table_->get_step_table()); // Get steps vector
+	m_cycle->set_current_loop(loop_number); // loop max-1 -> 0 to XXX
+	m_cycle->set_total_step_number(m_table_->get_step_number());  // 0 to XXX...
+	m_cycle->set_total_loop_number(loop_number); // 0 to XXX...
+	auto tab = m_table_->get_step_table();
+	m_cycle->set_step_table(tab); // Get steps vector
 
 		// Send the cycle to statistic module 
 	
