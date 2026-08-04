@@ -600,11 +600,11 @@ void cDurationStatisticCtrl::start(std::shared_ptr<cCycle> m_cycle)
 	wxString elapsed_timestamp = "Elapsed: 0.0 s";// +add_to_current_timestamp(0.0);
 	elapsed->SetLabelText(elapsed_timestamp);
 
-	saved_total_cycle = m_cycle->get_current_loop();
+	saved_total_cycle = m_cycle->get_current_loop()+1;
 	
 	int j = m_cycle->get_total_step_number();
 	saved_total_step = j;
-	wxString cycle_status = std::format("Performed: 0/{} cyles", saved_total_cycle);
+	wxString cycle_status = std::format("Performed: 1/{} cyles", saved_total_cycle);
 	cycle_step_state->SetLabelText(cycle_status);
 
 	// Update timestamp every 0.5s with a timer event
@@ -781,8 +781,11 @@ void cDurationStatisticCtrl::Notify()
 	elapsed->SetLabelText(elapsed_timestamp);
 
 	// Compute number of cycle performed
-	size_t current_cycle = m_cycle_->get_total_loop_number()- (m_cycle_->get_current_loop());
+	size_t current_cycle = m_cycle_->get_total_loop_number()- (m_cycle_->get_current_loop())+1;
 	size_t total_cycle = saved_total_cycle;
+
+	if(total_cycle==0)
+		total_cycle = 1; // avoid division by zero
 
 	// zu or Iu to print size_t integer value -> after MSVC2013 we can use zu, before it was not ANSI compatible and is %Iu formater.
 	//wxString performed = wxString::Format("Performed: %Iu/%Iu", current_cycle, total_cycle); // Use %Iu for MSW %zu otherwize to print size_t number
