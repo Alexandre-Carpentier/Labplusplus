@@ -47,7 +47,7 @@ int cCycleControler::get_total_loop()
 	return m_cycle->get_total_loop_number();
 }
 
-bool cCycleControler::get_current_step_param(STEPSTRUCT currentStep)
+bool cCycleControler::get_current_step_param(STEPSTRUCT& currentStep)
 {
 	std::atomic <int> step = m_cycle->get_current_step();
 	std::vector<STEPSTRUCT> step_struct_vec = m_cycle->get_step_table();

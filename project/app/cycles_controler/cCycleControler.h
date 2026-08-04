@@ -28,7 +28,7 @@ public:
 	int get_current_loop();
 	int get_total_step();
 	int get_total_loop();
-	bool get_current_step_param(STEPSTRUCT currentStep);
+	bool get_current_step_param(STEPSTRUCT& currentStep);
 	~cCycleControler();
 
 private:
