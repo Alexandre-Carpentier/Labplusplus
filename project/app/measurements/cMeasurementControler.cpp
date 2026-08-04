@@ -408,9 +408,9 @@ void cMeasurementControler::start()
 
 void cMeasurementControler::stop()
 {
-	std::cout << "cMeasurementcontroler->stoping...\n";
-	measurement_controler_thread.request_stop();
-	std::cout << "cMeasurementcontroler has joined...\n";
+    std::cout << "[*] cMeasurementControler->stopping...\n";
+    measurement_controler_thread.request_stop();
+    std::cout << "[*] cMeasurementControler has joined...\n";
 }
 
 double cMeasurementControler::get_aquisition_rate()

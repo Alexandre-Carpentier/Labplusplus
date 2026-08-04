@@ -74,6 +74,3 @@ public:
 	cFooter* get_footer();
 };
 
-// C++
-//auto manager = cObjectmanager::getInstance();
-
