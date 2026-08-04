@@ -38,7 +38,7 @@ void cInicfg::load_table(void)
 	cfg = new wxFileConfig(wxEmptyString, wxEmptyString, configfile, wxEmptyString, wxCONFIG_USE_LOCAL_FILE, wxConvAuto());
 	cfg->SetPath(wxT("TABLE"));
 
-	for (int line = 0; line < MAX_TABLE_LINE; line++)
+	for (int line = 0; line <= MAX_TABLE_LINE; line++)
 	{
 		int col_count = m_table->grid->GetNumberCols();
 		for (int col = 0; col < col_count; col++)
@@ -57,7 +57,10 @@ void cInicfg::load_table(void)
 			if (col_name == "Duration (s)")
 			{
 				std::string col_name_position = std::format("{}_{}", col_name.ToStdString(), line);
-				if (cfg->Read(col_name_position, &str)) { m_table->grid->SetCellValue(line, col, str); }		
+				if (cfg->Read(col_name_position, &str)) 
+				{ 
+					m_table->grid->SetCellValue(line, col, str); 
+				}		
 			}
 			/*
 			index = wxString::Format("row%icol%i", line, col);
@@ -109,7 +112,7 @@ void cInicfg::save_table(void)
 	//cfg->DeleteAll();
 
 	wxString str;
-	for (int line = 0; line < row_count; line++)
+	for (int line = 0; line <= row_count; line++)
 	{
 		int col_count = m_table->grid->GetNumberCols();
 		for (int col = 0; col < col_count; col++)

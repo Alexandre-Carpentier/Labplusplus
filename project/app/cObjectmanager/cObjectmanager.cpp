@@ -82,7 +82,4 @@ void cObjectmanager::kill()
             m_daq_ = nullptr;
         }
     }
-
-    // Optionally reset other internal state
-    // e.g. any vectors/lists of pointers maintained by the manager.
 }
